@@ -1,0 +1,47 @@
+<html t:type="layout" 
+	title="${message:manage} ${message:sysrole}"
+	breadcrumb="${message:control-panel}=admin,${message:manage} ${message:sysrole}=admin/sysrole"
+	totalShowOption="${totalSize}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="systemtools"/></p:leftMenuBlk>
+
+	<p:actionBtns >
+		<a href="#" t:type="pageLink" page="admin/sysrole/edit" class="button rounded">
+				 	<span>${message:add-new} ${message:sysrole}</span></a>
+		<a href="#" t:type="pageLink" page="admin/sysrole/privilege" class="button rounded">
+				 	<span>${message:sysrole-privilege}</span></a>
+	</p:actionBtns>
+
+
+	<table class="actionToolBar">
+		<tr>
+			<td class="right">		 	
+				
+			</td>
+		</tr>
+	</table>
+
+		
+	<t:grid t:id="sysRolesGrid" source="sysRoles" row="sysRole" class="stickyHeader t-data-grid"
+		t:rowsPerPage="rowsPerPage" 
+		t:pagerPosition="bottom"
+		exclude="id,system,displayName"
+		add="userCount,action"
+		>
+		<p:userCountCell>
+			${getCountUserBySysRole(sysRole)}
+		</p:userCountCell>
+		<p:actionCell>
+				<t:pagelink t:id="edit" page="admin/sysrole/edit" context="sysRole.id" class="button rounded">
+	          	<span>${message:edit}</span>
+	         </t:pagelink>
+	         
+	         <t:actionlink t:id="delete" context="sysRole.id" class="button rounded"
+	         	onclick="return confirmDelete('${message:confirm-permanent-delete-item}')">
+	          	<span>${message:delete}</span>
+	         </t:actionlink>
+		</p:actionCell>
+	
+	</t:grid>
+
+</html>

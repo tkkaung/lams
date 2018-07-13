@@ -1,0 +1,212 @@
+<html t:type="layout" 
+		title="${message:enroll-org-supervisor}"
+		currentModule="prop:moduleName"
+		currentProj="curProj" 
+		breadcrumb="${curProj.encodeddisplayname}=project/home?${curProj.id}
+			,${message:enroll-org-supervisor}=project/managemember?${curProj.id}"
+		xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" 
+      xmlns:p="tapestry:parameter">
+   
+	
+	<style>
+		.rtitle{
+			font-size: 15px;
+		}
+		.t-zone{
+			background-color: #fff;
+		}
+	</style>
+	
+	
+	<p:legendBlk>
+		<span class="required">*</span>  ${message:required-fields}
+		<div>
+			${message:notify-enroll-org-sup}
+		</div>
+	</p:legendBlk> 
+	
+	<table class="actionToolBar">
+		<tr>
+			<td class="right">
+			</td>
+		</tr>
+	</table>
+	
+ 	
+			
+		<table class="nomargin">
+		<tr>
+			<td valign="top" style="padding:3px;">
+			<div >
+				
+					<div class="rtitle">${message:check-exist-user-email}</div>
+					<form t:type="form" t:id="checkUserForm" t:zone="existUserZone" >
+						<t:errors/>
+						<table>
+							<tr>
+								<td class="label"><t:label for="username_email">${message:username-email-label}</t:label><span class="required">*</span></td>
+								<td>
+									<t:textfield t:id="username_email" value="usernameEmail" class="mwidth" validate="required"/>
+									<t:submit t:id="check" value="${message:check-exist-user-email-button}" class="submit squared" />
+								</td>
+							</tr>
+						</table>
+					</form>
+					
+					<t:zone t:id="existUserZone" id="existUserZone" />
+			
+				<t:block t:id="usersBlock">
+					<table class="t-data-grid">
+					<t:loop source="resultUsers" value="resultUser">
+								<tr class="uDiv">
+									<td>
+										${message:username-label}: 
+										<br/>${message:name-label}: 
+										<br/>${message:email-label}: 
+										<t:if test="resultUser.organization">
+											<br/>${message:organization-label}:
+										</t:if>
+										<t:if test="resultUser.jobTitle">
+											<br/>${message:jobTitle-label}:
+										</t:if>
+									</td>
+									<td>
+										${resultUser.username}
+										<br/><t:pagelink page="user/view" context="resultUser.id"> ${resultUser.displayname}</t:pagelink>
+										<br/>${resultUser.email}
+										<t:if test="resultUser.organization">
+											<br/>${resultUser.organization}
+										</t:if>
+										<t:if test="resultUser.jobTitle">
+											<br/>${resultUser.jobTitle}
+										</t:if>
+									</td>
+									<td>
+										<t:if test="hasEnrolled(resultUser)">
+											<div style="padding:5px;">
+												<a  class="button disabled rounded" disabled="disabled">
+													<span>${message:submit-and-enroll}</span>
+												</a>
+											</div>
+											<span class="attention">${message:user-already-enrolled}</span>
+											
+											
+											<p:else>
+												<t:eventlink event="enrollUser" context="resultUser.id" class="button rounded">
+													<span>${message:submit-and-enroll}</span>
+												</t:eventlink>
+											</p:else>
+										</t:if>
+										
+									</td>
+								</tr>
+						
+						
+								<p:empty>
+									<div style="padding:5px;margin:5px;background-color:#f5f5f5;">
+										${message:user-not-found}
+										<div>
+											<t:eventLink event="addNewUser" t:zone="newUserZone" context="usernameEmail">${message:add-new-user}</t:eventLink>
+										</div>
+									</div>
+									
+									<t:zone t:id="newUserZone" id="newUserZone" style="margin:5px;"/>
+									
+								</p:empty>
+							</t:loop>
+					</table>
+				</t:block>
+					
+					
+					
+				
+				<t:block t:id="newUserBlock">
+					<form t:type="form" t:id="newUserForm" id="newUserForm" >
+						<t:errors/>
+						
+						<div class="rtitle">${message:add-new-user}</div>
+						<table>
+							<tr>
+								<td class="label"><t:label for="email">${message:email-label}</t:label><span class="required">*</span></td>
+								<td>
+									<t:textfield t:id="email" value="newUser.email" class="mwidth" validate="required,regexp"/>
+									<br/><span class="formtip">${message:org-supervisor-email-tip}</span>
+								</td>
+							</tr>
+							<tr>
+								<td class="label">${message:firstName-label}<span class="required">*</span></td>
+								<td><t:textfield value="newUser.firstname" class="mwidth"/></td>
+							</tr>
+							<tr>
+								<td class="label">${message:lastName-label}<span class="required">*</span></td>
+								<td><t:textfield value="newUser.lastName" class="mwidth"/></td>
+							</tr>
+							<tr>
+								<td class="label">${message:organization-label}</td>
+								<td><t:textfield value="newUser.organization" class="mwidth"/></td>
+							</tr>
+							<tr>
+								<td class="label">${message:jobTitle-label}</td>
+								<td><t:textfield value="newUser.jobTitle" class="mwidth"/></td>
+							</tr>
+							<tr>
+								<td class="label">${message:phone-label}</td>
+								<td><t:textfield value="newUser.phone" class="mwidth"/></td>
+							</tr>
+							<tr>
+								<td class="label">${message:notify-the-member-label}</td>
+								<td>
+									<input t:type="checkbox" t:id="notifyMember" value="notifyMember" />
+								</td>
+							</tr>
+							<tr>
+								<td></td>
+								<td>
+									<t:submit t:id="submit" value="${message:add-and-enroll}" class="submit squared" />
+								</td>
+							</tr>
+						</table>
+					</form>
+				</t:block>
+			</div>
+			</td>
+			<td >
+				<div style="border-left: 1px #ececec solid;width:10px;min-height:290px;height:auto!important;_height:290px;">
+					<t:outputraw value="getSpace()"/>
+				</div>
+			</td>
+			<td valign="top" class="assign-half">
+				<div >
+					<div class="table-data-grid-header">${message:assigned-members}</div>
+					<t:grid source="selMembers" row="selMember"
+						add="role,action"
+						include="username,displayName"
+						id="userGrid2"
+						>
+						
+						<p:displayNameCell>
+							<t:pagelink page="user/view" context="selMember.id">${selMember.displayName}</t:pagelink>
+						</p:displayNameCell>
+						<p:roleCell>
+							${getCurProjUser(selMember, curProj).role.displayName}
+							<t:if test="curProjUser.customRoleName">
+								(<span class="customRoleName">${curProjUser.customRoleName}</span>)
+							</t:if>
+						</p:roleCell>
+						<p:actionCell>
+							<t:if test="canRemoveOrgSupervisor(curProjUser)">
+								<t:eventlink event="unEnrollUser" context="selMember.id" class="button rounded">
+									<span>${message:submit-and-unenroll}</span>
+								</t:eventlink>
+							</t:if>
+						</p:actionCell>
+						
+						<p:empty><div class="notfoundtext">${message:no-member-assigned}</div></p:empty>
+					</t:grid>
+				</div>
+			</td>
+		</tr>
+		</table>
+	
+	
+</html>

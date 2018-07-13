@@ -1,0 +1,59 @@
+<html t:type="layout" 
+	title="${message:list-user}"
+	breadcrumb="${message:control-panel}=admin,${message:list-user}=user/list"
+	totalShowOption="${totalSize}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="user"/></p:leftMenuBlk>
+
+	<style>
+		div.functionBar a {
+			font-weight: bold;
+		}
+		div.functionBar .highlight{
+			color: #ff9c00;
+		}
+	
+	</style>
+	
+	
+	<table class="actionToolBar">
+		<tr>
+			<td class="left">
+				
+			</td>	
+			<td class="right">	
+				<div class="functionBar">
+					<span t:type="loop" t:source="charList" t:value="character">
+						<t:actionLink t:id="startWith" t:context="character" class="prop:classForChar">
+						${character}</t:actionLink>
+						|
+					</span>
+				</div>
+			
+			<form t:type="form" t:id="searchForm" autofocus="false">
+				${message:search}:
+				<t:select value="filterType" blankoption="never" model="FilterTypeModel"/>
+				<t:textfield t:id="searchText" value="searchText" />
+				${message:in} <t:select t:id="searchIn" value="searchIn" blankLabel="${message:-all-}"/>
+				<input type="submit" value="${message:go}" class="squared" />
+			</form>	 	
+			</td>
+		</tr>
+	</table>
+	
+	<t:grid source="users" row="user" class="stickyHeader t-data-grid"
+		include="username,firstName,lastName,email" 
+		rowsPerPage="rowsPerPage"
+		pagerPosition="bottom"
+		rowClass="prop:evenodd.next">
+		<p:empty>
+			<div class="notfoundtext">${message:no-user-found}</div>
+		</p:empty>
+		<p:usernameCell>
+			<t:pagelink page="user/view" context="user.id">${user.username}</t:pagelink>
+		</p:usernameCell>
+		
+	</t:grid>
+
+
+</html>

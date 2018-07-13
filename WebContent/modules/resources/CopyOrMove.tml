@@ -1,0 +1,109 @@
+<html t:type="layout" 
+	title="${getModuleDisplayName(curProj)}"
+	currentModule="${moduleName}"
+	currentProj="curProj"
+	breadcrumb="${curProj.encodeddisplayname}=project/home?${curProj.id}
+		,${getModuleDisplayName(curProj)}=modules/resources/home?${curProj.id}
+		${getBreadcrumbLink()}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+<style>
+	.t-zone{
+		background: none;
+	}
+	
+</style>
+
+<p:actionBtns>
+	
+</p:actionBtns>
+
+
+<table class="actionToolBar">
+	<tr>
+		<td class="right">
+		</td>
+	</tr>
+</table>	
+
+<div >
+<t:form t:id="destinationFolderForm">
+   <t:errors/>
+<table width="100%" >
+  <tr style="width:150px">
+  	 <td ></td>
+  	 <td><strong>${message:select-destination-folder}:</strong></td>
+  </tr>
+  <tr >
+  	 <td ></td>
+    <td >
+	    	<div style="padding:10px;">
+	    		<t:if test="treeNodes">
+		    		<t:Tree treeid="literal:rsrcTree" source="treeNodes" currentNode="node">
+				        <a  href="javascript:void(0);"
+				        		onclick="nodeClicked(this, '${node.identifier}'); return false;"
+				        		class="${isCurNodeClass(selectedNode, node)}" 
+				        		title="${node.des}"
+				        		>
+				        		${truncateStr(node.name)}
+				        </a>
+				        <span class="tips"> (${countResourcesByFolder(node.getIdentifier())})</span>
+			      </t:Tree>
+			      <p:else>
+			      	<div class="notfoundtext">${message:no-folder-created}</div>
+			      </p:else>
+		      </t:if>
+		    </div>
+    	</td>
+    </tr>
+  <tr >
+  	 <td ></td>
+  	 <td><t:outputraw value="${getDisplayMessage()}"/></td>
+  </tr>
+  <tr >
+  	 <td ></td>
+  	 <td style="padding:15px;">
+    	
+    		<t:textfield t:id="destFolderId" id="destFolderId" t:value="destFolderId" style="display:none;"/>
+    		<t:submit t:id="submit" value="${getStartActionMessage()}" class="squared" />
+    	
+    </td>
+  </tr>
+    
+  
+</table>
+</t:form>
+</div>
+
+
+
+<script type="text/javascript">
+	
+	function nodeClicked(elm, nodeId){
+		$$('#rsrcTree .selected').each(function(e){
+			e.removeClassName("selected");
+		});
+		$(elm).addClassName("selected");
+		$('destFolderId').value = nodeId;
+		
+	}
+	
+	function initTree(imgFolder){
+	   treeObj = new JSDragDropTree();
+	   treeObj.setTreeId("rsrcTree");
+	   treeObj.setImageFolder(imgFolder);
+	   treeObj.setRenameAllowed(false);
+	   treeObj.setDeleteAllowed(false);
+	   treeObj.initTree();
+	   treeObj.expandAll();
+   }
+   
+   document.observe("dom:loaded", function(){
+  		initTree('${context:modules/resources/img}/');
+  		
+  	});
+  	
+</script>
+
+</html>

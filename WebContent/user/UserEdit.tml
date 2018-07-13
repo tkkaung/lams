@@ -1,0 +1,49 @@
+<html t:type="layout" 
+	title="${message:page-title}"
+	breadcrumb="${message:control-panel}=admin,${message:your-info}=user/viewyourinfo
+	,${message:page-title}=user/edit"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="user"/></p:leftMenuBlk>
+	<p:legendBlk>
+		<span class="required">*</span>  ${message:required-fields}
+	</p:legendBlk>
+
+		<t:beaneditform  object="user" t:id="userForm" model="model" autofocus="false"
+			submitLabel="message:submit-label"		>
+			<t:parameter name="username">
+		    	<label >${message:username-label}</label>
+		      	${user.username}
+	    	</t:parameter>		
+			<t:parameter name="firstname">
+	    		<label >${message:firstname-label}</label>
+		      ${user.firstname}
+		    </t:parameter>
+		     <t:parameter name="lastname">
+		    	<label >${message:lastname-label}</label>
+		      ${user.lastname}
+		    </t:parameter>
+		    <t:parameter name="organization">
+		    	<t:label for="organization"/>
+		      <t:textfield t:id="organization" value="user.organization" class="mwidth"/>
+		    </t:parameter>
+		    <t:parameter name="jobTitle">
+		    	<t:label for="jobTitle"/>
+		      <t:textfield t:id="jobTitle" value="user.jobTitle" class="mwidth"/>
+		    </t:parameter>
+		    <t:parameter name="email">
+		    	<label for="email">${message:email-label}</label>
+		      <t:if test="canChangeEmail(user)">
+		      	<t:textfield t:id="email" value="user.email" class="mwidth" validate="email,required"/>
+		      	<p:else>
+		      		${user.email}
+		      	</p:else>
+		      </t:if>
+		      
+		      
+		    </t:parameter>
+	    	
+	    	
+		</t:beaneditform>
+	
+</html>

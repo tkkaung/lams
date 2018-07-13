@@ -1,0 +1,130 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+   "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+	xmlns:p="tapestry:parameter">
+
+	<head>
+		<title>eUreka 2.0 Login</title>
+		
+		<style>
+			body{
+				background: #fff;
+			}
+			table.loginFormTbl td{
+				text-align: left;
+			}
+			input[type="text"]{
+				witdh: 160px;
+			}
+		</style>
+	
+	
+	</head>
+	<body>
+		
+		
+		
+		
+		<table width="100%">
+			<tr>
+				<td width="195px">
+					<table width="100%" height="400" align="center" border="0"
+						cellspacing="2" cellpadding="5" class="loginboxmain">
+						<tr>
+							<td height="80">
+								<img t:type="any" src="context:lib/img/ntulogo.jpg" border="0" />
+							</td>
+						</tr>
+						<tr>
+							<td valign="top" align="center" class="body-text-normal"
+								colspan="2">
+								<table width="100%" height="100" border="0" cellpadding="3"
+									cellspacing="0" class="loginbox">
+									<tr>
+										<td height="20" bgcolor="#0066FF" align="left" colspan="2">
+											<b>
+												<font color="white">Login</font>
+											</b>
+
+										</td>
+									</tr>
+									<tr>
+										<td>
+
+											<t:form t:id="loginForm">
+												<t:errors banner="literal:You must correct the following errors:" />
+												<table class="loginFormTbl">
+													<tr>
+														<td><t:label for="usernameeu" >${message:username-label}</t:label></td>
+														<td><t:textfield t:id="usernameeu" validate="required" value="username" /></td>
+													</tr>
+													<tr>
+														<td><t:label for="passwordeu" >${message:password-label}</t:label></td>
+														<td><t:passwordfield t:id="passwordeu"  autocomplete="off" value="password" /></td>
+													</tr>
+													<t:if test="ctext1">
+														<tr>
+															<td>Confirm text:</td>
+															<td>
+																<div>
+																	 <div class="capchaTxt">${ctext1}</div> 
+																	<t:textfield t:id="ctext2" value="ctext2" />
+																</div>
+															</td>
+														</tr>
+													</t:if>
+													<tr>
+														<td>&nbsp;</td>
+														<td>
+															<t:submit id="LoginSubmit" value="Login" />
+														</td>
+													</tr>
+												</table>
+											</t:form>
+										</td>
+									</tr>
+
+									
+
+								</table>
+							</td>
+						</tr>
+						
+						<tr>
+							<td class="header-text-small" align="left">
+								${getServerId()} Copyright 2004-${getYear()}
+								<br />
+								
+							</td>
+						</tr>
+
+						
+					</table>
+
+
+
+				</td>
+				
+			</tr>
+		</table>
+
+	</body>
+	
+	<script>
+		document.observe("dom:loaded", function(){
+  			var WindowSize = Class.create({
+			   width: window.innerWidth || (window.document.documentElement.clientWidth || window.document.body.clientWidth),
+			   height: window.innerHeight || (window.document.documentElement.clientHeight || window.document.body.clientHeight)
+			});
+  			
+  			
+  		});
+	
+	</script>
+	
+</html>
+
+	
+	 
+    
+

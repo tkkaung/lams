@@ -1,0 +1,74 @@
+<html t:type="layout" 
+	title="${message:page-title}"
+	breadcrumb="${message:control-panel}=admin,${message:page-title}=user/firstlogin"
+   xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+  
+	<p:legendBlk>
+		<span class="required">*</span>  ${message:required-fields}
+	</p:legendBlk>
+
+	<div style="margin: 10px;">
+		${message:notify-message}
+	</div>
+	
+	<div class="t-beaneditor">
+		<form t:type="form" t:id="userForm">
+			<t:errors />
+			<fieldset>
+    			<legend>${message:your-info}</legend>
+				<div class="t-beaneditor-row">
+				  <label for="username">${message:username-label}</label>
+			      <strong>${user.username}</strong>
+			    </div>
+			    <div class="t-beaneditor-row">
+				  <label for="firstname">${message:firstname-label}</label>
+			      <strong>${user.firstname}</strong>
+			    </div>
+			    <div class="t-beaneditor-row">
+				  <label for="lastname">${message:lastname-label}</label>
+			      <strong>${user.lastname}</strong>
+			    </div>
+			    
+		    </fieldset>
+		    
+			<fieldset>
+    			<legend>${message:change-password}</legend>
+				<div class="t-beaneditor-row">
+				  <t:label for="password"><span class="required">*</span> ${message:password-label}</t:label>
+			      <t:passwordfield t:id="password" value="user.password" validate="required,minlength=6"/>
+			    </div>
+			    <div class="t-beaneditor-row">
+				  <t:label for="confirmPassword"><span class="required">*</span> ${message:confirmPassword-label}</t:label>
+			      <t:passwordfield t:id="confirmPassword" value="confirmPassword" validate="required"/>
+			    </div>
+		    </fieldset>
+		    
+		   <fieldset>
+    			<legend>${message:contact-info}</legend>
+			 
+				<div class="t-beaneditor-row">
+					<t:label for="phone" />
+					<t:textfield t:id="phone" value="user.phone"></t:textfield>
+					<br/>
+					<span class="formtip">${message:phone-tip}</span>
+				</div>
+				<div class="t-beaneditor-row">
+					<t:label for="mphone" />
+					<t:textfield t:id="mphone" value="user.mphone"></t:textfield>
+					<br/>
+					<span class="formtip">${message:phone-tip}</span>
+				</div>
+				<div class="t-beaneditor-row">
+					<t:label for="email" ><span class="required">*</span> ${message:email-label}</t:label>
+					<t:textfield t:id="email" value="user.email" validate="required,email"></t:textfield>
+				</div>
+			</fieldset>
+			<fieldset>
+				<div class="t-beaneditor-row">
+			    	<input t:type="submit" value="${message:submit-label}" class="t-beaneditor-submit squared" />
+			   </div>
+		   </fieldset>
+		</form>
+	</div>
+</html>

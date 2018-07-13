@@ -1,0 +1,318 @@
+<html t:type="layout" 
+	title="${message:view} ${message:blog}"
+	currentModule="${moduleName}"
+   currentProj="curProj"
+	breadcrumb="${curProj.encodeddisplayname}=project/home?${curProj.id}
+		,${module.displayName}=modules/blog/home?${curProj.id}
+		,${message:view} ${message:blog}=modules/blog/view?${blog.id}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+
+
+	<p:actionBtns>
+		
+	</p:actionBtns>	
+
+	<table class="actionToolBar">
+		<tr>
+			<td class="right">
+				 <t:zone t:id="showRefLinkZone" id="showRefLinkZone" t:update="show">
+					 <t:actionlink t:id="showhideRef" zone="refltsZone">
+					 	<t:if test="showRef">
+					 		${message:hide-reflections}
+					 		<p:else>
+					 		${message:show-reflections}
+					 		</p:else>
+					 	</t:if>
+					 	(${countReflections()})
+					 </t:actionlink>
+				 </t:zone>
+			</td>
+		</tr>
+	</table>	
+	
+	
+	<table class="nomargin">
+	<tr>
+	<td style="vertical-align:top; width:100%;">
+		
+	<div class="blogEntry">
+		<div class="head">
+			<table class="nomargin">
+				<tr>
+					<td>
+						<img src="${context:lib/img/16/m_Blog.png}" class="icon" />
+						<span class="subject">${blog.subject}</span>
+						<t:if test="blog.shared" negate="true">
+							- <span class="attention" title="${message:private-tip}">${message:private}</span>
+						</t:if>
+						<t:if test="isPublished(blog)" negate="true">
+							- <span class="attention" title="${message:non-published-tip}">${blog.status}</span>
+						</t:if>
+						<br/>
+						<span class="author-date">
+							${message:by} <span class="author"><t:pageLink page="user/view" context="blog.author.id">${blog.author.displayname}</t:pageLink></span>
+							, <span class="date">${blog.cdateDisplay}</span>
+						</span>
+					</td>
+					<td align="right">
+						<t:if test="canEditBlog(blog)">
+							<a t:type="pageLink" page="modules/blog/edit" context="blog.id" >
+								<span>${message:edit}</span>
+							</a>
+						</t:if>
+						<t:if test="canDeleteBlog(blog)">
+							|
+							<t:if test="blog.comments.size()">
+								<a t:type="actionLink" t:id="deleteBlog1" context="blog.id" 
+									onclick="alert('${message:cant-delete-blog-with-comment}'); return false;">
+									<span>${message:delete}</span>
+								</a>
+							
+							<p:else>
+								<a t:type="actionLink" t:id="deleteBlog" context="blog.id" 
+									onclick="return confirmDelete('${message:confirm-delete-blog}')"
+									>
+									<span>${message:delete}</span>
+								</a>
+							</p:else>
+							</t:if>
+						</t:if>
+						
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="content">
+			<t:outputraw t:value="blog.content" />
+		</div>
+		<t:if test="blog.attaches">
+			<div class="attFiles">
+				<div class="attLabel">
+					${message:attachment} <img src="${context:lib/img/icon-attachment.gif}" />
+					:
+				</div>
+				<div >
+					<t:loop source="getNonImageAttachedFiles(blog.attaches)" value="attFile">
+						<div class="attFile">
+							<t:eventLink event="retrieveFile" context="attFile.id"  title="${message:click-to-download}">
+							<img src="${getAttachFileIcon(attFile)}" style="vertical-align:bottom;"/>
+							${attFile.displayName}</t:eventLink>
+							(${attFile.displaySize})
+						</div>
+					</t:loop>
+				</div>
+				<div class="imgBlks">
+					<t:loop source="getImageAttachedFiles(blog.attaches)" value="attFile">
+						<div class="imgBlk" >
+							<a href="${getRetrieveImageLink(attFile.id)}" target="_blank" >
+								<img src="${getRetrieveImageThumbLink(attFile.id)}" alt="" title="${message:click-to-view-originalsize}"/>
+							</a>
+							<t:eventLink event="retrieveFile" context="attFile.id"  title="${message:click-to-download}">
+							${message:download}</t:eventLink>
+							(${attFile.displaySize})
+						</div>
+					</t:loop>
+				</div>					
+			</div>
+		</t:if>
+		
+		
+		<t:if test="blog.hasEdited()">
+			<div class="mdate" >
+					${message:edited-on}: ${blog.mDateDisplay}
+			</div>
+		</t:if>
+		<t:if test="blog.tags.size()">
+			<div class="linkBar" >
+				${message:tags-label}:
+				<t:loop source="blog.tags" value="tempTag" index="tempIndex">
+					<t:if test="isMoreThan(tempIndex, 0)">, </t:if>
+					<t:pagelink page="modules/blog/tag" context="getParams(curProj.id, tempTag)">
+						${tempTag}
+					</t:pagelink>
+				</t:loop>
+			</div>
+		</t:if>
+	</div>
+	
+<t:if test="cmts">
+	<h2 class="sec_title" style="margin-left:10px;"><a name="viewcmt"></a> ${message:comments} (${totalSize}):</h2>
+	<div class="cmtEntryList">
+	<t:loop source="cmtsDisplay" value="cmt">
+		<a name="cmt${cmt.id}"/>
+		<div class="blogCmtEntry" id="cmt${cmt.id}" onmouseover="showCloseBtn(this);" onmouseout="hideCloseBtn(this);">
+			<div class="head">
+				<table class="nomargin">
+					<tr>
+						<td>
+							<span class="icon"><img src="${context:lib/img/icon_cmmt.png}" height="15px" /></span>
+							<span class="author-date">
+								${cmt.cdatedisplay},
+								<t:pageLink page="user/view" context="cmt.author.id">${cmt.author.displayname}</t:pageLink>
+								${message:says}:
+							</span>
+						</td>
+						<td align="right">
+							<t:if test="canDeleteComment(cmt)">
+								<t:actionLink t:id="deleteComment" context="cmt.id" class="closeBtn"
+									onclick="return confirmDelete('${message:confirm-delete-comment}')">
+									<img src="${context:lib/img/icon_close.png}" alt="${message:delete}" title="${message:delete}" />
+								</t:actionLink>
+							</t:if>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="content"><t:outputraw t:value="cmt.content" /></div>
+		</div>
+	</t:loop>
+	<t:if test="isMoreThan(cmts.size(), rowsPerPage)">
+		<t:GridPager currentPage="curPageNo" rowsPerPage="rowsPerPage" source="cmts" />
+	</t:if>
+	</div>
+</t:if>
+
+<a name="newcmt"></a>
+<t:if test="canAddComment(blog)">
+	<t:form t:id="cmtForm" >
+		<t:errors />
+		<div class="t-beaneditor">
+			<div style="padding-left:30px;">
+				<div class="rtitle">
+					<t:label for="content">${message:comment-label}</t:label>
+				</div>
+				<div>
+				<textarea t:type="ck/editor" t:id="content" value="newCmtContent" validate="required"
+	  		            customConfiguration="context:lib/js_config/ckeditor.js" toolbarSet="simpleToolbar"
+	              	width="660px" height="120px"></textarea>
+		      </div>
+		      <div>
+		      	<input t:type="checkbox" t:id="notifyMember" value="notifyMember" />
+					<span class="formtip">${message:notifyInvolvedMember-tip}</span>
+				</div>
+				<t:submit t:id="bsubmit" value="${message:submit-comment}" class="submit squared" />
+			</div>
+		</div>
+	</t:form>
+</t:if>
+
+
+</td>
+	<td style="vertical-align:top;" >
+		<t:zone t:id="refltsZone" id="refltsZone" >
+		<t:if test="showRef">
+		
+		<div id="refltCon" class="genericBlk refltsCon" style="width:220px;" >
+			<div class="rtitle altColor">${message:reflections}</div>
+			<t:loop source="getReflections()" value="reflt">
+				<a name="ref${reflt.id}"/>
+				<div class="genericBlk refltBlk" id="rBlk-${reflt.id}" onmouseover="showCloseBtn(this);showEditBtn(this);" onmouseout="hideCloseBtn(this);hideEditBtn(this);">
+					<table class="nomargin">
+						<tr>
+							<td>
+								<div class="title" onclick="toggleElm('rBlk-b${reflt.id}');">
+									${reflt.creator.displayname}
+									<t:if test="reflt.shared" negate="true">
+										<span class="personal"> - ${message:personal-reflection}</span>
+									</t:if>
+								</div>
+							</td>
+							<td align="right">
+								<t:if test="canEditRef(reflt)">
+									<t:actionLink t:id="editRef" context="reflt.id" class="editBtn" >
+										<img src="${context:lib/img/icon_edit.png}" alt="${message:edit}" title="${message:edit}" />
+									</t:actionLink>
+								</t:if>
+								<t:if test="canDeleteRef(reflt)">
+									<t:actionLink t:id="deleteRef" context="reflt.id" class="closeBtn"
+										onclick="return confirmDelete('${message:confirm-delete-reflection}')">
+										<img src="${context:lib/img/icon_close.png}" alt="${message:delete}" title="${message:delete}" />
+									</t:actionLink>
+								</t:if>
+							</td>
+						</tr>
+					</table>
+					<div id="rBlk-b${reflt.id}">
+						<div><span class="date">${reflt.mdateDisplay}</span></div>
+						<div class="content" >
+							<t:outputraw value="reflt.content"/>	
+						</div>
+						<t:loop source="reflt.files" value="lLogFile">
+							<t:eventLink event="retrieveLLogFile" context="lLogFile.id">
+								<img src="${context:lib/img/icon-attachment.gif}"  alt="" title="${message:click-to-download}"/>
+							</t:eventLink>
+						</t:loop>
+					</div>
+				</div>
+				
+				<p:empty><div class="notfoundtext">${message:no-reflection-found}</div></p:empty>
+			</t:loop>
+			
+			<div id="writeRefDiv">
+				<a onclick="toggleDisplay('#writeRefFormDiv'); return false;" href="#">${message:write-reflection}</a>
+				<div id="writeRefFormDiv">
+					<form t:type="form" t:id="writeRefForm">
+						<div>
+							<div>
+								<t:textarea t:id="refContent" t:value="refContent" style="width:210px;_width:197px;height:120px;"/>
+							</div>
+							<div>
+								<input t:type="checkbox" t:id="refShared" value="refShared" onchange="refSharedChanged(this);" />
+								<span class="formtip">${message:shared-reflection} ${message:refShared-tip}</span>
+							</div>
+							<div>
+								<input t:type="checkbox" t:id="refNotifyMember" id="refNotifyMember" value="refNotifyMember" />
+								<span class="formtip">${message:refNotifyMember-tip}</span>
+							</div>
+							<div>
+								<t:submit t:id="refsubmit" value="${message:submit-label}" class="submit squared" />
+							</div>
+							<t:if test="hasLearningLogMod()">
+								<div><span class="formtip">${message:save-ref-to-learninglog} 
+										<t:pagelink page="${getLearningLogModule().module.rooturl}" context="${curProj.id}">
+											${getLearningLogModule().module.displayName}</t:pagelink>
+									</span>
+								</div>
+							</t:if>
+						</div>
+					</form>
+					<script language="javascript">
+						$('writeRefFormDiv').hide();
+						$$(".refltsCon .closeBtn").each(function (elem) {
+							elem.hide();
+						});
+						$$(".refltsCon .editBtn").each(function (elem) {
+							elem.hide();
+						});
+						
+						
+						function refSharedChanged(elm){
+							if(elm.checked){
+								$('refNotifyMember').disabled = false;
+							}
+							else{
+								$('refNotifyMember').checked = false;
+								$('refNotifyMember').disabled = true;
+							}
+						};
+					</script>
+				</div>
+			</div>
+		</div>
+		</t:if>
+		</t:zone>
+	</td>
+</tr>
+</table>
+
+<script>
+	document.observe("dom:loaded", function() {
+		$$(".blogCmtEntry .closeBtn").each(function (elem) {
+			elem.hide();
+		});
+		
+	});
+</script>
+</html>

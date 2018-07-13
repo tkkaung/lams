@@ -1,0 +1,57 @@
+<html t:type="layout"
+		title="${message:edit-project-status}"
+      breadcrumb="${message:control-panel}=admin
+      ,${message:manage-my-project}=admin/project/manageprojects
+      ,${proj.encodeddisplayname}=project/home?${proj.id}
+      ,${message:edit-project-status}=admin/project/editstatus?${proj.id}"
+		xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+      xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="project"/></p:leftMenuBlk>
+   
+   
+   <t:form t:id="form" class="e-formeditor">
+   	<t:errors/>
+   	<div class="t-beaneditor">
+   		<table class="nomargin">
+   			<tr>
+   				<td class="label">${message:project}</td>
+   				<td>
+   					<div style="margin:0 0 5px 5px;">
+	   					<div style="font-weight:bold; ">
+		    					${proj.displayname}
+		    					<br/>
+		    					${proj.name}
+		    				</div>
+		    				<span class="date">${proj.sdatedisplay} - ${proj.edatedisplay}</span>
+		    				<div class="desc"><t:outputraw value="${proj.description}" /></div>
+	    				</div>
+   				</td>
+   			</tr>
+   			<tr>
+   				<td class="label"><t:label for="status">${message:status-label}</t:label></td>
+   				<td>
+   					<t:select t:id="status" value="proj.status" model="projStatusModel" />
+   					<div style="margin:5px;">
+   						<t:loop source="getAvailableStatus()" value="tempStatus">
+	   						<span class="formtip"><strong>${tempStatus.displayName}</strong> - ${tempStatus.description}</span>
+	   						<br/>
+	   					</t:loop>
+   					</div>
+   				</td>
+   			</tr>
+   			<tr>
+   				<td class="label"><t:label for="noAutoChangeStatus">${message:noAutoChangeStatus-label}</t:label></td>
+   				<td>
+   					<t:checkbox t:id="noAutoChangeStatus" value="proj.noAutoChangeStatus"/>
+   					<span class="formtip">${message:noAutoChangeStatus-tip}</span>
+   				</td>
+   			</tr>
+   		</table>
+   		<t:submit t:id="bSubmit" value="${message:submit-label}" class="submit squared"/>
+   		
+   	</div>
+   </t:form>
+   
+	
+	
+</html>

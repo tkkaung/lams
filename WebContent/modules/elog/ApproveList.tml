@@ -1,0 +1,143 @@
+<html t:type="layout" 
+	title="${message:elog-approve-list}"
+	currentModule="${moduleName}"
+   currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/elog/home?${project.id}
+		,${message:elog-approve-list}=modules/elog/approvelist?${project.id}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+	
+	<style>
+		.remarks{
+			width: 300px;
+		}
+		.listHeader{
+			font-weight: bold;
+			margin: 10px;
+		}
+		.listContainer{
+			margin-bottom: 20px;
+		}
+	</style>
+	
+	<p:actionBtns>
+		
+	</p:actionBtns>	
+		
+	<table class="actionToolBar">
+		<tr>
+			<td class="right">
+				<form t:type="form" t:id="filterForm" autofocus="false">
+					<span class="fTitle">${message:filter}:</span> 
+					<t:textfield t:id="filterText" value="filterText"/>
+					<t:submit value="${message:go}" class="squared"/>
+				</form>
+			</td>
+		</tr>
+	</table>	
+
+<div class="listContainer">
+	<t:grid source="pendingElogs" 
+		row="elog" 
+		pagerPosition="bottom" 
+		rowClass="prop:evenodd.next"
+		model="getPendingModel()"
+		>
+		<p:empty>
+			<div class="notfoundtext">${message:no-elog-found-to-approve}</div>
+		</p:empty>
+		
+		<p:subjectCell>
+			<t:pagelink page="modules/elog/approve" context="elog.id" >
+				<t:ck.TrimmedString value="elog.subject" maxLength="70"/>
+			</t:pagelink>
+			<span style="margin-left:5px;vertical-align:bottom;">
+				<t:loop source="elog.files" value="attFile">
+					<t:eventLink event="retrieveFile" context="attFile.id">
+						<img src="${context:lib/img/icon-attachment.gif}"  alt="" title="${message:click-to-download}"/>
+					</t:eventLink>
+				</t:loop>
+			</span>
+			<br/>
+			<span class="subdes"><t:ck.TrimmedString value="stripTags(elog.content)" maxLength="200"/></span>
+		</p:subjectCell>
+		<p:authorCell>
+			<t:pagelink page="user/view" context="elog.author.id">${elog.author.displayname}</t:pagelink>
+		</p:authorCell>
+		<p:remarksCell>
+			<span class="subdes"><t:outputraw value="elog.remarks"/></span>
+		</p:remarksCell>
+	</t:grid>
+</div>
+	
+	<t:if test="rejectedElogs">
+		<div class="listContainer">
+		<t:grid source="rejectedElogs" 
+			row="elog" 
+			pagerPosition="bottom" 
+			rowClass="prop:evenodd.next"
+			model="getRejectedModel()"
+			>
+			<p:subjectCell>
+				<t:pagelink page="modules/elog/view" context="elog.id"><t:ck.TrimmedString value="elog.subject" maxLength="70"/></t:pagelink>
+				<span style="margin-left:5px;vertical-align:bottom;">
+					<t:loop source="elog.images" value="tempImage">
+						<a href="${getRetrieveImageLink(tempImage.id)}"  target="_blank">
+							<img src="${context:lib/img/16/attachedImage.png}" alt="" title="${message:click-to-view-originalsize}"/>
+						</a>
+					</t:loop>
+					<t:loop source="elog.files" value="tempFile">
+						<t:eventLink event="retrieveFile" context="tempFile.id">
+							<img src="${context:lib/img/icon-attachment.gif}"  alt="" title="${message:click-to-download}"/>
+						</t:eventLink>
+					</t:loop>
+				</span>
+				<br/>
+				<span class="subdes"><t:ck.TrimmedString value="stripTags(elog.content)" maxLength="200"/></span>
+			</p:subjectCell>
+			<p:authorCell>
+				<t:pagelink page="user/view" context="elog.author.id">${elog.author.displayname}</t:pagelink>
+			</p:authorCell>
+			<p:remarksCell>
+				<span class="subdes"><t:outputraw value="elog.remarks"/></span>
+			</p:remarksCell>
+		</t:grid>
+		</div>
+	</t:if>
+	
+	<t:if test="approvedElogs">
+		<div class="listContainer">
+		<t:grid source="approvedElogs" 
+			row="elog" 
+			pagerPosition="bottom" 
+			rowClass="prop:evenodd.next"
+			model="getApprovedModel()"
+			>
+			<p:subjectCell>
+				<t:pagelink page="modules/elog/view" context="elog.id"><t:ck.TrimmedString value="elog.subject" maxLength="70"/></t:pagelink>
+				<span style="margin-left:5px;vertical-align:bottom;">
+					<t:loop source="elog.files" value="attFile">
+						<t:eventLink event="retrieveFile" context="attFile.id">
+							<img src="${context:lib/img/icon-attachment.gif}"  alt="" title="${message:click-to-download}"/>
+						</t:eventLink>
+					</t:loop>
+				</span>
+				<br/>
+				<span class="subdes"><t:ck.TrimmedString value="stripTags(elog.content)" maxLength="200"/></span>
+			</p:subjectCell>
+			<p:publishedCell>
+				<t:actionLink t:id="togglePublished" context="elog.id">${elog.published}</t:actionLink>
+			</p:publishedCell>
+			<p:authorCell>
+				<t:pagelink page="user/view" context="elog.author.id">${elog.author.displayname}</t:pagelink>
+			</p:authorCell>
+			<p:remarksCell>
+				<span class="subdes"><t:outputraw value="elog.remarks"/></span>
+			</p:remarksCell>
+		</t:grid>
+		</div>
+	</t:if>
+	
+	
+</html>

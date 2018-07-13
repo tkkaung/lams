@@ -1,0 +1,67 @@
+.folderclose {
+        background: transparent url(images/folder-closed.gif)
+                no-repeat scroll 0%;
+        float: left;
+        height: 14px;
+        padding-right: 3px;
+        width: 12px;
+}
+
+.folderopen {
+        background: transparent url(images/folder-open.gif)
+                no-repeat scroll 0%;
+        float: left;
+        height: 14px;
+        padding-right: 3px;
+        width: 12px;
+}
+
+.doc {
+        background: transparent url(images/file.gif) no-repeat
+                scroll 0%;
+        float: left;
+        height: 14px;
+        margin-left: 6px;
+        padding-right: 3px;
+        width: 6px;
+}
+
+.tier0 {
+        margin-left: 0pt;
+}
+
+.tier1 {
+        margin-left: 1.5em;
+}
+
+.tier2 {
+        margin-left: 3em;
+}
+
+.tier3 {
+        margin-left: 4.5em;
+}
+
+.tier4 {
+        margin-left: 6em;
+}
+
+.tier5 {
+        margin-left: 7.5em;
+}
+
+.tier6 {
+        margin-left: 9em;
+}
+
+.tier7 {
+        margin-left: 10.5em;
+}
+
+.tier8 {
+        margin-left: 12em;
+}
+
+.tier9 {
+        margin-left: 13.5em;
+}

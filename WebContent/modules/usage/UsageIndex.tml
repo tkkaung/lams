@@ -1,0 +1,336 @@
+<html t:type="layout" 
+	title="${module.displayName}"
+	currentModule="${moduleName}"
+	currentProj="proj"
+	breadcrumb="${proj.encodeddisplayname}=project/home?${proj.id}
+		,${module.displayName}=modules/usage?${proj.id}
+		"
+	totalShowOption="${getTotalSize()}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+<style>
+	table.t-data-grid TBODY TR TD, table.t-data-grid THEAD TR TH {
+		text-align: center;
+		white-space: normal;
+	}
+	table.t-data-grid TBODY TR TD.user {
+		text-align: left;
+	}
+	.no{
+		width: 15px;
+	}
+	th.subth{
+		font-size: 11px;
+	}
+	span.aaa{
+		padding: 2px 3px;
+		white-space: nowrap;
+	}
+	
+</style>
+
+<p:legendBlk>
+	<div class="legend">
+   	 	<div class="title">${message:note}:</div>
+    	- ${message:usageIndex-note1}
+    	
+    </div>
+</p:legendBlk>
+
+<table class="actionToolBar">
+	<tr>
+		<td class="right">
+		</td>
+	</tr>
+</table>
+
+
+
+
+<div class="usgContainer">
+	<table class="t-data-grid usgtbl" >
+		<thead>
+			<tr>
+				<th rowspan="2" class="no"></th>
+				<th rowspan="2" class="user">${message:user}</th>
+				<t:if test="getAnnmtModule()">
+					<th colspan="1" rowspan="2" class="annmt">${getAnnmtModule().displayname}</th>
+				</t:if>
+				<t:if test="getForumModule()">
+					<th colspan="3"  class="forum">${getForumModule().displayname}</th>
+				</t:if>
+				<t:if test="getBlogModule()">
+					<th colspan="3"  class="blog">${getBlogModule().displayname}</th>
+				</t:if>
+				<t:if test="getElogModule()">
+					<th colspan="3"  class="elog">${getElogModule().displayname}</th>
+				</t:if>
+				<t:if test="getResourceModule()">
+					<th colspan="4"  class="resource">${getResourceModule().displayname}</th>
+				</t:if>
+				<t:if test="getSchedulingModule()">
+					<th colspan="4"  class="scheduling">${getSchedulingModule().displayname}</th>
+				</t:if>
+			</tr>
+			<tr>
+				<t:if test="getForumModule()">
+					<th  class="frmTh subth">${message:thread}</th>
+					<th  class="frmThr subth">${message:reply}</th>
+					<th  class="frmRef subth">${message:reflection}</th>
+				</t:if>
+				<t:if test="getBlogModule()">
+					<th  class="blgEnt subth">${message:blog}</th>
+					<th  class="blgCmt subth">${message:comment}</th>
+					<th  class="blgRef subth">${message:reflection}</th>
+				</t:if>
+				<t:if test="getElogModule()">
+					<th  class="elgEnt subth">${message:elog}</th>
+					<th  class="elgCmt subth">${message:comment}</th>
+					<th  class="elgRef subth">${message:reflection}</th>
+				</t:if>
+				<t:if test="getResourceModule()">
+					<th  class="rsrcFd subth">${message:folder}</th>
+					<th  class="rsrcLk subth">${message:link}</th>
+					<th  class="rsrcFl subth">${message:file}</th>
+					<th  class="rsrcFVer subth">${message:file-version}</th>
+				</t:if>
+				<t:if test="getSchedulingModule()">
+					<th  class="schdMst subth">${message:milestone}</th>
+				<!-- 	<th  class="schdPhs subth">${message:phase}</th>
+					 -->
+					<th  class="schdTsk subth">${message:task}</th>
+					<th  class="schdAsgnTsk subth">${message:assigned-task}</th>
+				</t:if>
+			</tr>
+		</thead>
+		<tbody>
+		<t:loop source="usersDisplay" value="user" index="rowIndex">
+			<tr>
+				<td>${getRowNum()}</td>
+				<td class="user">
+					<t:pagelink page="user/view" context="user.id">${user.displayName}</t:pagelink>
+				</td>
+				<t:if test="getAnnmtModule()">
+					<td class="annmt">
+						<t:if test="getNumAnnouncement()">
+							<a t:type="pagelink" page="modules/usage/detail" context="getCxtAnnmt()">
+								${getNumAnnouncement()}
+							</a>
+							
+							<p:else>0</p:else>
+						</t:if>
+					</td>	
+				</t:if>
+				<t:if test="getForumModule()">
+					<td  class="frmTh">
+						<t:if test="getNumThread()">
+							<a t:type="pagelink" page="modules/usage/detail" context="getCxtThread()">
+								${getNumThread()}
+							</a>
+							
+							<p:else>0</p:else>
+						</t:if>
+						<div>
+							<t:if test="getNumThreadLike()">
+								<span class="aaa">
+									<img src="${context:lib/img/16/like_green.png}" width="12" alt="${message:rate-like}" />
+									<a title="${message:total-rate-like}"
+										t:type="pagelink" page="modules/usage/detail" context="getCxtThreadLike()"
+										>${getNumThreadLike()}</a>
+										(<a title="${message:your-total-rate-like}"
+											t:type="pagelink" page="modules/usage/detail" context="getCxtThreadYourLike()"
+										 >${getNumThreadYourLike()}</a>)
+								</span>
+							</t:if>
+							<t:if test="getNumThreadDislike()">
+								<span class="aaa">
+									<img src="${context:lib/img/16/dislike_green.png}" width="12" alt="${message:rate-dislike}" title="${message:rate-dislike}"/>
+									<a title="${message:total-rate-like}"
+										t:type="pagelink" page="modules/usage/detail" context="getCxtThreadDislike()"
+									>${getNumThreadDislike()}</a>
+										(<a title="${message:your-total-rate-dislike}"
+											t:type="pagelink" page="modules/usage/detail" context="getCxtThreadYourDislike()"
+										>${getNumThreadYourDislike()}</a>)
+								</span>
+							</t:if>
+						</div>
+					</td>
+					<td  class="frmThr">
+						<t:if test="getNumThreadReply()">
+							<a t:type="pagelink" page="modules/usage/detail" context="getCxtThreadReply()">
+								${getNumThreadReply()}
+							</a>
+							
+							<p:else>0</p:else>
+						</t:if>
+						<div>
+							<t:if test="getNumThreadReplyLike()">
+								<span class="aaa">
+									<img src="${context:lib/img/16/like_green.png}" width="12" alt="${message:rate-like}" />
+									<a title="${message:total-rate-like}"
+										t:type="pagelink" page="modules/usage/detail" context="getCxtThreadReplyLike()"
+									>${getNumThreadReplyLike()}</a>
+										(<a title="${message:your-total-rate-like}"
+										t:type="pagelink" page="modules/usage/detail" context="getCxtThreadReplyYourLike()"
+										>${getNumThreadReplyYourLike()}</a>)
+								</span>
+							</t:if>
+							<t:if test="getNumThreadReplyDislike()">
+								<span class="aaa">
+									<img src="${context:lib/img/16/dislike_green.png}" width="12" alt="${message:rate-dislike}" title="${message:rate-dislike}"/>
+									<a title="${message:total-rate-like}"
+										t:type="pagelink" page="modules/usage/detail" context="getCxtThreadReplyDislike()"
+									>${getNumThreadReplyDislike()}</a>
+										(<a title="${message:your-total-rate-dislike}"
+											t:type="pagelink" page="modules/usage/detail" context="getCxtThreadReplyYourDislike()"
+										>${getNumThreadReplyYourDislike()}</a>)
+								</span>
+							</t:if>
+						</div>
+					</td>
+					<td  class="frmRef">
+						<t:if test="getNumThreadReflection()">
+							<a t:type="pagelink" page="modules/usage/detail" context="getCxtThreadReflection()">
+								${getNumThreadReflection()}
+							</a>
+							
+							<p:else>0</p:else>
+						</t:if>
+					</td>
+				</t:if>
+				<t:if test="getBlogModule()">
+					<td class="blgEnt">
+						<t:if test="getNumBlog()">
+							<a t:type="pagelink" page="modules/usage/detail" context="getCxtBlog()">
+								${getNumBlog()}
+							</a>
+							<p:else>0</p:else>
+						</t:if>
+					</td>	
+					<td class="blgCmt">
+						<t:if test="getNumBlogComment()">
+							<a t:type="pagelink" page="modules/usage/detail" context="getCxtBlogComment()">
+								${getNumBlogComment()}
+							</a>
+							<p:else>0</p:else>
+						</t:if>
+					</td>	
+					<td class="blgRef">
+						<t:if test="getNumBlogReflection()">
+							<a t:type="pagelink" page="modules/usage/detail" context="getCxtBlogReflection()">
+								${getNumBlogReflection()}
+							</a>
+							<p:else>0</p:else>
+						</t:if>
+					</td>				
+				</t:if>
+				<t:if test="getElogModule()">
+					<td class="elgEnt">
+						<t:if test="getNumElog()">
+							<a t:type="pagelink" page="modules/usage/detail" context="getCxtElog()">
+								${getNumElog()}
+							</a>
+							<p:else>0</p:else>
+						</t:if>
+					</td>	
+					<td class="elgCmt">
+						<t:if test="getNumElogComment()">
+							<a t:type="pagelink" page="modules/usage/detail" context="getCxtElogComment()">
+								${getNumElogComment()}
+							</a>
+							<p:else>0</p:else>
+						</t:if>
+					</td>	
+					<td class="elgRef">
+						<t:if test="getNumElogReflection()">
+							<a t:type="pagelink" page="modules/usage/detail" context="getCxtElogReflection()">
+								${getNumElogReflection()}
+							</a>
+							<p:else>0</p:else>
+						</t:if>
+					</td>				
+				</t:if>
+				<t:if test="getResourceModule()">
+					<td  class="rsrcFd">
+						<t:if test="getNumFolder()">
+							<a t:type="pagelink" page="modules/usage/detail" context="getCxtFolder()">
+								${getNumFolder()}
+							</a>
+							<p:else>0</p:else>
+						</t:if>
+					</td>
+					<td  class="rsrcLk">
+						<t:if test="getNumLink()">
+							<a t:type="pagelink" page="modules/usage/detail" context="getCxtLink()">
+								${getNumLink()}
+							</a>
+							<p:else>0</p:else>
+						</t:if>
+					</td>
+					<td  class="rsrcFl">
+						<t:if test="getNumFile()">
+							<a t:type="pagelink" page="modules/usage/detail" context="getCxtFile()">
+								${getNumFile()}
+							</a>
+							<p:else>0</p:else>
+						</t:if>
+					</td>
+					<td  class="rsrcFVer">
+						<t:if test="getNumFileVersion()">
+							<a t:type="pagelink" page="modules/usage/detail" context="getCxtFileVersion()">
+								${getNumFileVersion()}
+							</a>
+							
+							<p:else>0</p:else>
+						</t:if>
+					</td>
+				</t:if>
+				<t:if test="getSchedulingModule()">
+					<td  class="schdMst">
+						<t:if test="getNumMilestone()">
+							<a t:type="pagelink" page="modules/usage/detail" context="getCxtMilestone()">
+								${getNumMilestone()}
+							</a>
+							<p:else>0</p:else>
+						</t:if>
+					</td>
+				<!--  	<td  class="schdPhs">
+						<t:if test="getNumPhase()">
+							<a t:type="pagelink" page="modules/usage/detail" context="getCxtPhase()">
+								${getNumPhase()}
+							</a>
+						</t:if>
+					</td>
+				-->
+					<td  class="schdTsk">
+						<t:if test="getNumTask()">
+							<a t:type="pagelink" page="modules/usage/detail" context="getCxtTask()">
+								${getNumTask()}
+							</a>
+							<p:else>0</p:else>
+						</t:if>
+					</td>
+					<td  class="schdAsgnTsk">
+						<t:if test="getNumTaskAssigned()">
+							<a t:type="pagelink" page="modules/usage/detail" context="getCxtTaskAssigned()">
+								${getNumTaskAssigned()}
+							</a>
+							<p:else>0</p:else>
+						</t:if>
+					</td>
+				</t:if>
+			</tr>
+		</t:loop>
+			
+		</tbody>
+		
+	</table>
+	<t:if test="isMoreThan(totalSize, rowsPerPage)">
+		<t:GridPager currentPage="curPageNo" rowsPerPage="rowsPerPage" source="users" />
+	</t:if>
+</div>
+
+
+
+</html>

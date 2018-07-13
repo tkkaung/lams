@@ -1,0 +1,255 @@
+<html t:type="layout" 
+	title="${module.displayName}"
+	currentModule="${moduleName}"
+   currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/blog/home?${project.id}"
+	totalShowOption="${totalSize}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+<link rel="stylesheet" type="text/css" href="${context:lib/lib/jcal/css/jscal2.css}" />
+<link rel="stylesheet" type="text/css" href="${context:lib/lib/jcal/css/steel/steel.css}" />
+<script type="text/javascript" src="${context:lib/lib/jcal/js/jscal2.js}"></script>
+<script type="text/javascript" src="${context:lib/lib/jcal/js/lang/en.js}"></script>
+
+<style>
+	.dateDisplayDiv, .tagDisplayDiv{
+		margin: 20px 0;
+		padding-right:10px;
+		text-align: right;
+	}
+	.tagDisplayDiv h2{
+		font-weight:bold;
+		font-size:1.5em;
+	}
+</style>
+
+<p:actionBtns>
+	<t:if test="canCreateBlog(project)">
+		<a class="button rounded" t:type="pageLink" page="modules/blog/edit" context="getParams(project.id, getNull())" >
+			<span>${message:add-new} ${message:blog-entry}</span>
+		</a>
+	</t:if>
+</p:actionBtns>	
+
+
+	<table class="actionToolBar">
+		<tr>
+			<td class="right">
+				<form t:type="form" t:id="filterForm" autofocus="false">
+					<span class="fTitle">${message:filter}:</span>
+					${message:author-label} 
+					<t:select t:id="author" model="authorModel" value="author" blankLabel="${message:-all-}" onchange="this.form.submit()"/> 
+				</form>
+			</td>
+		</tr>
+	</table>
+	
+	
+	<table width="100%" >
+		<tr>
+			<td valign="top">
+				
+				<t:loop source="blogsDisplay" value="blog" >
+					<p:empty>
+						<div class="notfoundtext">
+							${message:no-blog-found}
+						</div>
+					</p:empty>
+					<div class="blogEntry">
+						<div class="head">
+							<table class="nomargin">
+								<tr>
+									<td>
+										<img src="${context:lib/img/16/m_Blog.png}"  class="icon" />
+										<t:pageLink page="modules/blog/view" context="blog.id">
+											<span class="subject">${blog.subject}</span>
+										</t:pageLink>
+										<t:if test="blog.shared" negate="true">
+											- <span class="attention" title="${message:private-tip}">${message:private}</span>
+										</t:if>
+										<t:if test="isPublished(blog)" negate="true">
+											- <span class="attention" title="${message:non-published-tip}">${blog.status}</span>
+										</t:if>
+										<br/>
+									</td>
+									<td align="right">
+										<span class="author-date">
+											${message:by} <span class="author"><t:pageLink page="user/view" context="blog.author.id">${blog.author.displayname}</t:pageLink></span>
+											, <span class="date">${blog.cdateDisplay}</span>
+										</span>
+									</td>
+								</tr>
+							</table>
+						</div>
+						<div class="content">
+							<t:outputraw t:value="blog.content" />
+						</div>
+						<t:if test="blog.attaches.size()"> <!-- TODO -->
+							<div class="attFiles">
+								<div class="attLabel">
+									${message:attachment} <img src="${context:lib/img/icon-attachment.gif}" />
+									:
+								</div>
+								<div>
+									<t:loop source="getNonImageAttachedFiles(blog.attaches)" value="attFile">
+										<div class="attFile">
+											<t:eventLink event="retrieveFile" context="attFile.id"  title="${message:click-to-download}">
+											<img src="${getAttachFileIcon(attFile)}" style="vertical-align:bottom;"/>
+											${attFile.displayName}</t:eventLink>
+											(${attFile.displaySize})
+										</div>
+									</t:loop>
+								</div>
+								<div class="imgBlks">
+									<t:loop source="getImageAttachedFiles(blog.attaches)" value="attFile">
+										<div class="imgBlk" >
+											<a href="${getRetrieveImageLink(attFile.id)}" target="_blank" >
+												<img src="${getRetrieveImageThumbLink(attFile.id)}" alt="" title="${message:click-to-view-originalsize}"/>
+											</a>
+											<t:eventLink event="retrieveFile" context="attFile.id"  title="${message:click-to-download}">
+											${message:download}</t:eventLink>
+											(${attFile.displaySize})
+										</div>
+									</t:loop>
+								</div>					
+							</div>
+						</t:if>
+						
+						<t:if test="blog.hasEdited()">
+							<div class="mdate" >
+									${message:edited-on}: ${blog.mDateDisplay}
+							</div>
+						</t:if>
+						
+						<br />
+						<div class="linkBar" >
+							<t:pagelink page="modules/blog/view" context="blog.id" anchor="newcmt">${message:comments} </t:pagelink>
+							(<t:pagelink page="modules/blog/view" context="blog.id" anchor="viewcmt">${blog.cnum}</t:pagelink>)
+							
+							<t:if test="blog.tags.size()">
+								|
+								${message:tags-label}:
+								<t:loop source="blog.tags" value="tempTag" index="tempIndex">
+									<t:if test="isMoreThan(tempIndex, 0)">, </t:if>
+									<t:pagelink page="modules/blog/tag" context="getParams(project.id, tempTag)">
+										${tempTag}
+									</t:pagelink>
+								</t:loop>
+							</t:if>
+						 </div>
+					</div>
+				</t:loop>
+			</td>
+			<td valign="top" width="250px">
+			
+				<div id="calendar-container" />
+			
+				<div class="dateDisplayDiv">
+					<div>
+						<t:actionLink t:id="last7days" >${message:LAST_7_DAYS-label}</t:actionLink>
+					</div>
+					<div>
+						<t:actionLink t:id="last30days" >${message:LAST_30_DAYS-label}</t:actionLink>
+					</div>
+					<div>
+						<t:actionLink t:id="alldate" >${message:ALL_DATE-label}</t:actionLink>
+					</div>
+					<div >
+						<t:form t:id="dateFilterForm" autofocus="false">
+							<t:errors/>
+							<div>${message:SPECIFIED_DATE_RANGE-label}</div>
+							<div align="right">
+							<table >
+								<tr>
+									<td>${message:from}</td>
+									<td>
+										<t:datefield value="sdate" class="swidth" format="${message:datefield-format}"/>
+									</td>
+								</tr>
+								<tr>
+									<td>${message:to}</td>
+									<td>
+										<t:datefield t:id="edate" value="edate" class="swidth" format="${message:datefield-format}" />
+									</td>
+								</tr>
+								<tr>
+									<td></td>
+									<td>
+										<t:submit value="${message:go}" class="squared"/>
+									</td>
+								</tr>
+							</table>
+							</div>
+						</t:form>
+					</div>
+				</div>
+				
+				<t:if test="hasCommonTags(project)">
+					<div class="tagDisplayDiv">
+						<h2>${message:tags-label}:</h2>
+						<div class="blgTagsBlk">
+							<t:loop source="getCommonTags(project)" value="tempTag">
+								<span>
+									<t:pagelink page="modules/blog/tag" context="getParams(project.id, tempTag)">
+										${tempTag}
+									</t:pagelink>
+									(${getBlogsByTags(project, tempTag)})
+								</span>
+							</t:loop>
+						</div>
+					</div>
+				</t:if>
+			</td>
+		</tr>
+	</table>
+	
+	<t:if test="isMoreThan(totalSize, rowsPerPage)">
+		<t:GridPager currentPage="curPageNo" rowsPerPage="rowsPerPage" source="blogs" />
+	</t:if>
+
+<script>
+var dateArr = ${getDatesHighlight()};  //e.g: [20110301, 20110317, 20110331]
+var blogCountArr = ${getBlogCountArr()};  //e.g: {20110315 : 2 , 20110317 : 4 , 20110331 : 1}
+var tooltiptext = "${message:x-entry-found}";
+function getDateInfo(date, wantsClassName) {
+   var as_number = Calendar.dateToInt(date);
+   if (dateArr.findElemt(as_number)) {
+      return {klass: "blog_date_highlight", tooltip: (blogCountArr[as_number]+" "+tooltiptext) };
+   }
+}
+<t:if test="date">
+	var dd = parseInt('${date}');
+	var Cal = Calendar.setup({
+	   cont          : "calendar-container",
+	   weekNumbers   : true,
+	   dateInfo      : getDateInfo,
+	   selectionType : Calendar.SEL_SINGLE,
+	   selection     : dd,
+	   onSelect      : function() {
+	      var d = this.selection.get();
+	      document.location = "?date=" + d;
+	   }
+	});
+	Cal.moveTo(dd, false);
+
+	<p:else>
+	var Cal = Calendar.setup({
+	   cont          : "calendar-container",
+	   weekNumbers   : true,
+	   dateInfo      : getDateInfo,
+	   selectionType : Calendar.SEL_SINGLE,
+	   onSelect      : function() {
+	      var d = this.selection.get();
+	      document.location = "?date=" + d;
+	   }
+	});
+	</p:else>
+</t:if>
+</script>
+   
+  
+
+
+</html>

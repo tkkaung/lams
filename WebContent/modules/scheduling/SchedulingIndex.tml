@@ -1,0 +1,356 @@
+<html t:type="layout" 
+	title="${module.displayName}"
+	currentModule="${moduleName}"
+	currentProj="curProj"
+	breadcrumb="${curProj.encodeddisplayname}=project/home?${curProj.id}
+		,${module.displayName}=modules/scheduling?${curProj.id}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+	
+	<style>
+		#scheduleContainer {
+			overflow: auto;
+		<t:if test="${isMoreThan(totalScheduleWidth, 972)}">	
+			_overflow: scroll;  /* IE */
+		</t:if>
+			width: 100%;
+			/*		width: 972px;*/
+		}
+		#schdBlk td.dateCol{
+			width: ${columnWidth}px;
+		}
+	</style>
+
+<p:actionBtns>
+	<t:if test="canManageVersion(curProj)">
+		<a class="button rounded" t:type="pageLink" page="modules/scheduling/scheduleManage" context="curProj.id" 
+			title="${message:manage-version-tip}"
+			>
+			<span>${message:manage-version}</span>
+		</a>
+	</t:if>
+	<a class="button rounded" t:type="pageLink" page="modules/scheduling/scheduleView" context="schedule.id"
+		onclick="popup(this.href , 'schd_Window'); return false;" target="_blank" 
+		title="${message:print-friendly-tip}"
+		>
+		<span>${message:print-friendly}</span>
+	</a>
+</p:actionBtns>	
+<p:legendBlk>
+	<div class="legend">
+		<div class="title">${message:legend}</div>
+		<div class="content">
+			<table>
+				<tr>
+					<td><div class="milestone" /></td>
+					<td class="label">${message:gantt-milestone}</td>
+					<td><div class="phase" style="width: 15px;" ><t:outputraw value="emptyString"/></div></td>
+					<td class="label">${message:gantt-phase}</td>
+					<td><div class="task" style="width: 15px;" ><t:outputraw value="emptyString"/></div></td>
+					<td class="label">${message:gantt-task-ongoing}</td>
+					<td><div class="task done" style="width: 15px;" ><t:outputraw value="emptyString"/></div></td>
+					<td class="label">${message:gantt-task-complete}</td>
+					<td><div class="today" ><t:outputraw value="emptyString"/></div></td>
+					<td class="label">${message:gantt-today}</td>
+				</tr>
+				<tr>
+					<td colspan="10">
+						<span class="con1">
+							<img src="${context:lib/img/prio_high.png}" alt=""/>
+							<span class="label">${message:highUrgency-label}</span>
+						</span>
+						<span class="con1">
+							<img src="${context:lib/img/prio_medium.png}" alt=""/>
+							<span class="label">${message:mediumUrgency-label}</span>
+						</span>
+						<span class="con1">
+							<img src="${context:lib/img/prio_low.png}" alt=""/>
+							<span class="label">${message:lowUrgency-label}</span>
+						</span>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</p:legendBlk>	
+		
+		
+		<table class="actionToolBar">
+			<tr>
+			<td>
+				${message:project-date-label}: <span class="date">${curProj.sdatedisplay} - ${curProj.edatedisplay}</span>
+			</td>
+			<td class="right">
+				<form t:type="form" t:id="displayOptionForm" style="display: inline;" autofocus="false">
+					${message:display}: <t:select t:id="displayType" value="displayType" validate="required" onchange="this.form.submit()"/>
+					<t:select t:id="displayStatus" value="displayStatus"  blankLabel="${message:-all-}" onchange="this.form.submit()"/>
+					<t:select t:id="displayAssign" value="displayAssign" blankLabel="${message:-all-}" model="displayAssignModel" onchange="this.form.submit()"/>
+				</form>
+			</td>
+			</tr>
+		</table>
+			
+		
+		<div id="scheduleContainer" >
+		<div class="wrapper">
+			<table id="schdBlk" cellspacing="0" cellpadding="0" style="width:${totalScheduleWidth}px;" >
+				<thead>
+					<tr>
+						<th rowspan="2" class="iconspan"><t:outputraw value="emptyString"/></th>
+						<th rowspan="2" class="description" colspan="2">${message:description-label}</th>
+						<th rowspan="2" class="duration">${message:duration-label}</th>
+						<th rowspan="2" class="percentDone">${message:percentDone-label}</th>
+						<th rowspan="2" class="hiddenCol" ></th>
+				 		<t:loop source="dateTopColumns" value="dateTopColumn">
+							<th class="dateTopCol" colspan="${dateTopColumnCountDisplay}">${dateTopColumnDisplay}</th>
+						</t:loop>
+					</tr>
+					<tr>
+						<t:loop source="dateColumns" value="dateColumn">
+							<th class="dateCol">${dateColumnDisplay}</th>
+						</t:loop>
+					</tr>
+				</thead>
+			
+				<tbody>
+					<t:loop source="milestones" value="milestone">
+						<tr class="milestone-row">
+							<td class="iconspan">
+								<span class="${milestoneIconClass}" id="icon_m_${milestone.id}" onclick="milestoneIconClick(${milestone.id});" />
+							</td>
+							<td class="description" >
+								<a class="tooltipTrigger" href="#" t:type="pageLink" page="modules/scheduling/milestoneview" context="milestone.id">
+									${milestone.name}
+								</a>
+								<div class="tooltip">
+									<table>
+										<tr>
+											<th>${message:milestone-label}:</th>
+											<td>${milestone.name}</td>
+										</tr>
+										<tr>
+											<th>${message:manager-label}:</th>
+											<td>
+												<t:if test="${milestone.manager}">
+													${milestone.manager.displayname}
+												</t:if>
+											</td>
+										</tr>
+										<t:if test="milestone.comment">
+											<tr>
+												<th>${message:comment-label}:</th>
+												<td>${milestone.comment}</td>
+											</tr>
+										</t:if>
+									</table>
+								</div>
+									<t:if test="canCreatePhase()">
+										<span class="nowrap">
+											[<a href="#" class="alink" t:type="pageLink" page="modules/scheduling/phaseEdit" context="milestoneIdAndPhaseId">${message:addPhase}</a>]
+										</span>
+									</t:if>
+									<t:if test="canCreateTask()">
+										<span class="nowrap">
+											[<a href="#" class="alink" t:type="pageLink" page="modules/scheduling/taskEdit" context="milestoneIdAndPhaseIdAndTaskId">${message:addTask}</a>]
+										</span>
+									</t:if>
+									<t:if test="canDeleteMilestone(milestone)">
+										<span class="nowrap">
+											[<a href="#" class="alink" t:type="actionLink" t:id="removeMilestone" context="milestone.id"
+												t:mixins="Confirm" t:message="${message:confirm-delete-milestone-text}"
+												>${message:remove}</a>]
+										</span>
+									</t:if>
+								
+							</td>
+							<td class="urgIcon">
+								
+							</td>
+							<td class="duration" ><span class="date">${milestone.deadlineDisplay}</span></td>
+						  	<td class="percentDone">${milestone.averagePercentDone}</td>
+							<td class="hiddenCol" >
+								<div class="chartBarWrapper">
+									<div class="todayBar today" style="left: ${todayLeftMargin}px;  "/>
+									<div class="chartBar milestone" style="left: ${computeWidthAdjustSingle(StartDay, milestone.deadline, false, 12)}px; "/>
+								</div>	
+							</td>
+						  	<t:loop source="dateColumns" value="dateColumn" >
+								<td class="dateCol" ><t:outputraw value="emptyString"/></td>
+							</t:loop>
+						</tr>
+						
+						<t:loop source="milestone.SortedTasksAndPhases" value="activity">
+							<t:if test="isInstanceofTask(activity)">
+								<t:if test="filterCheck(task)">
+									<tr class="task-row icon_m_${milestone.id}">
+										<t:delegate to="block:taskRow"/>
+									</tr>
+								</t:if>
+								
+								<t:block t:id="taskRow">
+									<td class="iconspan">
+										<span class="icontask" />
+									</td>
+									<td class="description">
+										<a class="tooltipTrigger" href="#" t:type="pageLink" page="modules/scheduling/taskview" context="task.id">
+											${task.name}
+										</a>
+										<div class="tooltip">
+											<table>
+												<tr>
+													<th>${message:task-label}:</th>
+													<td>${task.name}</td>
+												</tr>
+												<tr>
+													<th>${message:manager-label}:</th>
+													<td>${task.manager.displayname}</td>
+												</tr>
+												<tr>
+													<th>${message:assignedTo-label}:</th>
+													<td>
+														${task.assignedPersonsDisplay}
+													</td>
+												</tr>
+												<t:if test="task.comment">
+													<tr>
+														<th>${message:comment-label}:</th>
+														<td>${task.comment}</td>
+													</tr>
+												</t:if>
+											</table>
+										</div>
+											<t:if test="canDeleteTask(task)">
+												<span class="nowrap"> [<a href="#" class="alink" t:type="actionLink" t:id="removeTask" context="task.id"
+													t:mixins="Confirm" t:message="message:confirm-delete-task-text"
+													>${message:remove}</a>]
+												</span>
+											</t:if>
+									</td>
+									<td class="urgIcon">
+										<img src="${getUrgencyLevelIcon(task.urgency)}" alt=""  title="${getUrgencyTip(task.urgency)}"/>
+									</td>
+									<td class="duration" ><span class="date">${task.startDateDisplay}</span> - <span class="date">${task.endDateDisplay}</span></td>
+								  	<td class="percentDone">
+									  		<t:if test="canEditTask(task)">
+										  		<p:else>
+													<div class="${getPercentDoneClass(task.percentageDone, task.endDate)}">${task.percentageDone}</div>
+												</p:else>
+										  		
+										  		<div class="${getPercentDoneClass(task.percentageDone, task.endDate)} percentT" 
+										  			id="percentT${task.id}"  onclick="editPercDone(${task.id})" title="${message:click-to-change}">${task.percentageDone}</div>
+												
+												<form t:type="form" t:id="ganttChartForm" clientId="ganttChartForm">
+										  		<t:select t:id="editPercentT" clientId="editPercentT${task.id}" 
+												  			 class="editPercentT"
+												  			 value="task.percentageDone" 
+												  			 validate="required" 
+												  			 onblur="editPercDoneBlur(${task.id});"
+												  			 onchange="this.form.submit();"
+												  			 model="literal:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100"
+												  	></t:select>
+												  	<input type="hidden" name="taskId" value="${task.id}"/>
+												</form>
+											</t:if>
+								  	</td>
+									<td class="hiddenCol" >
+										<div class="chartBarWrapper">
+											<div class="todayBar today" style="left: ${todayLeftMargin}px;  "></div>
+											<div class="chartBar task" title="${task.percentageDone}% ${getCompletedOn(task)}"
+												style="left: ${computeWidthAdjust(StartDay, task.startDate, false)}px;
+													 width: ${computeWidth(task.startDate, task.endDate, true)}px; "
+											></div>
+											<div class="chartBar done task" title="${task.percentageDone}% ${getCompletedOn(task)}"
+												style="left: ${computeWidthAdjust(StartDay, task.startDate, false)}px;
+													 width: ${computeWidthDone(task.startDate, task.endDate, true, task.percentageDone)}px; "
+													 ><t:outputraw value="emptyString"/></div>
+										</div>	
+									</td>
+								  	<t:loop source="dateColumns" value="dateColumn" index="var:i">
+										<td class="dateCol" ><t:outputraw value="emptyString"/></td>
+									</t:loop>
+								</t:block>
+							</t:if>
+							<t:if test="isInstanceofPhase(activity)">
+								<tr class="phase-row icon_m_${milestone.id}"  id="p_${phase.id}">
+									<td class="iconspan">
+										<span class="${phaseIconClass}" id="icon_p_${phase.id}" onclick="phaseIconClick('p_${phase.id}');" />
+									</td>
+									<td class="description">
+										<a class="tooltipTrigger" href="#" t:type="pageLink" page="modules/scheduling/phaseview" context="phase.id">
+											${phase.name}
+										</a>
+										<div class="tooltip">
+											<table>
+												<tr>
+													<th>${message:phase-label}:</th>
+													<td>${phase.name}</td>
+												</tr>
+												<tr>
+													<th>${message:manager-label}:</th>
+													<td>${phase.manager.displayname}</td>
+												</tr>
+												<t:if test="phase.comment">
+													<tr>
+														<th>${message:comment-label}:</th>
+														<td>${phase.comment}</td>
+													</tr>
+												</t:if>
+											</table>
+										</div>
+											<t:if test="canCreateTask()">
+												<span class="nowrap">
+													[<a href="#" class="alink" t:type="pageLink" page="modules/scheduling/taskEdit" context="PhaseIdAndTaskId">${message:addTask}</a>]
+												</span>
+											</t:if>
+											<t:if test="canDeletePhase(phase)">
+												<span class="nowrap">[<a href="#" class="alink" t:type="actionLink" t:id="removePhase" context="phase.id"
+													t:mixins="Confirm" t:message="${message:confirm-delete-phase-text}"
+													>${message:remove}</a>]
+												</span>
+											</t:if>
+									</td>
+									<td class="urgIcon">
+									</td>
+									<td class="duration" ><span class="date">${phase.startDateDisplay}</span> - <span class="date">${phase.endDateDisplay}</span></td>
+								  	<td class="percentDone">${phase.averagePercentDone}</td>
+									<td class="hiddenCol" >
+										<div class="chartBarWrapper">
+											<div class="todayBar today" style="left: ${todayLeftMargin}px;  "></div>
+											<div class="chartBar phase" 
+												style="left: ${computeWidthAdjust(StartDay, phase.startDate, false)}px;
+												 width: ${computeWidth(phase.startDate, phase.endDate, true)}px; "
+											></div>
+										</div>	
+									</td>							  	
+								  	<t:loop source="dateColumns" value="dateColumn">
+										<td class="dateCol" ><t:outputraw value="emptyString"/></td>
+									</t:loop>
+								</tr>
+				
+								<t:loop source="phase.tasks" value="task" >
+									<t:if test="filterCheck(task)">
+										<tr class="task2-row icon_p_${phase.id}">
+											<t:delegate to="block:taskRow"/>
+										</tr>
+									</t:if>
+								</t:loop>
+							</t:if>
+						</t:loop>
+					</t:loop>
+				
+					<tr><td colspan="5" class="addMilestoneRole">
+							<t:if test="canCreateMilestone()">
+								[<a href="#" t:type="pageLink" page="modules/scheduling/MilestoneEdit" context="ScheduleIdAndMilestoneId" class="alink">${message:addMilestone}</a>]
+							</t:if>
+						<t:outputraw value="emptyString"/>
+					</td>
+					</tr>
+				
+				</tbody>
+			</table>
+		</div>
+		</div>
+		
+		
+		
+</html>

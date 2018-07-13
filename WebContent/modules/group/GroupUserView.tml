@@ -1,0 +1,51 @@
+<html t:type="layout" 
+	title="${message:view} ${message:group}"
+	currentModule="${moduleName}"
+	currentProj="curProj"
+	breadcrumb="${curProj.encodeddisplayname}=project/home?${curProj.id}
+			,${message:manage-group}=modules/group?${curProj.id}
+			,${message:view} ${message:group}=modules/group/userview"
+   xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+   
+	<div class="t-beaneditor e-formeditor">
+		<table >
+			<tr>
+				<td class="label">${message:group}</td>
+				<td>
+						${group.groupType}
+				</td>
+			</tr>
+			<tr>
+				<td class="label">${message:groupNum-label}</td>
+				<td>
+					${groupUser.groupNum}
+				</td>
+			</tr>
+			<t:if test="groupUser.groupNumName">
+				<tr>
+					<td class="label">${message:groupNumName-label}</td>
+					<td>
+						${groupUser.groupNumName}
+					</td>
+				</tr>
+			</t:if>
+			<tr>
+				<td class="label">${message:group-members}</td>
+				<td>
+					<t:loop source="groupUser.users" value="user">
+						<t:pagelink page="user/view" context="user.id">
+							${user.displayname}
+						</t:pagelink>
+						<br/>
+					</t:loop>
+				</td>
+			</tr>
+		</table>
+	</div>
+			
+	
+	<div class="botpage">
+		<a href="javascript:history.go(-1);" class="button welBtn"><span>${message:back}</span></a>
+	</div>
+</html>

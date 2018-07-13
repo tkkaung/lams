@@ -1,0 +1,256 @@
+<html t:type="layout" 
+	title="${message:elog-approve-list}"
+	currentModule="${moduleName}"
+   currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/elog/home?${project.id}
+		,${message:elog-approve-list}=modules/elog/approveoverview?${project.id}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+	
+	<style>
+		.action{
+			width: 90px;
+			text-align: center;
+		}
+		
+	</style>
+	
+	<p:actionBtns>
+		<a class="button rounded" t:type="pageLink" page="modules/elog/home" context="project.id" >
+			<span>${message:view-published-elogs}</span>
+		</a>
+	</p:actionBtns>	
+		
+	<table class="actionToolBar">
+		<tr>
+			<td class="right">
+				<form t:type="form" t:id="filterForm" autofocus="false">
+					<span class="fTitle">${message:filter}:</span> 
+					<t:textfield t:id="filterText" value="filterText"/>
+					<t:submit value="${message:go}" class="squared"/>
+				</form>
+			</td>
+		</tr>
+	</table>	
+
+
+	<table class="dashboard-container">
+		<tr>
+			<td class="left">
+
+				<div class="container-box">
+		       	<div class="title"><div class="box">
+		       		<span class="altColor" >
+		       			${message:pending-elogs}
+		       		</span>
+			 		</div></div>
+		       	<div class="content">
+	       			<t:grid source="pendingElogs" 
+							row="elog" 
+							pagerPosition="bottom" 
+							rowClass="prop:evenodd.next"
+							model="getModel()"
+							>
+							<p:empty>
+								<div class="notfoundtext">${message:no-elog-pending}</div>
+							</p:empty>
+							<p:subjectHeader></p:subjectHeader>
+							<p:subjectCell>
+								<div >
+		       					<span class="date">${elog.mdateDisplay}</span> - 
+		       					<t:pageLink page="modules/elog/preview" context="elog.id">
+		       						${elog.subject} 
+		       					</t:pageLink>
+		       					<span style="margin-left:5px;vertical-align:bottom;">
+										<t:loop source="elog.files" value="attFile">
+											<t:eventLink event="retrieveFile" context="attFile.id">
+												<img src="${context:lib/img/icon-attachment.gif}"  alt="" title="${message:click-to-download}"/>
+											</t:eventLink>
+										</t:loop>
+									</span>
+		       					- 
+		       					<span class="author">
+										<t:pagelink page="user/view" context="elog.author.id">${elog.author.displayname}</t:pagelink>
+									</span>
+									<br/>
+								</div>
+							
+							</p:subjectCell>
+							<p:actionHeader></p:actionHeader>
+							<p:actionCell>
+								<t:pagelink page="modules/elog/approve" context="elog.id" class="button rounded">
+									<span>${message:approve-reject}</span>
+								</t:pagelink>
+							</p:actionCell>
+						</t:grid>
+	       		</div>
+			  </div>
+			
+			
+				<div class="container-box">
+		       	<div class="title"><div class="box">
+		       		<span class="altColor" >
+		       			${message:rejected-elogs}
+		       		</span>
+			 		</div></div>
+		       	<div class="content">
+	       			<t:grid source="rejectedElogs" 
+							row="elog" 
+							pagerPosition="bottom" 
+							rowClass="prop:evenodd.next"
+							model="getModel()"
+							>
+							<p:empty>
+								<div class="notfoundtext">${message:no-elog-rejected}</div>
+							</p:empty>
+							<p:subjectHeader></p:subjectHeader>
+							<p:subjectCell>
+								<div >
+		       					<span class="date">${elog.mdateDisplay}</span> - 
+		       					<t:pageLink page="modules/elog/preview" context="elog.id">
+		       						${elog.subject}
+		       					</t:pageLink>
+		       					<span style="margin-left:5px;vertical-align:bottom;">
+										<t:loop source="elog.files" value="attFile">
+											<t:eventLink event="retrieveFile" context="attFile.id">
+												<img src="${context:lib/img/icon-attachment.gif}"  alt="" title="${message:click-to-download}"/>
+											</t:eventLink>
+										</t:loop>
+									</span>
+		       					- 
+		       					<span class="author">
+										<t:pagelink page="user/view" context="elog.author.id">${elog.author.displayname}</t:pagelink>
+									</span>
+									<br/>
+								</div>
+							
+							</p:subjectCell>
+							<p:actionHeader></p:actionHeader>
+							<p:actionCell>
+								
+							</p:actionCell>
+						</t:grid>
+	       		</div>
+			  </div>
+			
+			</td>
+			<td class="mid" >
+				<div style="min-height: 290px;height:auto!important;_height:290px; ">
+					<t:outputraw value="getSpace()"/>
+				</div>
+			</td>
+			<td class="right">
+				
+				<div class="container-box">
+		       	<div class="title"><div class="box">
+		       		<span class="altColor" >
+		       			${message:approved-published-elogs}
+		       		</span>
+			 		</div></div>
+		       	<div class="content">
+	       			<t:grid source="approvedPublishedElogs" 
+							row="elog" 
+							pagerPosition="bottom" 
+							rowClass="prop:evenodd.next"
+							model="getModel()"
+							>
+							<p:empty>
+								<div class="notfoundtext">${message:no-elog-approved-published}</div>
+							</p:empty>
+							<p:subjectHeader></p:subjectHeader>
+							<p:subjectCell>
+								<div >
+		       					<span class="date">${elog.mdateDisplay}</span> - 
+		       					<t:pageLink page="modules/elog/preview" context="elog.id">
+		       						${elog.subject} <t:outputraw value="getSpace()"/>
+		       					</t:pageLink>
+		       					<span style="margin-left:5px;vertical-align:bottom;">
+										<t:loop source="elog.files" value="attFile">
+											<t:eventLink event="retrieveFile" context="attFile.id">
+												<img src="${context:lib/img/icon-attachment.gif}"  alt="" title="${message:click-to-download}"/>
+											</t:eventLink>
+										</t:loop>
+									</span>
+		       					- 
+		       					<span class="author">
+										<t:pagelink page="user/view" context="elog.author.id">${elog.author.displayname}</t:pagelink>
+									</span>
+									<br/>
+								</div>
+							
+							</p:subjectCell>
+							<p:actionHeader></p:actionHeader>
+							<p:actionCell>
+					<!-- 			<t:actionLink t:id="unpublishElog" context="elog.id" class="button rounded"
+									t:mixins="Confirm" t:message="${message:confirm-unpublish-elog}">
+									<span>${message:unpublish}</span>
+					 			</t:actionLink>
+					-->		</p:actionCell>
+						</t:grid>
+	       		</div>
+			  </div>
+				
+				<div class="container-box">
+		       	<div class="title"><div class="box">
+		       		<span class="altColor" >
+		       			${message:approved-unpublished-elogs}
+		       		</span>
+			 		</div></div>
+		       	<div class="content">
+	       			<t:grid source="approvedUnpublishedElogs" 
+							row="elog" 
+							pagerPosition="bottom" 
+							rowClass="prop:evenodd.next"
+							model="getModel()"
+							>
+							<p:empty>
+								<div class="notfoundtext">${message:no-elog-approved-unpublished}</div>
+							</p:empty>
+							<p:subjectHeader></p:subjectHeader>
+							<p:subjectCell>
+								<div >
+		       					<span class="date">${elog.mdateDisplay}</span> - 
+		       					<t:pageLink page="modules/elog/preview" context="elog.id">
+		       						${elog.subject}
+		       					</t:pageLink>
+		       					<span style="margin-left:5px;vertical-align:bottom;">
+										<t:loop source="elog.files" value="attFile">
+											<t:eventLink event="retrieveFile" context="attFile.id">
+												<img src="${context:lib/img/icon-attachment.gif}" alt="" title="${message:click-to-download}"/>
+											</t:eventLink>
+										</t:loop>
+									</span>
+		       					- 
+		       					<span class="author">
+										<t:pagelink page="user/view" context="elog.author.id">${elog.author.displayname}</t:pagelink>
+									</span>
+									<br/>
+								</div>
+							
+							</p:subjectCell>
+							<p:actionHeader></p:actionHeader>
+							<p:actionCell>
+								<t:actionLink t:id="publishElog" context="elog.id" class="button rounded"
+									t:mixins="Confirm" t:message="${message:confirm-publish-elog}">
+									<span>${message:publish}</span>
+								</t:actionLink>
+							</p:actionCell>
+						</t:grid>
+	       		</div>
+			  </div>
+				
+
+			</td>
+		</tr>
+	</table>
+
+
+
+
+
+
+
+
+	
+</html>

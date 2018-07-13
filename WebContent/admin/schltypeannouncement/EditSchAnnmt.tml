@@ -1,0 +1,67 @@
+<html t:type="layout"
+	title="${getTitle()}"
+	breadcrumb="${message:control-panel}=admin
+		,${message:manage} ${message:schoolannouncement}=admin/schltypeannouncement/manageschannmt
+		,${getTitle()}=admin/schltypeannouncement/editschannmt"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="announcement"/></p:leftMenuBlk>
+
+
+	<p:legendBlk>
+		<span class="required">*</span>  ${message:required-fields}
+	</p:legendBlk>
+
+	<t:beaneditform t:id="form"  object="annmt" 
+      		submitLabel="${message:submit-label}"
+      		exclude="cdate,mdate"
+      		add="school,projtype"
+      		reorder="school,projtype"
+      		autofocus="false">
+	    <t:parameter name="subject">
+	    	<t:label for="subject"><span class="required">*</span> ${message:subject-label}</t:label>
+	      	<t:textfield t:id="subject" value="annmt.subject" validate="required,maxlength=255"  class="lwidth"/>
+	    </t:parameter>
+	     <t:parameter name="content">
+		      <t:label for="content"><span class="required">*</span> ${message:content-label}</t:label>
+		      <textarea t:type="ck/editor" t:id="content" value="prop:annmt.content"
+   		            customConfiguration="context:lib/js_config/ckeditor.js" toolbarSet="Default"
+               	width="630px" height="400px" validate="required"></textarea>
+		 </t:parameter>
+		<t:parameter name="sdate">
+	   	<div class="datetime">
+	      	<t:label for="sdate"/>
+	      	<span class="datetimeField">
+	      	<t:ck.datetimefield t:id="sdate" value="annmt.sdate" 
+	      		timePicker="true" timePickerAdjacent="true" datePattern="${message:datetimefield-format}"/>
+	      	</span>
+	      	<span class="formTip">${message:sdate-tip}</span>
+	 		</div>
+		 </t:parameter>
+		 <t:parameter name="edate">
+		   <div class="datetime">
+		      <t:label for="edate"/>
+		      <span class="datetimeField">
+		      <t:ck.datetimefield t:id="edate" value="annmt.edate"  
+		      	timePicker="true" timePickerAdjacent="true" datePattern="${message:datetimefield-format}"/>
+		      </span>
+		      <span class="formTip">${message:edate-tip}</span>
+		 	</div>
+		 </t:parameter>
+		 <t:parameter name="urgent">
+		      <t:label for="urgent">${message:urgent-label}</t:label>
+		      <input t:type="checkbox" t:id="urgent" value="annmt.urgent" />
+		      <span class="formtip">${message:form-urgent-tip}</span>
+		      <img src="${context:lib/img/icon_urgent.png}" />
+		 </t:parameter>
+		 <t:parameter name="school" >
+	      <t:label for="school"><span class="required">*</span> ${message:school-label}</t:label>
+	      <t:select t:id="school" value="annmt.school" model="schoolModel" validate="required"/>
+		 </t:parameter>
+		 <t:parameter name="projType" >
+	 	   <t:label for="projType">${message:projType-label}</t:label>
+	      <t:select t:id="projType" value="annmt.projType" model="projTypeModel" blankLabel="message:-all-"/>
+		 </t:parameter>
+   </t:beaneditform>
+   
+</html>

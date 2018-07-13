@@ -1,0 +1,58 @@
+<html t:type="layout" title="${message:project-statistic}"
+	breadcrumb="${message:control-panel}=admin,${message:project-statistic}=admin/project/AllProjectsStat"
+	totalShowOption="${totalSize}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" xmlns:p="tapestry:parameter">
+		<p:leftMenuBlk><t:ControlPanMenu initTab="statistic"/></p:leftMenuBlk>
+   <style>
+	#projGrid span.uName{
+		display: block;
+		margin-bottom: 5px;
+	}     	
+	#projGrid span.mName{
+		display: block;
+	}
+	.moreBtn, .lessBtn {
+		font-size: 0.9em;
+		font-style: italic;
+	}
+	.statBtn{
+		margin-top: 15px;
+	}
+	table.t-data-grid THEAD TR TH {
+		white-space: normal;
+	}
+	</style>
+		<table class="actionToolBar">
+			<tr>
+				<td class="right">
+					<form t:type="form" t:id="filterForm">
+						<t:errors/>	
+						${message:year-label}
+						<t:select t:id="filterYear" value="filterYear" validate="required" model="projYearModel" />
+						${message:status-label}
+						<t:select t:id="filterStatus" value="filterStatus" model="projStatusModel" blankLabel="${message:-all-}"/>
+						${message:type-label}
+						<t:select t:id="filterType" value="filterType" model="projTypeModel" blankLabel="${message:-all-}"/>
+						${message:school-label}
+						<t:select t:id="filterSchool" value="filterSchool" model="schoolModel" blankLabel="${message:-all-}"/>
+						
+						<t:submit value="${message:go}" class="squared"/>	
+					</form>
+				</td>
+			</tr>
+		</table>
+	 <form t:type="form" t:id="projForm">
+	 	<t:errors/>
+<t:grid source="projects" row="project" model="model" pagerPosition="both" rowIndex="rowIndex" id="projGrid" rowsperpage="rowsperpage">
+	<t:parameter name="NoCell">${getNo()}</t:parameter>
+	<t:parameter name="nameCell">
+		<t:pageLink page="admin/project/stat" context="project.id">${project.name}</t:pageLink>
+	</t:parameter>
+	<t:parameter name="statusCell">${project.status.displayname}</t:parameter>
+	<t:parameter name="schoolCell">${project.school.displayname}</t:parameter>
+	<t:parameter name="typeCell">${project.type.displayname}</t:parameter>
+	<t:parameter name="numVisitCell">${project.numVisit}</t:parameter>
+	
+</t:grid>
+ 		</form>
+</html>

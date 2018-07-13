@@ -1,0 +1,55 @@
+<html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <link rel="SHORTCUT ICON" href="${context:lib/img/favicon.ico}" />
+    <title>eUreka - Projects Stats</title>
+</head>
+<body>
+<table class="actionToolBar">
+	<tr>
+		<td class="right">
+			<form t:type="form" t:id="filterForm">
+				<t:errors/>	
+				${message:year-label}
+				<t:select t:id="filterYear" value="filterYear" validate="required" model="projYearModel" />
+				${message:status-label}
+				<t:select t:id="filterStatus" value="filterStatus" model="projStatusModel" blankLabel="${message:-all-}"/>
+				${message:type-label}
+				<t:select t:id="filterType" value="filterType" model="projTypeModel" blankLabel="${message:-all-}"/>
+				${message:school-label}
+				<t:select t:id="filterSchool" value="filterSchool" model="schoolModel" blankLabel="${message:-all-}"/>
+				<t:submit value="${message:go}" class="squared"/>	
+			</form>
+		</td>
+	</tr>
+</table>
+<t:grid source="projects" row="project" model="model" pagerPosition="both" rowIndex="rowIndex" id="projGrid" rowsperpage="rowsperpage">
+	<t:parameter name="NoCell">${getNo()}</t:parameter>
+	<t:parameter name="statusCell">${project.status.displayname}</t:parameter>
+	<t:parameter name="schoolCell">${project.school.displayname}</t:parameter>
+	<t:parameter name="typeCell">${project.type.displayname}</t:parameter>
+	<t:parameter name="numVisitCell">${project.numVisit}</t:parameter>
+	<t:parameter name="membersCell">${member}</t:parameter>
+	<t:parameter name="announcementCell">${announcement}</t:parameter>
+	<t:parameter name="assessmentCell">${assessment}</t:parameter>
+	<t:parameter name="blogCell">${blog}</t:parameter>
+	<t:parameter name="budgetCell">${budget}</t:parameter>
+	<t:parameter name="elogCell">${elog}</t:parameter>
+	<t:parameter name="forumCell">${forum}</t:parameter>
+	<t:parameter name="noteCell">${note}</t:parameter>
+	<t:parameter name="resourceCell">${resource}</t:parameter>
+	<t:parameter name="timelineCell">${timeline}</t:parameter>
+</t:grid>
+<table class="actionToolBar3">
+	<tr>
+		<td class="right">		 	
+			<form t:type="form" t:id="rowsPerPageForm" autofocus="false">
+				${totalShowOption} ${message:results-found}, ${message:show}
+				<select t:type="select" t:id="rowsPerPageSelect" model="literal:1,5,10,20,50,100" value="rowsPerPage" onchange="this.form.submit()" />
+					${message:results-per-page}
+			</form>
+		</td>
+	</tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<html t:type="layout" 
+	title="message:migrate-projects"
+   breadcrumb="${message:control-panel}=admin,${message:migrate-projects}=admin/backuprestore/migrateprojects"
+   xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="project"/></p:leftMenuBlk>
+
+
+
+<table class="actionToolBar">
+		<tr>
+			<td class="right">
+			</td>
+		</tr>
+	</table>	
+		
+		<div class="proc-form">
+			<form t:type="form" t:id="selectProjForm">
+				<t:errors/>
+				<div class="instruction"></div>
+				<div class="proc-area">
+					<div style="margin-bottom:10px;">
+						eUreka1 Project Status:
+						<t:select t:id="statusSelect" value="status" model="statusModel" blanklabel="${message:-all-}" 
+							zone="countProjZone"
+						/>
+						(
+						<t:zone t:id="countProjZone" style="display:inline;"><strong>${getCountProjs()}</strong></t:zone> 
+						projects
+						) 
+					</div>
+				
+					 
+					
+					
+					<div style="margin:10px;">
+						Migrate Starting from row number: <t:textfield t:id="firstResult"  class="swidth"/>
+						<br/>
+						Limit Max results: <t:textfield t:id="maxResult" class="swidth"/>  
+						<br/>
+						<span class="formtip">(Leave empty for migrate ALL)</span>
+					</div>
+					
+					<div style="margin:10px;">
+						<t:label for="whenExist">If eureka1 project ID exists in eureka2 (i.e: previously migrated):</t:label>
+						<div style="margin:10px;">
+							<t:RadioGroup t:id="whenExist" value="whenExistRadio" encoder="stringEncoder">
+								<t:Radio t:id="radioIgnore" value="literal:Ignore" /> Ignore the project
+								<br/>
+								<t:Radio t:id="radioAddModule" value="literal:AddModule" /> Add modules only
+								<br/>
+								<t:Radio t:id="radioReplace" value="literal:Replace" /> Delete it and Add new project
+							</t:RadioGroup>
+						</div>
+					</div>
+					<span class="formtip">This can take hours to finish... Please be patient...</span>
+				</div>
+				<div class="footer">
+					<t:submit value="Start Migration Process" class="squared"/>	
+				</div>
+			</form>
+		</div>
+		
+	
+	
+</html>

@@ -1,0 +1,39 @@
+<html t:type="layout" title="Admin Page Instruction"
+	breadcrumb="Admin Page Instruction=admin/adminpageinstruction"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="systemtools"/></p:leftMenuBlk>
+	<p style="color:#ff3300;">
+	WARNING: Use this pages with care. It bypass the checking.
+	</p>
+	<div style="padding:5px;">
+	
+	1. 	Edit grouping, after the group is used and student already started evaluating. 
+		<ul>
+		<li>- Go the edit grouping page</li>
+		<li>- add the word "admin" into the URL.  
+			<br/>
+			eg: From <em>/webapp/modules/group/edit/1722662626273</em> to <em>/webapp/modules/group/edit<strong>admin</strong>/1722662626273</em>
+			<a href="${context:lib/ss/ss2-editgroup.jpg}" target="_blank" style="padding-left:15px;">Picture1 </a>
+			<br/>
+			eg: From <em>/webapp/modules/group/enrolluser/1722662626273</em> to <em>/webapp/modules/group/enrolluser<strong>admin</strong>/1722662626273</em>
+			<a href="${context:lib/ss/ss1-enrolluser.jpg}" target="_blank"  style="padding-left:15px;">Picture2 </a>
+			
+		</li>
+		</ul>
+	 </div>
+	 ---------------------
+	<div style="padding:5px;">
+	
+	2. 	Delete Student's Evaluated grades 
+		<ul>
+		<li>- Go the view grade by evaluator</li>
+		<li>- add the word "admin" into the URL.  
+			<br/>
+			eg: From <em>/webapp/modules/peerevaluation/viewdetailbyassessor/48366333/223334</em> to <em>/webapp/modules/peerevaluation/viewdetailbyassessor<strong>admin</strong>/48366333/223334</em>
+			<a href="${context:lib/ss/ss3-deletedEvaulatedGrade.jpg}" target="_blank" style="padding-left:15px;">Picture3 </a>			
+		</li>
+		</ul>
+	 </div>
+	
+	
+</html>

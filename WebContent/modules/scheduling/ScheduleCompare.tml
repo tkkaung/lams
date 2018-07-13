@@ -1,0 +1,276 @@
+<html t:type="layout" 
+	title="${message:compare-gantt-chart-page-title}"
+	currentModule="${moduleName}"
+	currentProj="curProj"
+	breadcrumb="${curProj.encodeddisplayname}=project/home?${curProj.id}
+		,${module.displayName}=modules/scheduling?${curProj.id}
+		,${message:manage-version-page-title}=modules/scheduling/schedulemanage?${curProj.id}
+		,${message:compare-gantt-chart-page-title}=modules/scheduling/schedulecompare?"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+	
+	<style>
+		.schedule {
+			background-color: #f4f4f4;
+		}
+		.schedule thead th{
+			background: #969696 url('${context:lib/img/action_tool_bar2_bg.png}') repeat-x;
+			border: 1px solid #f9f9f9;
+			font-size: 12px;
+		}
+		.schedule tbody tr td{
+			border: 1px solid #f9f9f9;
+			background: #f4f4f4 ;
+		}
+		
+		.schd1_remarks{
+			font-weight: normal;
+		}
+		.schd1_remarks .label{
+			font-size: 0.9em;
+			font-weight: bold;
+		}
+		.description{
+			width: 350px;
+		}
+		.duration{
+			width: 130px;
+		}
+		.percentDone{
+			width: 60px;
+		}
+		.schedule td {
+			background-color: #ffffff;
+			border-bottom: 1px solid #f4f4f4;
+			border-right: 1px solid #f4f4f4;
+			padding-left: 3px;
+		}
+		.schedule .milestone-row td.description{
+			padding-left: 0px;
+			font-size: 14px;
+		}
+		.schedule .phase-row td.description{
+			padding-left: 10px;
+			font-size: 13px;
+		}
+		.schedule .task-row td.description{
+			padding-left: 10px;
+			font-size: 12px;
+		}
+		.schedule .task2-row td.description{
+			padding-left: 20px;
+			font-size: 12px;
+		}
+		
+		div.legend{
+			font-weight: bold;
+		}
+		div.legend td.label{
+			padding-right: 20px;
+		}
+		div.legendmark{
+			width: 25px;
+			height:10px;
+			float: left; 
+			border: 1px solid #666;
+		}
+		.schedule .same , .same{
+			background-color: #fff;
+		}
+		.schedule .changed , .changed{
+			background-color: #beb;
+		}
+		.schedule .removed , .removed{
+			background-color: #fbb;
+		}
+		.schedule .added , .added{
+			background-color: #7be;
+		}
+		
+	</style>
+
+<p:legendBlk>
+	<div class="legend">
+		<div class="title">${message:legend}</div>
+		<div class="content">
+			<table>
+				<tr>
+					<td><div class="legendmark same" /></td>
+					<td class="label">${message:legend-unchanged}</td>
+					<td><div class="legendmark changed" /></td>
+					<td class="label">${message:legend-changed}</td>
+					<td><div class="legendmark removed" /></td>
+					<td class="label">${message:legend-removed}</td>
+					<td><div class="legendmark added" /></td>
+					<td class="label">${message:legend-added}</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</p:legendBlk>
+
+<table class="actionToolBar">
+	<tr><td class="right">
+	</td>
+	</tr>
+</table>	
+	
+		<table width="100%">
+			<tr>
+				<th >
+					${message:version-saved-on}: 
+					<a href="#" t:type="pageLink" page="modules/scheduling/scheduleView" context="schedule.id" 
+						onclick="popup(this.href , 'schd_Window'); return false;"
+						target="_blank">
+						<span>${schedule.createDateDisplay}</span>
+					</a>
+					<br/> ${message:createdBy-label}: <t:pagelink page="user/view" context="schedule.user.id">${schedule.user.displayName}</t:pagelink>
+					<t:if test="schedule.remarks">
+						<br/><span class="schd1_remarks"> <span class="label">${message:remarks-label}:</span> ${schedule.remarks}</span>
+					</t:if>
+				</th>
+				<th width="5px"></th>
+				<th >
+					<a href="#" t:type="pageLink" page="modules/scheduling/scheduleView" context="activeSchedule.id" 
+						onclick="popup(this.href , 'schd_Window'); return false;"
+						target="_blank">
+						<span>${message:current-version}</span>
+					</a>
+				</th>
+			</tr>
+			<tr>
+				<td valign="top">
+					<div id="schedule1Container" >
+						<table id="schedule1" class="schedule">
+							<thead>
+								<tr>
+									<th class="description">${message:description-label}</th>
+									<th class="duration">${message:duration-label}</th>
+									<th class="percentDone">${message:percentDone-label}</th>
+								</tr>
+							</thead>
+							<tbody>
+								<t:unless test="schedule.milestones">
+									<tr><td colspan="3">
+										${message:NoItemToDisplay} 
+									</td></tr>
+								</t:unless>
+								<t:loop source="schedule.milestones" value="milestone">
+									<tr class="milestone-row">
+										<td class="description ${getComparedClassName(milestone, activeSchedule, nameField, false, true)}">
+											${milestone.name}
+										</td>
+										<td colspan="2" class="duration ${getComparedClassName(milestone, activeSchedule, dateField, true, true)}">
+											<div class="small" >${milestone.deadlineDisplay}</div>
+										</td>
+									</tr>
+									<t:loop source="milestone.SortedTasksAndPhases" value="activity">
+										<t:if test="isInstanceofPhase(activity)">
+											<tr class="phase-row" >
+												<td class="description ${getComparedClassName(phase, activeSchedule, nameField, false, true)}">
+													${phase.name}
+												</td>
+												<td colspan="2" class="duration ${getComparedClassName(phase, activeSchedule, dateField, true, true)}">
+													<div class="small" >${phase.startDateDisplay} - ${phase.endDateDisplay}</div>
+												</td>
+											</tr>
+										
+											<t:loop source="phase.tasks" value="task" >
+												<tr class="task2-row">
+													<t:delegate to="block:taskRow"/>
+												</tr>
+											</t:loop>
+										</t:if>
+										<t:if test="isInstanceofTask(activity)">
+											<tr class="task-row">
+												<t:delegate to="block:taskRow"/>
+											</tr>
+											<t:block t:id="taskRow">
+												<td class="description ${getComparedClassName(task, activeSchedule, nameField, false, true)}">
+													${task.name}
+												</td>
+												<td class="duration ${getComparedClassName(task, activeSchedule, dateField, true, true)}">
+													<div class="small" >${task.startDateDisplay} - ${task.endDateDisplay}</div>
+												</td>
+												<td class="percentDone ${getComparedClassName(task, activeSchedule, percentDoneField, true, true)}">
+													<div class="PercentDone">${task.percentageDone}</div>
+												</td>
+											</t:block>
+										</t:if>
+										
+									</t:loop>
+								</t:loop>
+							</tbody>
+						</table>
+					</div>
+				</td>
+				<td > </td>
+				<td valign="top">
+					<div id="schedule2container">
+						<table id="schedule2" class="schedule">
+							<thead>
+								<tr>
+									<th class="description">${message:description-label}</th>
+									<th class="duration">${message:duration-label}</th>
+									<th class="percentDone">${message:percentDone-label}</th>
+								</tr>
+							</thead>
+							<tbody>
+								<t:unless test="activeSchedule.milestones">
+									<tr><td colspan="3">
+										${message:NoItemToDisplay} 
+									</td></tr>
+								</t:unless>
+								<t:loop source="activeSchedule.milestones" value="milestone">
+									<tr class="milestone-row">
+										<td class="description ${getComparedClassName(milestone, schedule, nameField, false, false)}">
+											${milestone.name}
+										</td>
+										<td colspan="2" class="duration ${getComparedClassName(milestone, schedule, dateField, true, false)}">
+											<div class="small" >${milestone.deadlineDisplay}</div>
+										</td>
+									</tr>
+									<t:loop source="milestone.SortedTasksAndPhases" value="activity">
+										<t:if test="isInstanceofPhase(activity)">
+											<tr class="phase-row" >
+												<td class="description ${getComparedClassName(phase, schedule, nameField, false, false)}">
+													${phase.name}
+												</td>
+												<td colspan="2" class="duration ${getComparedClassName(phase, schedule, dateField, true, false)}">
+													<div class="small" >${phase.startDateDisplay} - ${phase.endDateDisplay}</div>
+												</td>
+											</tr>
+										
+											<t:loop source="phase.tasks" value="task" >
+												<tr class="task2-row">
+													<t:delegate to="block:taskRow2"/>
+												</tr>
+											</t:loop>
+										</t:if>
+										<t:if test="isInstanceofTask(activity)">
+											<tr class="task-row">
+												<t:delegate to="block:taskRow2"/>
+											</tr>
+											<t:block t:id="taskRow2">
+												<td class="description ${getComparedClassName(task, schedule, nameField, false, false)}">
+													${task.name}
+												</td>
+												<td class="duration ${getComparedClassName(task, schedule, dateField, true, false)}">
+													<div class="small" >${task.startDateDisplay} - ${task.endDateDisplay}</div>
+												</td>
+												<td class="percentDone ${getComparedClassName(task, schedule, percentDoneField, true, false)}">
+													<div class="PercentDone">${task.percentageDone}</div>
+												</td>
+											</t:block>
+										</t:if>
+										
+									</t:loop>
+								</t:loop>
+							</tbody>
+						</table>
+					</div>
+				</td>
+			</tr>
+		</table>
+		
+</html>

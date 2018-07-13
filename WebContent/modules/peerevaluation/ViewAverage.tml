@@ -1,0 +1,620 @@
+<html t:type="layout" 
+	title="${message:view-evaluation-average}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/peerevaluation/home?${project.id}
+		,${message:manage-evaluation}=modules/peerevaluation/manage?${project.id}
+		,${message:view-evaluation-average}=modules/peerevaluation/viewaverage
+		"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+<style>
+	
+	#evalContainer {
+		overflow-x: auto;
+	<t:if test="${isMoreThan(eval.criterias.size(), 7)}">	
+		_overflow-x: scroll;  /* IE */
+	</t:if>
+		width: 100%;
+	}
+	table.t-data-grid th.no_bot_border{
+		border-bottom-color: #ccc !important; 
+	}
+	table.t-data-grid th.no_top_border{
+		border-top-color: #ccc !important; 
+	}
+	
+	table.t-data-grid tbody tr td{
+		text-align: center;
+		vertical-align: middle;
+	}
+	.evaltbl th{
+		padding:5px
+	}
+	.evaltbl .name{
+		text-align: left;
+		min-width: 190px;
+	}
+	
+	.evaltbl .crit {
+		vertical-align: top;
+		width: ${getCritNameWidthPercent(60, eval)};
+		text-align: center;
+		font-size: 11px;
+	}
+	.evaltbl .opques{
+		vertical-align: top;
+		text-align: left;
+		font-size: 11px;
+	}
+	
+	
+	.evaltbl td.strength, .evaltbl td.weakness {
+		vertical-align: top;
+		text-align: left;
+		width: 180px;
+	}
+	.cmmtnamebox {
+		position: relative;
+	  	
+	}
+	
+	.csEditBtn, .cwEditBtn, .coEditBtn {
+	  position: absolute;	
+	  right: 2px;
+	  top: 2px;    
+	}
+	
+	#dialog_xlsx {
+		height: 200px;
+	}
+	#dialog_xlsx h2{
+		font-size: 24px;
+	}
+	#dialog_xlsx div{
+		margin: 10px;
+	}
+	#dialog_xlsx div a{
+		font-size: 14px;
+	}
+	
+	.selfHighlight{
+		background: #ddd;
+	}
+	
+</style>
+
+
+<p:legendBlk>
+	<div class="legend">
+		<div class="title">${message:legend}</div>
+		<div class="content">
+			<table>
+				<tr>
+		<td><div class="legendmark aplus" /></td>
+					<td class="label">${getColorCodeGradeAplus()}</td>
+					<td><div class="legendmark a" /></td>
+					<td class="label">${getColorCodeGradeA()}</td>
+					<td><div class="legendmark aminus" /></td>
+					<td class="label">${getColorCodeGradeAminus()}</td>
+					<td><div class="legendmark bplus" /></td>
+					<td class="label">${getColorCodeGradeBplus()}</td>
+					<td><div class="legendmark b" /></td>
+					<td class="label">${getColorCodeGradeB()}</td>
+					<td><div class="legendmark bminus" /></td>
+					<td class="label">${getColorCodeGradeBminus()}</td>
+					<td><div class="legendmark cplus" /></td>
+					<td class="label">${getColorCodeGradeCplus()}</td>
+					<td><div class="legendmark c" /></td>
+					<td class="label">${getColorCodeGradeC()}</td>
+					<td><div class="legendmark dplus" /></td>
+					<td class="label">${getColorCodeGradeDplus()}</td>
+					<td><div class="legendmark d" /></td>
+					<td class="label">${getColorCodeGradeD()}</td>
+					<td><div class="legendmark f" /></td>
+					<td class="label">${getColorCodeGradeF()}</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</p:legendBlk>
+
+<p:actionBtns>
+
+
+<a class="button rounded" title="${message:export-tip}" onclick="openDialogExport(); return false;">
+		<span>${message:export-xls}</span>
+	</a>
+	
+<div id="dialog_xlsx" >
+	<h2 style="font-size:24px;">Select what to export: </h2>
+		<div >
+		<a class="button squared"  t:type="eventlink" t:event="ExportXlsScore" context="eval.id" 
+			>
+			<span>Score Only</span>
+		</a>
+		</div>
+		<div >
+		<a class="button squared" t:type="eventlink" t:event="ExportXlsQF" context="eval.id" 
+			>
+			<span>Qualitative Feedback Only</span>
+		</a>
+		</div>
+		<div >
+		<a class="button squared" t:type="eventlink" t:event="ExportXlsScoreNQF" context="eval.id" 
+			>
+			<span>Both</span>
+		</a>
+		</div>
+</div>
+			
+	<t:pagelink page="modules/peerevaluation/releaseresult" context="eval.id" class="button rounded">
+		<span>${message:release-result}</span>
+	</t:pagelink>
+</p:actionBtns>
+
+<table class="actionToolBar">
+	<tr>
+		<td class="right">
+		</td>
+	</tr>
+</table>
+
+<div class="e-formeditor t-beaneditor">
+	<table >
+			<tr>
+				<td class="label">${message:evaluation-name}</td>
+				<td>
+					${eval.name}
+				</td>
+			</tr>
+		</table>
+</div>
+
+<div id="evalContainer">
+
+<t:if test="eval.criterias">
+	<div id="scroller">
+	<t:if test="eval.useFixedPoint">
+		<p:else>
+			
+		<table class="t-data-grid evaltbl stickyHeader"  >
+		<thead>
+		<tr>
+			<th rowspan="2" colspan="4"><t:outputraw value="getSpace()"/></th>
+	
+			<th colspan="${eval.criterias.size()}" ><t:if test="eval.rubric">${eval.rubric.name}</t:if></th>
+			<t:if test="hasQualitativeFeedback(eval)">
+				<th  colspan="${getNumQualitativeFeedback(eval)}">${message:comment}</th>
+			</t:if>
+		
+			
+			<th class="no_bot_border" rowspan="3" >
+				${message:total-average} 
+				<br/> <span class="formtip">(%)</span> 
+			</th>
+		
+		</tr>
+			
+		<tr>
+			<t:loop source="eval.criterias" value="tempCrit" index="colIndex" >
+				<th class="crit" title="${tempCrit.name}">
+					<t:outputraw value="${truncateString(textarea2html(tempCrit.name),100)}"/>
+				</th>
+			</t:loop>
+			<t:if test="eval.getUseCmtStrength()">
+				<th class="no_bot_border cmmtnamebox" rowspan="2">
+					  	<span id="csDisplay">${getCmmtStrengthName(eval)}</span>
+				</th>
+		   	</t:if>
+			<t:if test="eval.getUseCmtWeakness()">
+				<th class="no_bot_border cmmtnamebox" rowspan="2">
+					  	<span id="cwDisplay">${getCmmtWeaknessName(eval)}</span>
+				</th>
+			</t:if>
+			<t:if test="eval.getUseCmtOther()">
+				<th class="no_bot_border cmmtnamebox" rowspan="2">
+					   	<span id="coDisplay">${getCmmtOtherName(eval)}</span>
+				</th>
+			</t:if>
+			
+		</tr>
+		<tr>
+			<th >${message:no}</th>
+			<th >
+				<t:if test="eval.group">
+					${message:group}
+					<p:else> </p:else>
+				</t:if>				
+			</th>
+			
+			<th >${message:student}</th>
+			<th ># of Evaluators</th>
+			
+			<t:loop source="eval.criterias" value="tempCrit" index="colIndex" >
+				<th class="weight">
+					<span class="formtip">${message:weightage-label}: ${tempCrit.weightage}</span>
+					<br/>
+					<span class="formtip">${tempCrit.minScore}-${tempCrit.maxScore}</span>
+				</th>
+			</t:loop>
+		</tr>
+		</thead>
+		<tbody>
+				
+		<t:loop source="assessees" value="user" index="rowIndex">
+			<tr>
+				<td>${getRowNum()}</td>
+				<td >${getGroupTypeName(eval.group, user)}</td>
+				${loadEvalUserList(eval, user)}
+				<td class="name">
+					${user.displayName}
+				</td>
+				<td class="evalby">
+					<t:pagelink page="modules/peerevaluation/viewdetailbyassessee" context="getParams(eval.id,user.id)">
+						${evalUserList.size()}
+					</t:pagelink>
+				</td>
+				<t:loop source="eval.criterias" value="tempCrit" index="colIndex" >
+					<td>
+						<t:if test="hasGraded()">
+							${getComputedCritScoreDisplay(tempCrit, evalUserList)}
+						</t:if>
+						<t:outputraw value="getSpace()"/>
+					</td>
+				</t:loop>
+				<t:if test="eval.getUseCmtStrength()">
+					<td class="strength" >
+						<t:loop source="evalUserList" value="evalUser">
+							<t:if test="evalUser.getCmtStrengthDisplay()">
+								<div title="by ${evalUser.assessor.displayname}">
+								- <t:outputraw value="${textarea2html(evalUser.getCmtStrengthDisplay())}"/>
+								</div>
+							</t:if>
+						</t:loop>
+					</td>
+				</t:if>
+				<t:if test="eval.getUseCmtWeakness()">		
+					<td class="weakness" >
+						<t:loop source="evalUserList" value="evalUser">
+							<t:if test="evalUser.getCmtWeaknessDisplay()">
+								<div title="by ${evalUser.assessor.displayname}">
+								- <t:outputraw value="${textarea2html(evalUser.getCmtWeaknessDisplay())}"/>
+								</div>
+							</t:if>
+						</t:loop>
+					</td>
+				</t:if>
+				<t:if test="eval.getUseCmtOther()">
+					<td class="Other" >
+						<t:loop source="evalUserList" value="evalUser">
+							<t:if test="evalUser.getCmtOtherDisplay()">
+								<div title="by ${evalUser.assessor.displayname}">
+								- <t:outputraw value="${textarea2html(evalUser.getCmtOtherDisplay())}"/>
+								</div>
+							</t:if>
+						</t:loop>
+					</td>
+				</t:if>
+				
+
+				<td class="total ${getTotalScoreClass()}">
+					<t:if test="hasGraded()">
+					${getTotalScoreDisplay()}
+					</t:if>
+					<t:outputraw value="getSpace()"/>
+				</td>
+			</tr>
+			<t:if test="eval.openEndedQuestions">
+				<tr>
+					<td></td>
+					<td colspan="100">
+						<table width="100%">
+							<tbody>
+							<t:loop source="eval.openEndedQuestions" value="oQuestion" index="quesIndex" >
+								<tr>
+									<th width="30%" class=" opques" title="${oQuestion}"  >
+										<t:outputraw value="${truncateString(textarea2html(oQuestion),300)}"/>
+									</th>
+									<td class=" opques">
+										
+										<t:loop source="evalUserList" value="evalUser">
+											<t:if test="evalUser.getOpenEndedQuestionAnswers(quesIndex)">
+												<div title="by ${evalUser.assessor.displayname}">
+												 <t:outputraw value="${textarea2html(evalUser.getOpenEndedQuestionAnswers(quesIndex))}"/>
+													<hr/>
+												</div>
+											</t:if>
+										</t:loop>
+										
+									</td>
+								</tr>
+							</t:loop>
+							</tbody>
+						</table>
+					</td>
+				</tr>
+		</t:if>	
+		</t:loop>
+		
+		
+		
+		
+		<tr>
+			<th colspan="4" style="text-align:right;">${message:average}:</th>
+
+			<t:loop source="eval.criterias" value="tempCrit" index="colIndex" >
+				<td class="average ${getAverageScoreClass(tempCrit)}" >${getAverageScoreDisplay(tempCrit)}</td>
+			</t:loop>
+			<t:if test="hasQualitativeFeedback(eval)">
+				<td colspan="${getNumQualitativeFeedback(eval)}"><t:outputraw value="getSpace()"/></td>
+			</t:if>
+			<td class="${getTotalAverageScoreClass()}">
+				${getTotalAverageScoreDisplay()}
+			</td>
+		</tr>
+		<tr>
+			<th colspan="4" style="text-align:right;">${message:stdev}:</th>
+
+			<t:loop source="eval.criterias" value="tempCrit" index="colIndex" >
+				<td class="stdev " >${getSTDEV(tempCrit, eval)}</td>
+			</t:loop>
+			<t:if test="hasQualitativeFeedback(eval)">
+				<td colspan="${getNumQualitativeFeedback(eval)}"><t:outputraw value="getSpace()"/></td>
+			</t:if>
+			<td class="stdev">
+				${getTotalSTDEV(eval)}
+			</td>
+		</tr>
+		</tbody>		
+	</table>
+		
+		</p:else>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		<!-- Use Fixed point distribution -->
+		
+		<table class="t-data-grid evaltbl stickyHeader"  >
+		<thead>
+		<tr>
+			<th rowspan="2" colspan="4"><t:outputraw value="getSpace()"/></th>
+	
+			<th colspan="${getColspanRubric()}" ><t:if test="eval.rubric">${eval.rubric.name}</t:if></th>
+			<t:if test="hasQualitativeFeedback(eval)">
+				<th  colspan="${getNumQualitativeFeedback(eval)}">${message:comment}</th>
+			</t:if>
+		
+			
+			<th class="no_bot_border" rowspan="3" >
+				Total Average 
+				<br/> <span class="formtip">(%)</span> 
+			</th>
+		
+		</tr>
+			
+		<tr>
+			<t:loop source="eval.criterias" value="tempCrit" index="colIndex" >
+				<th class="crit" colspan="${getColspanCriteria()}" title="${tempCrit.name}">
+					<t:outputraw value="${truncateString(textarea2html(tempCrit.name),100)}"/>
+				</th>
+			</t:loop>
+			<t:if test="eval.getUseCmtStrength()">
+				<th class="no_bot_border cmmtnamebox" rowspan="2">
+					  	<span id="csDisplay">${getCmmtStrengthName(eval)}</span>
+				</th>
+		   	</t:if>
+			<t:if test="eval.getUseCmtWeakness()">
+				<th class="no_bot_border cmmtnamebox" rowspan="2">
+					  	<span id="cwDisplay">${getCmmtWeaknessName(eval)}</span>
+				</th>
+			</t:if>
+			<t:if test="eval.getUseCmtOther()">
+				<th class="no_bot_border cmmtnamebox" rowspan="2">
+					   	<span id="coDisplay">${getCmmtOtherName(eval)}</span>
+				</th>
+			</t:if>
+			
+		</tr>
+		<tr>
+			<th >${message:no}</th>
+			<th >
+				<t:if test="eval.group">
+					${message:group}
+					<p:else> </p:else>
+				</t:if>				
+			</th>
+			
+			<th >${message:student}</th>
+			<th ># of Evaluators</th>
+			
+			<t:loop source="eval.criterias" value="tempCrit" index="colIndex" >
+				<t:loop source="1..getGroupSize()" value="var:peerIndex">
+				
+				<th class="peer">
+					Peer ${var:peerIndex}
+				</th>
+				</t:loop>
+				<th>Sum</th>
+			</t:loop>
+		</tr>
+		</thead>
+		<tbody>
+				
+		<t:loop source="assessees" value="user" index="rowIndex">
+			<tr>
+				<td>${getRowNum()}</td>
+				<td >${getGroupTypeName(eval.group, user)}</td>
+				${loadEvalUserList(eval, user)}
+				${loadGroupUser(eval.group, user)}
+				
+				
+				<td class="name">
+						${user.displayName}
+				</td>
+				<td class="evalby">
+					<t:pagelink page="modules/peerevaluation/viewdetailbyassessee" context="getParams(eval.id,user.id)">
+						${evalUserList.size()}
+					</t:pagelink>
+				</td>
+				
+				<t:loop source="eval.criterias" value="tempCrit" index="colIndex" >
+					<t:if test="groupUser">
+						<t:loop source="groupUser.getUsers()" value="colUser" >
+							<td class="${getSelfClass(colUser, user, eval)}">
+								${getAssessorCritScoreDisplay(tempCrit, evalUserList, colUser)}
+								<t:outputraw value="getSpace()"/>
+							</td>
+						</t:loop>
+						
+						<p:else>
+							<t:loop source="1..getGroupSize()" value="var:peerIndex">
+								<td >
+									<t:outputraw value="getSpace()"/>	
+								</td>
+							</t:loop>
+						</p:else>
+					</t:if>
+					
+					<th>
+						<t:if test="hasGraded()">
+							${getCritScoreSumDisplay(tempCrit, evalUserList)}
+							<t:outputraw value="getSpace()"/>
+						</t:if>
+					</th>
+				</t:loop>
+				<t:if test="eval.getUseCmtStrength()">
+					<td class="strength" >
+						<t:loop source="evalUserList" value="evalUser">
+							<t:if test="evalUser.getCmtStrengthDisplay()">
+								<div title="by ${evalUser.assessor.displayname}">
+								- <t:outputraw value="${textarea2html(evalUser.getCmtStrengthDisplay())}"/>
+								</div>
+							</t:if>
+						</t:loop>
+					</td>
+				</t:if>
+				<t:if test="eval.getUseCmtWeakness()">		
+					<td class="weakness" >
+						<t:loop source="evalUserList" value="evalUser">
+							<t:if test="evalUser.getCmtWeaknessDisplay()">
+								<div title="by ${evalUser.assessor.displayname}">
+								- <t:outputraw value="${textarea2html(evalUser.getCmtWeaknessDisplay())}"/>
+								</div>
+							</t:if>
+						</t:loop>
+					</td>
+				</t:if>
+				<t:if test="eval.getUseCmtOther()">
+					<td class="Other" >
+						<t:loop source="evalUserList" value="evalUser">
+							<t:if test="evalUser.getCmtOtherDisplay()">
+								<div title="by ${evalUser.assessor.displayname}">
+								- <t:outputraw value="${textarea2html(evalUser.getCmtOtherDisplay())}"/>
+								</div>
+							</t:if>
+						</t:loop>
+					</td>
+				</t:if>
+				
+
+				<td class="total ${getTotalScoreClass()}">
+					<t:if test="hasGraded()">
+					<span style="color:#666;">
+					${getStudentTotalFixedPoint(evalUserList)}
+					/
+					${getMaxGroupStudentTotalFixedPoint(groupUser, eval)}
+					= 
+					</span>
+					${getTotalScoreDisplay()}
+					</t:if>
+					<t:outputraw value="getSpace()"/>
+				</td>
+			</tr>
+			<t:if test="eval.openEndedQuestions">
+				<tr>
+					<td></td>
+					<td colspan="100">
+						<table width="100%">
+							<tbody>
+							<t:loop source="eval.openEndedQuestions" value="oQuestion" index="quesIndex" >
+								<tr>
+									<th width="30%" class=" opques" title="${oQuestion}"  >
+										<t:outputraw value="${truncateString(textarea2html(oQuestion),300)}"/>
+									</th>
+									<td class=" opques">
+										
+										<t:loop source="evalUserList" value="evalUser">
+											<t:if test="evalUser.getOpenEndedQuestionAnswers(quesIndex)">
+												<div title="by ${evalUser.assessor.displayname}">
+												 <t:outputraw value="${textarea2html(evalUser.getOpenEndedQuestionAnswers(quesIndex))}"/>
+													<hr/>
+												</div>
+											</t:if>
+										</t:loop>
+										
+									</td>
+								</tr>
+							</t:loop>
+							</tbody>
+						</table>
+					</td>
+				</tr>
+		</t:if>	
+		</t:loop>
+		
+		
+		
+		
+		</tbody>		
+	</table>
+	</t:if>
+	
+	
+	
+		</div>
+		
+	
+	
+</t:if>	
+
+	
+	<div style="height:20px;"><t:outputraw value="getSpace()"/></div>
+	
+</div>
+
+<script language="javascript">
+
+	document.observe("dom:loaded", function() {
+		 $$(".csEdit, .cwEdit, .coEdit").each(function(item){
+			item.hide();
+		});
+   
+    	$('dialog_xlsx').hide();
+	});
+	
+    function openDialogExport(){
+    	Modalbox.show($('dialog_xlsx'), {title: 'Export Excel file', width: 350});
+    }
+    
+        
+</script>
+
+
+</html>

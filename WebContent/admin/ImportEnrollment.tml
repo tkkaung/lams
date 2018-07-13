@@ -1,0 +1,36 @@
+<html t:type="layout" title="Import Enrollment"
+	breadcrumb="${message:control-panel}=admin
+	,import Enrollment=admin/batch"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="project"/></p:leftMenuBlk>
+	
+	
+	
+	<p:legendBlk>
+		<div class="legend">
+			<div class="title">${message:note}</div>
+			<div class="content">
+				CSV file must be in the format given.
+				<a href="${context:lib/sample_files/import_enrollment_CSV.csv}">Sample file</a>
+	        	<br/>
+	        	This will enroll new user only, not remove.
+			</div>
+		</div>
+	</p:legendBlk>
+			
+	
+	
+		<div class="t-beaneditor">
+			<t:form t:id="form" autofocus="false">
+				<t:errors/>
+				<div class="t-beaneditor-row">
+					<t:label for="file"><span class="required">*</span> ${message:file-label}</t:label>
+					<input t:type="upload" t:id="file" validate="required, regexp"/>
+		      </div>
+		      
+		       <div class="t-beaneditor-row" style="margin-top:15px;">
+					<input t:type="submit" value="${message:upload-n-run}" class="squared t-beaneditor-submit"/>
+				</div>
+		    </t:form>
+	   </div>
+</html>

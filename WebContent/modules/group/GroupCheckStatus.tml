@@ -1,0 +1,57 @@
+<html t:type="layout" 
+	title="${message:checkstatus-selfenroll}"
+	currentModule="${moduleName}"
+	currentProj="curProj"
+	totalShowOption="${members.size()}"
+	breadcrumb="${curProj.encodeddisplayname}=project/home?${curProj.id}
+			,${message:manage-group}=modules/group?${curProj.id}
+			,${message:checkstatus-selfenroll}=modules/group/checkstatus"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+	
+
+
+
+<t:grid source="members" row="user" class="stickyHeader t-data-grid"
+	model="model"
+	rowIndex="rowIndex"
+	pagerPosition="bottom"
+	rowsPerPage="rowsPerpage" 
+    		 
+	>
+	<p:empty>
+		<div class="notfoundtext">
+			${message:no-members}
+		</div>
+	</p:empty>
+   
+   <t:parameter name="noCell">
+   	${getRowNum()}
+   </t:parameter>
+   <t:parameter name="nameCell">
+   		${user.displayname}
+   </t:parameter>
+   
+   <t:parameter name="groupCell">
+   		${loadGroupUser(group, user)}
+   		<t:if test="groupUser">
+   			<t:pagelink page="modules/group/userview" context="groupUser.id">
+		   		<span >${groupUser.getGroupNumNameDisplay()}</span>
+   			</t:pagelink>
+   		</t:if>
+   </t:parameter>
+   <t:parameter name="actionCell">
+		<!--<a href="mailto:${user.email}" class="button rounded">
+			<span>${message:email}</span> 
+		</a>
+		--><a t:type="pagelink" page="modules/group/sendemail" context="getParams(gid, user.id)" class="button rounded">
+			<span>${message:email-via-eureka}</span> 
+		</a>
+		
+			
+	</t:parameter>
+</t:grid>
+
+
+
+</html>

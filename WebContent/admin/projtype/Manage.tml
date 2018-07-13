@@ -1,0 +1,61 @@
+<html t:type="layout" 
+	title="${message:manage} ${message:projtype}"
+	breadcrumb="${message:control-panel}=admin,${message:manage} ${message:projtype}=admin/projtype/manage"
+	totalShowOption="${totalSize}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="systemtools"/></p:leftMenuBlk>
+   
+   <p:actionBtns >
+		<a href="#" t:type="pageLink" page="admin/projtype/edit" class="button rounded">
+				<span>${message:add-new} ${message:projtype}</span></a>
+	</p:actionBtns>
+    
+    <table class="actionToolBar">
+		<tr>
+			<td class="right">
+			</td>
+			</tr>
+		</table>
+       
+    <t:grid source="types" row="type" class="stickyHeader t-data-grid"
+    	exclude="displayName,system"
+    	add="modules,nonmodules,defaultModules,roles,projectCount,action"
+    	rowsPerPage="rowsPerPage" 
+		pagerPosition="bottom" >
+		
+       <t:parameter name="modulesCell">
+          <t:loop t:id="modules" source="type.modules" value="tmodule">
+             - <span>${tmodule.displayname}</span><br/>
+          </t:loop>
+       </t:parameter>
+       <t:parameter name="nonmodulesCell">
+          <t:loop t:id="nonmodules" source="type.nonmodules" value="tmodule">
+             - <span>${tmodule.displayname}</span><br/>
+          </t:loop>
+       </t:parameter>
+       <t:parameter name="defaultModulesCell">
+          <t:loop t:id="defaultmodules" source="type.defaultmodules" value="tmodule">
+             - <span>${tmodule.displayname}</span><br/>
+          </t:loop>
+       </t:parameter>
+       <t:parameter name="rolesCell">
+          <t:loop t:id="roles" source="type.roles" value="tRole">
+             - <span>${tRole.displayname}</span><br/>
+          </t:loop>
+       </t:parameter>
+       <p:projectCountCell>
+			${getCountProjectByType(type)}
+		</p:projectCountCell>
+       <t:parameter name="actionCell">
+       	<t:pagelink t:id="edit" page="admin/projtype/edit" context="type.id" class="button rounded">
+          	<span>${message:edit}</span>
+         </t:pagelink>
+         <t:actionlink t:id="delete" context="type.id" class="button rounded"
+          	onclick="return confirmDelete('${message:confirm-permanent-delete-item}')">
+          	<span>${message:delete}</span>
+         </t:actionlink>
+       </t:parameter>
+    </t:grid>
+    
+</html>

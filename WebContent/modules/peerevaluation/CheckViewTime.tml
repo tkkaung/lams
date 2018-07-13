@@ -1,0 +1,64 @@
+<html t:type="layout" 
+	title="${message:check-view-time}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	totalShowOption="${assessees.size()}"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/peerevaluation/home?${project.id}
+		,${message:manage-evaluation}=modules/peerevaluation/manage?${project.id}
+		,${message:check-view-time}=modules/peerevaluation/checkviewtime
+		"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+
+<style>
+	table.t-data-grid tbody tr td{
+		text-align: center;
+		vertical-align: middle;
+	}
+	table.t-data-grid th{
+		padding:5px
+	}
+	table.t-data-grid .name{
+		text-align: left;
+	}
+</style>
+
+	    
+
+
+<t:grid source="assessees" row="user" class="stickyHeader t-data-grid"
+	model="model"
+	rowsPerPage="rowsPerpage" 
+	rowIndex="rowIndex"
+	pagerPosition="bottom" 
+	id="userGrid"
+	>
+	<p:empty>
+		<div class="notfoundtext">
+			${message:no-assessee-found}
+		</div>
+	</p:empty>
+   
+   
+
+   <t:parameter name="noCell">
+   	${getRowNum()}
+   </t:parameter>
+   <t:parameter name="nameCell">
+   		${user.displayname}
+   </t:parameter>
+   <t:parameter name="groupCell">
+   		${getGroupTypeName(eval.group, user)}
+   </t:parameter>
+   <t:parameter name="firstViewTimeCell">
+   		${getEvalAssesseeViewFirst(eval, user)}
+   </t:parameter>
+   <t:parameter name="lastViewTimeCell">
+   		${getEvalAssesseeViewLast(eval, user)}
+   </t:parameter>
+   </t:grid>
+
+
+</html>

@@ -1,0 +1,55 @@
+<html t:type="layout" 
+	title="${message:migrate-forum}"
+   breadcrumb="${message:control-panel}=admin,${message:migrate-forum}=admin/backuprestore/migrateforum"
+   xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="project"/></p:leftMenuBlk>
+	<p:legendBlk>
+		<span class="required">*</span>  ${message:required-fields}
+	</p:legendBlk>
+
+	<form t:type="form" t:id="importForm" class="e-formeditor">
+		<t:errors />
+		<div class="t-beaneditor">
+	<div>
+		<ul>
+		<li>	
+			This will copy all forum(s) from specified Source Project in eureka1, then create them into Destination Project in eureka2. 
+		</li>
+			Reflections, Attached files, and view statistic are not migrate over.
+		<li>
+		</li>
+		<li>
+			If run this multiple times, it will create the forums multiple times. No Duplicate-Check is implemented.
+		</li>	
+	</ul>
+	</div>
+			<table>
+				<tr>
+					<td class="label">
+						<t:label for="projIdFrom"><span class="required">*</span> ${message:projIdFrom-label}</t:label>
+					</td>
+					<td>
+						<t:textfield t:id="projIdFrom" value="projIdFrom" validate="required" class="mwidth"/>
+						<span class="formtip">${message:projIdFrom-tip}</span>
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<t:label for="projIdTo"><span class="required">*</span> ${message:projIdTo-label}</t:label>
+					</td>
+					<td>
+						<t:textfield t:id="projIdTo" value="projIdTo" validate="required" class="mwidth"/>
+						<span class="formtip">${message:projIdTo-tip}</span>
+					</td>
+				</tr>
+			</table>
+			<div style="margin-top:10px;">
+				<t:submit t:id="submit" value="${message:submit-label}" class="submit squared"  />
+			</div>
+		</div>
+	</form>
+	
+	
+	
+</html>

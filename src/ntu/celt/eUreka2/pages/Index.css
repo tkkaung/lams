@@ -1,0 +1,67 @@
+#projGrid span.uName{
+	display: block;
+	margin-bottom: 5px;
+}
+#projGrid td.past7day{
+	width: 140px;
+	padding-left: 10px;
+}
+#projGrid .prName{
+	font-size:0.9em;
+}
+
+.no{
+	text-align:center;
+}
+.tmod{
+	display: inline-block ;
+	_display: inline; /*IE*/
+	width: 65px;
+	padding: 2px;
+}
+
+.tooltip{
+	position: relative;
+	float: left;
+	
+}
+.tooltipInner{
+	position: absolute;
+	left:-355px;
+	top: 5px;
+	width:440px;
+}
+.mlu{
+	border: 1px solid #ccc;
+}
+.mlu .even{
+	background-color: #ffd;
+}
+.mlu .odd{
+	background-color: #ffc;
+}
+.mlu a:hover .mlui{
+	background-color: #fff;
+}
+.mlui{
+	padding: 3px;
+}
+.mlui .date{
+	color: #555;
+	margin-right: 10px;
+}
+.mlui .type{
+	color: #999;
+	margin-right: 5px;
+}
+
+.moreBtn, .lessBtn {
+	font-size: 0.9em;
+	font-style: italic;
+}
+
+.legend .item{
+	display: inline-block;
+	_display: inline; /*IE*/
+	width: 150px;	
+}

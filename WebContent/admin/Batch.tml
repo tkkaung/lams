@@ -1,0 +1,140 @@
+<html t:type="layout" title="Batch process"
+	breadcrumb="Batch  process=admin/batch"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="systemtools"/></p:leftMenuBlk><!--
+	
+	
+	
+	<div>
+		<t:actionLink t:id="createSchoolAdmins">Create School Admins from available schools' name</t:actionLink>
+	</div>
+	<div>
+		<t:actionLink t:id="ChangeSchoolName">change school name from 'New_Dept' to Dept_# </t:actionLink>
+	</div>
+	<div>
+		<t:actionLink t:id="ChangeMilestoneCreator">change milestone create from 'null' to NTU_tutor's ID </t:actionLink>
+	</div>
+	<div>
+		<t:actionLink t:id="resourceToResource2">Migrate from Resource to Resource2 </t:actionLink>
+	</div>
+	<div>
+		<t:actionLink t:id="importDuplicateSchoolNameMap">Import duplicate School Name Map </t:actionLink>
+	</div>
+	<div>
+		<t:actionLink t:id="MergeDuplicateSchoolName">MergeDuplicateSchoolName </t:actionLink>
+	</div>
+	<div>
+		<t:actionLink t:id="DeleteUnusedProjects">DeleteUnusedProjects </t:actionLink>
+	</div>
+	<div>
+		<t:actionLink t:id="PermanentDeleteProjects">PermanentDeleteProjects </t:actionLink>
+	</div>
+	<div>
+		<t:actionLink t:id="MoveResourceFolders">MoveResourceFolders </t:actionLink>
+	</div>
+	<div>
+		<t:actionLink t:id="SetScheduleItemIdentifiers">SetScheduleItemIdentifiers</t:actionLink>
+	</div>
+	<div>
+		<t:actionLink t:id="TestUserExternalKey">TestUserExternalKey</t:actionLink>
+	</div>
+	<div>
+		<t:actionLink t:id="TestUserExternalKey">TestUserExternalKey</t:actionLink>
+	</div>
+	
+	
+-->
+
+<p></p>
+	<div>
+		
+		<t:form t:id="assmtCriteriaToScoreAndUpdateTotalAllByLimitForm">
+			Modified Date from Year <t:textfield t:id="dateYear" class="swidth" t:value="dateYear"/>
+			Month  <t:textfield t:id="dateMonth" class="swidth" t:value="dateMonth"/>
+			<br/>
+			index from: <t:textfield t:id="startFrom" class="swidth" t:value="startFrom"/>
+			max row to run: <t:textfield t:id="numRecord" class="swidth" t:value="numRecord"/>
+			<t:submit value="assmtCriteriaToScoreAndUpdateTotal All "/>
+			(e.g. if total is 100, index will be from 0 to 99.)
+			max row cannot be too big, it will take too much time, then fail
+		</t:form>
+	</div>
+	
+	<!--<div>
+	<br/>
+		<t:actionLink t:id="DeleteProjects">DeleteProjects</t:actionLink> (do not click this if you are not sure what it does)
+	</div>
+	<div>
+	<br/>
+		<t:actionLink t:id="DeleteEvaluation">DeleteEvaluation</t:actionLink> (do not click this if you are not sure what it does)
+	</div>
+	
+	
+	
+	--><!--
+	
+
+
+	<div>
+		<t:actionLink t:id="assmtScoretoSelectedCritria">assmtScoretoSelectedCritria Descending (assmt Modified Date after 1 Jun 2013)</t:actionLink>
+	</div>
+	<p></p>
+	
+	<p></p>
+	<div>
+		
+		<t:form t:id="assmtToCriteriaAllByLimitForm">
+			index from: <t:textfield t:id="startFrom" class="swidth" t:value="startFrom"/>
+			max row to run: <t:textfield t:id="numRecord" class="swidth" t:value="numRecord"/>
+			<t:submit value="AssmtScoretoSelectedCritria All (MDate after 1 Jun 2013) "/>
+			(e.g. if total is 100, index will be from 0 to 99.)
+		</t:form>
+	</div>
+	<p></p>
+	<div>
+		
+		<t:form t:id="assmtToCriteriaForm">
+			project ID: <t:textfield t:id="projID" t:value="projID"/>
+			<t:submit value="AssmtScoretoSelectedCritria "/>
+		</t:form>
+	</div>
+	<p></p>
+	<div>
+		
+		<t:form t:id="assmtToCriteriaByAssmtForm">
+			Assmt ID: <t:textfield t:id="assmtID" t:value="assmtID"/>
+			<t:submit value="AssmtScoretoSelectedCritria "/>
+		</t:form>
+	</div>
+	========
+	<div style="font-weight:bold;">
+		convert "-" to Grade
+	</div>
+	<div>
+		
+		<t:form t:id="assmtDashToGradeAllForm">
+			<i>All (MDate after 1 Jun 2013)</i>
+			index from: <t:textfield t:id="startFrom2" class="swidth" t:value="startFrom"/>
+			max row to run: <t:textfield t:id="numRecord2" class="swidth" t:value="numRecord"/>
+			<t:submit value=" Go "/>
+			(e.g. if total is 100, index will be from 0 to 99.)
+		</t:form>
+	</div>
+	<p></p>
+	<div>
+		
+		<t:form t:id="assmtDashToGradeProjForm">
+			project ID: <t:textfield t:id="projID2" t:value="projID"/>
+			<t:submit value=" Go "/>
+		</t:form>
+	</div>
+	<p></p>
+	<div>
+		
+		<t:form t:id="assmtDashToGradeAssmtForm">
+			Assmt ID: <t:textfield t:id="assmtID2" t:value="assmtID"/>
+			<t:submit value=" Go "/>
+		</t:form>
+	</div>
+	
+--></html>

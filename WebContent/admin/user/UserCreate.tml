@@ -1,0 +1,74 @@
+<html t:type="layout" 
+	title="${message:add-new} ${message:user}"
+	breadcrumb="${message:control-panel}=admin
+	,${message:admin-manage-user}=admin/user
+	,${message:add-new} ${message:user}=admin/user/create"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="user"/></p:leftMenuBlk>
+	<p:legendBlk>
+		<span class="required">*</span>  ${message:required-fields}
+	</p:legendBlk>
+	
+      <t:beaneditform t:id="userForm"  object="user" 
+      		add="confirmPassword,school,sysRole"
+      		reorder="username,password,confirmPassword,title,firstName,lastName,
+      			externalKey,school,organization,jobTitle,phone,mphone,
+      			email,sysRole,enabled,remarks"
+      		exclude="createDate,modifyDate,ip"
+        		submitLabel="${message:submit-label}">
+	    <t:parameter name="username">
+	    	<t:label for="username"><span class="required">*</span>  ${message:username-label}</t:label>
+	      <t:textfield t:id="username" value="user.username" />
+	    </t:parameter>
+	    <t:parameter name="password">
+	      <t:label for="password"><span class="required">*</span>  ${message:password-label}</t:label>
+	      <t:passwordfield t:id="password" value="user.password" validate="required" />
+	    </t:parameter>
+	   <t:parameter name="confirmPassword">
+	      <t:label for="confirmPassword"><span class="required">*</span>  ${message:confirmpassword-label}</t:label>
+	      <t:passwordfield t:id="confirmPassword" value="confirmPassword" validate="required" />
+	    </t:parameter>
+	    <t:parameter name="firstname">
+	    	<t:label for="firstname"><span class="required">*</span>  ${message:firstname-label}</t:label>
+	      <t:textfield t:id="firstname" value="user.firstname" class="mwidth" validate="required"/>
+	    </t:parameter>
+	     <t:parameter name="lastname">
+	    	<t:label for="lastname"><span class="required">*</span>  ${message:lastname-label}</t:label>
+	      <t:textfield t:id="lastname" value="user.lastname" class="mwidth" validate="required"/>
+	    </t:parameter>
+	   <t:parameter name="externalKey">
+	    	<t:label for="externalKey"/>
+	      <t:textfield t:id="externalKey" value="user.externalKey" />
+	      <span class="formtip">${message:externalkey-tip}</span>
+	    </t:parameter>
+	    <t:parameter name="organization">
+	    	<t:label for="organization"/>
+	      <t:textfield t:id="organization" value="user.organization" class="mwidth"/>
+	    </t:parameter>
+	    <t:parameter name="jobTitle">
+	    	<t:label for="jobTitle"/>
+	      <t:textfield t:id="jobTitle" value="user.jobTitle" class="mwidth"/>
+	    </t:parameter>
+	    <t:parameter name="email">
+	    	<t:label for="email"><span class="required">*</span>  ${message:email-label}</t:label>
+	      <t:textfield t:id="email" value="user.email" class="mwidth" validate="required,email"/>
+	    </t:parameter>
+	    
+	     <t:parameter name="school">
+		      <t:label for="school"><span class="required">*</span> ${message:school-label}</t:label>
+		      <t:select t:id="school" value="user.school" model="schoolModel" validate="required"/>
+		 </t:parameter>
+		 <t:parameter name="sysRole">
+		      <t:label for="sysRole"><span class="required">*</span> ${message:sysRole-label}</t:label>
+		      <t:select t:id="sysRole" value="user.sysRole" model="sysRoleModel" />
+		 </t:parameter>
+		 <t:parameter name="remarks">
+		      <t:label for="remarks"/>
+		      <textarea t:type="textarea" t:id="remarks" value="user.remarks" cols="50" rows="5" class="mwidth"/>
+		 </t:parameter>
+   
+   	</t:beaneditform>
+    
+    
+</html>

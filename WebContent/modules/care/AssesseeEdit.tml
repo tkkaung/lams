@@ -1,0 +1,293 @@
+<html t:type="layout" 
+	title="Do Survey"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+	,${module.displayName}=modules/care/assesseehome?${project.id}
+	,Do Survey=modules/care/assesseeedit?${care.id}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+<style>
+	table.tbContainer {
+		width:100%;
+	}
+	table.tbContainer td{
+		border: 1px solid #ddd;;
+	}
+	table.tblLScore{
+	}
+	table.tblLScore thead tr th {
+	    text-align: center;
+	    vertical-align: bottom;
+   		width: 13%;
+	}
+	table.tblLScore tbody tr td {
+	    text-align: center;
+	    vertical-align: middle;
+	    
+	}
+	
+	
+	
+</style>
+
+
+<table class="actionToolBar">
+	<tr>
+		<td class="right">
+		</td>
+	</tr>
+</table>
+
+<t:if test="finished">
+<div>You already finished this survey</div>
+<p:else>
+
+		<t:if test="createMode">
+
+		<form t:type="form" t:id="formParticular" >
+		
+		<table class="tbContainer">
+			<tr>
+				<td colspan="5" style="font-size:16px;text-align:center;background:#ddd;">
+					<div >${care.name}</div>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="5" style="font-size:12px;padding:5px;">
+						<table class="t-data-grid">
+							<tr>
+								<td>Matriculation Number: </td>
+								<td>
+									<t:textfield t:id="matricNumber" value="particular.matricNumber" class="swidth"	validate="required" />
+								</td>
+								<td>Age:</td>
+								<td>
+									<t:textfield t:id="age" value="particular.age" class="swidth"	validate="required" />
+								</td>
+								<td>Gender:</td>
+								<td><t:select t:id="gender" value="particular.gender" model="literal:Male,Female" validate="required" /></td>
+							</tr>
+							<tr>
+								<td>Highest Education: </td>
+								<td><t:textfield t:id="highestEducation" value="particular.highestEducation" class="swidth"	validate="required" /></td>
+								<td>Marital Status:</td>
+								<td><t:select t:id="maritalStatus" value="particular.maritalStatus" model="literal:Single,Married,Divorced,Widowed" /></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr>
+								<td>Last Leadership Appointment: </td>
+								<td><t:textfield t:id="lastLeadershipApppointRank" value="particular.lastLeadershipApppointRank" class="swidth"	validate="required" /></td>
+								<td>Years in Leadership Appointment:</td>
+								<td><t:textfield t:id="yearsInLeadershipAppointment" value="particular.yearsInLeadershipAppointment" class="swidth"	validate="required" /></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr>
+								<td>Experience in Crisis Leadership (You have led in a Crisis): </td>
+								<td>
+									<t:RadioGroup t:id="hasExpInCrisisLeadership" value="particular.hasExpInCrisisLeadership" >
+									<t:Radio t:id="rdo1" value="true" /> 
+									<t:label for="rdo1">Yes</t:label>
+									<t:Radio t:id="rdo0" value="false" /> 
+									<t:label for="rdo0">No</t:label>
+									</t:RadioGroup>
+								</td>
+								<td >Brief description of the crisis:</td>
+								<td colspan="4">
+								<textarea t:type="textarea" t:id="briefDescriptionOfTheCrisis" value="particular.briefDescriptionOfTheCrisis" 
+								cols="50" rows="3" style="height: 36px;" class="mwidth"/>
+								</td>
+							</tr>
+						</table>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="5" style="font-size:14px;padding:5px;">
+					<h2 style="font-size:20px;font-weight:bold;">Instructions:</h2>
+					
+					<p>Studies revealed that 69% of leaders have to manage and lead in Volatile, 
+					Uncertain, Complex and Ambiguous (VUCA) environment. 
+					Researchers also asserted that that crisis leadership is an essential competency for organizational survival in VUCA environment.</p> 
+					
+					<p>This survey is designed to provide you a good opportunity to understand your leadership qualities so that
+					 you can use this information to develop and prepare yourself for the future of work and your leadership abilities. 
+					 Hence, it is in your interest to be honest. </p>
+					
+					<p>There are no right or wrong answers to these questionnaires. Do not try to second-guess the response you think should be given.</p>
+					
+					<p>Look at each item and rate how well each item describe you when you are handling a crisis.</p>
+					<p>Please complete the CARE Psychometric Survey using this 5-point Likert Scale,</p>
+					
+				</td>
+			</tr>
+			<tr>
+					<td>
+							
+						<table class="tblLScore t-data-grid">
+							<thead>
+							<tr>
+								<th>Likert-Scale:</th>
+								<th>1</th>
+								<th>2</th>
+								<th>3</th>
+								<th>4</th>
+								<th>5</th>
+							</tr>
+							<tr>
+								<th>Description:</th>
+								<th>Totally Disagree</th>
+								<th>Disagree</th>
+								<th>Neutral</th>
+								<th>Agree</th>
+								<th>Totally Agree</th>
+							</tr>
+							</thead>
+						</table>
+			
+					</td>
+				</tr>
+				
+				<tr>
+				<td colspan="5" style="text-align:center;font-size:16px;">
+					<p style="margin:20px;">
+					If you are ready to proceed, fill in your particular above, then click NEXT.
+						
+						<t:submit t:id="partiSubmit" value="NEXT &gt;&gt;" class="submit squared" 
+							style="margin:5px;padding:8px 20px;height:30px;font-weight:bold;"
+					/>
+					
+					</p>
+				</td>
+					
+				</tr>
+			</table>
+		</form>
+		
+		<p:else>	
+
+<form t:type="form" t:id="form" class="e-formeditor">
+		<t:errors />
+	
+	<table class="tbContainer">
+		<tr>
+			<td colspan="5" style="font-size:16px;text-align:center;background:#ddd;">
+				<div >${care.name}</div>
+			</td>
+		</tr>
+			<tr>
+				<td colspan="5" style="text-align:center;font-size:16px;padding:15px;color:#00e;">
+					<div >${que.getNumberDisplay()} <t:outputraw value="${textarea2html(que.des)}"/></div>
+				</td>
+			</tr>
+			<t:loop source="assessees" value="user" index="rowIndex">
+				<tr>
+					<td>
+							
+						<table class="tblLScore t-data-grid">
+							<thead>
+							<tr>
+								<th>1</th>
+								<th>2</th>
+								<th>3</th>
+								<th>4</th>
+								<th>5</th>
+							</tr>
+							<tr>
+								<th><label for="rdo_${user.id}_1">Totally Disagree</label></th>
+								<th><label for="rdo_${user.id}_2">Disagree</label></th>
+								<th><label for="rdo_${user.id}_3">Neutral</label></th>
+								<th><label for="rdo_${user.id}_4">Agree</label></th>
+								<th><label for="rdo_${user.id}_5">Totally Agree</label></th>
+							</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<t:loop source="1..5" value="tempScore">
+									<td class="tdRdo" style="height:40px;">
+										<input  id="rdo_${user.id}_${tempScore}" type="radio" name="rdo_${user.id}" value="${tempScore}" />
+									</td>
+									</t:loop>
+								</tr>
+							</tbody>
+						</table>
+			
+					</td>
+				</tr>
+			</t:loop>
+			<tr>
+				<td colspan="5" style="text-align:center; padding-right:20px;">
+					<t:submit t:id="bsubmit" value="&gt;&gt; ${getSubmitText()}" class="submit squared" 
+					style="margin:5px;padding:10px 30px;height:40px;font-weight:bold;"
+					onclick="return onSubmitClicked();"/>
+				</td>
+			</tr>
+	</table>
+	<table class="actionToolBar">
+		<tr>
+			<td >
+			</td>
+		</tr>
+	</table>
+		
+	<div style="text-align:center;padding:5px;">
+		<div style="margin:auto;width:${getProgressBarWidth()}px;background:#bbb;border:#ccc 2px solid;">
+			<div style="width:${getProgressWidth()}px;background:#5e5;text-align:right;padding-right:5px;">
+				${getProgressPercent()}%
+			</div>
+		</div>
+		<!--<span style="color:#ff5a11;"><b>${que.number}</b></span> 
+				of <b>${getNumQuestionWithoutNumber(care)}</b>
+		
+		-->
+		<t:if test="isOneFourthWay()">
+			<div style="margin-top:5px;">
+				<img style="vertical-align:middle;" src="${context:lib/img/emoji/emoji_goodjob.png}"/>
+				<span style="font-size:16px;font-weight:bold;color:#00e;">Well Done! You are 25% through !</span>
+			</div>
+		</t:if>
+		<t:if test="isHalfWay()">
+			<div style="margin-top:5px;">
+				<img style="vertical-align:middle;" src="${context:lib/img/emoji/emoji_goodjob.png}"/>
+				<span style="font-size:16px;font-weight:bold;color:#00e;">Well Done! You are half-way through !</span>
+			</div>
+		</t:if>
+		<t:if test="isThreeFourthWay()">
+			<div style="margin-top:5px;">
+				<img style="vertical-align:middle;" src="${context:lib/img/emoji/emoji_goodjob.png}"/>
+				<span style="font-size:16px;font-weight:bold;color:#00e;">Well Done! You are 75% through !</span>
+			</div>
+		</t:if>
+	</div>
+
+</form>
+		</p:else>
+		</t:if>
+
+
+<script>
+$$('.tdRdo').invoke('observe', 'click', function(){
+  	this.down('input').checked = true; 
+});
+
+
+function onSubmitClicked(){
+	<t:loop source="assessees" value="user" index="rowIndex">
+		if ($$('input[name=rdo_${user.id}]:checked').length == 0){
+			alert("Some answer not selected yet, please select again");
+			return false;
+		}
+	</t:loop>
+	
+	
+	return true;
+}
+
+
+</script> 
+
+</p:else>
+</t:if>
+</html>

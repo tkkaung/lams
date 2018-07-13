@@ -1,0 +1,101 @@
+<html t:type="layout"
+	title="${getTitle()}"
+	currentModule="${moduleName}"
+	currentProj="curProj"
+	breadcrumb="${curProj.encodeddisplayname}=project/home?${curProj.id}
+		,${getModuleDisplayName(curProj)}=modules/resources/home?${curProj.id}
+		${getBreadcrumbLink()}
+		,${getTitle()}=modules/resources/resourceedit?${resrc.id}
+		"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+   
+<style>
+	.rtitle{
+		font-size: 15px;
+	}
+</style>
+   
+<p:legendBlk>
+	<span class="required">*</span>  ${message:required-fields}
+</p:legendBlk>
+
+<table class="actionToolBar">
+	<tr>
+		<td class="right">
+		</td>
+	</tr>
+</table>	
+
+<table>
+	<tr>
+		<td ><img src="${getTypeIcon(resrc)}" width="35px" /> </td>
+		<td>
+			<div class="rtitle">${resrc.name}</div>
+		</td>
+	</tr>
+</table>
+		<t:form t:id="form">
+			<t:errors/>
+		
+		<div class="t-beaneditor e-formeditor">
+		<table>
+			<tr>
+				<td class="label">
+					<t:label for="resrcName" ><span class="required">*</span> ${message:name-label}</t:label>
+				</td>
+				<td>
+					<t:textfield t:id="resrcName" value="resrcName" class="mwidth" validate="regexp" />
+				</td>
+			</tr>
+			<t:if test="resrc.isLink()">
+				<tr>
+					<td class="label"><t:label for="lURL" ><span class="required">*</span> ${message:lURL-label}</t:label></td>
+					<td>
+						<t:textfield t:id="lURL" value="resrc.toLink().url" class="lwidth" validate="required" />
+					</td>
+				</tr>
+			</t:if>
+			<tr>
+				<td class="label"><t:label for="des" /></td>
+				<td>
+					<textarea t:type="textarea" t:id="des" value="resrc.des" cols="50" rows="3" class="lwidth"/>
+				</td>
+			</tr>
+			<tr>
+				<td class="label">${message:owner-label}</td>
+				<td>
+					<t:if test="resrc.owner">
+						<t:pagelink page="user/view" context="resrc.owner.id">${resrc.owner.displayName}</t:pagelink>
+					</t:if>
+				</td>
+			</tr>
+			<tr>
+				<td class="label">${message:cdate-label}</td>
+				<td>
+					<span class="date">${resrc.cdatedisplay}</span>
+				</td>
+			</tr>
+			<t:if test="resrc.editor">
+				<tr>
+					<td class="label">${message:editor-label}</td>
+					<td>
+						<t:pagelink page="user/view" context="resrc.editor.id">${resrc.editor.displayName}</t:pagelink>
+						, <span class="date">${resrc.mdatedisplay}</span>
+					</td>
+				</tr>
+			</t:if> 
+			<tr>
+				<td ></td>
+				<td>
+					<t:submit value="${message:submit-label}"	class="squared" />
+				</td>
+			</tr>
+		</table>
+	</div>
+	</t:form>	
+	
+	
+	
+
+</html>

@@ -1,0 +1,171 @@
+<html t:type="layout" 
+	title="${message:search-result-for}: ${encode(searchText)}"
+	currentModule="${moduleName}"
+	currentProj="curProj"
+	breadcrumb="${curProj.encodeddisplayname}=project/home?${curProj.id}
+		,${module.displayName}=modules/message?${curProj.id}
+		,${message:search-result}=modules/message/search?${curProj.id}:${encode(searchText)}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+		
+	<style>
+		.chkbox, .flag, .hasRead{
+			width: 15px;
+			text-align: center;
+		}
+		.keyword{
+			font-weight: normal;
+		}
+	</style>
+	
+	<p:actionBtns>
+		<t:if test="canCreateMessage(curProj)">
+			<a class="button rounded" t:type="pageLink" page="modules/message/new" context="curProj.id" >
+				<span>${message:add-new} ${message:message}</span>
+			</a>
+		</t:if>
+	</p:actionBtns>
+	
+	<table class="actionToolBar">
+		<tr>
+			<td class="right">
+				<form t:type="form" t:id="searchForm" autofocus="false">
+					<input t:type="textfield" value="searchText" style="width: 200px;" />
+					<t:submit value="${message:search-message}" class="squared"/>
+				</form>
+			</td>
+		</tr>
+	</table>	
+	
+	<table width="100%">
+		<tr>
+			<td class="mleftTd" width="140px" valign="top">
+				<div class="msgleftpan">
+					<t:loop t:type="loop" source="msgTypes" value="tempType" >
+						<div class="type ${typeSelectedClass}">
+							<a t:type="pageLink" page="modules/message" context="getParams(curProj.id, tempType)">
+								${getTypeNameDisplay(tempType)}
+								<t:if test="getUnreadCount(tempType)">(${unreadCount})</t:if>
+							</a>
+						</div>
+					</t:loop>
+				</div>
+			</td>
+			<td class="mRightTd" valign="top">
+				<t:if test="msgs" >
+					<div id="msgBody" style="min-height:200px">
+						<t:delegate to="block:defaultBlock"/>
+					</div>
+					<p:else>
+						${message:search-return-no-result}
+					</p:else>
+				</t:if>	
+			</td>
+		</tr>
+	</table>
+	
+	
+	
+	<t:block t:id="defaultActionToolBar">
+		<t:submit value="${message:delete}" t:id="delete" class="squared" 
+		 	onclick="return checkHasSelectChBox('msgGrid','${message:select-at-least-one-item}');"/>
+		 <t:submit value="${message:mark-read}" t:id="markRead" class="squared" 
+			onclick="return checkHasSelectChBox('msgGrid','${message:select-at-least-one-item}');"/>
+		 <t:submit value="${message:mark-unread}" t:id="markUnread" class="squared" 
+			onclick="return checkHasSelectChBox('msgGrid','${message:select-at-least-one-item}');"/>
+		 <t:submit value="${message:set-flag}" t:id="markFlag" class="squared" 
+			onclick="return checkHasSelectChBox('msgGrid','${message:select-at-least-one-item}');"/>
+		 <t:submit value="${message:clear-flag}" t:id="markUnflag" class="squared" 
+			onclick="return checkHasSelectChBox('msgGrid','${message:select-at-least-one-item}');"/>
+	</t:block>
+		
+
+	
+	<t:block t:id="defaultBlock">
+		<div style="min-height:200px;height:auto!important; _height:200px;">
+		<form t:type="form" t:id="gridForm">
+			<t:errors/>
+			<table class="actionToolBar2">
+				<tr>
+					<td class="left"> 
+						<t:delegate to="block:defaultActionToolBar"/>
+					</td>
+				</tr>
+			</table>
+
+			<t:grid source="msgs" row="msg"
+				id="msgGrid"
+				model="getModel()"
+				rowClass="RowClass"
+				rowsPerPage="rowsPerPage"
+				pagerPosition="bottom" 
+			>
+				<p:chkboxHeader>
+					<input type="checkbox" name="chkBoxAll" id="chkBoxAll" onclick="chkboxAll('msgGrid','chkBoxAll')"/>
+				</p:chkboxHeader>
+				<p:chkboxCell>
+					<input type="checkbox" name="chkBox" value="${msg.id}" onclick="chkbox('msgGrid','chkBoxAll')"/>
+				</p:chkboxCell>
+				<p:flagCell>
+					<a href="#" t:type="actionLink" context="msg.id" t:id="toggleFlag">
+					<t:if test="msg.flag">
+						<img src="${context:lib/img/16/flag.png}" width="14"/>
+						<p:else>
+							<img src="${context:lib/img/16/unflag.png}" width="14"/>
+						</p:else>
+					</t:if>
+					</a>
+				</p:flagCell>
+				<p:hasReadCell>
+					<a href="#" t:type="actionLink" context="msg.id" t:id="toggleRead">
+					<t:if test="msg.hasRead">
+						<img src="${context:lib/img/icon-mail-read.png}" width="15"/>
+						<p:else>
+							<img src="${context:lib/img/icon-mail.png}" width="15" />
+						</p:else>
+					</t:if>
+					</a>
+				</p:hasReadCell>
+				<p:senderCell>
+					<t:pagelink page="user/view" context="msg.sender.id">
+						<t:ck.TrimmedString maxLength="30" value="msg.sender.displayName"/>
+					</t:pagelink>
+				</p:senderCell>
+				<p:receiverCell>
+					<t:ck.TrimmedString maxLength="30" value="msg.recipientsDisplay"/>
+				</p:receiverCell>
+				<p:subjectCell>
+					<t:pagelink page="modules/message/view" context="msg.id" >
+						<t:if test="msg.subject">
+							<t:ck.TrimmedString maxLength="30" value="msg.subject"/>
+							<p:else>(${message:no-subject})</p:else>
+						</t:if>
+					</t:pagelink>
+				</p:subjectCell>
+				<p:contentCell>
+					<t:pagelink page="modules/message/view" context="msg.id" >
+						<t:ck.TrimmedString maxLength="80" value="stripTags(msg.content)"/>
+					</t:pagelink>
+				</p:contentCell>
+				<p:dateCell>
+					${msg.sendDateDisplay}
+				</p:dateCell>
+			</t:grid>
+		</form>
+		</div>
+		
+		<table class="actionToolBar3">
+			<tr>
+				<td class="right">		 	
+					<form t:type="form" t:id="rowsPerPageForm" autofocus="false">
+						${totalSize} ${message:results-found}, ${message:show}
+						<select t:type="select" t:id="rowsPerPageSelect" model="literal:5,10,20,50,100"
+							value="rowsPerPage" onchange="this.form.submit()" />
+						${message:results-per-page}
+					</form>
+				</td>
+			</tr>
+		</table>
+	</t:block>
+	
+</html>

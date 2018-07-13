@@ -1,0 +1,167 @@
+<html t:type="layout" 
+	title="${message:edit-elog-orgsup-title}"
+	currentModule="${moduleName}"
+   currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/elog/home?${project.id}
+		,${message:manage-elog}=modules/elog/manage?${project.id}
+		,${message:approve-reject-elog}=modules/elog/approve?${elog.id}
+		,${message:edit-elog-orgsup-title}=modules/elog/editorgsup"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+
+<p:legendBlk>
+	<span class="required">*</span>  ${message:required-fields}
+</p:legendBlk>
+
+
+	<form t:type="form" t:id="elogform" enctype="multipart/form-data" class="e-formeditor">
+	<t:errors />
+	<div class="t-beaneditor">
+		<table >
+			<tr>
+				<td class="label">
+					<label >${message:author-label}</label>
+				</td>
+				<td>
+					<t:pagelink page="user/view" context="elog.author.id">${elog.author.displayName}</t:pagelink>
+				</td>
+			</tr>
+			<tr>
+				<td class="label">
+					<t:label for="subject" ><span class="required">*</span>  ${message:subject-label}</t:label>
+				</td>
+				<td>
+					<input t:type="TextField" t:id="subject" value="elog.subject" class="lwidth" validate="required" />
+					<input type="hidden" name="mode" id="mode" value="button" />
+		    		<br/>
+		    		<span class="formtip">${message:auto-save-in} <span id="autoSaveMin">10</span> ${message:minutes}</span>
+				</td>
+			</tr>
+			<tr>
+				<td class="label">
+					<t:label for="content" ><span class="required">*</span>  ${message:content-label}</t:label>
+				</td>
+				<td>
+					<textarea t:type="ck/editor" t:id="content" value="elog.content" 
+						customConfiguration="context:lib/js_config/ckeditor.js" 
+						toolbarSet="Default"  
+						width="630px" height="500px"
+						validate="required"
+						></textarea>
+				</td>
+			</tr>
+			
+			
+			<tr>
+				<td class="label"><label >${message:file}</label></td>
+				<td>
+					<t:zone t:id="attachedFilesZone" id="attachedFilesZone">
+					<div>
+					<t:loop source="elog.files" value="tempFile">
+						<div class="existDiv">
+							<t:eventLink event="retrieveFile" context="tempFile.id"  title="${message:click-to-download}">
+								<img src="${getAttachFileIcon(tempFile)}" style="vertical-align:bottom;"/>
+								${tempFile.displayName}
+							</t:eventLink>
+							(${tempFile.displaySize})
+							[<a href="#" t:type="actionLink" t:id="removeFile" 
+								context="tempFile.id"
+								zone="attachedFilesZone"
+								class="alink"
+							>
+								<span t:type="any" t:mixins="Confirm" t:message="${message:confirm-remove-attachment}">
+									${message:remove}
+								</span>
+							</a>]
+						</div>
+					</t:loop>
+					</div>
+					</t:zone>
+					<div id="file1" class="fileDiv subgroup">
+						<input t:type="upload" t:id="file1" />
+					</div>
+					<div id="file2" class="fileDiv subgroup">
+						<input t:type="upload" t:id="file2" />
+					</div>
+					<div id="file3" class="fileDiv subgroup">
+						<input t:type="upload" t:id="file3" />
+					</div>
+					<div id="file4" class="fileDiv subgroup">
+						<input t:type="upload" t:id="file4" />
+					</div>
+					<div id="file5" class="fileDiv subgroup">
+						<input t:type="upload" t:id="file5" />
+					</div>
+					<div>
+						<a href="#" id="addMoreFileLink" onclick="addMoreFile(); return false;">${message:add-more-file}</a>
+						<span id="addMoreFileMsg" class="formtip">${message:max-5-files-to-add}</span>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td class="label"><label>${message:logs-label}</label></td>
+				<td >
+					<t:zone t:id="remarkLogsZone" id="remarkLogsZone">
+						<div>
+						<t:outputraw value="elog.remarks"/>
+						</div>
+					</t:zone>
+				</td>
+			</tr>
+		</table>
+		
+		<t:submit t:id="save" value="${message:save}" class="submit squared" onclick="submitClicked();" />
+		<t:submit t:id="saveAndApprove" value="${message:saveAndApprove-btn}" class="squared" onclick="submitClicked();" />
+	</div>
+	</form>
+<script language="javascript">
+	var submitting = false; 
+	function submitClicked(){
+		submitting = true;
+	}
+	
+	function autoAction() {
+		if(!submitting){
+		   $('mode').value = "auto";
+		   submitting = true;
+		   $('elogform').submit();
+		   $('mode').value = "button";
+	   }
+	}
+	var autoSaveMin = 10;
+	function updateAutoSaveMin(){
+		autoSaveMin -= 0.5;
+		$('autoSaveMin').update(autoSaveMin);
+	}
+	
+	function addMoreFile(){
+		 if($('file4').visible()){
+			showElm('file5');
+			$('addMoreFileLink').hide();
+			$('addMoreFileMsg').show();
+		}
+		else if($('file3').visible())
+			showElm('file4');
+		else if($('file2').visible())
+			showElm('file3');
+		else if($('file1').visible())
+			showElm('file2');
+		else{
+			showElm('file1');
+			$('addMoreFileLink').update('${message:add-more}');
+		}
+	
+		return false;
+	}
+	
+	document.observe("dom:loaded", function() {
+		$$('.fileDiv').invoke('hide');
+		$('addMoreFileMsg').hide();
+
+		setInterval("autoAction()", 600000);
+		setInterval("updateAutoSaveMin()", 30000);
+	});
+</script>
+</html>

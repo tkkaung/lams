@@ -1,0 +1,45 @@
+<html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+      xmlns:p="tapestry:parameter">
+   
+    
+	<div>
+		
+		<t:form t:id="queryForm">
+			<t:textarea t:id="sql" value="sql" cols="70" rows="4" class="lwidth" style="width:700px;"/>
+			<br/>
+			Full Class Name: <t:textfield t:id="className" class="mwidth" style="width:500px;" t:value="className"/>
+			<br/>
+			<t:submit value="Execute"/>
+		</t:form>
+	</div>
+	ntu.celt.eUreka2.modules.assessment.Assessment
+	<br/>
+	ntu.celt.eUreka2.modules.peerevaluation.Evaluation
+	<br/>
+	<br/>
+	
+	
+	
+	
+	<t:grid source="results" row="result" 
+	model="model"
+	rowIndex="rowIndex"
+	RowsPerPage="100"
+	pagerPosition="bottom" 
+	>
+	</t:grid>	
+
+    
+    
+    <br/>
+    ResultText:
+    <br/>
+    ${msg}
+    
+     <br/>
+     <br/>
+    logMsg:
+    <br/>
+    ${logMsg}
+    
+</html>

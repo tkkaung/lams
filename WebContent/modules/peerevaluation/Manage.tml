@@ -1,0 +1,216 @@
+<html t:type="layout" 
+	title="${message:manage-evaluation}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/peerevaluation/home?${project.id}
+		,${message:manage-evaluation}=modules/peerevaluation/manage?${project.id}
+		"
+	totalShowOption="${totalSize}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+<style>
+	.wCell form{
+		display: inline;
+	}
+	.wCell form .wEdit{
+		display: inline;
+	}
+	.wCell .wEditBtn{
+		float: right;
+	}
+</style>
+<p:actionBtns>
+	<a class="button rounded" t:type="pageLink" page="modules/peerevaluation/new" context="project.id" >
+		<span>${message:add-new} ${message:evaluation}</span>
+	</a>
+	<a class="button rounded" t:type="pageLink" page="admin/rubric/home" target="_blank" >
+		<span>${message:manage-my-rubric}</span>
+	</a>
+	<a class="button rounded" t:type="pageLink" page="modules/group" context="project.id" >
+		<span>${message:manage-group}</span>
+	</a>
+</p:actionBtns>	
+
+
+<t:grid source="evals" row="eval" 
+	model="model"
+	rowIndex="rowIndex"
+	rowsPerPage="rowsPerPage"
+	pagerPosition="bottom" 
+	>
+	<p:empty>
+		<div class="notfoundtext">
+			${message:no-evaluation-found}
+		</div>
+	</p:empty>
+   <t:parameter name="orderNumberCell">
+   	${eval.ordernumber}
+   	<t:if test="isFirst(rowIndex)">
+			<img src="${context:lib/img/arrow_up0.png}" ></img>
+			<p:else>
+				<t:eventlink t:event="swapOrder" context="getParams(getPrevEval(rowIndex).id, eval.id)" >
+					<img src="${context:lib/img/arrow_up.png}" title="${message:move-up}"></img>	
+				</t:eventlink>
+			</p:else>
+		</t:if>
+		<t:if test="isLast(rowIndex, evals)">
+			<img src="${context:lib/img/arrow_down0.png}" ></img>
+			<p:else>
+				<t:eventlink t:event="swapOrder" context="getParams(getNextEval(rowIndex).id, eval.id)" >
+					<img src="${context:lib/img/arrow_down.png}" title="${message:move-down}"></img>	
+				</t:eventlink>
+			</p:else>
+		</t:if>
+   </t:parameter>
+   
+   <t:parameter name="nameCell">
+   		<t:pagelink page="modules/peerevaluation/viewaverage" context="eval.id" >
+				<span>${eval.name}</span> 
+		</t:pagelink>
+   	<div>
+   		<span class="subdes">
+   			<t:outputraw value="${truncateString(textarea2html(eval.des))}"/>
+   		</span>
+   	</div>
+   	
+   </t:parameter>
+   <t:parameter name="mdateCell">
+   	<span class="date">${eval.mdatedisplay}</span>
+   	<t:if test="eval.isDiffEditor()">
+			<div style="font-size:0.9em">
+				${message:by} 
+				<t:pagelink page="user/view" context="eval.editor.id">${eval.editor.displayname}</t:pagelink>
+			</div>
+		</t:if>
+   </t:parameter>
+   <t:parameter name="groupCell">
+   	<t:if test="eval.group">
+   		${eval.group.groupType}
+   		<p:else>
+   			${message:random-grouping}
+   		</p:else>
+   	</t:if>
+   </t:parameter>
+   <t:parameter name="weightageCell">
+	   	<div class="wCell" >
+	   	<span id="wDisplay${eval.id}">${eval.weightage}%</span>
+	   	  		<form t:type="form" t:id="editWeightageForm" >
+	  				<div class="wEdit" id="wEdit${eval.id}" >
+		  				<t:select t:id="wSelect" clientId="wSelect${eval.id}" 
+					  			 class="wSelect"
+					  			 value="eval.weightage" 
+					  			 validate="required" 
+					  			 onchange="this.form.submit();"
+					  			 model="literal:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100"
+					  	></t:select>
+					  	%
+					  	<input type="hidden" name="evalId" value="${eval.id}" />
+				  	</div>
+				  	<div class="wEditBtn" >
+					  	<a href="javascript:void(0);" onclick="editWeightClick('${eval.id}')" class="editBtn" >
+				   		<img src="${context:lib/img/icon_edit.png}" title="${message:edit}" id="imgEd${eval.id}"/>
+				   	</a>
+			   	</div>
+		   	</form>
+			
+		</div>
+		
+	</t:parameter>
+   <t:parameter name="rubricCell">
+   	<t:if test="eval.rubric">
+   		<t:pagelink page="admin/rubric/view" context="eval.rubric.id">${eval.rubric.name}</t:pagelink>
+   	</t:if>
+   </t:parameter>
+   <t:parameter name="allowSelfEvaluationCell">
+	   ${getBooleanDisplay(eval.allowSelfEvaluation)}
+	   
+	   
+   </t:parameter>
+   <t:parameter name="releasedCell">
+   		<t:pagelink page="modules/peerevaluation/releaseresult" context="eval.id">	
+	   		${getBooleanDisplay(eval.released)}
+	    </t:pagelink>
+    <br/>
+    <span class="small">
+   
+	   <t:if test="eval.allowViewScoredCriteria"><span title="${message:allowViewScoredCriteria-tip}">
+	   		- ${message:allowViewScoredCriteria-label}</span><br/></t:if>
+	   	<t:if test="eval.allowViewGrade"><span title="${message:allowViewGrade-tip}">
+	   		- ${message:allowViewGrade-label}</span><br/></t:if>
+	   	<t:if test="eval.allowViewGradeDetail"><span title="${message:allowViewGradeDetail-tip}">
+	   		- ${message:allowViewGradeDetail-label}</span><br/></t:if>
+	   	<t:if test="eval.allowViewGradeDetailPeer"><span title="${message:allowViewGradeDetailPeer-tip}">
+	   		- ${message:allowViewGradeDetailPeer-label}</span><br/></t:if>
+	</span>   
+   </t:parameter>
+   <t:parameter name="edateCell">
+   		<t:if test="eval.sdate" >
+   			<span class="date">${eval.sdatedisplay}</span>
+   		</t:if> -
+   		<span class="date">${eval.edatedisplay}</span>
+   		
+   	</t:parameter>
+     
+   <t:parameter name="actionCell">
+			<t:if negate="true" test="eval.released">
+				<t:pagelink page="modules/peerevaluation/edit" context="eval.id" class="button rounded">
+					<span>${message:edit}</span> 
+				</t:pagelink>
+			</t:if>
+			<t:actionlink t:id="delete" context="eval.id" class="button rounded"
+				onclick="return confirmDelete('${message:confirm-permanent-delete-evaluation}')">
+				<span>${message:delete}</span>
+			</t:actionlink>
+			<t:pagelink page="modules/peerevaluation/viewaverage" context="eval.id" class="button rounded">
+				<span>View Score</span> 
+			</t:pagelink>
+			<t:pagelink page="modules/peerevaluation/checkstatus" context="eval.id" class="button rounded">
+				<span>${message:checkstatus}</span> 
+			</t:pagelink>
+			<t:pagelink page="modules/peerevaluation/checkviewtime" context="eval.id" class="button rounded">
+				<span>Check grade view status</span> 
+			</t:pagelink>
+			<t:pagelink page="modules/peerevaluation/checkauditlog" context="eval.id" class="button rounded">
+				<span>Change Log</span> 
+			</t:pagelink>
+			
+	</t:parameter>
+</t:grid>
+
+<t:if test="evals">
+	<t:if test="isTotalWeight100()" negate="true">
+		<div class="attention" style="padding:10px;">
+			${message:warn-total-weight-not-100}
+			,  ${message:current-total-weight} = <strong>${getTotalWeight()}%</strong> 
+		</div>
+	</t:if>
+</t:if>
+
+<script>
+	document.observe("dom:loaded", function() {
+		$$(".wEdit").each(function(item){
+			item.hide();
+		});
+	});
+	
+	function editWeightClick(evalId){
+		if($('wEdit'+evalId).visible()){
+			$('wEdit'+evalId).hide();
+			$('wDisplay'+evalId).show();
+			$('imgEd'+evalId).writeAttribute("src", '${context:lib/img/icon_edit.png}');
+		}
+		else{
+			$('wEdit'+evalId).show();
+			$('wDisplay'+evalId).hide();
+			$('wSelect'+evalId).focus();
+			$('imgEd'+evalId).writeAttribute("src",'${context:lib/img/icon_close.png}' );
+		}
+	}
+	
+</script>
+
+
+
+</html>

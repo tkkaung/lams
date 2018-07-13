@@ -1,0 +1,339 @@
+<html t:type="layout" 
+	title="${message:assessment-score}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/assessment/home?${project.id}
+		,${message:manage} ${message:assessment}=modules/assessment/manage?${project.id}
+		,${message:assessment-score}=modules/assessment/score"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+<style>
+	
+	#assmtContainer {
+		overflow-x: auto;
+	<t:if test="${isMoreThan(assmt.criterias.size(), 7)}">	
+		_overflow-x: scroll;  /* IE */
+	</t:if>
+		width: 100%;
+		/*		width: 972px;*/
+	}
+	table.t-data-grid th.no_bot_border{
+		border-bottom-color: #ccc !important; 
+	}
+	table.t-data-grid th.no_top_border{
+		border-top-color: #ccc !important; 
+	}
+	
+	table.t-data-grid tbody tr td{
+		text-align: center;
+		vertical-align: middle;
+	}
+	.assmttbl th{
+		padding:5px
+	}
+	.assmttbl .name, .assmttbl .cmmt{
+		text-align: left;
+	}
+	.assmttbl .crit{
+		vertical-align: top;
+		width: ${getCritNameWidthPercent(60, assmt)};
+		text-align: left;
+		font-size: 11px;
+	}
+</style>
+
+<p:actionBtns>
+
+<a class="button rounded" t:type="eventlink" t:event="ExportXls" context="assmt.id" 
+				title="${message:export-tip}">
+				<span>${message:export-xls}</span>
+			</a>
+
+
+	
+		<a class="button rounded" t:type="pageLink" page="modules/assessment/givescore" context="assmt.id" >
+			<span>${message:givescore}</span>
+		</a>
+	
+</p:actionBtns>	
+
+<p:legendBlk>
+	<div class="legend">
+		<div class="title">${message:legend}</div>
+		<div class="content">
+			<table>
+				<tr>
+							<td><div class="legendmark aplus" /></td>
+					<td class="label">${getColorCodeGradeAplus()}</td>
+					<td><div class="legendmark a" /></td>
+					<td class="label">${getColorCodeGradeA()}</td>
+					<td><div class="legendmark aminus" /></td>
+					<td class="label">${getColorCodeGradeAminus()}</td>
+					<td><div class="legendmark bplus" /></td>
+					<td class="label">${getColorCodeGradeBplus()}</td>
+					<td><div class="legendmark b" /></td>
+					<td class="label">${getColorCodeGradeB()}</td>
+					<td><div class="legendmark bminus" /></td>
+					<td class="label">${getColorCodeGradeBminus()}</td>
+					<td><div class="legendmark cplus" /></td>
+					<td class="label">${getColorCodeGradeCplus()}</td>
+					<td><div class="legendmark c" /></td>
+					<td class="label">${getColorCodeGradeC()}</td>
+					<td><div class="legendmark dplus" /></td>
+					<td class="label">${getColorCodeGradeDplus()}</td>
+					<td><div class="legendmark d" /></td>
+					<td class="label">${getColorCodeGradeD()}</td>
+					<td><div class="legendmark f" /></td>
+					<td class="label">${getColorCodeGradeF()}</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</p:legendBlk>
+
+
+<table class="actionToolBar">
+	<tr>
+		<td class="right">
+		</td>
+	</tr>
+</table>
+
+<div class="e-formeditor t-beaneditor">
+	<table >
+			<tr>
+				<td class="label">${message:assessment}</td>
+				<td>
+					<t:pagelink page="modules/assessment/view" context="assmt.id">
+							${assmt.name}
+					</t:pagelink>
+					<div><t:outputraw value="${textarea2html(assmt.des)}"/></div>
+				</td>
+			</tr>
+		</table>
+</div>
+		
+<div id="assmtContainer">
+<t:if test="assmt.criterias">
+
+	<p:else>
+	<div id="scroller">
+		<table class="t-data-grid assmttbl stickyHeader" style="width:${getTableWidth()};">
+		<thead>
+		<tr>
+			<th >${message:no}</th>
+			<th >${getAssesseeRoleNames(project)}</th>
+			<t:if test="assmt.group">
+				<th >Group: ${assmt.group.groupType}</th>
+			</t:if>
+			<th >${message:total} <span class="formtip">(%)</span></th>
+		</tr>
+		</thead>
+		<tbody>
+		<t:loop source="assessees" value="user" index="rowIndex">
+			<tr>
+				<td>${getRowNum()}</td>
+				<td class="name assessee">
+					<t:pagelink page="user/view" context="user.id" >
+						${user.displayName}
+					</t:pagelink>
+				</td>
+				<t:if test="assmt.group">
+					<td >${getGroupTypeName(assmt.group, user)}</td>
+				</t:if>
+			
+				${loadAssmtUser(assmt,user)}
+				<td class="total ${getTotalGradeClass()}">
+					<t:if test="hasGraded()">
+						<t:pagelink  page="modules/assessment/viewgrade" context="getParams(assmt.id,user.id)" style="color:#333;">
+							<span >${assmtUser.totalScoreDisplay}</span>
+						</t:pagelink>
+					</t:if>
+					<t:outputraw value="getSpace()"/>
+				</td>
+			</tr>
+		</t:loop>
+		<tr>
+			<th><t:outputraw value="getSpace()"/></th>
+			<t:if test="assmt.group">
+				<th ><t:outputraw value="getSpace()"/></th>
+				<th style="text-align:right;">${message:average}:</th>
+				<p:else>
+					<th style="text-align:right;">${message:average}:</th>
+				</p:else>
+			</t:if>
+			<td class="average ${getTotalAvgGradeClass()}">
+				${getTotalAvgScoreDisplay(assessees, assmt)}
+				<t:outputraw value="getSpace()"/>
+			</td>
+		</tr>
+		</tbody>
+		</table>
+		</div>
+	</p:else>
+
+	
+	<div id="scroller">
+	<table class="t-data-grid assmttbl stickyHeader" style="width:${getTableWidth()};">
+	<thead>
+		<tr>
+			<th class="no_bot_border"><t:outputraw value="getSpace()"/></th>
+			<th class="no_bot_border"><t:outputraw value="getSpace()"/></th>
+			<t:if test="assmt.group">
+				<th class="no_bot_border"><t:outputraw value="getSpace()"/></th>
+			</t:if>
+			<t:if test="assmt.criterias">
+				<th colspan="${assmt.criterias.size()}" >
+						${message:rubric} : 
+						<t:if test="assmt.rubric">
+							${assmt.rubric.name}
+					</t:if>
+				</th>
+			</t:if>
+			<th class="no_bot_border"><t:outputraw value="getSpace()"/></th>
+			<th class="no_bot_border"><t:outputraw value="getSpace()"/></th>
+		</tr>
+			
+		<tr>
+			<th class="no_bot_border no_top_border">${message:no}</th>
+			<th class="no_bot_border no_top_border">${getAssesseeRoleNames(project)}</th>
+			<t:if test="assmt.group">
+				<th class="no_bot_border no_top_border">Group: ${assmt.group.groupType}</th>
+			</t:if>
+			<t:loop source="assmt.criterias" value="tempCrit" index="colIndex" >
+				<th class="crit" title="${tempCrit.name}">
+					<t:outputraw value="${truncateString(textarea2html(tempCrit.name),100)}"/>
+				</th>
+			</t:loop>
+			<th class="no_bot_border no_top_border">${message:total} <span class="formtip">(%)</span></th>
+			<th class="no_bot_border no_top_border">${message:comment} </th>
+			
+		</tr>
+		<tr>
+			<th class="no_top_border"><t:outputraw value="getSpace()"/></th>
+			<th class="no_top_border"><t:outputraw value="getSpace()"/></th>
+			<t:if test="assmt.group">
+				<th class="no_top_border"><t:outputraw value="getSpace()"/></th>
+			</t:if>
+			<t:loop source="assmt.criterias" value="tempCrit" index="colIndex" >
+				<th class="weight">
+					<span class="formtip">${message:weightage-label}: ${tempCrit.weightage}</span>
+				</th>
+			</t:loop>
+			<th class="no_top_border"><t:outputraw value="getSpace()"/></th>
+			<th class="no_top_border"><t:outputraw value="getSpace()"/></th>
+			
+		</tr>
+		</thead>
+		<tbody>
+		<t:loop source="assessees" value="user" index="rowIndex">
+			<tr >
+				${loadAssmtUser(assmt,user)}
+				
+				<td>${getRowNum()}</td>
+				<td class="name">
+				<t:if test="hasGraded()">
+					<t:pagelink page="modules/assessment/viewgrade" context="getParams(assmt.id,user.id)">
+						${user.displayName}
+					</t:pagelink>
+					<p:else>
+						<t:pagelink page="modules/assessment/grade" context="getParams(assmt.id,user.id)">
+							${user.displayName}
+						</t:pagelink>
+					</p:else>
+				</t:if>
+					
+				</td>
+				<t:if test="assmt.group">
+					<td >${getGroupTypeName(assmt.group, user)}</td>
+				</t:if>
+				
+				<t:loop source="assmt.criterias" value="tempCrit" index="colIndex" >
+					<td>
+						<t:if test="hasGraded()">
+						<t:if test="assmt.gmat">
+							${getComputedCritScoreDisplayGMAT(tempCrit,assmtUser)}
+							<p:else>
+								${getComputedCritScoreDisplay(tempCrit,assmtUser)}
+							</p:else>
+						</t:if>
+							<t:outputraw value="getSpace()"/>
+								<t:if test="textarea2html(getCritComment(tempCrit, assmtUser))">
+									<a href="javascript:void(0);" onclick="openPopup('${getViewCritCmmtURL(tempCrit, assmtUser)}', 'assmtCritCmmt', 500, 300)">
+					   					<img src="${context:lib/img/cmmt.png}"/>
+					   				</a>
+				   				</t:if>	
+						</t:if>
+						<t:outputraw value="getSpace()"/>
+					</td>
+				</t:loop>
+				<td class="total ${getTotalGradeClass()}">
+					<t:if test="hasGraded()">
+						<t:pagelink page="modules/assessment/viewgrade" context="getParams(assmt.id,user.id)" style="color:#333;">
+							${assmtUser.totalScoreDisplay}
+						</t:pagelink>
+					</t:if>
+					<t:outputraw value="getSpace()"/>
+				</td>
+				<td class="cmmt" >
+					<t:if test="hasGraded()">
+						<t:if test="assmtUser.comments">
+							<t:outputraw value="textarea2html(truncateString(assmtUser.comments, 100))"/>
+						</t:if>
+					</t:if>
+					<t:outputraw value="getSpace()"/>
+				</td>
+			</tr>
+		</t:loop>
+		
+		<tr>
+			<th><t:outputraw value="getSpace()"/></th>
+			<t:if test="assmt.group">
+				<th ><t:outputraw value="getSpace()"/></th>
+				<th style="text-align:right;">${message:average}:</th>
+				<p:else>
+					<th style="text-align:right;">${message:average}:</th>
+				</p:else>
+			</t:if>
+			<t:loop source="assmt.criterias" value="tempCrit" index="colIndex" >
+				<t:if test="assmt.gmat">
+					<td class="average ${getAvgGradeClassGMAT(tempCrit)}" >${getAverageScoreGMAT(tempCrit,assessees, assmt)}</td>
+					<p:else>
+						<td class="average ${getAvgGradeClass(tempCrit)}" >${getAverageScore(tempCrit,assessees, assmt)}</td>
+					</p:else>
+				</t:if>
+			</t:loop>
+			<td class="average ${getTotalAvgGradeClass()}">
+				${getTotalAvgScoreDisplay(assessees, assmt)}
+				<t:outputraw value="getSpace()"/>
+			</td>
+		</tr>
+		<tr>
+			<th><t:outputraw value="getSpace()"/></th>
+			<t:if test="assmt.group">
+				<th ><t:outputraw value="getSpace()"/></th>
+				<th style="text-align:right;">${message:stdev}:</th>
+				<p:else>
+					<th style="text-align:right;">${message:stdev}:</th>
+				</p:else>
+			</t:if>
+			<t:loop source="assmt.criterias" value="tempCrit" index="colIndex" >
+				<td class="stdev" >${getSTDEV(tempCrit, assmt)}</td>
+			</t:loop>
+			<td class="stdev ">
+				${getTotalSTDEV(assmt)}
+			</td>
+		</tr>
+		</tbody>
+	</table>
+	</div>
+</t:if>	
+	
+	
+	<div style="height:20px;"><t:outputraw value="getSpace()"/></div>
+	
+</div>
+
+</html>

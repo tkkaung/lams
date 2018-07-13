@@ -1,0 +1,119 @@
+<html t:type="layout" 
+	title="Page View Analytic"
+	breadcrumb="${message:control-panel}=admin
+		,Page View Analytic=admin/report/analyticreport"
+	totalShowOption="${totalSize}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="statistic"/></p:leftMenuBlk>
+	
+	
+<p:legendBlk>
+Note: Data is collected starting from Aug 2016. (all earlier data has no project ID specified)
+</p:legendBlk>
+	
+	<p:actionBtns>
+
+<a class="button rounded" t:type="eventlink" t:event="ExportXls" 
+				title="${message:export-tip}">
+				<span>Export to XLS</span>
+			</a>
+	</p:actionBtns>
+    
+	<table class="actionToolBar">
+			<tr>
+				<td class="right">
+					<form t:type="form" t:id="filterForm">
+						<t:errors/>	
+						Date ${message:from}
+						<t:datefield value="searchSDate" class="swidth" format="${message:datefield-format}"/>
+						${message:to}
+						<t:datefield t:id="searchEDate" value="searchEDate" class="swidth" format="${message:datefield-format}" />
+						<br/>
+						Project ID:
+						<t:textfield t:id="projID" value="searchProjID" />
+						${message:school-label}:
+						<t:if test="canManageReport()">
+							<t:select value="searchSchool" model="getSchoolModel()" blankLabel="-Please Select-"
+							context="searchSchool"
+							class="dropdownSel"
+								/>
+							<p:else>
+								<t:select value="searchSchool" model="getSchoolModel()" validate="required" 
+								context="searchSchool"
+								class="dropdownSel"
+								/>
+							</p:else>
+						</t:if>
+						
+						Type:
+						<t:select value="searchType" model="getProjTypeModel()" blankLabel="${message:-all-}"
+							context="searchType"
+							class="dropdownSelSmall"
+							/>
+						
+						Module:
+						<t:select value="searchModule" model="getModuleModel()" 
+							context="searchModule"
+							class="dropdownSelSmall"
+							/>
+						
+						<t:submit value="${message:go}" class="squared"/>	
+					</form>
+				</td>
+			</tr>
+		</table>
+			
+		 
+	<t:grid source="analyticDatas" row="data" 
+		model="model"
+		t:id="grid"
+		rowIndex="rowIndex" 
+	  	rowsPerPage="rowsPerPage"
+		pagerPosition="bottom" 
+		>
+		<p:empty>
+			<div class="notfoundtext">No data found</div>
+		</p:empty>
+		<t:parameter name="NoCell">${getNo()}</t:parameter>
+	       
+		<t:parameter name="ProjNameCell">
+			<t:if test="data.proj">
+				${data.proj.getDisplayName()} 
+			</t:if>	
+		</t:parameter>
+		<t:parameter name="ProjIDCell">
+			<t:if test="data.proj">
+				${data.proj.getID()} 
+				<p:else>
+					-- Not specified --
+				</p:else>
+			</t:if>	
+		</t:parameter>
+		<t:parameter name="AccessedByRoleCell">
+			<t:if test="data.projRole">
+				${data.projRole.getName()} 
+			</t:if>	
+		</t:parameter>
+	    <t:parameter name="numLeaderInProjCell">
+			<t:if test="data.proj">
+				${getCountLeaderByProjectID(data.proj.getID())} 
+				<p:else>
+					--
+				</p:else>
+			</t:if>	
+		</t:parameter>
+		<t:parameter name="numStudentInProjCell">
+			<t:if test="data.proj">
+				${getCountStudentByProjectID(data.proj.getID())} 
+				<p:else>
+					--
+				</p:else>
+			</t:if>	
+		</t:parameter>
+		 
+		
+	</t:grid>
+	 
+
+</html>

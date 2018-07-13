@@ -1,0 +1,45 @@
+<html t:type="layout" title="${message:manage} ${message:module}"
+		breadcrumb="${message:control-panel}=admin,${message:manage} ${message:module}=admin/module/manage"
+      totalShowOption="${totalSize}"
+		xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+      xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="systemtools"/></p:leftMenuBlk>
+     
+   <p:actionBtns >
+		<a href="#" t:type="pageLink" page="admin/module/edit" class="button rounded">
+			<span>${message:add-new} ${message:module}</span>
+		</a>
+	</p:actionBtns>
+    
+	<table class="actionToolBar">
+		<tr>
+			<td class="right">		 	
+			</td>
+		</tr>
+	</table>
+		
+    <t:grid source="modules" row="module" class="stickyHeader t-data-grid"
+    	add="projectCount,action"
+    	exclude="version,available,displayname,remarks"
+    	rowsPerPage="rowsPerPage" 
+		pagerPosition="bottom" >
+    	
+    	<t:parameter name="iconUrlCell">
+    		${module.iconUrl}
+    		<img src="${getContextPath()}/${module.iconUrl}"/>
+    	</t:parameter>
+       
+      <t:parameter name="projectCountCell">
+    		${getCountProjectByModule(module)}
+    	</t:parameter>
+       
+       <t:parameter name="actionCell">
+          <t:pagelink t:id="edit" page="admin/module/edit" context="module.id" class="button rounded">
+          	<span>${message:edit}</span></t:pagelink>
+          <t:actionlink t:id="delete" context="module.id" class="button rounded"
+          	onclick="return confirmDelete('${message:confirm-permanent-delete-item}')">
+          	<span>${message:delete}</span></t:actionlink>
+       </t:parameter>
+    </t:grid>
+   
+</html>

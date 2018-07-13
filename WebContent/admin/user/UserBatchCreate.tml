@@ -1,0 +1,78 @@
+<html t:type="layout" 
+	title="${message:add-new-user-from-file}"
+	breadcrumb="${message:control-panel}=admin
+	,${message:admin-manage-user}=admin/user
+	,${message:add-new-user-from-file}=admin/user/batchcreate"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="user"/></p:leftMenuBlk>
+	
+	<t:delegate to="getDisplayModeBlock()"/>
+	
+	<t:block t:id="viewModeBlock">
+		<div class="t-beaneditor">
+			<t:form t:id="form" autofocus="false">
+				<t:errors/>
+				<div class="t-beaneditor-row">
+					<t:label for="file"><span class="required">*</span> ${message:file-label}</t:label>
+					<input t:type="upload" t:id="file" validate="required, regexp"/>
+		      </div>
+		      <div class="t-beaneditor-row">
+					<t:label for="whenExist">${message:whenuserexist-label}</t:label>
+					<t:RadioGroup t:id="whenExist" value="whenExistRadio" encoder="stringEncoder">
+						<t:Radio t:id="radioIgnore" value="literal:Ignore" label="Ignore"/> ${message:ignore}
+						<t:Radio t:id="radioReplace" value="literal:Replace" label="Replace"/> ${message:replace}
+					</t:RadioGroup>
+		      </div> 
+		       <div class="t-beaneditor-row">
+					<input t:type="submit" value="${message:upload-n-run}" class="squared t-beaneditor-submit"/>
+				</div>
+		    </t:form>
+	   </div>
+	   <span class="required">*</span>  ${message:required-fields}
+	   <div class="legend">
+	    	<div class="title">${message:note} :</div>
+	    	<div class="content">
+	    		${message:note1-input-file-format} <strong>.csv</strong>, 
+	    			<a href="${context:lib/sample_files/eureka_batch_create_user1.csv}">${message:sample-csv-file}</a>
+	        	<br />
+	        	"${message:school}","${message:sysrole}" ${message:note2-must-be-predefined}
+	        	<br />
+	        	When "Replace", only fill the columns you want to replace together with Username, (empty cell in input file will be ignored). 
+	      </div>
+	    </div>
+   </t:block>
+   
+	
+	<t:block t:id="resultModeBlock">
+		<div class="page-result-block">
+	 		<div class="title">${message:result}:</div>
+	 		<p>${message} </p>
+	 		<t:zone t:id="logZone">
+	 			<div style="margin:10px 0;">
+					<a href="#"  t:type="eventLink" t:event="showLog" t:zone="logZone" class="button rounded">
+						<span>${message:show-log}</span>
+					</a>
+				</div>
+			</t:zone>
+			<t:block id="logDetailsDefault">
+				<div style="margin:10px 0;">
+					<a href="#"  t:type="eventLink" t:event="showLog" t:zone="logZone" class="button rounded">
+						<span>${message:show-log}</span>
+					</a>
+				</div>
+			</t:block>
+			<t:block id="logDetails">
+				<a href="#"  t:type="eventLink" t:event="hideLog" t:zone="logZone" class="button rounded">
+					<span>${message:hide-log}</span>
+				</a>
+				<pre><code>${processLog}</code></pre>
+			</t:block>
+			<div class="footer">
+				<a href="#" t:type="pageLink" page="admin/user/batchcreate" >
+			 		<span>${message:ok}</span>
+				</a>
+			</div>
+		</div>
+ 	</t:block>
+</html>

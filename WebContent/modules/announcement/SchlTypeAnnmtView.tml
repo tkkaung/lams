@@ -1,0 +1,55 @@
+<html t:type="layout" 
+	title="${message:view} ${message:schltypeannouncement}"
+	currentModule="${moduleName}"
+	currentProj="curProj"
+	breadcrumb="${curProj.encodeddisplayname}=project/home?${curProj.id}
+		,${module.displayName}=modules/announcement?${curProj.id}
+		,${message:view} ${message:schltypeannouncement}=modules/announcement/schltypeannmtview"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+	
+	
+	<p:actionBtns>
+		
+	</p:actionBtns>	
+	<div class="schltypeannmtBlk">
+		<table >
+			<tr>
+				<td rowspan="2" class="icon" style="vertical-align:top;"><img src="${context:lib/img/2-announcement.png}" /></td>
+				<td class="title">
+					<t:if test="annmt.urgent">
+						<img src="${context:lib/img/icon_urgent.png}"  alt="${message:annmt-urgent-tip}" title="${message:annmt-urgent-tip}" />
+						-
+					</t:if>
+				 	<span class="subject" style="font-size:1.2em;">
+				 		${annmt.subject}
+				 	</span>
+				 </td>
+				<td style="text-align:right;">
+					<span class="date">
+				 		<t:if test="annmt.sdate">
+							${annmt.sdateDisplay}
+							<p:else>
+								${formatDateTime(annmt.mdate)}
+							</p:else>
+						</t:if>
+				 	</span> 
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<div class="content" style="min-height:150px;height:auto!important;_height:150px;margin-right:10px;">
+						<t:outputraw value="annmt.content"/>
+					</div>
+				</td>
+			</tr>
+			<tr>
+			<td colspan="2">
+				<a class="button rounded" t:type="actionLink" t:id="dismissAnnmt" context="getParams(curProj.id, annmt.id)" >
+					<span>${message:dismiss-annmt}</span>
+				</a>
+			</td>
+		</tr>
+		</table>
+	</div>
+</html>

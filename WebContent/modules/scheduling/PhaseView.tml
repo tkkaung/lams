@@ -1,0 +1,63 @@
+<html t:type="layout" 
+	title="${message:view} ${message:phase}"
+	currentModule="${moduleName}"
+	currentProj="curProj"
+	breadcrumb="${curProj.encodeddisplayname}=project/home?${curProj.id}
+		,${module.displayName}=modules/scheduling?${curProj.id}
+		,${message:milestone}: ${encode(milestone.name)}=modules/scheduling/milestoneview?${milestone.id}
+		,${message:view} ${message:phase}=modules/scheduling/phaseview?phase.id"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+<p:actionBtns>
+		<t:if test="canEditPhase(phase)">
+			<a class="button rounded" t:type="pageLink" page="modules/scheduling/phaseedit" context="phase.id" >
+				<span>${message:edit} ${message:phase}</span>
+			</a>
+		</t:if>
+		<t:if test="canCreateTask(curProj)">
+			<a class="button rounded" t:type="pageLink" page="modules/scheduling/taskEdit" context="PhaseIdAndTaskId">
+				<span>${message:addTask}</span>
+			</a>
+		</t:if>
+</p:actionBtns>	
+
+	<t:beandisplay object="phase" 
+		include="name,startDate,endDate,averagePercentDone,comment"
+		add="creator,divideInto"
+		>
+		<t:parameter name="name">
+			<strong>${phase.name}</strong>
+		</t:parameter>
+		<t:parameter name="startDate">
+			${phase.startdatedisplay}
+		</t:parameter>
+		<t:parameter name="endDate">
+			${phase.enddatedisplay}
+		</t:parameter>
+		<t:parameter name="creator">
+			<t:pagelink page="user/view" context="phase.manager.id">${phase.manager.displayname}</t:pagelink>
+		</t:parameter>
+		<t:parameter name="averagePercentDone">${phase.getAveragePercentDone()}</t:parameter>
+		<t:parameter name="divideInto"> 
+			<div style="display:inline-block;">
+				<ul style="list-style:square;padding:0px;margin: 0 20px;">
+					<t:loop source="phase.tasks" value="tempTask">
+						<li>	
+							<t:pageLink page="modules/scheduling/taskview" context="tempTask.id">
+								${tempTask.name}
+							</t:pageLink>
+							- <span class="formtip"> ${tempTask.percentageDone} ${message:percentDone-label}</span>
+						</li>
+					</t:loop>
+				</ul>
+			</div>
+			<t:outputraw value="${getSpace()}"/>
+		</t:parameter>
+		
+
+</t:beandisplay>
+	
+	
+	
+</html>

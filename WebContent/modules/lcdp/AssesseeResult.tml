@@ -1,0 +1,97 @@
+<html t:type="layout" 
+	title="View Result"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/lcdp/assesseehome?${project.id}
+		,View Result=modules/lcdp/assesseeresult?${project.id}
+		"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+<p:actionBtns>
+</p:actionBtns>	
+
+<p:legendBlk>
+	<div class="legend">
+		<div class="title">${message:legend}</div>
+		<div class="content">
+			<table>
+				<tr>
+					<td><div class="self_pre" /></td>
+					<td class="label">: Self</td>
+					<td><div class="norms" style="width: 25px;" ><t:outputraw value="emptyString"/></div></td>
+					<td class="label">Norms</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</p:legendBlk>	
+
+	<table class="actionToolBar">
+		<tr>
+		<td>
+		</td>
+		<td class="right">
+		</td>
+		</tr>
+	</table>
+		
+
+
+<div style="padding:10px;">Student: <span class="studentname">${assessee.getDisplayName()}</span></div>
+
+<div class="resultContainer">
+	<div class="wrapper">
+		<table id="resultBlk" cellspacing="0" cellpadding="0" style="width:${getTotalWidth()}px;">
+			<tr>
+				<th rowspan="2" class="dimensionCol" style="width:${getDimColWidth()}px;" ></th>
+				<th rowspan="2" class="hiddenCol" ></th>
+				<th class="scoreCol" style="width:${getColumnWidth()}px;"><div class="leftspan">0</div>1</th>
+				<t:loop source="2..7" value="tempInt">
+					<th class="scoreCol" style="width:${getColumnWidth()}px;">${tempInt}</th>
+				</t:loop>
+			</tr>
+			<tr>
+				<th>Never<br/>(0 to 10%)</th>
+				<th>Very seldom<br/>(10 to 20%)</th>
+				<th>Seldom<br/>(30 to 50%)</th>
+				<th>Sometimes<br/>(50%)</th>
+				<th>Often<br/>(50 to 70%)</th>
+				<th>Most of the time<br/>(70 to 90%)</th>
+				<th>Always<br/>(Above 90%)</th>
+			</tr>
+
+			<t:loop source="1..3" value="dimNum">
+				<tr >
+					<td style="padding:5px;">${getDimName(dimNum)}</td>
+					<td class="hiddenCol" >
+						<div class="chartBarWrapper">
+							<div class="chartBar norms" style="left: ${computeWidth(getNormsStart(dimNum))}px; 
+								width: ${computeWidth(getNormsWidth(dimNum))}px;"
+							>
+							<t:outputraw value="emptyString"/>
+							</div>
+							<div class="chartBar self_pre" style="left: ${computeWidth(getAvgSelf(dimNum))}px;">
+							<t:outputraw value="emptyString"/>
+							</div>
+							
+						</div>	
+					</td>
+				  	<t:loop source="1..7" value="tempInt">
+						<td class="scoreCol" ><t:outputraw value="emptyString"/></td>
+					</t:loop>
+					
+				</tr>
+			
+			</t:loop>
+		</table>
+
+
+
+	</div>
+</div>
+
+
+
+</html>

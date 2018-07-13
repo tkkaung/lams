@@ -1,0 +1,48 @@
+<html t:type="layout" 
+		title="${message:edit-module}"
+		breadcrumb="${message:control-panel}=admin
+			,${message:admin-manage-project}=admin/project/manageadminprojects
+			,${message:manage-project-modules}=admin/project/manageadminmodule?${curProj.id}
+			,${message:edit-module}=admin/project/moduleAdminedit?${curProj.id}:${mod.id}
+			"
+		xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" 
+      xmlns:p="tapestry:parameter">
+   <p:leftMenuBlk><t:ControlPanMenu initTab="project"/></p:leftMenuBlk>
+   
+	
+ 	<form t:type="form" t:id="form" class="e-formeditor">
+		<t:errors />
+		<div class="t-beaneditor">
+			<table>
+				<tr>
+					<td class="label">${message:project}</td>
+					<td>
+						<t:pagelink page="project/home" context="curProj.id">
+							${curProj.displayName}
+						</t:pagelink>
+					</td>
+				</tr>
+				<tr>
+					<td class="label">${message:module}</td>
+					<td>
+						<img src="${getContextPath()}/${mod.iconUrl}" alt="${mod.name}" style="display:block;"/>
+							${mod.displayName} 
+					</td>
+				</tr>
+				<tr>
+					<td class="label"><t:label for="customModuleName">${message:customModuleName-label}</t:label></td>
+					<td>
+						<t:textfield t:id="customModuleName" value="pMod.customModuleName" class="mwidth"/>
+						<br/>
+						<span class="formtip">${message:customModuleName-tip}</span>
+					</td>
+				</tr>
+			</table>
+			<div style="margin-top:10px;">
+				<t:submit t:id="submit" value="${message:submit-label}" class="submit squared"  />
+			</div>
+		</div>
+	</form>
+	
+	
+</html>

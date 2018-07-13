@@ -1,0 +1,240 @@
+<html t:type="layout" 
+	title="${getTitle()}"
+	currentModule="${moduleName}"
+   currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/blog/home?${project.id}
+		,${getTitle()}=modules/blog/edit"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+
+<p:legendBlk>
+	<span class="required">*</span>  ${message:required-fields}
+</p:legendBlk>
+
+
+	<form t:type="form" t:id="blogform" enctype="multipart/form-data" class="e-formeditor">
+	<t:errors />
+	<div class="t-beaneditor">
+		<table >
+			<tr>
+				<td class="label">
+					<t:label for="subject" ><span class="required">*</span>  ${message:subject-label}</t:label>
+				</td>
+				<td>
+					<input t:type="TextField" t:id="subject" value="subject" class="lwidth" validate="required" />
+					<input type="hidden" name="mode" id="mode" value="button" />
+		    		<br/>
+		    		<span class="formtip">${message:auto-save-in} <span id="autoSaveMin">10</span> ${message:minutes}</span>
+				</td>
+			</tr>
+			<tr>
+				<td class="label">
+					<t:label for="content" ><span class="required">*</span>  ${message:content-label}</t:label>
+				</td>
+				<td>
+					<textarea t:type="ck/editor" t:id="content" value="content" 
+						customConfiguration="context:lib/js_config/ckeditor.js" 
+						toolbarSet="Default"  
+						width="630px" height="500px"
+						validate="required"
+						></textarea>
+				</td>
+			</tr>
+			<tr>
+				<td class="label"><label for="shared" >${message:shared-label}</label></td>
+				<td>
+					<span>
+						<t:if test="blog.shared">
+							<span style="margin:0 5px;">
+								<input type="radio" name="shared" id="shd1" value="true" checked="true" /> 
+								<label for="shd1">${message:public}</label> 
+							</span>
+							<span style="margin:0 5px;">
+								<input type="radio" name="shared" id="shd2" value="false" /> 
+								<label for="shd2">${message:private}</label> 
+								<span class="formtip">${message:blog-private-tip}</span>
+							</span>
+							
+							<p:else>
+								<span style="margin:0 5px;">
+									<input type="radio" name="shared" id="shd1" value="true"  /> 
+									<label for="shd1">${message:public}</label> 
+								</span>
+								<span style="margin:0 5px;">
+									<input type="radio" name="shared" id="shd2" value="false" checked="true"/> 
+									<label for="shd2">${message:private}</label> 
+									<span class="formtip">${message:blog-private-tip}</span>
+								</span>
+							</p:else>
+						</t:if>
+					</span>
+				</td>
+			</tr>
+			<tr>
+				<td class="label"><label >${message:file}</label></td>
+				<td>
+					<t:zone t:id="attachedFilesZone">
+						<div>
+						<t:loop source="blog.attaches" value="tempFile">
+							<div class="existDiv">
+									<t:eventLink event="retrieveFile" context="tempFile.id"  title="${message:click-to-download}">
+										<img src="${getAttachFileIcon(tempFile)}" style="vertical-align:bottom;"/>
+										${tempFile.displayName}
+									</t:eventLink>
+									(${tempFile.displaySize})
+								[<a href="#" t:type="actionLink" t:id="removeFile" 
+									context="tempFile.id"
+									zone="attachedFilesZone"
+									class="alink"
+								>
+									<span t:type="any" t:mixins="Confirm" t:message="${message:confirm-remove-attachment}">
+										${message:remove}
+									</span>
+								</a>]
+							</div>
+						</t:loop>
+					</div>
+					</t:zone>
+					<div id="file1" class="fileDiv subgroup">
+						<input t:type="upload" t:id="file1" />
+					</div>
+					<div id="file2" class="fileDiv subgroup">
+						<input t:type="upload" t:id="file2" />
+					</div>
+					<div id="file3" class="fileDiv subgroup">
+						<input t:type="upload" t:id="file3" />
+					</div>
+					<div id="file4" class="fileDiv subgroup">
+						<input t:type="upload" t:id="file4" />
+					</div>
+					<div id="file5" class="fileDiv subgroup">
+						<input t:type="upload" t:id="file5" />
+					</div>
+					<div>
+						<a href="#" id="addMoreFileLink" onclick="addMoreFile(); return false;">${message:add-more-file}</a>
+						<span id="addMoreFileMsg" class="formtip">${message:max-5-files-to-add}</span>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td class="label">
+					<t:label for="tags"></t:label>
+				</td>
+				<td>
+					<t:zone t:id="selectedTagsZone">
+						<div>
+							<t:loop source="blog.tags" value="tempTag">
+								<div class="existDiv">
+									${tempTag}
+									[<a href="javascript:void(0);" t:type="any"
+											t:mixins="zoneUpdater" t:clientEvent="click" 
+											t:event1="removeTag" t:zone1="selectedTagsZone"
+											t:context="getParams(blog.id, tempTag)"
+										>
+									Remove</a>]
+								</div>
+							</t:loop>
+						</div>
+					</t:zone>	
+					
+					<input t:type="TextField" t:id="tags" value="tags" class="lwidth" />
+					<br/>
+					<span class="formtip">${message:tags-tip}</span>
+					<br/>
+					<t:if test="hasCommonTags(project)">
+						<t:zone t:id="tagsZone">
+							<span class="formtip">
+							[<a href="javascript:void(0);" t:type="any"
+								t:mixins="zoneUpdater" t:clientEvent="click" 
+								t:event1="toggleUsedTags" t:zone1="tagsZone"
+								t:context="project.id"
+							>
+								<t:if test="showTags">
+									${message:hide}
+									<p:else>
+									${message:show}
+									</p:else>
+								</t:if>
+							</a>]
+							${message:common-used-tags}:
+							</span>
+							
+							<t:if test="showTags">
+								<div class="blgTagsBlk">
+									<t:loop source="getCommonTags(project)" value="tempTag">
+										<a href="javascript:void(0);" onclick="addTag('${tempTag}')">
+											<span>${tempTag}</span>
+										</a>
+									</t:loop>
+								</div>
+							</t:if>
+						</t:zone>
+					</t:if>
+				</td>
+			</tr>
+			<tr>
+				<td class="label">
+					<t:label for="notifyMember"></t:label>
+				</td>
+				<td><input t:type="checkbox" t:id="notifyMember" value="notifyMember" />
+		      		<span class="formtip">${message:notifyMember-tip}</span></td>
+			</tr>
+		</table>
+		
+		<t:submit t:id="submit" value="${message:submit-label}" class="submit squared" onclick="submitClicked();" />
+		
+	</div>
+	</form>
+<script language="javascript">
+	var submitting = false; //may take long time to upload file
+	function submitClicked(){
+		submitting = true;
+	}
+	
+	function autoAction() {
+		if(!submitting){
+		   $('mode').value = "auto";
+		   submitting = true;
+		   $('blogform').submit();
+		   $('mode').value = "button";
+	   }
+	}
+	var autoSaveMin = 10;
+	function updateAutoSaveMin(){
+		autoSaveMin -= 0.5;
+		$('autoSaveMin').update(autoSaveMin);
+	}
+	
+	function addMoreFile(){
+		if($('file4').visible()){
+			showElm('file5');
+			$('addMoreFileLink').hide();
+			$('addMoreFileMsg').show();
+		}
+		else if($('file3').visible())
+			showElm('file4');
+		else if($('file2').visible())
+			showElm('file3');
+		else if($('file1').visible())
+			showElm('file2');
+		else{
+			showElm('file1');
+			$('addMoreFileLink').update('${message:add-more}');
+		}
+		return false;
+	}
+	function addTag(tagName){
+		$('tags').value = $('tags').value + ", " +tagName;
+	}
+	
+	document.observe("dom:loaded", function() {
+		$$('.fileDiv').invoke('hide');
+		$('addMoreFileMsg').hide();
+
+		setInterval("autoAction()", 600000);
+		setInterval("updateAutoSaveMin()", 30000);
+	});
+</script>
+</html>

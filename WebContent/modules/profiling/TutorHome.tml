@@ -1,0 +1,102 @@
+<html t:type="layout" 
+	title="${module.displayName}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/profiling/home?${project.id}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+<style>
+	
+	table.t-data-grid thead tr th, table.t-data-grid tbody tr td {
+	    text-align: center;
+	    vertical-align: middle;
+	}
+	table.t-data-grid tbody tr td.assessee {
+	    text-align: left;
+	}
+	
+	
+</style>
+
+<p:actionBtns>	
+			
+</p:actionBtns>	
+
+
+
+
+<table class="actionToolBar">
+	<tr>
+		<td class="right">
+		</td>
+	</tr>
+</table>
+
+<div class="assmtContainer">
+<div id="scroller">
+	<table class="t-data-grid assmttbl stickyHeader"  >
+		<thead>
+			<tr>
+				<th  class="no"></th>
+				<th  class="assessee">Student</th>
+				<t:if test="profPEER.group">
+					<th >Group</th>
+				</t:if>
+				
+				<th rowspan="2"> ${profINSTRUCTOR.name} 
+				<div>${profINSTRUCTOR.getSdateDisplay()} - ${profINSTRUCTOR.getEdateDisplay()} </div>
+				
+				
+				
+				</th>
+			</tr>
+			
+		</thead>
+		<tbody>
+			<t:loop source="assessees" value="user" index="rowIndex">
+				
+				<tr>
+					<td>${getRowNum()}</td>
+					<td class="assessee">
+						${user.displayName}
+					</td>
+					<t:if test="profPEER.group">
+						<td >${getGroupTypeName(profPEER.group, user)}</td>
+					</t:if>
+					<td>
+						${loadProfUser(profINSTRUCTOR, getNull(), user)}
+						<t:if test="hasGraded()">
+							<t:if test="profUser.isFinished()">
+								<t:pageLink page="modules/profiling/viewscore" context="profUser.id" >
+									${getStatus(profUser)}
+								</t:pageLink>
+								
+								<p:else>
+									<t:pageLink page="modules/profiling/tutorassess" context="getParams(profINSTRUCTOR.id, user.id)" >
+										${getStatus(profUser)}
+									</t:pageLink>
+								</p:else>
+							</t:if>
+							
+							<p:else>
+								<t:if test="profINSTRUCTOR.questionSet" >
+									<t:pageLink page="modules/profiling/tutorassess" context="getParams(profINSTRUCTOR.id, user.id)" >
+										Click to Assess
+									</t:pageLink>
+								</t:if>
+							</p:else>
+
+						</t:if>
+					</td>
+					
+				</tr>
+			</t:loop>
+			
+		</tbody>
+		
+	</table>
+	
+</div>
+</div>
+</html>

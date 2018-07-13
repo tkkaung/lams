@@ -1,0 +1,82 @@
+<html t:type="layout"
+	title="${message:add-edit} ${message:sysrole}"
+	breadcrumb="${message:control-panel}=admin,${message:manage} ${message:sysrole}=admin/sysrole,${message:add-edit} ${message:sysrole}=admin/sysrole/edit"
+   xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="systemtools"/></p:leftMenuBlk>
+	<p:legendBlk>
+		<span class="required">*</span>  ${message:required-fields}
+	</p:legendBlk>
+<style>
+	table.t-data-grid THEAD TR TH {
+		white-space: normal;
+	}
+</style>
+<p:legendBlk>
+ <div class="legend">
+   	<div class="title">${message:privileges-label} :</div>
+   	<div class="content">
+   		<ul>
+    		<li t:type="loop" source="privs" value="priv">
+    		<strong>${priv.name}</strong> - ${priv.description}
+    		</li>
+    	</ul>
+   	</div>
+   </div>
+</p:legendBlk>
+
+
+<form t:type="form" t:id="form" class="e-formeditor">
+	<t:errors />
+	<div class="t-beaneditor">
+		<table>
+			<tr>
+				<td class="label"><t:label for="name"><span class="required">*</span> ${message:name-label}</t:label></td>
+				<td>
+					<t:textfield t:id="name" value="sysRole.name" maxlenght="100" validate="required" class="mwidth"/>
+					<span class="formtip">${message:name-known-to-system-tip}</span>
+				</td>
+			</tr>
+			<tr>
+				<td class="label"><t:label for="alias">${message:alias-label}</t:label></td>
+				<td>
+					<t:textfield t:id="alias" value="sysRole.alias" />
+   				<span class="formtip">${message:alias-tip}</span>
+				</td>
+			</tr>
+			<tr>
+				<td class="label"><t:label for="des">${message:des-label}</t:label></td>
+				<td>
+					<textarea t:type="textarea" t:id="des" value="sysRole.description" cols="50" rows="5" class="lwidth"/>
+				</td>
+			</tr>
+			<tr>
+				<td class="label">${message:privileges-label}</td>
+				<td>
+					<table class="t-data-grid" style="margin:5px 0 10px 0;">
+						<thead>
+							<tr>
+								<t:loop source="privs" value="priv">
+									<th title="${priv.description}">${priv.name}</th>
+								</t:loop>
+							</tr>
+						</thead>
+						<tbody>
+							<tr >
+								<t:loop source="privs" value="priv">
+									<td align="center">
+										<input type="checkbox" name="privIDs" value="${priv.id}" checked="${hasPrivChecked(priv)}"/>
+									</td>
+								</t:loop>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+		</table>
+		<t:submit t:id="bsubmit" value="${message:submit-label}" class="submit squared" />
+	</div>
+</form>	
+
+	
+	
+</html>

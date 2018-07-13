@@ -1,0 +1,7 @@
+<html t:type="layout" title="Default Page"
+      xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+      xmlns:p="tapestry:parameter">
+
+    <p>Default page here ...</p>
+
+</html>

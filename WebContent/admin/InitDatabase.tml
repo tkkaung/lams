@@ -1,0 +1,14 @@
+<html t:type="layout" title="Initialize Database"
+	breadcrumb="Initialize Database=admin/initdatabase"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" xmlns:p="tapestry:parameter">
+	
+	
+	
+	<div>
+		<t:actionLink t:id="StartInitDb">Start Initialize Database</t:actionLink>
+	</div>
+	
+	<div>
+		<t:actionLink t:id="StartInitLDimension">Start Initialize LDimension Table</t:actionLink>
+	</div>
+</html>

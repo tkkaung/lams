@@ -1,0 +1,43 @@
+<html t:type="layout" 
+	title="${care.name}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+	,${module.displayName}=modules/care/assesseehome?${project.id}
+	,${encode(care.name)}=modules/care/assesseeedit?${care.id}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+<table class="actionToolBar">
+	<tr>
+		<td class="right">
+		</td>
+	</tr>
+</table>
+
+<div style="font-size:16px; color:green; margin:10px;">
+	<img style="vertical-align:middle;" src="${context:lib/img/emoji/emoji_goodjob.png}"/>
+	<span style="font-size:16px;font-weight:bold;color:#00e;">You have done!</span>
+	
+	<div>
+		<img src="${context:lib/img/tick_y.png}"/>
+		<span style="margin:5px;">
+		Thank you for submitting the Survey.
+		</span>
+	</div>
+</div>
+
+
+<div style="margin:30px;">
+<a  class="button squared big" t:type="pageLink" page="modules/care/assesseehome" context="project.id" >
+		<span>Back to main page</span>
+	</a>
+</div>
+<table class="actionToolBar">
+	<tr>
+		<td class="right">
+		</td>
+	</tr>
+</table>
+	
+</html>

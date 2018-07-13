@@ -1,0 +1,185 @@
+<html t:type="layout" 
+	title="${message:project-home}" 
+	totalShowOption="${totalSize}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" 
+	xmlns:p="tapestry:parameter">
+
+
+	<p:actionBtns>
+		<t:if test="canCreateProject()">
+			<a class="button rounded" t:type="pageLink" page="project/new" >
+				<span>${message:new-adhoc-project}</span>
+		 	</a>
+		</t:if>
+	 	<a class="button rounded" t:type="pageLink" page="admin/project/manageprojects" >
+	 		<span>${message:manage-my-project}</span>
+	 	</a>
+	</p:actionBtns>
+	 
+	<!--<p:legendBlk>
+		<div class="legend">
+			<div class="title">${message:legend}</div>
+			<div class="content">
+				<div class="item">
+					<img src="${getContextPath()}/lib/img/16/i2_important.png" />
+					${message:schltypeannouncement}
+				</div>
+				<t:loop source="tempMods" value="tempMod">
+					<div class="item">
+						<img src="${getContextPath()}/lib/img/16/i2_${tempMod.name}.png"  />
+						${tempMod.displayname}
+					</div>
+				</t:loop>
+			</div>
+		</div>
+	</p:legendBlk>
+
+    
+    --><t:grid source="projects" row="project" model="model" 
+    		rowsPerPage="rowsPerpage" 
+    		pagerPosition="both" 
+    		rowIndex="rowIndex" 
+    		id="projGrid"
+    		class="t-data-grid t2 stickyHeader "
+    		
+    		>
+    	 <p:empty>
+    	 	<div class="notfoundtext">
+    	 	${message:no-project-found}
+    	 	, ${message:suggest-action-text} <t:pagelink page="search" context="getSrchProjParams()">
+    	 		${message:search-for-project}</t:pagelink>
+    	 	<t:if test="canCreateProject()">
+    	 		${message:or} <a t:type="pageLink" page="project/new" >
+					<span>${message:create-adhoc-project}</span>
+			 	</a>
+    	 	</t:if>
+    	 	</div>
+    	 </p:empty>
+    	 
+       <t:parameter name="NoCell">${getNo()}</t:parameter>
+       <t:parameter name="nameCell">
+       	<t:pageLink page="project/home" context="project.id" >
+       		${project.name}
+       		<t:if test="project.isActive()" negate="true"> 
+  					(<span class="attention" >${project.status.displayname}</span>)
+  				</t:if>
+	       </t:pageLink>
+	      <br/>
+       	<t:outputraw value="${truncateString(project.description)}" />
+       </t:parameter>
+       <t:parameter name="sdateCell">
+       	<span class="sdate">${project.sdateDisplay}</span>
+       	- 
+       	<span class="sdate">${project.edateDisplay}</span>
+       </t:parameter>
+         <t:parameter name="typeCell">
+	       	<span title="${project.type.des}">${project.type.displayname}</span>
+	       	<t:if test="project.courseId"> 
+	       		<br/><span class="small">(${message:courseId-label}: <em>${project.courseId}</em>)</span> 
+	       	</t:if> 
+	       </t:parameter>
+       <t:parameter name="membersCell">
+       	<t:loop source="projRoles" value="projRole" index="roleIndex" >
+	       	<t:if test="project.hasMembersByRole(projRole)">
+		       	<div>
+		       	<div class="prName">${projRole.displayName}:</div>
+		       	<t:loop source="getMembersByRole(project, projRole)" value="tempUser" index="userIndex">
+		       		<span class="uName ${getOverListUserClass(userIndex)}" id="p${rowIndex}r${roleIndex}u${userIndex}">
+		       			<t:pagelink page="user/view" class="userlink" context="tempUser.id" >
+		       				${tempUser.displayName}
+		       			</t:pagelink>
+		       		</span>
+		       		<t:if test="isLast(userIndex, membersByRole)">
+		       			<t:if test="hasOverListUser(userIndex)">
+		       				<div class="moreBtn">
+		       					...
+		       					(<a href="#" onclick="moreUserClicked(this); return false;">
+		       						${getNumMoreText(membersByRole)}
+		       					</a>)
+		       				</div>
+		       			</t:if>
+		       		</t:if>
+		       	</t:loop>
+		       	</div>
+	       	</t:if>
+       	</t:loop>
+       </t:parameter>
+       <!--<t:parameter name="past7dayCell">
+       	<div class="tmod">
+	       	<t:pagelink page="project/home" context="project.id">
+	       		<img src="${getContextPath()}/lib/img/16/i2_important.png"  title="${message:schltypeannouncement}"/>
+	       	</t:pagelink>
+	       	<span class="itxt">
+	       		[
+	       			<t:if test="getSchlTypeAnnmtLastUpdate()">
+	     					<a href="#" class="tooltipTrigger" onclick="return false;" >
+	     						${lastUpdateList.size()}
+	     					</a>
+	     					<div class="tooltip">
+		     					<div class="mlu tooltipInner" >
+		     						<t:loop source="lastUpdateList" value="tempLastUpdate">
+		     							<a href="${tempLastUpdate.url}">
+		     								<div class="mlui ${evenOdd.next}" >
+		     									<div >
+		      									<span class="date">${tempLastUpdate.timeDisplay}</span>
+		      									<t:if test="tempLastUpdate.type">
+		      										<span class="type">[${tempLastUpdate.type}]</span>
+		      									</t:if>
+		      									<span class="title">${tempLastUpdate.title}</span>
+		     									</div>
+		     								</div>
+		     							</a>
+		     						</t:loop>
+		     					</div>
+	     					</div>
+	     					<p:else>
+	     						0
+	     					</p:else>
+	     				</t:if>
+	       		]
+	       	</span>
+       	</div>
+       	
+	      <t:loop source="getModulesToDisplay(project)" value="tempMod" >
+	       	<div class="tmod">
+	       		<t:pagelink page="${tempMod.rooturl}" context="project.id">
+	       			<img src="${getContextPath()}/lib/img/16/i2_${tempMod.name}.png"  title="${tempMod.displayname}"/>
+	       		</t:pagelink>
+	       		<span class="itxt">
+	       			[
+	       				<t:if test="loadModuleLastUpdate(tempMod)">
+	       					
+	       					<a href="#" class="tooltipTrigger" id="mluL_${tempMod.id}" onclick="return false;">
+	       						${lastUpdateList.size()}
+	       					</a>
+	       					<div class="tooltip">
+		       					<div class="mlu tooltipInner" id="mlu_${tempMod.id}">
+		       						<t:loop source="lastUpdateList" value="tempLastUpdate">
+		       							<a href="${tempLastUpdate.url}">
+		       								<div class="mlui ${evenOdd.next}">
+		       									<div>
+			       									<span class="date">${tempLastUpdate.timeDisplay}</span>
+			       									<t:if test="tempLastUpdate.type">
+			       										<span class="type">[${tempLastUpdate.type}]</span>
+			       									</t:if>
+			       									<span class="title">${tempLastUpdate.title}</span>
+		       									</div>
+		       								</div>
+		       							</a>
+		       						</t:loop>
+		       					</div>
+	       					</div>
+	       					
+	       					<p:else>
+	       						0
+	       					</p:else>
+	       				</t:if>
+	       			]
+	       		</span>
+	       	</div>
+	       </t:loop>
+       </t:parameter>
+    -->
+    </t:grid>
+    
+</html>

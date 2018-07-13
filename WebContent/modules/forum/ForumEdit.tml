@@ -1,0 +1,45 @@
+<html t:type="layout" 
+	title="${message:add-edit} ${message:forum}"
+	currentModule="${moduleName}"
+	currentProj="curProj"
+	breadcrumb="${curProj.encodeddisplayname}=project/home?${curProj.id}
+		,${getModuleDisplayName(curProj)}=modules/forum?${curProj.id}
+		,${message:add-edit} ${message:forum}=modules/forum/forumedit"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+<p:legendBlk>
+	<span class="required">*</span>  ${message:required-fields}
+</p:legendBlk>
+		
+		<div class="t-beaneditor">
+		<form t:type="form" t:id="form">
+			<t:errors />
+			<div class="t-beaneditor-row">
+				<t:label for="name" ><span class="required">*</span> ${message:name-label}</t:label>
+				<t:textfield t:id="name" value="forum.name" validate="required" class="lwidth"></t:textfield>
+			</div>
+			<div class="t-beaneditor-row">
+				<t:label for="description" />
+				<t:textarea t:id="description" value="forum.description" cols="50" rows="5" class="lwidth"></t:textarea>
+			</div>
+			<div class="t-beaneditor-row">
+				<div>
+					<label >${message:allow-anonymous}</label>
+					<t:checkbox value="forum.anonymousPost" /> 
+					<span class="formtip">${message:allow-anonymous-tip}</span>
+				</div>
+			</div>
+
+			
+			<div class="t-beaneditor-row">
+				<t:label for="notifyMember"/>
+				<input t:type="checkbox" t:id="notifyMember"  />
+				<span class="formtip">${message:notifyMember-tip}</span>
+			</div>
+			<div class="t-beaneditor-row">
+				<input t:type="submit" value="${message:submit-label}" class="t-beaneditor-submit" />
+			</div>
+		</form>
+	</div>
+</html>

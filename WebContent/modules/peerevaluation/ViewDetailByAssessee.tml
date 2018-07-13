@@ -1,0 +1,355 @@
+<html t:type="layout" 
+	title="${message:view-evaluation-detail-by-assessee}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/peerevaluation/home?${project.id}
+		,${message:view-evaluation-average}=modules/peerevaluation/viewaverage?${eval.id}
+		,${message:view-evaluation-detail-by-assessee}=modules/peerevaluation/viewdetailbyassessee
+		"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+<style>
+	
+	#evalContainer {
+		overflow-x: auto;
+	<t:if test="${isMoreThan(eval.criterias.size(), 7)}">	
+		_overflow-x: scroll;  /* IE */
+	</t:if>
+		width: 100%;
+		/*		width: 972px;*/
+	}
+	table.t-data-grid th.no_bot_border{
+		border-bottom-color: #ccc !important; 
+	}
+	table.t-data-grid th.no_top_border{
+		border-top-color: #ccc !important; 
+	}
+	
+	table.t-data-grid tbody tr td{
+		text-align: center;
+		vertical-align: middle;
+	}
+	.evaltbl th{
+		padding:5px
+	}
+	.evaltbl .name{
+		text-align: left;
+	}
+	.evaltbl .crit {
+		vertical-align: top;
+		width: ${getCritNameWidthPercent(60, eval)};
+		text-align: left;
+		font-size: 11px;
+	}
+	.evaltbl .opques{
+		vertical-align: top;
+		text-align: left;
+		font-size: 11px;
+	}
+	.evaltbl td.strength, .evaltbl td.weakness , .evaltbl td.other {
+		vertical-align: top;
+		text-align: left;
+	/*	width: 180px;*/
+	}
+	.evaltbl tr.self td {
+		background-color: #999;
+		background-image: none;
+	}
+</style>
+
+
+<p:legendBlk>
+	<div class="legend">
+		<div class="title">${message:legend}</div>
+		<div class="content">
+			<table>
+				<tr>
+		<td><div class="legendmark aplus" /></td>
+					<td class="label">${getColorCodeGradeAplus()}</td>
+					<td><div class="legendmark a" /></td>
+					<td class="label">${getColorCodeGradeA()}</td>
+					<td><div class="legendmark aminus" /></td>
+					<td class="label">${getColorCodeGradeAminus()}</td>
+					<td><div class="legendmark bplus" /></td>
+					<td class="label">${getColorCodeGradeBplus()}</td>
+					<td><div class="legendmark b" /></td>
+					<td class="label">${getColorCodeGradeB()}</td>
+					<td><div class="legendmark bminus" /></td>
+					<td class="label">${getColorCodeGradeBminus()}</td>
+					<td><div class="legendmark cplus" /></td>
+					<td class="label">${getColorCodeGradeCplus()}</td>
+					<td><div class="legendmark c" /></td>
+					<td class="label">${getColorCodeGradeC()}</td>
+					<td><div class="legendmark dplus" /></td>
+					<td class="label">${getColorCodeGradeDplus()}</td>
+					<td><div class="legendmark d" /></td>
+					<td class="label">${getColorCodeGradeD()}</td>
+					<td><div class="legendmark f" /></td>
+					<td class="label">${getColorCodeGradeF()}</td>
+				</tr>
+				<tr>
+					<td>*</td>
+					<td class="label" colspan="10">${message:edited-by-leader} </td>
+				</tr>
+				<t:if test="eval.allowSelfEvaluation">
+					<tr>
+						<td>Note:</td>
+						<td class="label" colspan="10">${message:note-self-not-contribute-to-total} </td>
+					</tr>
+				</t:if>	
+			</table>
+		</div>
+	</div>
+</p:legendBlk>
+
+
+<p:actionBtns>
+<a class="button rounded" t:type="eventlink" t:event="ExportXls" context="getParams(eval.id, selectedUser.id)" 
+				title="${message:export-tip}">
+				<span>${message:export-xls}</span>
+			</a>
+	
+</p:actionBtns>
+
+<table class="actionToolBar">
+	<tr>
+		<td class="right">
+		</td>
+	</tr>
+</table>
+
+<div class="e-formeditor t-beaneditor">
+	<table >
+		<tr>
+			<td class="label">${message:evaluation-name}</td>
+			<td>
+				${eval.name}
+			</td>
+		</tr>
+		<tr>
+			<td class="label">${message:evaluating-student}</td>
+			<td>
+				${selectedUser.displayName}
+			</td>
+		</tr>
+		
+	</table>
+<br />
+</div>		
+
+<div id="evalContainer">
+<t:if test="eval.criterias">
+	
+	<table class="t-data-grid evaltbl" >
+		<tr>
+			<th rowspan="2" colspan="3"><t:outputraw value="getSpace()"/></th>
+	
+			<th colspan="${eval.criterias.size()}" ><t:if test="eval.rubric">${eval.rubric.name}</t:if></th>
+			<t:if test="hasQualitativeFeedback(eval)">
+				<th  colspan="${getNumQualitativeFeedback(eval)}">${message:comment}</th>
+			</t:if>
+	
+			
+			<th class="no_bot_border" rowspan="3" >
+				${message:total-average} 
+				<br/> <span class="formtip">(%)</span> 
+			</th>
+				
+		</tr>
+			
+		<tr>
+			<t:loop source="eval.criterias" value="tempCrit" index="colIndex" >
+				<th class="crit" title="${tempCrit.name}">
+					<t:outputraw value="${truncateString(textarea2html(tempCrit.name),100)}"/>
+				</th>
+			</t:loop>
+			<t:if test="eval.getUseCmtStrength()">
+				<th class="no_bot_border cmmtnamebox" rowspan="2">
+					  	<span id="csDisplay">${getCmmtStrengthName(eval)}</span>
+				</th>
+		   	</t:if>
+			<t:if test="eval.getUseCmtWeakness()">
+				<th class="no_bot_border cmmtnamebox" rowspan="2">
+					  	<span id="cwDisplay">${getCmmtWeaknessName(eval)}</span>
+				</th>
+			</t:if>
+			<t:if test="eval.getUseCmtOther()">
+				<th class="no_bot_border cmmtnamebox" rowspan="2">
+					   	<span id="coDisplay">${getCmmtOtherName(eval)}</span>
+				</th>
+			</t:if>
+		
+		</tr>
+		<tr>
+			<th class="no_top_border">${message:no}</th>
+			<th class="no_top_border">
+				<t:if test="eval.group">
+					${message:group}
+				</t:if>
+			</th>
+			<th class="no_top_border">${message:evaluator}</th>
+			<t:loop source="eval.criterias" value="tempCrit" index="colIndex" >
+				<th class="weight">
+					<t:if test="eval.useFixedPoint" negate="true">
+						<span class="formtip">${message:weightage-label}: ${tempCrit.weightage}</span>
+						<br/>
+					</t:if>
+					<span class="formtip">${tempCrit.minScore}-${tempCrit.maxScore}</span>
+				</th>
+			</t:loop>
+		</tr>
+		
+		${loadEvalUserList(eval, selectedUser)}
+
+		<t:if test="assessors" negate="true">
+			<tr><td colspan="50">-- No one evaluated this student yet --</td></tr>
+		</t:if>				
+		<t:loop source="assessors" value="user" index="rowIndex">
+			<tr class="${getIsSelfClass(user)}">
+				<td>${getRowNum()}</td>
+				<td ><t:if test="groupUser">${groupUser.getGroupNumNameDisplay()}</t:if></td>
+				<td class="name">
+					<t:pagelink page="modules/peerevaluation/viewdetailbyassessor" context="getParams(eval.id,user.id)">
+						${user.displayName} ${getIsSelf(user)}
+					</t:pagelink>
+				</td>
+				
+				${loadEvalUser(eval,user)}
+				<t:loop source="eval.criterias" value="tempCrit" index="colIndex" >
+					<td>
+						<t:if test="hasGraded()">
+							${getCritScoreDisplay(tempCrit,evalUser)}
+							<t:if test="evalUser.hasEditedCritByLeader(tempCrit)">
+								<span title="${message:original-value-is} ${getCritScoreOriginalDisplay(tempCrit,evalUser)}">*</span>
+							</t:if>
+						</t:if>
+						<t:outputraw value="getSpace()"/>
+						
+					</td>
+				</t:loop>
+				
+				<t:if test="eval.getUseCmtStrength()">
+				<td class="strength" >
+					<t:if test="hasGraded()">
+						<t:outputraw value="${textarea2html(evalUser.cmtStrengthDisplay)}"/>
+						<t:if test="evalUser.hasEditedStrengthByLeader()">
+							<a href="javascript:void(0);" title="${message:click-to-view-original}"
+							onclick="openPopup('${getViewCmtStrengthURL(evalUser.id)}', 'evalCmmt', 500, 300)">
+			   					*
+			   				</a>
+	   					</t:if>
+						
+					</t:if>
+				</td>
+				</t:if>
+				<t:if test="eval.getUseCmtWeakness()">
+				<td class="weakness" >
+					<t:if test="hasGraded()">
+						<t:outputraw value="${textarea2html(evalUser.cmtWeaknessDisplay)}"/>
+						<t:if test="evalUser.hasEditedWeaknessByLeader()">
+							<a href="javascript:void(0);" title="${message:click-to-view-original}"
+							onclick="openPopup('${getViewCmtWeaknessURL(evalUser.id)}', 'evalCmmt', 500, 300)">
+			   					*
+			   				</a>
+						</t:if>
+					</t:if>
+				</td>
+				</t:if>
+				<t:if test="eval.getUseCmtOther()">
+				<td class="other" >
+					<t:if test="hasGraded()">
+						<t:outputraw value="${textarea2html(evalUser.cmtOtherDisplay)}"/>
+						<t:if test="evalUser.hasEditedOtherByLeader()">
+							<a href="javascript:void(0);" title="${message:click-to-view-original}"
+							onclick="openPopup('${getViewCmtOtherURL(evalUser.id)}', 'evalCmmt', 500, 300)">
+			   					*
+			   				</a>
+						</t:if>
+					</t:if>
+				</td>
+				</t:if>
+				
+		
+				
+				
+				<td class="total ${getTotalScoreClass()}">
+					<t:if test="hasGraded()">
+						${getTotalScoreDisplay()}
+					</t:if>
+					<t:outputraw value="getSpace()"/>
+				</td>
+			</tr>
+			
+			
+			<t:if test="eval.openEndedQuestions">
+				<t:if test="hasGraded()">
+				<tr>
+					<td></td>
+					<td colspan="100">
+						<table width="100%">
+							<tbody>
+							<t:loop source="eval.openEndedQuestions" value="oQuestion" index="quesIndex" >
+								<tr>
+									<th width="30%" class=" opques" title="${oQuestion}"  >
+										<t:outputraw value="${truncateString(textarea2html(oQuestion),300)}"/>
+									</th>
+									<td class=" opques">
+										<t:outputraw value="${textarea2html(evalUser.getOpenEndedQuestionAnswers(quesIndex))}"/>
+				
+									</td>
+								</tr>
+							</t:loop>
+							</tbody>
+						</table>
+					</td>
+				</tr>
+				</t:if>
+			</t:if>	
+		</t:loop>
+		
+		<tr>
+			<th colspan="3" style="text-align:right;">${message:average}:</th>
+
+			<t:loop source="eval.criterias" value="tempCrit" index="colIndex" >
+				<t:if test="eval.useFixedPoint">
+					<th class="average " >${getAverageScoreDisplay(tempCrit)}</th>
+				<p:else>
+					<td class="average ${getAverageScoreClass(tempCrit)}" >${getAverageScoreDisplay(tempCrit)}</td>
+				</p:else>
+				</t:if>
+			</t:loop>
+			
+			<t:if test="hasQualitativeFeedback(eval)">
+				<td colspan="${getNumQualitativeFeedback(eval)}"><t:outputraw value="getSpace()"/></td>
+			</t:if>
+		
+			<td class="average ${getTotalAverageScoreClass()}">
+				<t:if test="eval.useFixedPoint" >
+					<span style="color:#666;">
+					${getStudentTotalFixedPoint(evalUserList)}
+					/
+					${getMaxGroupStudentTotalFixedPoint(groupUser, eval)}
+					= 
+					</span>
+				</t:if>
+				${getTotalAverageScoreDisplay()}
+			</td>
+		</tr>
+	</table>
+	
+	
+	
+	
+	
+	
+</t:if>	
+	
+	
+	<div style="height:20px;"><t:outputraw value="getSpace()"/></div>
+	
+</div>
+
+
+</html>

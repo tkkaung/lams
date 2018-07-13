@@ -1,0 +1,209 @@
+<html t:type="layout" 
+	title="View Score"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/profiling/home?${project.id}
+		,View Score=modules/profiling/viewscore?${project.id}
+		"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+<style>
+.scaleScore{
+	min-width: 15px;
+}
+.avgScore, .stdevScore{
+	text-align: center;
+}
+
+</style>
+
+<p:actionBtns>
+	<t:if test="canClearScore(project)">
+		<a class="button rounded" t:type="actionLink" t:id="clearGrade" 
+			context="profUser.id"  onclick="return confirmDelete('WARNING: You are about to clear score of this student in this Survey, Are you sure to continue?')">
+			<span>Reset scores</span>
+		</a>
+	</t:if>
+</p:actionBtns>	
+
+<div class="e-formeditor">
+	<div class="t-beaneditor ">
+		<table >
+			<tr>
+				<td class="label">${message:profiling}</td>
+				<td>${prof.name}</td>
+			</tr>
+			<tr>
+				<td class="label">Assessor</td>
+				<td>${profUser.assessor.getDisplayName()}</td>
+			</tr>
+			<tr>
+				<td class="label">Assessee</td>
+				<td>${profUser.assessee.getDisplayName()}</td>
+			</tr>
+			<tr>
+				<td class="label">Start Assess Time</td>
+				<td>${profUser.getStartAssessTimeDisplay()}</td>
+			</tr>
+			<tr>
+				<td class="label">Last Assess Time</td>
+				<td>${profUser.getlastAssessTimeDisplay()}</td>
+			</tr>
+			<t:if test="profUser.resetCount">
+				<tr>
+					<td class="label">Reset Answers</td>
+					<td>${profUser.resetCount} times</td>
+				</tr>
+			</t:if>
+			<tr>
+				<td class="label">Result</td>
+				<td>
+					<table class="rubricDetailZone stickyHeader">
+						<thead>
+						<tr>
+							<th rowspan="2"></th>
+							<th colspan="7">Scale</th>
+							<th rowspan="2">Average</th>
+							<th rowspan="2">STDEV</th>
+							<th rowspan="2">Norms</th>
+						</tr>
+						<tr>
+							<t:loop source="1..7" value="tempInt">
+								<th class="scaleScore">${tempInt}</th>
+							</t:loop>
+						</tr>
+						</thead>
+						<tbody>
+						<t:loop source="ldims" value="ldim">
+							${loadAVGscore(ldim)}
+							<tr>
+								<td>${ldim.name}</td>
+								<t:loop source="1..7" value="tempInt">
+									<td class="${getGraphTDclass(tempInt, roundFull(avgScore))}"><t:outputraw value="getSpace()"/></td>
+								</t:loop>
+								<td class="avgScore"><t:if test="hasAVGScore()">${formatDecimal(avgScore)}</t:if></td>
+								<td class="stdevScore"><t:if test="hasAVGScore()">${formatDecimal(getSTDEVscore(ldim))}</t:if></td>
+								<td></td>
+							</tr>
+						</t:loop>
+						
+						<tr>
+							<th style="text-align:left;">Overall Leadership Style</th>
+							<t:loop source="1..7" value="tempInt">
+								<th class="${getGraphTDclass(tempInt, roundFull(getAVG(ldims)))}">
+									<t:outputraw value="getSpace()"/>
+								</th>
+							</t:loop>
+							<th class="avgScore"><t:if test="hasAVGScore()">${formatDecimal(getAVG(ldims))}</t:if></th>
+							<th class="stdevScore"><t:if test="hasAVGScore()">${formatDecimal(getSTDEV(ldims))}</t:if></th>
+							<th></th>
+						</tr>
+						
+						<tr>
+							<td colspan="15" style="background:#ddd;"><t:outputraw value="getSpace()"/></td>
+						</tr>
+						
+						
+						<tr>
+							<td>Transformational</td>
+							<t:loop source="1..7" value="tempInt">
+								<td class="${getGraphTDclass(tempInt, roundFull(getAVG(ldimsTransformational)))}"><t:outputraw value="getSpace()"/></td>
+							</t:loop>
+							<td class="avgScore"><t:if test="hasAVGScore()">${formatDecimal(getAVG(ldimsTransformational))}</t:if></td>
+							<td class="stdevScore"><t:if test="hasAVGScore()">${formatDecimal(getSTDEV(ldimsTransformational))}</t:if></td>
+							<td></td>
+						</tr>
+						
+						<tr>
+							<td>Transactional</td>
+							<t:loop source="1..7" value="tempInt">
+								<td class="${getGraphTDclass(tempInt, roundFull(getAVG(ldimsTransactional)))}"><t:outputraw value="getSpace()"/></td>
+							</t:loop>
+							<td class="avgScore"><t:if test="hasAVGScore()">${formatDecimal(getAVG(ldimsTransactional))}</t:if></td>
+							<td class="stdevScore"><t:if test="hasAVGScore()">${formatDecimal(getSTDEV(ldimsTransactional))}</t:if></td>
+							<td></td>
+						</tr>
+						
+						<tr>
+							<td colspan="15" style="background:#ddd;"><t:outputraw value="getSpace()"/></td>
+						</tr>
+						
+						<t:loop source="ldimsNonLeadershipStyle" value="ldim">
+							${loadAVGscore(ldim)}
+							<tr>
+								<td>${ldim.name}</td>
+								<t:loop source="1..7" value="tempInt">
+									<td class="${getGraphTDclass(tempInt, roundFull(avgScore))}"><t:outputraw value="getSpace()"/></td>
+								</t:loop>
+								<td class="avgScore"><t:if test="hasAVGScore()">${formatDecimal(avgScore)}</t:if></td>
+								<td class="stdevScore"><t:if test="hasAVGScore()">${formatDecimal(getSTDEVscore(ldim))}</t:if></td>
+								<td></td>
+							</tr>
+						</t:loop>
+								
+						</tbody>		
+					</table>
+					<br/>
+					<br/>
+							
+				</td>
+			</tr>
+			
+			<tr>
+				<td class="label">Answers</td>
+				<td>
+						<div class="rubricDetailZone view ">
+							<table class="stickyHeader">
+								<thead>
+								<tr>
+									<th >No</th>
+									<th >Question</th>
+									<th >Dimension Type</th>
+									<th >score</th>
+								</tr>
+								</thead>
+								<tbody>
+								<t:loop source="profUser.questionScores" value="que" index="rowIndex">
+									<tr>
+										<td>
+											${que.question.number}
+										</td>
+										<td>
+											<t:outputraw value="${textarea2html(que.question.des)}"/>
+										</td>
+										<td>
+											<t:if test="que.question.dimension">
+												${que.question.dimension.name}
+											</t:if>
+										</td>
+										<td>
+											${que.score}
+										</td>
+									</tr>
+									
+									<p:empty>
+										<tr ><td colspan="6">${message:no-question-answered}</td></tr>
+									</p:empty>
+								</t:loop>
+								</tbody>				
+							</table>
+						</div>
+						
+					</td>
+				</tr>
+				
+			</table>
+
+			
+			
+		
+		
+		
+		
+	</div>
+	
+</div>
+
+</html>

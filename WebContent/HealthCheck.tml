@@ -1,0 +1,12 @@
+<html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+	xmlns:p="tapestry:parameter">
+	
+<div>Hostname: ${getHostname()}  -- ${getServerId()}</div>
+<div>Database connection Status: ${getStatus()}</div>
+<div>Shared Folder: ${getFolderStatus()}</div>
+<div>eureka Version: ${getBuildNumber()}</div>
+
+<div>Time of Request: ${getReqTime()}</div>
+	
+</html>
+

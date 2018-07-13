@@ -1,0 +1,14 @@
+<html t:type="layout" 
+	title="Contact eUreka2 Helpdesk"
+   xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+   <p>Contact eUreka2 ...</p>
+    
+   <p>Please contact eUreka helpdesk at bb-help@ntu.edu.sg .</p>
+
+	<p>Click here if you have forgotten your password.</p>
+
+	<p>Click here if you have enquiries on eUreka external user account. </p>
+
+</html>

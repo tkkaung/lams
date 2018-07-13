@@ -1,0 +1,132 @@
+<html t:type="layout" 
+	title="${message:view} ${message:task}"
+	currentModule="${moduleName}"
+	currentProj="curProj"
+	breadcrumb="${curProj.encodeddisplayname}=project/home?${curProj.id}
+		,${module.displayName}=modules/scheduling?${curProj.id}
+		,${message:milestone}: ${encode(milestone.name)}=modules/scheduling/milestoneview?${milestone.id}
+		,${getBreadcrumbLink()}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+<p:actionBtns>
+		<t:if test="canEditTask(task)">
+			<a class="button rounded" t:type="pageLink" page="modules/scheduling/taskedit" context="task.id" >
+				<span>${message:edit} ${message:task}</span>
+			</a>
+		</t:if>
+</p:actionBtns>	
+		
+		
+		<div class="t-beaneditor e-formeditor">
+			<table >
+				<tr>
+					<td class="label">
+						<label for="name" >${message:name-label}</label>
+					</td>
+					<td>
+						<strong>${task.name}</strong>
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<label for="startDate" >${message:startDate-label}</label>
+					</td>
+					<td>
+						${task.startdatedisplay}
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<label for="endDate" >${message:endDate-label}</label>
+					</td>
+					<td>
+						${task.enddatedisplay}
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<label for="urgency" >${message:urgency-label}</label>
+					</td>
+					<td>
+						<img src="${getUrgencyLevelIcon(task.urgency)}" alt=""/>
+						${task.urgency}
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<label for="completeDate" >${message:completeDate-label}</label>
+					</td>
+					<td>
+						${task.completeDatedisplay}
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<label for="percentDone" >${message:percentDone-label}</label>
+					</td>
+					<td>
+						${task.percentageDone}
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<label for="comment" >${message:comment-label}</label>
+					</td>
+					<td>
+						${task.comment}
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<label for="assignedTo" >${message:assignedTo-label}</label>
+					</td>
+					<td>
+						<t:loop source="task.assignedPersons" value="tempUser" index="tempIndex">
+							<t:unless test="isFirst()">
+								<br/> 
+							</t:unless>
+							<t:pagelink page="user/view" context="tempUser.id">${tempUser.displayname}</t:pagelink>
+						</t:loop>
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<label for="creator" >${message:creator-label}</label>
+					</td>
+					<td>
+						<t:pagelink page="user/view" context="task.manager.id">${task.manager.displayname}</t:pagelink>
+						<t:if test="task.editor">
+							<br/>
+							${message:edited-on} <span class="date">${task.modifyDateDisplay}</span> 
+							, ${message:by}
+							<t:pagelink page="user/view" context="task.editor.id">${task.editor.displayname}</t:pagelink>
+						</t:if>
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<label for="reminder" >${message:reminder-label}</label>
+					</td>
+					<td>
+						<t:if test="task.daysToRemind">
+							${message:remind}
+							<em>${getReminderTypeLabel(task.reminderType)}</em>
+							${message:on-the}
+							<t:loop source="task.daysToRemind" value="tempNumDay" index="tempIndex">
+								<t:unless test="isFirst()">
+									, 
+								</t:unless>
+								<span class="date">${getDateDisplay(task.endDate,tempNumDay)}</span>
+							</t:loop>
+							
+							<p:else>
+								<span class="formtip">${message:reminder-not-found}</span>
+							</p:else>
+						</t:if>
+					</td>
+				</tr>
+			</table>
+		</div>
+		
+</html>

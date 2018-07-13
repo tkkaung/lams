@@ -1,0 +1,160 @@
+<html t:type="layout" 
+	title="${message:forum}: ${truncateStr(forum.name)}"
+	currentModule="${moduleName}"
+	currentProj="curProj"
+	breadcrumb="${curProj.encodeddisplayname}=project/home?${curProj.id}
+		,${getModuleDisplayName(curProj)}=modules/forum?${curProj.id}
+		,${encode(truncateStr(forum.name))}=modules/forum/forumview?${forum.id}"
+	totalShowOption="${totalSize}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+		
+<style>
+	table.t-data-grid .chkbox, table.t-data-grid .flag{
+		width: 15px;
+		text-align: center;
+	}
+	span.aaa{
+		padding: 2px 3px;
+		white-space: nowrap;
+	}
+</style>
+		
+
+<p:legendBlk>
+	<div class="legend">
+		<div class="title">${message:legend}</div>
+		<div class="content">
+			<table>
+				<tr>
+					<td><img src="${context:lib/img/frm_type/DISCUSS_TOPIC.png}"/> ${message:thtype0-label}</td>
+					<td><img src="${context:lib/img/frm_type/ASK_A_QUESTION.png}"/> ${message:thtype1-label}</td>
+					<td><img src="${context:lib/img/frm_type/SUGGEST_IMPROVMENTS.png}"/> ${message:thtype2-label}</td>
+				</tr>
+				<tr>
+					<td><img src="${context:lib/img/frm_type/DEVELOPING_SOLUTIONS.png}"/> ${message:thtype3-label}</td>
+					<td><img src="${context:lib/img/frm_type/IDENTITFY_PROBLEMS.png}"/> ${message:thtype4-label}</td>
+					<td><img src="${context:lib/img/frm_type/ADD_OPINION_OR_FEEDBACK.png}"/> ${message:thtype5-label}</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</p:legendBlk>		
+		
+<p:actionBtns>
+	<t:if test="canCreateThread(curProj)">
+		 <a class="button rounded" t:type="pageLink" page="modules/forum/threadEdit" context="getParams(forum.id, 0)" >
+			<span>${message:add-new} ${message:thread}</span>
+		</a>
+	</t:if>	 
+	
+</p:actionBtns>			
+		
+<table class="actionToolBar">
+	<tr>
+		<td class="right">
+		</td>
+	</tr>
+</table>	
+		
+	<t:if test="threads">
+		<p:else>
+			<div class="notfoundtext">${message:no-thread-found}</div>
+		</p:else>
+		
+		<form t:type="form" t:id="GridForm">
+			<t:errors/>	
+			<t:if test="canDeleteForumThread(curProj)">
+				<table class="actionToolBar2">
+					<tr>
+					 <td align="left">
+				 		<t:submit value="${message:delete}" t:id="deleteThread" class="squared"
+				 			onclick="return checkChBoxAndConfirmDelete('threadGrid','${message:select-at-least-one-item}','${message:confirm-delete-threads-text}')"/>
+					 </td>
+					</tr>
+				</table>
+			</t:if>
+			
+			<t:grid source="threads" row="thread" 
+				rowsPerPage="rowsPerPage"
+				pagerPosition="bottom" 
+				model="model" 
+				id="threadGrid"
+				rowclass="getRowClass(thread)"
+				>
+				
+				<p:chkboxHeader>
+					<input type="checkbox" name="chkBoxAll" id="chkBoxAll" onclick="chkboxAll('threadGrid','chkBoxAll')"/>
+				</p:chkboxHeader>
+				<p:chkboxCell>
+					<input type="checkbox" name="thChkBox" value="${thread.id}" onclick="chkbox('threadGrid','chkBoxAll')"/>
+				</p:chkboxCell>
+				<p:flagHeader><img src="${context:lib/img/16/flag.png}" width="14" alt="${message:flagged}" title="${message:flagged}"/></p:flagHeader>
+				<p:flagCell>
+						<t:if test="isFlagged(thread)"><img src="${context:lib/img/16/flag.png}" width="14" /></t:if>
+				</p:flagCell>
+				<p:threadCell>
+					<t:if test="thread.pinned">
+						<img src="${context:lib/img/icon_pin_red.png}" height="16" alt="${message:important-thread-tip}" title="${message:important-thread-tip}" />
+						- 
+					</t:if>
+					<img src="${getThreadTypeIcon(thread.type)}"  title="${getThreadTypeIconTip(thread.type)}" style="display:inline-block;"/>
+					<a href="#" t:type="pageLink" page="modules/forum/ThreadView" context="thread.id">
+						${thread.name}
+					</a>
+					<t:loop source="thread.attachedFiles" value="tempAttFile" formState="NONE">
+						<t:eventLink event="retrieveFile" context="tempAttFile.id">
+							<img src="${context:lib/img/icon-attachment.gif}"  alt="" title="${message:click-to-download}"/>
+						</t:eventLink>
+					</t:loop>
+				</p:threadCell>
+				<p:dateCell>
+					${thread.modifyDateDisplay}
+				</p:dateCell>
+				<p:authorCell>
+					<t:if test="thread.anonymous">
+						${thread.authorDisplayName}
+						<p:else>
+							<t:pagelink page="user/view" context="thread.author.id">${thread.authorDisplayName}</t:pagelink>
+						</p:else>
+					</t:if>
+				</p:authorCell>
+				<t:parameter name="viewsCell">
+					${getTotalView(thread)}
+				</t:parameter>
+				<t:parameter name="ratesCell">
+					<span class="aaa">
+						<img src="${context:lib/img/16/like_green.png}" width="14" alt="${message:rate-like}" title="${message:total-rate-like}"/>
+						${getTotalPositiveRate(thread)}
+					</span>
+					<span class="aaa">
+						<img src="${context:lib/img/16/dislike_green.png}" width="14" alt="${message:rate-dislike}" title="${message:total-rate-dislike}"/>
+						${getTotalNegativeRate(thread)}
+					</span>
+				</t:parameter>
+				<t:parameter name="lastRepliedCell">
+					<t:if test="loadRecentPost(thread)">
+						<t:pagelink page="modules/forum/threadview" context="recentThreadR.thread.id" anchor="thR${recentThreadR.id}">
+							<t:ck.TrimmedString maxLength="30" value="recentThreadR.name"/>
+						</t:pagelink>
+						<br/>
+						<span class="small">
+							${message:by} 
+							<t:if test="recentThreadR.anonymous">
+								${recentThreadR.authorDisplayName}
+								<p:else>
+									<t:pagelink page="user/view" context="recentThreadR.author.id">${recentThreadR.authorDisplayName}</t:pagelink>
+								</p:else>
+							</t:if>
+							<br/>
+							<span class="date">${recentThreadR.modifyDateDisplay}</span>
+						</span>
+					</t:if>
+				</t:parameter>
+				
+				
+			</t:grid>
+		</form>
+	</t:if>
+	
+</html>

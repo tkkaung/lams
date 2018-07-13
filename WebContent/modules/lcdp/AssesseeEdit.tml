@@ -1,0 +1,223 @@
+<html t:type="layout" 
+	title="Do Survey"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+	,${module.displayName}=modules/lcdp/assesseehome?${project.id}
+	,Do Survey=modules/lcdp/assesseeedit?${lcdp.id}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+<style>
+	table.tbContainer {
+		width:100%;
+	}
+	table.tbContainer td{
+		border: 1px solid #ddd;;
+	}
+	table.tblLScore{
+	}
+	table.tblLScore thead tr th {
+	    text-align: center;
+	    vertical-align: bottom;
+   		width: 13%;
+	}
+	table.tblLScore tbody tr td {
+	    text-align: center;
+	    vertical-align: middle;
+	    
+	}
+	
+	
+	
+</style>
+
+
+<table class="actionToolBar">
+	<tr>
+		<td class="right">
+		</td>
+	</tr>
+</table>
+
+<t:if test="finished">
+<div>You already finished this survey</div>
+<p:else>
+
+		<t:if test="createMode">
+		<table class="tbContainer">
+			<tr>
+				<td colspan="5" style="font-size:16px;text-align:center;background:#ddd;">
+					<div >${lcdp.name}</div>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="5" style="font-size:16px;padding:5px;">
+					<p>This survey aims to help you understand what you do most of the time in your daily job 
+					(current appointment). There is no Right or Wrong answer. The main objective is to help you gain better self-awareness and become an effective leader.</p> 
+					<p>Answer each question objectively and frankly. </p>
+					<p>This 7-point Likert scale requires you to indicate how often you carry out certain actions and the scale is as follows:
+					</p>
+				</td>
+			</tr>
+			<tr>
+					<td>
+							
+						<table class="tblLScore t-data-grid">
+							<thead>
+							<tr>
+								<th>1</th>
+								<th>2</th>
+								<th>3</th>
+								<th>4</th>
+								<th>5</th>
+								<th>6</th>
+								<th>7</th>
+							</tr>
+							<tr>
+								<th>Never<br/>(0 to 10%)</th>
+								<th>Very seldom<br/>(10 to 20%)</th>
+								<th>Seldom<br/>(30 to 50%)</th>
+								<th>Sometimes<br/>(50%)</th>
+								<th>Often<br/>(50 to 70%)</th>
+								<th>Most of the time<br/>(70 to 90%)</th>
+								<th>Always<br/>(Above 90%)</th>
+							</tr>
+							</thead>
+						</table>
+			
+					</td>
+				</tr>
+				
+				<tr>
+				<td colspan="5" style="text-align:center;font-size:16px;">
+					<p style="margin:20px;">
+					If you are ready to proceed, click NEXT.
+						<a class="button squared" t:type="eventlink" t:event="StartSurvey" context="lcdp.id" 
+						style="margin:5px;padding:8px 20px;height:30px;font-weight:bold;"
+							>
+							<span>NEXT &gt;&gt; </span>
+						</a>
+					</p>
+				</td>
+					
+				</tr>
+			</table>
+				
+		<p:else>	
+
+<form t:type="form" t:id="form" class="e-formeditor">
+		<t:errors />
+	
+	<table class="tbContainer">
+		<tr>
+			<td colspan="5" style="font-size:16px;text-align:center;background:#ddd;">
+				<div >${lcdp.name}</div>
+			</td>
+		</tr>
+			<tr>
+				<td colspan="5" style="text-align:center;font-size:16px;padding:15px;color:#00e;">
+					<div >${que.getNumberDisplay()} <t:outputraw value="${textarea2html(que.des)}"/></div>
+				</td>
+			</tr>
+			<t:loop source="assessees" value="user" index="rowIndex">
+				<tr>
+					<td>
+							
+						<table class="tblLScore t-data-grid">
+							<thead>
+							<tr>
+								<th>1</th>
+								<th>2</th>
+								<th>3</th>
+								<th>4</th>
+								<th>5</th>
+								<th>6</th>
+								<th>7</th>
+							</tr>
+							<tr>
+								<th><label for="rdo_${user.id}_1">Never<br/>(0 to 10%)</label></th>
+								<th><label for="rdo_${user.id}_2">Very seldom<br/>(10 to 20%)</label></th>
+								<th><label for="rdo_${user.id}_3">Seldom<br/>(30 to 50%)</label></th>
+								<th><label for="rdo_${user.id}_4">Sometimes<br/>(50%)</label></th>
+								<th><label for="rdo_${user.id}_5">Often<br/>(50 to 70%)</label></th>
+								<th><label for="rdo_${user.id}_6">Most of the time<br/>(70 to 90%)</label></th>
+								<th><label for="rdo_${user.id}_7">Always<br/>(Above 90%)</label></th>
+							</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<t:loop source="1..7" value="tempScore">
+									<td class="tdRdo">
+										<input  id="rdo_${user.id}_${tempScore}" type="radio" name="rdo_${user.id}" value="${tempScore}" />
+									</td>
+									</t:loop>
+								</tr>
+							</tbody>
+						</table>
+			
+					</td>
+				</tr>
+			</t:loop>
+			<tr>
+				<td colspan="5" style="text-align:center; padding-right:20px;">
+					<t:submit t:id="bsubmit" value="&gt;&gt; ${getSubmitText()}" class="submit squared" 
+					style="margin:5px;padding:8px 20px;height:30px;font-weight:bold;"
+					onclick="return onSubmitClicked();"/>
+				</td>
+			</tr>
+	</table>
+	<table class="actionToolBar">
+		<tr>
+			<td >
+			</td>
+		</tr>
+	</table>
+		
+	<div style="text-align:center;padding:5px;">
+		<div style="margin:auto;width:${getProgressBarWidth()}px;background:#bbb;border:#ccc 2px solid;">
+			<div style="width:${getProgressWidth()}px;background:#5e5;text-align:right;padding-right:5px;">
+				${getProgressPercent()}%
+			</div>
+		</div>
+		<!--<span style="color:#ff5a11;"><b>${que.number}</b></span> 
+				of <b>${getNumQuestionWithoutNumber(lcdp)}</b>
+		
+		-->
+		<t:if test="isHalfWay()">
+			<div style="margin-top:5px;">
+				<img style="vertical-align:middle;" src="${context:lib/img/emoji/emoji_goodjob.png}"/>
+				<span style="font-size:16px;font-weight:bold;color:#00e;">Well Done! You are half-way through !</span>
+			</div>
+		</t:if>
+	</div>
+
+</form>
+		</p:else>
+		</t:if>
+
+
+<script>
+$$('.tdRdo').invoke('observe', 'click', function(){
+  	this.down('input').checked = true; 
+});
+
+
+function onSubmitClicked(){
+	<t:loop source="assessees" value="user" index="rowIndex">
+		if ($$('input[name=rdo_${user.id}]:checked').length == 0){
+			alert("Some answer not selected yet, please select again");
+			return false;
+		}
+	</t:loop>
+	
+	
+	return true;
+}
+
+
+</script> 
+
+</p:else>
+</t:if>
+</html>

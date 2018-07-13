@@ -1,0 +1,515 @@
+<html t:type="layout" 
+	title="${message:thread}: ${truncateStr(thread.name)}"
+	currentModule="${moduleName}"
+	currentProj="curProj"
+	breadcrumb="${curProj.encodeddisplayname}=project/home?${curProj.id}
+		,${getModuleDisplayName(curProj)}=modules/forum?${curProj.id}
+		,${encode(truncateStr(forum.name))}=modules/forum/forumview?${forum.id},${encode(truncateStr(thread.name))}=modules/forum/threadview?${thread.id}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+
+
+<p:actionBtns>
+	<!-- 
+	<t:if test="hasLearningLogMod(curProj)">
+		<t:actionLink t:id="addLearningLog" context="thread.id" class="button rounded">
+			<span>${message:add-learningLog}</span>
+		</t:actionLink>
+	</t:if>
+	 -->
+</p:actionBtns>
+
+<p:legendBlk>
+	<div class="legend">
+		<div class="title">${message:legend}</div>
+		<div class="content">
+			<table>
+				<tr>
+					<td><img src="${context:lib/img/frm_type/DISCUSS_TOPIC.png}"/> ${message:thtype0-label}</td>
+					<td><img src="${context:lib/img/frm_type/ASK_A_QUESTION.png}"/> ${message:thtype1-label}</td>
+					<td><img src="${context:lib/img/frm_type/SUGGEST_IMPROVMENTS.png}"/> ${message:thtype2-label}</td>
+				</tr>
+				<tr>
+					<td><img src="${context:lib/img/frm_type/DEVELOPING_SOLUTIONS.png}"/> ${message:thtype3-label}</td>
+					<td><img src="${context:lib/img/frm_type/IDENTITFY_PROBLEMS.png}"/> ${message:thtype4-label}</td>
+					<td><img src="${context:lib/img/frm_type/ADD_OPINION_OR_FEEDBACK.png}"/> ${message:thtype5-label}</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</p:legendBlk>
+
+
+<table class="actionToolBar">
+	<tr>
+		<td>
+			<t:if test="threadRsDisplay">
+				<a href="#" onclick="showHideDisplayNText('.thrdRBlk .body,.thrdRBlk .foot', 'colpsLink', '${message:expand-all}','${message:collapse-all}'); return false;">
+					<span id="colpsLink" >${message:expand-all}</span>
+				</a>
+			</t:if>
+		</td>
+		<td class="right">
+			 <t:zone t:id="showRefLinkZone" id="showRefLinkZone" t:update="show">
+				 <t:actionlink t:id="showhideRef" zone="refltsZone">
+				 	<t:if test="showRef">
+				 		${message:hide-reflections}
+				 		<p:else>
+				 		${message:show-reflections}
+				 		</p:else>
+				 	</t:if>
+				 	(${countReflections()})
+				 </t:actionlink>
+			 </t:zone>
+		</td>
+	</tr>
+</table>			
+		
+<table class="nomargin">
+	<tr>
+	<td style="vertical-align:top;width:100%;">
+		
+		<t:delegate to="block:thrdBlk"/>
+		
+		<div id="thrdRBlks">
+			<table class="e-data-grid">
+				<tbody>
+					<t:loop source="threadRsDisplay" value="threadR">
+						<tr >
+							<td >
+								<t:delegate to="block:thrdRBlk"/>
+							</td>
+						</tr>
+					</t:loop>
+				</tbody>
+			</table>	
+		</div>
+		<t:if test="threadRsDisplay">
+			<t:GridPager currentPage="curPageNo" rowsPerPage="rowsPerPage" source="threadRs" />
+			<table class="actionToolBar3">
+				<tr>
+					<td class="right">		 	
+						<form t:type="form" t:id="rowsPerPageForm" autofocus="false">
+							${totalSize} ${message:replys-found}, ${message:show}
+							<select t:type="select" t:id="rowsPerPageSelect" model="literal:5,10,20,50,100"
+								value="rowsPerPage" onchange="this.form.submit()" />
+							${message:replys-per-page}
+						</form>
+					</td>
+				</tr>
+			</table>
+		</t:if>
+		
+		
+		<t:form t:id="qReplyForm" autofocus="false">
+			<t:errors />
+			<div class="t-beaneditor" style="margin-top: 10px;">
+				<t:if test="canCreateThreadReply(curProj)">
+					<div style="padding-left:30px;">
+						<div class="rtitle">
+							${message:quick-reply}
+						</div>
+						<div>
+							<textarea t:type="ck/editor" t:id="qReplyContent" value="qReplyContent" validate="required"
+	   		            customConfiguration="context:lib/js_config/ckeditor.js" toolbarSet="simpleToolbar"
+	               		width="660px" height="120px"></textarea>
+						</div>
+						<div>
+							<input t:type="checkbox" t:id="notifyMember" value="notifyMember" />
+							<span class="formtip">${message:notifyInvolvedMember-tip}</span>
+						</div>
+						<t:submit t:id="rsubmit" value="${message:submit-label}" class="submit squared" />
+					</div>
+				</t:if>
+			</div>
+		</t:form>
+	
+	</td>
+	<td style="vertical-align:top;" >
+		<t:zone t:id="refltsZone" id="refltsZone" >
+		
+		<t:if test="showRef">
+		
+		<div id="refltCon" class="genericBlk refltsCon" style="width:220px;" >
+			<div class="rtitle altColor">${message:reflections}</div>
+			<t:loop source="getReflections()" value="reflt">
+				<a name="ref${reflt.id}"/>
+				<div class="genericBlk refltBlk" id="rBlk-${reflt.id}" onmouseover="showCloseBtn(this);showEditBtn(this);" onmouseout="hideCloseBtn(this);hideEditBtn(this);">
+					<table class="nomargin">
+						<tr>
+							<td>
+								<div class="title" onclick="toggleElm('rBlk-b${reflt.id}');">
+									${reflt.creator.displayname}
+									<t:if test="reflt.shared" negate="true">
+										<span class="personal"> - ${message:personal-reflection}</span>
+									</t:if>
+								</div>
+							</td>
+							<td align="right">
+								<t:if test="canEditRef(reflt)">
+									<t:actionLink t:id="editRef" context="reflt.id" class="editBtn" >
+										<img src="${context:lib/img/icon_edit.png}" alt="${message:edit}" title="${message:edit}" />
+									</t:actionLink>
+								</t:if>
+								<t:if test="canDeleteRef(reflt)">
+									<t:actionLink t:id="deleteRef" context="reflt.id" class="closeBtn"
+										onclick="return confirmDelete('${message:confirm-delete-reflection}')">
+										<img src="${context:lib/img/icon_close.png}" alt="${message:delete}" title="${message:delete}" />
+									</t:actionLink>
+								</t:if>
+							</td>
+						</tr>
+					</table>
+					<div id="rBlk-b${reflt.id}" >
+						<div><span class="date" >${reflt.mdateDisplay}</span></div>
+						<div class="content" >
+							<t:outputraw value="reflt.content"/>	
+						</div>
+						<t:loop source="reflt.files" value="lLogFile">
+							<t:eventLink event="retrieveLLogFile" context="lLogFile.id">
+								<img src="${context:lib/img/icon-attachment.gif}"  alt="" title="${message:click-to-download}"/>
+							</t:eventLink>
+						</t:loop>
+					</div>
+				</div>
+				
+				<p:empty><div class="notfoundtext">${message:no-reflection-found}</div></p:empty>
+			</t:loop>
+			
+			<div id="writeRefDiv">
+				<a onclick="toggleDisplay('#writeRefFormDiv'); return false;" href="#">${message:write-reflection}</a>
+				<div id="writeRefFormDiv">
+					<form t:type="form" t:id="writeRefForm">
+						<div>
+							<div>
+								<t:textarea t:id="refContent" t:value="refContent" style="width:210px;_width:197px;height:120px;"/>
+							</div>
+							<div>
+								<input t:type="checkbox" t:id="refShared" value="refShared" onchange="refSharedChanged(this);" />
+								<span class="formtip">${message:shared-reflection} ${message:refShared-tip}</span>
+							</div>
+							<div>
+								<input t:type="checkbox" t:id="refNotifyMember" id="refNotifyMember" value="refNotifyMember" />
+								<span class="formtip">${message:refNotifyMember-tip}</span>
+							</div>
+							<div>
+								<t:submit t:id="refsubmit" value="${message:submit-label}" class="submit squared" />
+							</div>
+							<t:if test="hasLearningLogMod(curProj)">
+								<div><span class="formtip">${message:save-ref-to-learninglog} 
+										<t:pagelink page="${getLearningLogModule().module.rooturl}" context="${curProj.id}">
+											${getLearningLogModule().module.displayname}</t:pagelink>
+									</span>
+								</div>
+							</t:if>
+						</div>
+					</form>
+					<script language="javascript">
+						$('writeRefFormDiv').hide();
+						$$(".refltsCon .closeBtn").each(function (elem) {
+							elem.hide();
+						});
+						$$(".refltsCon .editBtn").each(function (elem) {
+							elem.hide();
+						});
+						function refSharedChanged(elm){
+							if(elm.checked){
+								$('refNotifyMember').disabled = false;
+							}
+							else{
+								$('refNotifyMember').checked = false;
+								$('refNotifyMember').disabled = true;
+							}
+						};
+					</script>
+				</div>
+			</div>
+		</div>
+		</t:if>
+		
+		</t:zone>
+	</td>
+</tr>
+</table>
+
+
+
+
+<t:block id="thrdBlk">
+	<a name="th${thread.id}"></a>
+	<div class="thrdBlk" id="thBlk${thread.id}">
+	<div class="head">
+		<table width="100%">
+			<tr>
+				<td width="20px" valign="top" onclick="toggleElm('thBlk-b${thread.id}');toggleElm('thBlk-f${thread.id}');"
+						 style="cursor:pointer;" title="${message:click-to-show-hide-thread}">
+					<img src="${getThreadTypeIcon(thread.type)}" title="${getThreadTypeIconTip(thread.type)}"/>
+				</td>
+				<td onclick="toggleElm('thBlk-b${thread.id}');toggleElm('thBlk-f${thread.id}');"
+						 style="cursor:pointer;" title="${message:click-to-show-hide-thread}">
+					<t:if test="thread.pinned">
+						-
+						<img src="${context:lib/img/icon_pin_red.png}" height="16" alt="${message:important-thread-tip}" title="${message:important-thread-tip}" />
+						- 
+					</t:if>
+					<span class="name" >
+						${thread.name}
+					</span>
+					<br/>
+					<span class="author">
+						<t:if test="thread.anonymous">
+							${thread.authordisplayname}
+							<p:else><t:pagelink page="user/view" context="thread.author.id">${thread.authordisplayname}</t:pagelink></p:else>
+						</t:if>
+					</span>,
+					<span class="date">${thread.createdatedisplay}</span>
+				</td>
+				<td align="right" >
+					<t:if test="canCreateThreadReply(curProj)">
+						<a href="#" t:type="pageLink" page="modules/forum/threadEditReply" context="getParams(thread.id,0)" >
+							${message:reply}
+						</a>
+					</t:if>
+					<t:if test="canEditThread(thread)">
+						| <a href="#" t:type="pageLink" page="modules/forum/threadEdit" context="thread.id">${message:edit}</a>
+					</t:if>
+					<t:if test="canDeleteThread(thread)">
+						| <a href="#" t:type="actionLink" t:id="removeThrd"  context="thread.id"
+							onclick="return confirmDelete('${message:confirm-delete-thread-text}')"
+							>${message:delete}</a>
+					</t:if>
+					<br/>
+
+					<t:if test="isFlagged(thread)">
+						<a href="#" t:type="actionLink" t:id="unflag" context="thread.id" title="${message:unflag-tooltip-text}">
+							<img src="${context:lib/img/16/flag.png}" width="14" alt="${message:flagged}"/>
+						</a>
+						<p:else>
+							<a href="#" t:type="actionLink" t:id="flag" context="thread.id" title="${message:flag-tooltip-text}">
+								<img src="${context:lib/img/16/unflag.png}" width="14" alt="${message:unflagged}" />
+							</a>
+						</p:else>
+					</t:if>
+						|
+						<t:if test="hasRated(thread.id)">
+							<t:if test="isRatedPos(thread.id)">
+								<a href="#" t:type="eventLink" t:event="UnRate" context="thread.id" title="${message:click-to-unrate-like}">
+									<img src="${context:lib/img/16/like_green.png}" width="14" alt="${message:rate-like}" />
+								</a>
+								<span style="margin-left: 3px;" >${getTotalPositiveRate(thread)}</span>
+								|
+								<img src="${context:lib/img/16/dislike_grey.png}" width="14" alt="${message:rate-dislike}" title="${message:rate-dislike}"/>
+								<span style="margin-left: 3px;" >${getTotalNegativeRate(thread)}</span>
+							
+								<p:else>
+									<img src="${context:lib/img/16/like_grey.png}" width="14" alt="${message:rate-like}" title="${message:rate-like}"/>
+									<span style="margin-left: 3px;" >${getTotalPositiveRate(thread)}</span>
+									|
+									<a href="#" t:type="eventLink" t:event="UnRate" context="thread.id" title="${message:click-to-unrate-dislike}">
+										<img src="${context:lib/img/16/dislike_green.png}" width="14" alt="${message:rate-dislike}" />
+									</a>
+									<span style="margin-left: 3px;" >${getTotalNegativeRate(thread)}</span>
+								</p:else>
+							</t:if>
+							
+							
+							<p:else>
+								<a href="#" t:type="eventLink" t:event="ratePositive" context="thread.id" >
+									<img src="${context:lib/img/16/like_green.png}" width="14" alt="${message:rate-like}" title="${message:rate-like}" />
+								</a>
+								<span style="margin-left: 3px;" >${getTotalPositiveRate(thread)}</span>
+								|
+								<a href="#" t:type="eventLink" t:event="rateNegative" context="thread.id" >
+									<img src="${context:lib/img/16/dislike_green.png}" width="14" alt="${message:rate-dislike}" title="${message:rate-dislike}" />
+								</a>
+								<span style="margin-left: 3px;" >${getTotalNegativeRate(thread)}</span>
+							</p:else>
+						</t:if>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<div class="body" id="thBlk-b${thread.id}">
+		<div class="content">
+			<t:outputraw value="thread.message" />
+				
+			<t:if test="thread.attachedFiles">
+				<div class="attFiles">
+					<div class="attLabel">
+						${message:attachment} <img src="${context:lib/img/icon-attachment.gif}" />
+						:
+					</div>
+					<div>
+						<t:loop source="getNonImageAttachedFiles(thread.attachedFiles)" value="tempAttFile">
+							<div class="attFile">
+								<t:eventLink event="retrieveFile" context="tempAttFile.id" title="${message:click-to-download}">
+									${tempAttFile.displayName}
+								</t:eventLink>
+								(${tempAttFile.displaySize})
+							</div>
+						</t:loop>
+					</div>
+					<div class="imgBlks">
+						<t:loop source="getImageAttachedFiles(thread.attachedFiles)" value="tempAttFile">
+							<div class="imgBlk" >
+								<a href="${getRetrieveImageLink(tempAttFile.id)}" target="_blank" >
+									<img src="${getRetrieveImageThumbLink(tempAttFile.id)}" alt="" title="${message:click-to-view-originalsize}"/>
+								</a>
+								<t:eventLink event="retrieveFile" context="tempAttFile.id"  title="${message:click-to-download}">
+								${message:download}</t:eventLink>
+								(${tempAttFile.displaySize})
+							</div>
+						</t:loop>
+					</div>					
+				</div>
+			</t:if>
+				
+		</div>
+	</div>
+	<div class="foot" id="thBlk-f${thread.id}">
+		<t:if test="thread.hasEdited()">
+				<span class="mdate">${message:edited-on}: ${thread.modifyDateDisplay}</span>
+		</t:if>
+	</div>
+	</div>
+</t:block>
+
+
+
+
+<t:block id="thrdRBlk">
+	<a name="thR${threadR.id}"></a>
+	<div class="thrdRBlk tier${getDepth(threadR)}" id="thRBlk${threadR.id}">
+	<div class="head">
+		<table width="100%">
+			<tr>
+				<td width="20px" valign="top" onclick="toggleElm('thRBlk-b${threadR.id}');toggleElm('thRBlk-f${threadR.id}');"
+						 style="cursor:pointer;" title="${message:click-to-show-hide-thread}">
+					<img src="${getThreadTypeIcon(threadR.type)}" title="${getThreadTypeIconTip(threadR.type)}"/>
+				</td>
+				<td onclick="toggleElm('thRBlk-b${threadR.id}');toggleElm('thRBlk-f${threadR.id}');"
+						 style="cursor:pointer;" title="${message:click-to-show-hide-thread}">
+					<span class="name" >
+						${threadR.name}
+					</span>
+					<br/>
+					<span class="author">
+						<t:if test="threadR.anonymous">
+							${threadR.authordisplayname}
+							<p:else><t:pagelink page="user/view" context="threadR.author.id">${threadR.authordisplayname}</t:pagelink></p:else>
+						</t:if>
+					</span>,
+					<span class="date">${threadR.createdatedisplay}</span>
+				</td>
+				<td align="right" >
+					<t:if test="canCreateThreadReply(curProj)">
+						<a href="#" t:type="pageLink" page="modules/forum/threadEditReply" context="getParams(thread.id, threadR.id)" >
+							${message:reply}
+						</a>
+					</t:if>
+					<t:if test="canEditThreadReply(threadR)">
+						| <a href="#" t:type="pageLink" page="modules/forum/threadEditReply" context="threadR.id">${message:edit}</a>
+					</t:if>
+					<t:if test="canDeleteThreadReply(threadR)">
+						| <a href="#" t:type="actionLink" t:id="removeThrdR"  context="threadR.id"
+							onclick="return confirmDelete('${message:confirm-delete-threadReply-text}')"
+							>${message:delete}</a>
+					</t:if>
+					<br/>
+		
+						<t:if test="hasRatedR(threadR.id)">
+							<t:if test="isRatedRPos(threadR.id)">
+								<a href="#" t:type="eventLink" t:event="UnRateR" context="threadR.id" title="${message:click-to-unrate-like}">
+									<img src="${context:lib/img/16/like_green.png}" width="14" alt="${message:rate-like}" />
+								</a>
+								<span style="margin-left: 3px;" >${getTotalPositiveRateR(threadR)}</span>
+								|
+								<img src="${context:lib/img/16/dislike_grey.png}" width="14" alt="${message:rate-dislike}" title="${message:rate-dislike}"/>
+								<span style="margin-left: 3px;" >${getTotalNegativeRateR(threadR)}</span>
+								
+								<p:else>
+									<img src="${context:lib/img/16/like_grey.png}" width="14" alt="${message:rate-like}" title="${message:rate-like}"/>
+									<span style="margin-left: 3px;" >${getTotalPositiveRateR(threadR)}</span>
+									|
+									<a href="#" t:type="eventLink" t:event="UnRateR" context="threadR.id" title="${message:click-to-unrate-dislike}">
+										<img src="${context:lib/img/16/dislike_green.png}" width="14" alt="${message:rate-dislike}" />
+									</a>
+									<span style="margin-left: 3px;" >${getTotalNegativeRateR(threadR)}</span>
+								</p:else>
+							</t:if>
+							
+							<p:else>
+								<a href="#" t:type="eventLink"  t:event="ratePositiveR" context="threadR.id" >
+									<img src="${context:lib/img/16/like_green.png}" width="14" alt="${message:rate-like}" title="${message:rate-like}" />
+								</a>
+								<span style="margin-left: 3px;" >${getTotalPositiveRateR(threadR)}</span>
+								|
+								<a href="#" t:type="eventLink" t:event="rateNegativeR" context="threadR.id" >
+									<img src="${context:lib/img/16/dislike_green.png}" width="14" alt="${message:rate-dislike}" title="${message:rate-dislike}" />
+								</a>
+								<span style="margin-left: 3px;" >${getTotalNegativeRateR(threadR)}</span>
+							</p:else>
+						</t:if>
+						
+				</td>
+			</tr>
+		</table>
+	</div>
+	<div class="body" id="thRBlk-b${threadR.id}">
+		<div class="content">
+			<t:outputraw value="threadR.message" />
+			
+			<t:if test="threadR.attachedFiles">
+				<div class="attFiles">
+					<div class="attLabel">
+						${message:attachment} <img src="${context:lib/img/icon-attachment.gif}" />
+						:
+					</div>
+					<div>
+						<t:loop source="getNonImageAttachedFiles(threadR.attachedFiles)" value="tempAttFile">
+							<div class="attFile">
+								<t:eventLink event="retrieveFile" context="tempAttFile.id" title="${message:click-to-download}">
+									${tempAttFile.displayName}
+								</t:eventLink>
+								(${tempAttFile.displaySize})
+							</div>
+						</t:loop>
+					</div>
+					<div class="imgBlks">
+						<t:loop source="getImageAttachedFiles(threadR.attachedFiles)" value="tempAttFile">
+							<div class="imgBlk" >
+								<a href="${getRetrieveImageLink(tempAttFile.id)}" target="_blank" >
+									<img src="${getRetrieveImageThumbLink(tempAttFile.id)}" alt="" title="${message:click-to-view-originalsize}"/>
+								</a>
+								<t:eventLink event="retrieveFile" context="tempAttFile.id"  title="${message:click-to-download}">
+								${message:download}</t:eventLink>
+								(${tempAttFile.displaySize})
+							</div>
+						</t:loop>
+					</div>					
+				</div>
+			</t:if>
+		</div>
+	</div>
+	<div class="foot" id="thRBlk-f${threadR.id}">
+		<t:if test="threadR.hasEdited()">
+				<span class="mdate">${message:edited-on}: ${threadR.modifyDateDisplay}</span>
+		</t:if>
+	</div>
+	</div>
+</t:block>
+	
+<script type="text/javascript">
+	function collapseAll(){
+		$$('.thrdRBlk .body,.thrdRBlk .foot').each(function(e){
+			e.hide();
+		});
+	}
+	document.observe("dom:loaded", function() {
+		collapseAll();
+	});
+</script>
+	
+	
+</html>

@@ -1,0 +1,132 @@
+<html t:type="layout" 
+	title="${message:approve-reject-elog}"
+	currentModule="${moduleName}"
+   currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/elog/home?${project.id}
+		,${message:elog-approve-list}=modules/elog/approveoverview?${project.id}
+		,${message:approve-reject-elog}=modules/elog/approve?${elog.id}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+
+	<p:legendBlk>
+		<span class="required">*</span>  ${message:required-fields}
+	</p:legendBlk>
+
+<p:actionBtns>
+	<a class="button rounded" t:type="pageLink" page="modules/elog/editorgsup" context="elog.id" >
+		<span>${message:edit-elog-orgsup}</span>
+	</a>
+</p:actionBtns>	
+	
+	<t:form t:id="form" class="e-formeditor" autofocus="false">
+		<t:errors />
+		<div class="t-beaneditor">
+			<table >
+				<tr>
+					<td class="label">${message:preview-elog}</td>
+					<td>
+						<div style="border:1px solid #ccc;margin:5px;">
+						<div class="elogEntry">
+							<div class="head">
+								<table class="nomargin">
+									<tr>
+										<td>
+											<img src="${context:lib/img/16/m_eLog.png}" class="icon" />
+											<span class="subject">${elog.subject}</span>
+											<br/>
+											<span class="author-date">
+												${message:by} <span class="author"><t:pageLink page="user/view" context="elog.author.id">${elog.author.displayname}</t:pageLink></span>
+												, <span class="date">${elog.cdateDisplay}</span>
+											</span>
+										</td>
+										<td align="right">
+											
+										</td>
+									</tr>
+								</table>
+							</div>
+							<div class="content"><t:outputraw t:value="elog.content" /></div>
+							
+							<t:if test="elog.files">
+								<div class="attFiles">
+									<div >
+										${message:attachment} <img src="${context:lib/img/icon-attachment.gif}" />
+										:
+									</div>
+									<div >
+										<t:loop source="getNonImageAttachedFiles(elog.files)" value="attFile">
+											<div class="attFile">
+												<t:eventLink event="retrieveFile" context="attFile.id"  title="${message:click-to-download}">
+												<img src="${getAttachFileIcon(attFile)}" style="vertical-align:bottom;"/>
+												${attFile.displayName}
+												</t:eventLink>
+												(${attFile.displaySize})
+											</div>
+										</t:loop>
+									</div>
+									<div class="imgBlks">
+										<t:loop source="getImageAttachedFiles(elog.files)" value="attFile">
+											<div class="imgBlk" >
+												<a href="${getRetrieveImageLink(attFile.id)}" target="_blank" >
+													<img src="${getRetrieveImageThumbLink(attFile.id)}" alt="" title="${message:click-to-view-originalsize}"/>
+												</a>
+												<t:eventLink event="retrieveFile" context="attFile.id"  title="${message:click-to-download}">
+												${message:download}</t:eventLink>
+												(${attFile.displaySize})
+											</div>
+										</t:loop>
+									</div>
+								</div>
+							</t:if>
+							<t:if test="elog.hasEditor()">
+								<div class="mdate" >
+										${message:edited-on}: ${elog.mDateDisplay}
+										, ${message:by} 
+										<t:pagelink page="user/view" context="elog.editor.id">${elog.editor.displayName}</t:pagelink>
+								</div>
+							</t:if>
+						</div>
+						</div>
+					</td>
+				</tr>
+				
+				<tr>
+					<td class="label"><label>${message:logs-label}</label></td>
+					<td >
+						<t:outputraw value="elog.remarks"/>
+					</td>
+				</tr>
+				
+				<tr>
+					<td class="label"><span class="required">*</span><t:label for="decision">${message:decision}</t:label></td>
+					<td>
+						<t:select t:id="decision" value="decision" model="getApproveDecisionModel()" validate="required"/>
+					</td>
+				</tr>
+				<tr>
+					<td class="label"><t:label for="remarks"/></td>
+					<td>
+						<t:textarea t:id="remarks" value="remarks" cols="50" rows="3" class="lwidth"/>
+					</td>
+				</tr>
+				
+				<tr>
+					<td></td>
+					<td >
+						<div>${message:approve-reject-tip1}</div>
+						<div>${message:approve-reject-tip2}</div>
+						<div>${message:approve-reject-tip3}</div>
+						<div>${message:approve-reject-tip4}</div>
+					</td>
+				</tr>
+				
+			</table>
+			<t:submit t:id="submit" value="${message:submit-label}" class="submit squared" />
+			
+						
+
+		</div>
+	</t:form>
+</html>

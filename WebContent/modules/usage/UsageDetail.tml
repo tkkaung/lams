@@ -1,0 +1,564 @@
+<html t:type="layout" 
+	title="${getTypeDisplay()}"
+	currentModule="${moduleName}"
+	currentProj="proj"
+	breadcrumb="${proj.encodeddisplayname}=project/home?${proj.id}
+		,${module.displayName}=modules/usage?${proj.id}
+		,${message:usage-detail}: ${getTypeDisplay()}=modules/usage/usagedetail?${proj.id}
+		"
+	totalShowOption="${totalSize}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+<style>
+	.no{
+		width: 15px;
+	}
+	span.aaa{
+		padding: 2px 3px;
+		white-space: nowrap;
+	}
+	
+</style>
+
+<table class="actionToolBar">
+	<tr>
+		<td class="right">
+		</td>
+	</tr>
+</table>
+
+
+<t:grid source="annmtList" row="annmt"
+	model="getAnnmtModel()"
+	rowsPerPage="rowsPerPage"
+	rowIndex="rowIndex"
+	pagerPosition="bottom" 
+	>
+	<p:empty></p:empty>
+	<t:parameter name="noCell">
+		${getRowNum()}
+	</t:parameter>
+	<t:parameter name="subjectCell">
+		<t:pagelink page="modules/announcement/view" context="annmt.id">
+			${annmt.subject}
+		</t:pagelink>
+		<div>
+			${truncateString(stripTags(annmt.content))}
+		</div>
+	</t:parameter>	
+	<t:parameter name="startDateCell">
+		<span class="date">${annmt.startDateDisplay}</span>
+	</t:parameter>
+	<t:parameter name="endDateCell">
+		<span class="date">${annmt.endDateDisplay}</span>
+	</t:parameter>
+	<t:parameter name="modifydateCell">
+		<span class="date">${annmt.modifyDateDisplay}</span>
+	</t:parameter>
+	<t:parameter name="createdateCell">
+		<span class="date">${annmt.createDateDisplay}</span>
+	</t:parameter>
+</t:grid>
+
+
+<t:grid source="thrdList" row="thrd"
+	model="getThreadModel()"
+	rowsPerPage="rowsPerPage"
+	rowIndex="rowIndex"
+	pagerPosition="bottom" 
+	>
+	<p:empty></p:empty>
+	<t:parameter name="noCell">
+		${getRowNum()}
+	</t:parameter>
+	<t:parameter name="nameCell">
+		<t:pagelink page="modules/forum/threadview" context="thrd.id">
+			${thrd.name}
+		</t:pagelink>
+		<t:if test="thrd.attachedFiles">
+			<img src="${context:lib/img/icon-attachment.gif}"/>
+		</t:if>
+					
+		<div>
+			${truncateString(stripTags(thrd.message))}
+		</div>
+	</t:parameter>	
+	<t:parameter name="modifydateCell">
+		<span class="date">${thrd.modifyDateDisplay}</span>
+	</t:parameter>
+	<t:parameter name="createdateCell">
+		<span class="date">${thrd.createDateDisplay}</span>
+	</t:parameter>
+	<t:parameter name="ratesCell">
+		<span class="aaa">
+			<img src="${context:lib/img/16/like_green.png}" width="14" alt="${message:rate-like}" 
+			/>
+			${getTotalPositiveRate(thrd)}
+		</span>
+		<span class="aaa">
+			<img src="${context:lib/img/16/dislike_green.png}" width="14" alt="${message:rate-dislike}" 
+			/>
+			${getTotalNegativeRate(thrd)}
+		</span>
+	</t:parameter>
+</t:grid>
+
+
+<t:grid source="thrdRList" row="thrdR"
+	model="getThreadReplyModel()"
+	rowsPerPage="rowsPerPage"
+	rowIndex="rowIndex"
+	pagerPosition="bottom" 
+	>
+	<p:empty></p:empty>
+	<t:parameter name="noCell">
+		${getRowNum()}
+	</t:parameter>
+	<t:parameter name="nameCell">
+		<t:pagelink page="modules/forum/threadview" context="thrdR.thread.id" anchor="thR${thrdR.id}">
+			${thrdR.name}
+		</t:pagelink>
+		<t:if test="thrdR.attachedFiles">
+			<img src="${context:lib/img/icon-attachment.gif}"/>
+		</t:if>
+					
+		<div>
+			${truncateString(stripTags(thrdR.message))}
+		</div>
+	</t:parameter>	
+	<t:parameter name="threadCell">
+		<t:pagelink page="modules/forum/threadview" context="thrdR.thread.id" >
+			${thrdR.thread.name}
+		</t:pagelink>
+	</t:parameter>	
+	<t:parameter name="modifydateCell">
+		<span class="date">${thrdR.modifyDateDisplay}</span>
+	</t:parameter>
+	<t:parameter name="createdateCell">
+		<span class="date">${thrdR.createDateDisplay}</span>
+	</t:parameter>
+	<t:parameter name="ratesCell">
+		<span class="aaa">
+			<img src="${context:lib/img/16/like_green.png}" width="14" alt="${message:rate-like}" 
+			/>
+			${getTotalPositiveRateR(thrdR)}
+		</span>
+		<span class="aaa">
+			<img src="${context:lib/img/16/dislike_green.png}" width="14" alt="${message:rate-dislike}" 
+			/>
+			${getTotalNegativeRateR(thrdR)}
+		</span>
+	</t:parameter>
+</t:grid>
+
+<t:grid source="reflctList" row="reflct"
+	model="getReflectionModel()"
+	rowsPerPage="rowsPerPage"
+	rowIndex="rowIndex"
+	pagerPosition="bottom" 
+	>
+	<p:empty></p:empty>
+	<t:parameter name="noCell">
+		${getRowNum()}
+	</t:parameter>
+	<t:parameter name="contentCell">
+		<div>
+			${truncateString(stripTags(reflct.content))}
+			<t:if test="reflct.files">
+				<img src="${context:lib/img/icon-attachment.gif}"/>
+			</t:if>
+		</div>
+	</t:parameter>	
+	<t:parameter name="mdateCell">
+		<span class="date">${reflct.mdateDisplay}</span>
+	</t:parameter>
+	<t:parameter name="cdateCell">
+		<span class="date">${reflct.cdateDisplay}</span>
+	</t:parameter>
+	<t:parameter name="typeCell">
+		<t:if test="reflct.forumThreadId">
+			<t:pagelink page="modules/forum/threadview" context="reflct.forumThreadId">
+				${getForumThreadTitleById(reflct.forumThreadId)}
+			</t:pagelink>
+		</t:if>
+		<t:if test="reflct.blogId">
+			<t:pagelink page="modules/blog/view" context="reflct.blogId">
+				${getBlogTitleById(reflct.blogId)}
+			</t:pagelink>
+		</t:if>
+		<t:if test="reflct.elogId">
+			<t:pagelink page="modules/elog/view" context="reflct.elogId">
+				${getElogTitleById(reflct.elogId)}
+			</t:pagelink>
+		</t:if>
+	</t:parameter>
+	
+</t:grid>
+
+
+<t:grid source="blogList" row="blog"
+	model="getBlogModel()"
+	rowsPerPage="rowsPerPage"
+	rowIndex="rowIndex"
+	pagerPosition="bottom" 
+	>
+	<p:empty></p:empty>
+	<t:parameter name="noCell">
+		${getRowNum()}
+	</t:parameter>
+	<t:parameter name="subjectCell">
+		<t:pagelink page="modules/blog/view" context="blog.id">
+			${blog.subject}
+		</t:pagelink>
+		<t:if test="blog.shared" negate="true">
+			- <span class="attention" >${message:private}</span>
+		</t:if>
+		<t:if test="isPublished(blog)" negate="true">
+			- <span class="attention" >${blog.status}</span>
+		</t:if>
+		<t:if test="blog.attaches">
+			<img src="${context:lib/img/icon-attachment.gif}"/>
+		</t:if>
+					
+		<div>
+			${truncateString(stripTags(blog.content))}
+		</div>
+	</t:parameter>	
+	<t:parameter name="mdateCell">
+		<span class="date">${blog.mdateDisplay}</span>
+	</t:parameter>
+	<t:parameter name="cdateCell">
+		<span class="date">${blog.cdateDisplay}</span>
+	</t:parameter>
+</t:grid>
+
+
+<t:grid source="blogCmtList" row="blogCmt"
+	model="getBlogCommentModel()"
+	rowsPerPage="rowsPerPage"
+	rowIndex="rowIndex"
+	pagerPosition="bottom" 
+	>
+	<p:empty></p:empty>
+	<t:parameter name="noCell">
+		${getRowNum()}
+	</t:parameter>
+	<t:parameter name="contentCell">
+		<div>
+			${truncateString(stripTags(blogCmt.content))}
+		</div>
+	</t:parameter>	
+	<t:parameter name="blogCell">
+		<t:pagelink page="modules/blog/view" context="blogCmt.blog.id" anchor="cmt${blogCmt.id}" >
+			${blogCmt.blog.subject}
+		</t:pagelink>
+	</t:parameter>	
+	<t:parameter name="cdateCell">
+		<span class="date">${blogCmt.cdateDisplay}</span>
+	</t:parameter>
+</t:grid>
+
+<t:grid source="elogList" row="elog"
+	model="getElogModel()"
+	rowsPerPage="rowsPerPage"
+	rowIndex="rowIndex"
+	pagerPosition="bottom" 
+	>
+	<p:empty></p:empty>
+	<t:parameter name="noCell">
+		${getRowNum()}
+	</t:parameter>
+	<t:parameter name="subjectCell">
+		<t:pagelink page="modules/elog/view" context="elog.id">
+			${elog.subject}
+		</t:pagelink>
+		<t:if test="isApproved(elog)" negate="true">
+			- <span class="attention" >${elog.status}</span>
+		</t:if>
+		<t:if test="elog.files">
+			<img src="${context:lib/img/icon-attachment.gif}"/>
+		</t:if>
+					
+		<div>
+			${truncateString(stripTags(elog.content))}
+		</div>
+	</t:parameter>	
+	<t:parameter name="mdateCell">
+		<span class="date">${elog.mdateDisplay}</span>
+	</t:parameter>
+	<t:parameter name="cdateCell">
+		<span class="date">${elog.cdateDisplay}</span>
+	</t:parameter>
+</t:grid>
+
+<t:grid source="elogCmtList" row="elogCmt"
+	model="getElogCommentModel()"
+	rowsPerPage="rowsPerPage"
+	rowIndex="rowIndex"
+	pagerPosition="bottom" 
+	>
+	<p:empty></p:empty>
+	<t:parameter name="noCell">
+		${getRowNum()}
+	</t:parameter>
+	<t:parameter name="contentCell">
+		<div>
+			${truncateString(stripTags(elogCmt.content))}
+		</div>
+	</t:parameter>	
+	<t:parameter name="elogCell">
+		<t:pagelink page="modules/elog/view" context="elogCmt.elog.id" anchor="cmt${elogCmt.id}" >
+			${elogCmt.elog.subject}
+		</t:pagelink>
+	</t:parameter>	
+	<t:parameter name="cdateCell">
+		<span class="date">${elogCmt.cdateDisplay}</span>
+	</t:parameter>
+</t:grid>
+
+<t:grid source="rsrcFdList" row="rsrcFd"
+	model="getResourceFolderModel()"
+	rowsPerPage="rowsPerPage"
+	rowIndex="rowIndex"
+	pagerPosition="bottom" 
+	>
+	<p:empty></p:empty>
+	<t:parameter name="noCell">
+		${getRowNum()}
+	</t:parameter>
+	<t:parameter name="nameCell">
+		<t:pagelink page="modules/resources/home" context="getParams(projId, rsrcFd.id)"  >
+			${rsrcFd.name}
+		</t:pagelink>
+	</t:parameter>
+	<t:parameter name="desCell">
+		<div>${truncateString(stripTags(rsrcFd.des))}</div>
+	</t:parameter>
+	<t:parameter name="fileCountCell">
+		${countResourcesByFolder(rsrcFd)}
+	</t:parameter>
+	<t:parameter name="cdateCell">
+		<span class="date">${rsrcFd.cdateDisplay}</span>
+	</t:parameter>
+	<t:parameter name="mdateCell">
+		<span class="date">${rsrcFd.mdateDisplay}</span>
+	</t:parameter>
+</t:grid>
+
+
+<t:grid source="rsrcLkList" row="rsrcLk"
+	model="getResourceLinkModel()"
+	rowsPerPage="rowsPerPage"
+	rowIndex="rowIndex"
+	pagerPosition="bottom" 
+	>
+	<p:empty></p:empty>
+	<t:parameter name="noCell">
+		${getRowNum()}
+	</t:parameter>
+	<t:parameter name="nameCell">
+		${rsrcLk.name}
+	</t:parameter>
+	<t:parameter name="desCell">
+		<div>${truncateString(stripTags(rsrcLk.des))}</div>
+	</t:parameter>
+	<t:parameter name="urlCell">
+		<a href="${rsrcLk.url}" target="_blank">
+			${rsrcLk.url}
+		</a>
+	</t:parameter>
+	<t:parameter name="inFolderCell">
+		<t:pagelink page="modules/resources/home" context="getParams(projId, rsrcLk.parent.id)"  >
+			${rsrcLk.parent.name}
+		</t:pagelink>
+	</t:parameter>
+	<t:parameter name="cdateCell">
+		<span class="date">${rsrcLk.cdateDisplay}</span>
+	</t:parameter>
+	<t:parameter name="mdateCell">
+		<span class="date">${rsrcLk.mdateDisplay}</span>
+	</t:parameter>
+</t:grid>
+
+<t:grid source="rsrcFileList" row="rsrcFile"
+	model="getResourceFileModel()"
+	rowsPerPage="rowsPerPage"
+	rowIndex="rowIndex"
+	pagerPosition="bottom" 
+	>
+	<p:empty></p:empty>
+	<t:parameter name="noCell">
+		${getRowNum()}
+	</t:parameter>
+	<t:parameter name="typeiconCell">
+		<img src="${getTypeIcon(rsrcFile)}" />
+	</t:parameter>
+	<t:parameter name="nameCell">
+		<t:pagelink page="modules/resources/fileview" context="rsrcFile.id"  >
+			${rsrcFile.name}
+		</t:pagelink>
+	</t:parameter>
+	<t:parameter name="desCell">
+		<div>${truncateString(stripTags(rsrcFile.des))}</div>
+	</t:parameter>
+	<t:parameter name="inFolderCell">
+		<t:pagelink page="modules/resources/home" context="getParams(projId, rsrcFile.parent.id)"  >
+			${rsrcFile.parent.name}
+		</t:pagelink>
+	</t:parameter>
+	<t:parameter name="latestVersionCell">
+		<span class="ver"> ${rsrcFile.getLatestFileVersion().getVersionDisplay()}</span>
+	</t:parameter>
+	<t:parameter name="cdateCell">
+		<span class="date">${rsrcFile.cdateDisplay}</span>
+	</t:parameter>
+	<t:parameter name="mdateCell">
+		<span class="date">${rsrcFile.mdateDisplay}</span>
+	</t:parameter>
+</t:grid>
+
+<t:grid source="rsrcFileVerList" row="rsrcFileVer"
+	model="getResourceFileVersionModel()"
+	rowsPerPage="rowsPerPage"
+	rowIndex="rowIndex"
+	pagerPosition="bottom" 
+	>
+	<p:empty></p:empty>
+	<t:parameter name="noCell">
+		${getRowNum()}
+	</t:parameter>
+	<t:parameter name="typeiconCell">
+		<img src="${getRFVTypeIcon(rsrcFileVer)}" />
+	</t:parameter>
+	<t:parameter name="nameCell">
+		${rsrcFileVer.name}
+	</t:parameter>
+	<t:parameter name="cmmtCell">
+		<div>${truncateString(stripTags(rsrcFileVer.cmmt))}</div>
+	</t:parameter>
+	<t:parameter name="fileCell">
+		<t:pagelink page="modules/resources/fileview" context="rsrcFileVer.rfile.id"  >
+			${rsrcFileVer.rfile.name}
+		</t:pagelink>
+	</t:parameter>
+	<t:parameter name="versionCell">
+		${rsrcFileVer.versionDisplay}
+	</t:parameter>
+	<t:parameter name="sizeCell">
+		${rsrcFileVer.displaySize}
+	</t:parameter>
+	<t:parameter name="cdateCell">
+		<span class="date">${rsrcFileVer.cdateDisplay}</span>
+	</t:parameter>
+	
+</t:grid>
+
+
+<t:grid source="schdMstList" row="schdMst"
+	model="getSchdMilestoneModel()"
+	rowsPerPage="rowsPerPage"
+	rowIndex="rowIndex"
+	pagerPosition="bottom" 
+	>
+	<p:empty></p:empty>
+	<t:parameter name="noCell">
+		${getRowNum()}
+	</t:parameter>
+	<t:parameter name="nameCell">
+		<t:pagelink page="modules/scheduling/milestoneview" context="schdMst.id"  >
+			${schdMst.name}
+		</t:pagelink>
+	</t:parameter>
+	<t:parameter name="commentCell">
+		<div>${truncateString(stripTags(schdMst.comment))}</div>
+	</t:parameter>
+	<t:parameter name="deadlineCell">
+		<span class="date">${schdMst.deadlineDisplay}</span>
+	</t:parameter>
+	<t:parameter name="createDateCell">
+		<span class="date">${schdMst.createDateDisplay}</span>
+	</t:parameter>
+	<t:parameter name="modifyDateCell">
+		<span class="date">${schdMst.modifyDateDisplay}</span>
+	</t:parameter>
+	
+</t:grid>
+
+
+<t:grid source="schdPhsList" row="schdPhs"
+	model="getSchdPhaseModel()"
+	rowsPerPage="rowsPerPage"
+	rowIndex="rowIndex"
+	pagerPosition="bottom" 
+	>
+	<p:empty></p:empty>
+	<t:parameter name="noCell">
+		${getRowNum()}
+	</t:parameter>
+	<t:parameter name="nameCell">
+		<t:pagelink page="modules/scheduling/phaseview" context="schdPhs.id"  >
+			${schdPhs.name}
+		</t:pagelink>
+	</t:parameter>
+	<t:parameter name="commentCell">
+		<div>${truncateString(stripTags(schdPhs.comment))}</div>
+	</t:parameter>
+	<t:parameter name="startDateCell">
+		<span class="date">${schdPhs.startDateDisplay}</span>
+	</t:parameter>
+	<t:parameter name="endDateCell">
+		<span class="date">${schdPhs.endDateDisplay}</span>
+	</t:parameter>
+	<t:parameter name="createDateCell">
+		<span class="date">${schdPhs.createDateDisplay}</span>
+	</t:parameter>
+	<t:parameter name="modifyDateCell">
+		<span class="date">${schdPhs.modifyDateDisplay}</span>
+	</t:parameter>
+	
+</t:grid>
+
+
+<t:grid source="schdTskList" row="schdTsk"
+	model="getSchdTaskModel()"
+	rowsPerPage="rowsPerPage"
+	rowIndex="rowIndex"
+	pagerPosition="bottom" 
+	>
+	<p:empty></p:empty>
+	<t:parameter name="noCell">
+		${getRowNum()}
+	</t:parameter>
+	<t:parameter name="nameCell">
+		<t:pagelink page="modules/scheduling/taskview" context="schdTsk.id"  >
+			${schdTsk.name}
+		</t:pagelink>
+	</t:parameter>
+	<t:parameter name="managerCell">
+		<t:pagelink page="user/view" context="schdTsk.manager.id">${schdTsk.manager.displayName}</t:pagelink>
+		<t:if test="schdTsk.editor">
+			<br/>
+			<span class="small">
+				${message:edited-on} <span class="date">${schdTsk.modifyDateDisplay}</span> 
+				, ${message:by}
+				<t:pagelink page="user/view" context="schdTsk.editor.id">${schdTsk.editor.displayname}</t:pagelink>
+			</span>
+		</t:if>
+	</t:parameter>
+	
+	<t:parameter name="commentCell">
+		<div>${truncateString(stripTags(schdTsk.comment))}</div>
+	</t:parameter>
+	<t:parameter name="startDateCell">
+		<span class="date">${schdTsk.startDateDisplay}</span>
+	</t:parameter>
+	<t:parameter name="endDateCell">
+		<span class="date">${schdTsk.endDateDisplay}</span>
+	</t:parameter>
+	<t:parameter name="createDateCell">
+		<span class="date">${schdTsk.createDateDisplay}</span>
+	</t:parameter>
+</t:grid>
+
+</html>

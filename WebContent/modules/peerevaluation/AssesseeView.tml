@@ -1,0 +1,140 @@
+<html t:type="layout" 
+   title="View ${message:evaluation}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/peerevaluation/assesseehome?${project.id}
+		,View ${message:evaluation}=modules/peerevaluation/assesseeview"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+  
+<form class="e-formeditor">
+	<div class="t-beaneditor ">
+		<table >
+			<tr>
+				<td class="label">${message:evaluation}</td>
+				<td>
+					${eval.name}
+					<div>
+				   		<span class="subdes"><t:outputraw value="eval.des"/></span>
+				   	</div>
+				</td>
+			</tr>
+			<tr>
+				<td class="label">Evaluation Period</td>
+				<td>
+					<span >${eval.sdateDisplay}</span>
+					-
+					<span >${eval.edateDisplay}</span>
+				</td>
+			</tr>
+			<tr>
+				<td class="label">Group</td>
+				<td>
+					<t:if test="eval.group">
+						${getGroupTypeName(eval.group, getCurUser())}
+					<p:else>
+						Student may select peer(s) to evaluate
+					</p:else>
+					</t:if>
+				</td>
+			</tr>
+			<tr>
+				<td class="label">Status</td>
+				<td>
+					${getEvalStatusStudentView(eval, getCurUser())}
+	
+					<t:if test="canSubmit(eval)">
+			   			<t:pagelink page="modules/peerevaluation/assesseeEdit" context="eval.id" class="button rounded ">
+				   			<span>Do Evaluation</span>
+				   		</t:pagelink>
+				   	<p:else>
+					   	<t:pagelink page="modules/peerevaluation/assesseeShow" context="eval.id" class="button rounded">
+				   			<span>View Evaluated</span>
+				   		</t:pagelink>
+				   	</p:else>
+				   	</t:if>
+				</td>
+			</tr>
+			
+			<tr>
+				<td class="label">Rubric</td>
+				<td>		   			
+	   			</td>
+			</tr>
+		</table>
+		
+		<t:if test="eval.criterias">
+			<p:else>
+				<table >
+					<tr>
+						<td class="label"></td>
+						<td>
+							<span >${message:no-criteria-found}</span>
+						</td>
+					</tr>
+				</table>
+				
+			</p:else>
+			
+			<div class="rubricDetailZone view">
+				<style>.rubricDetailZone td{
+					width: ${getCritNameWidthPercentNum(60,getFirstCriterions().size())};
+				}
+				</style>
+				
+				<table >
+					<tr>
+						<th rowspan="2" class="criteria">${message:criteria-objective}</th>
+						<!--<th rowspan="2" class="weightage">${message:weightage-label} <span class="formtip">(%)</span></th> 
+						--><th colspan="${getFirstCriterions().size()}">${message:criterion}</th>
+					</tr>
+					<tr>
+						<t:loop source="getFirstCriterions()" value="tempRCriterion" index="colIndex">
+							<th>
+								<span title="${message:columnScore-label}">${tempRCriterion.score}</span>
+							</th>
+						</t:loop>
+					</tr>
+					<t:loop source="eval.getCriterias()" value="tempRCrit" index="rowIndex">
+						<tr>
+							<th class="critName">
+								<span title="${message:critName-label}"><t:outputraw value="${textarea2html(tempRCrit.name)}"/></span>
+								<t:outputraw value="getSpace()"/>
+							</th>
+							<!--<th class="weightage">
+								${tempRCrit.weightage}
+							</th> 
+							--><t:loop source="tempRCrit.criterions" value="tempRCriterion" index="colIndex">
+								<td class="crionDes">
+									<t:outputraw value="${textarea2html(tempRCriterion.des)}"/>
+								</td>
+							</t:loop>
+						</tr>
+					</t:loop>
+			
+			
+				</table>
+			</div>
+			<t:if test="eval.openEndedQuestions">
+				<div class="t-beaneditor e-formeditor">
+					<table >
+						<tr>
+							<td class="label" ><label > ${message:open-question-label}</label></td>
+							<td>
+								<t:loop source="eval.openEndedQuestions" value="oQuestion">
+									<div style="padding:5px; margin:0 5px 10px 5px; background:#fafafa;">
+										<t:outputraw value="textarea2html(oQuestion)"/>
+									</div>
+									
+								</t:loop>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</t:if>
+		</t:if>
+	</div>
+</form>
+
+</html>

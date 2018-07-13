@@ -1,0 +1,88 @@
+<html t:type="layout"
+	title="${message:backup} ${message:project}"
+	breadcrumb="${message:control-panel}=admin,${message:backup-restore} ${message:project}=admin/backuprestore,${message:backup} ${message:project}=admin/backuprestore/backupproject"
+   xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="project"/></p:leftMenuBlk>
+	
+	<t:if test="showResult">
+		<t:delegate to="block:resultBlock"/>
+		<p:else>
+			<t:delegate to="block:formBlock"/>
+		</p:else>
+	</t:if>
+	
+	<t:block t:id="formBlock">
+		<t:if test="projs">
+			<p:else>
+				<p>${message:no-project-to-backup}</p>
+			</p:else>
+		
+		<t:beaneditform t:id="backupForm" object="bEntry" submitLabel="${message:submit-label}"
+			include="remarks"
+			add="selectProj,selectProjModule"
+			reorder="selectProj,selectProjModule,remarks"
+			>
+			<t:parameter name="selectProj">
+				<t:label for="selectProj"/>
+					<t:select t:id="selectProj" value="selProjId" model="projModel" 
+						t:mixins="zoneUpdater" t:clientEvent="change" t:event1="changeOfProj" zone1="projModuleZone" />
+			</t:parameter>
+			<t:parameter name="selectProjModule">
+				<t:zone id="projModuleZone" t:id="projModuleZone">
+						<t:if test="selProjId">
+							<label for="selectProjModule">${message:selectProjModule-label}</label>
+							<div class="fields-wrap" >
+								<div>
+									<input type="checkBox" name="projInfoChkBox" value="projInfo" id="projInfo" disabled="disabled" checked="checked"/>
+									<label for="projInfo" >${message:projInfo-label}</label>
+								</div>
+								<t:loop source="projModules" value="projModule"  >
+									<div>
+										<input type="checkBox" name="moduleChkBox" value="${projModule.module.id}" id="${projModule.module.id}" />
+										<label for="${projModule.module.id}">${projModule.module.displayName}</label>
+									</div>
+								</t:loop>
+							</div>
+							<p:else>
+								<t:outputraw value="getSpace()"/>
+							</p:else>
+						</t:if>
+				</t:zone>
+			</t:parameter>
+			<t:parameter name="remarks">
+				<t:label for="remarks" />
+				<textarea t:type="textarea" t:id="remarks" value="bEntry.remarks" cols="50" rows="5" class="mwidth"/>
+			</t:parameter>
+		</t:beaneditform>
+		
+		</t:if>
+	</t:block>
+	
+	
+	<t:block t:id="resultBlock">
+		<div class="page-result-block">
+			<div class="title">${message:result}:</div>
+	 		<div class="title2">${resultSucceededBackups.size()} ${message:successful-exported}:</div>
+	 		<ul>
+				<li t:type="loop" source="resultSucceededBackups" value="var:modName">
+					${var:modName}
+				</li>
+			</ul>
+			<t:if test="resultFailedBackups">
+				<div class="title2">${resultFailedBackups.size()} ${message:failed-exported}:</div>
+	 			<ul>
+					<li t:type="loop" source="resultFailedBackups" value="var:modName">
+						${var:modName}
+					</li>
+				</ul>
+			</t:if>
+			<div class="footer">			
+				<a href="#" t:type="pageLink" page="admin/backupRestore" class="button squared">
+			 		<span>${message:ok}</span>
+				</a>
+			</div>
+		</div>
+	</t:block>
+	
+</html>

@@ -1,0 +1,14 @@
+<t:container xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd" 
+             xmlns:p="tapestry:parameter" >
+	
+       <form t:type="form" t:id="QuickSrchForm" autofocus="false" >
+				<input t:type="textField" value="srchTxt" 
+					onfocus="inputTxtFocus(this, '${message:search-default-text}')" 
+					onblur="inputTxtBlur(this, '${message:search-default-text}')"
+					/>
+				${message:in}
+				<t:select t:id="srchFld" value="srchField" model="srchModel" encoder="stringEncoder" blankLabel="${message:-all-}"></t:select>
+				<input class="button squared" t:type="submit" value="${message:go}" />
+				<a class="button squared" t:type="pageLink" page="searchAdvanced" context="true" ><span>${message:advanced}</span></a>
+		</form>
+	</t:container>

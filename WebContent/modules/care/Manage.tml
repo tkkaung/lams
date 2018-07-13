@@ -1,0 +1,88 @@
+<html t:type="layout" 
+	title="${message:manage-care}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/care/home?${project.id}
+		,${message:manage-care}=modules/care/manage?${project.id}
+		"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+<style>
+	.released, .orderNumber{
+		text-align: center;
+	}
+</style>
+
+<p:actionBtns>
+	
+	<a class="button rounded" t:type="pageLink" page="modules/care/managequestionset" context="project.id" >
+		<span>${message:manage-questionset}</span>
+	</a>
+</p:actionBtns>	
+
+
+<t:grid source="cares" row="care" 
+	model="model"
+	rowIndex="rowIndex"
+	pagerPosition="bottom" 
+	>
+	<p:empty>
+		<div class="notfoundtext">
+			${message:no-care-found}
+		</div>
+	</p:empty>
+   <t:parameter name="orderNumberCell">
+   	${care.ordernumber}
+   </t:parameter>
+   
+   <t:parameter name="nameCell">
+   		<span>${care.name}</span> 
+   </t:parameter>
+   <t:parameter name="mdateCell">
+   	<span class="date">${care.mdatedisplay}</span>
+   	<t:if test="care.isDiffEditor()">
+			<div style="font-size:0.9em">
+				${message:by} 
+				<t:pagelink page="user/view" context="care.editor.id">${care.editor.displayname}</t:pagelink>
+			</div>
+		</t:if>
+   </t:parameter>
+   <t:parameter name="questionSetNameCell">
+   		<t:if test="care.questionSet">
+   			<t:pagelink page="modules/care/QuestionsetView" context="getParams(project.id, care.questionSet.id)">${care.questionSetName}</t:pagelink>
+   		</t:if>
+   </t:parameter>
+   <t:parameter name="edateCell">
+   		<t:if test="care.sdate" >
+   			<span class="date">${care.sdatedisplay}</span>
+   		</t:if> -
+   		<span class="date">${care.edatedisplay}</span>
+   	</t:parameter>
+     
+     <t:parameter name="releasedCell">
+   		<t:actionLink t:id="toggleReleased" context="care.id" title="Click to toggle Release">
+   			<t:if test="care.released" >
+	   			<span >Yes</span>
+	   			<p:else>
+	   				No
+	   			</p:else>
+	   		</t:if>
+   		</t:actionLink>
+   	</t:parameter>
+     
+   <t:parameter name="actionCell">
+			<t:pagelink page="modules/care/edit" context="care.id" class="button rounded">
+				<span>${message:edit}</span> 
+			</t:pagelink>
+			<t:pagelink page="modules/care/checkstatus" context="care.id" class="button rounded">
+				<span>${message:check-status}</span> 
+			</t:pagelink>
+			
+			
+	</t:parameter>
+</t:grid>
+
+
+</html>

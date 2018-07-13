@@ -1,0 +1,230 @@
+<html t:type="layout" 
+	title="${module.displayName}"
+	currentModule="${moduleName}"
+   currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/elog/home?${project.id}"
+	totalShowOption="${totalSize}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+<link rel="stylesheet" type="text/css" href="${context:lib/lib/jcal/css/jscal2.css}" />
+<link rel="stylesheet" type="text/css" href="${context:lib/lib/jcal/css/steel/steel.css}" />
+<script type="text/javascript" src="${context:lib/lib/jcal/js/jscal2.js}"></script>
+<script type="text/javascript" src="${context:lib/lib/jcal/js/lang/en.js}"></script>
+
+<style>
+	.dateDisplayDiv{
+		margin-top: 20px;
+		padding-right:10px;
+		text-align: right;
+	}
+</style>
+
+<p:actionBtns>
+		<t:if test="canCreateElog(project)">
+			<a class="button rounded" t:type="pageLink" page="modules/elog/edit" context="getParams(project.id,getNull())" >
+				<span>${message:add-new} ${message:elog}</span>
+			</a>
+			<a class="button rounded" t:type="pageLink" page="modules/elog/manage" context="project.id" >
+				<span>${message:manage-elog} (${getCountMyElog()})</span>
+			</a>
+		</t:if>
+		<t:if test="canViewApproveList(project)">
+			<a class="button rounded" t:type="pageLink" page="modules/elog/approveoverview" context="project.id" >
+				<span>${message:elog-approve-list}</span>
+			</a>
+		</t:if>
+</p:actionBtns>	
+
+
+	<table class="actionToolBar">
+		<tr>
+			<td class="right">
+				<form t:type="form" t:id="filterForm" autofocus="false">
+					<span class="fTitle">${message:filter}:</span>
+					${message:author-label} 
+					<t:select t:id="author" model="authorModel" value="author" blankLabel="${message:-all-}" onchange="this.form.submit()"/> 
+				</form>
+			</td>
+		</tr>
+	</table>
+	
+	
+	<table width="100%" >
+		<tr>
+			<td valign="top">
+				
+				<t:loop source="elogsDisplay" value="elog" >
+					<p:empty>
+						<div class="notfoundtext">
+							${message:no-elog-found}
+						</div>
+					</p:empty>
+					<div class="elogEntry">
+						<div class="head">
+							<table class="nomargin">
+								<tr>
+									<td>
+										<img src="${context:lib/img/16/m_eLog.png}"  class="icon" />
+										<t:pageLink page="modules/elog/view" context="elog.id">
+											<span class="subject">${elog.subject}</span>
+										</t:pageLink>
+									</td>
+									<td align="right">
+										<span class="author-date">
+											${message:by} <span class="author"><t:pageLink page="user/view" context="elog.author.id">${elog.author.displayname}</t:pageLink></span>
+											, <span class="date">${elog.cdateDisplay}</span>
+										</span>
+									</td>
+								</tr>
+							</table>
+						</div>
+						<div class="content"><t:outputraw t:value="elog.content" /></div>
+						
+						<t:if test="elog.files">
+							<div class="attFiles">
+								<div >
+									${message:attachment} <img src="${context:lib/img/icon-attachment.gif}" />
+									:
+								</div>
+								<div >
+									<t:loop source="getNonImageAttachedFiles(elog.files)" value="attFile">
+										<div class="attFile">
+											<t:eventLink event="retrieveFile" context="attFile.id"  title="${message:click-to-download}">
+											<img src="${getAttachFileIcon(attFile)}" style="vertical-align:bottom;"/>
+											${attFile.displayName}
+											</t:eventLink>
+											(${attFile.displaySize})
+										</div>
+									</t:loop>
+								</div>
+								<div class="imgBlks">
+									<t:loop source="getImageAttachedFiles(elog.files)" value="attFile">
+										<div class="imgBlk" >
+											<a href="${getRetrieveImageLink(attFile.id)}" target="_blank" >
+												<img src="${getRetrieveImageThumbLink(attFile.id)}" alt="" title="${message:click-to-view-originalsize}"/>
+											</a>
+											<t:eventLink event="retrieveFile" context="attFile.id"  title="${message:click-to-download}">
+											${message:download}</t:eventLink>
+											(${attFile.displaySize})
+										</div>
+									</t:loop>
+								</div>
+							</div>	
+						</t:if>
+						
+						<t:if test="elog.hasEdited()">
+							<div class="mdate" >
+								${message:edited-on}: ${elog.mDateDisplay}
+								<t:if test="elog.hasEditor()">
+									, ${message:by} 
+									<t:pagelink page="user/view" context="elog.editor.id">${elog.editor.displayName}</t:pagelink>
+								</t:if>
+							</div>
+						</t:if>
+						
+						<br />
+						<div class="linkBar" align="right">
+							<t:pagelink page="modules/elog/view" context="elog.id" anchor="newcmt">${message:comments} </t:pagelink>
+							(<t:pagelink page="modules/elog/view" context="elog.id" anchor="viewcmt">${elog.cnum}</t:pagelink>)
+						 </div>
+					</div>
+				</t:loop>
+			</td>
+			<td valign="top" width="250px">
+				<div id="calendar-container" />
+				
+				<div class="dateDisplayDiv">
+					<div>
+						<t:actionLink t:id="last7days" >${message:LAST_7_DAYS-label}</t:actionLink>
+					</div>
+					<div>
+						<t:actionLink t:id="last30days" >${message:LAST_30_DAYS-label}</t:actionLink>
+					</div>
+					<div>
+						<t:actionLink t:id="alldate" >${message:ALL_DATE-label}</t:actionLink>
+					</div>
+					<div >
+						<t:form t:id="dateFilterForm" autofocus="false">
+							<t:errors/>
+							<div>${message:SPECIFIED_DATE_RANGE-label}</div>
+							<div align="right">
+							<table >
+								<tr>
+									<td>${message:from}</td>
+									<td>
+										<t:datefield value="sdate" class="swidth" format="${message:datefield-format}"/>
+									</td>
+								</tr>
+								<tr>
+									<td>${message:to}</td>
+									<td>
+										<t:datefield t:id="edate" value="edate" class="swidth" format="${message:datefield-format}" />
+									</td>
+								</tr>
+								<tr>
+									<td></td>
+									<td>
+										<t:submit value="${message:go}" class="squared"/>
+									</td>
+								</tr>
+							</table>
+							</div>
+						</t:form>
+					</div>
+					
+				</div>
+				
+			</td>
+		</tr>
+	</table>
+	
+	<t:if test="isMoreThan(totalSize, rowsPerPage)">
+		<t:GridPager currentPage="curPageNo" rowsPerPage="rowsPerPage" source="elogs" />
+	</t:if>
+
+<script>
+var dateArr = ${getDatesHighlight()};  //e.g: [20110301, 20110317, 20110331]
+var elogCountArr = ${getElogCountArr()};  //e.g: {20110315 : 2 , 20110317 : 4 , 20110331 : 1}
+var tooltiptext = "${message:x-entry-found}";
+function getDateInfo(date, wantsClassName) {
+   var as_number = Calendar.dateToInt(date);
+   if (dateArr.findElemt(as_number)) {
+      return {klass: "elog_date_highlight", tooltip: (elogCountArr[as_number]+" "+tooltiptext) };
+   }
+}
+<t:if test="date">
+	var dd = parseInt('${date}');
+	var Cal = Calendar.setup({
+	   cont          : "calendar-container",
+	   weekNumbers   : true,
+	   dateInfo      : getDateInfo,
+	   selectionType : Calendar.SEL_SINGLE,
+	   selection     : dd,
+	   onSelect      : function() {
+	      var d = this.selection.get();
+	      document.location = "?date=" + d;
+	   }
+	});
+	Cal.moveTo(dd, false);
+
+	<p:else>
+	var Cal = Calendar.setup({
+	   cont          : "calendar-container",
+	   weekNumbers   : true,
+	   dateInfo      : getDateInfo,
+	   selectionType : Calendar.SEL_SINGLE,
+	   onSelect      : function() {
+	      var d = this.selection.get();
+	      document.location = "?date=" + d;
+	   }
+	});
+	</p:else>
+</t:if>
+</script>
+   
+  
+
+
+</html>

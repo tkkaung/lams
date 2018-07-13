@@ -1,0 +1,91 @@
+<html t:type="layout" 
+	title="${message:batch-create-project}"
+	breadcrumb="${message:control-panel}=admin
+	,${message:batch-create-project}=admin/project/batchcreateproject"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="project"/></p:leftMenuBlk>
+	
+	<t:delegate to="getDisplayModeBlock()"/>
+	
+	<t:block t:id="viewModeBlock">
+	
+		<div class="t-beaneditor">
+			<t:form t:id="form" autofocus="false">
+				<t:errors/>
+				
+				<div class="t-beaneditor-row">
+					<t:label for="projType"><span class="required">*</span> ${message:projtype-label}</t:label>
+					<t:select t:id="projType" value="ptype" model="getProjTypeModel()" validate="required" />
+		      </div>
+				<div class="t-beaneditor-row">
+					<t:label for="school"><span class="required">*</span> ${message:school-label}</t:label>
+					<t:select  t:id="school"  value="school" model="getSchoolModel()" validate="required"/>
+		      </div>
+		      
+
+			  <div class="t-beaneditor-row">
+					<t:label for="file"><span class="required">*</span> ${message:file-label}</t:label>
+					<input t:type="upload" t:id="file" validate="required, regexp"/>
+		      </div>
+		      
+		       <div class="t-beaneditor-row">
+					<input t:type="submit" value="${message:upload-n-run}" class="squared t-beaneditor-submit"/>
+				</div>
+		    </t:form>
+	   </div>
+	   <span class="required">*</span>  ${message:required-fields}
+	   <div class="legend">
+	    	<div class="title">${message:note} :</div>
+	    	<div class="content">
+	    		- ${message:note1-input-file-format} <strong>.csv</strong>, 
+	    			<a href="${context:lib/sample_files/eureka_batch_create_project.csv}">${message:sample-csv-file}</a>
+	        	<br />
+	        	- if Project-ID column has value, it will try to REPLACE data, 
+<br />				- if Project-ID column has no value, it will try to INSERT data, 
+<br />
+<br />				- When INSERT, assume combination of "project title" , "supervisor", "project start date" to be unique 
+<br />				- When INSERT, if contain duplicate (i.e: same project and same student) , the row will be ignored
+<br />				- When INSERT, if error (e.g wrong date format, matric number not exist in eureka, IC no not exist in eureka) , the row will be ignored
+<br />				
+<br />				- When REPLACE, if error (e.g invalid project ID, wrong date format, matric number not exist in eureka, IC no. not exist in eureka) , the row will be ignored
+<br />				- When REPLACE, if project not belong to same school, the row will be ignored
+<br />				
+<br />				- at the end, system will show result of every row
+	      </div>
+	    </div>
+    </t:block>
+   
+	
+	<t:block t:id="resultModeBlock">
+		<div class="page-result-block">
+	 		<div class="title">${message:result}:</div>
+	 		<p>${message} </p>
+	 		<t:zone t:id="logZone">
+	 			<div style="margin:10px 0;">
+					<a href="#"  t:type="eventLink" t:event="showLog" t:zone="logZone" class="button rounded">
+						<span>${message:show-log}</span>
+					</a>
+				</div>
+			</t:zone>
+			<t:block id="logDetailsDefault">
+				<div style="margin:10px 0;">
+					<a href="#"  t:type="eventLink" t:event="showLog" t:zone="logZone" class="button rounded">
+						<span>${message:show-log}</span>
+					</a>
+				</div>
+			</t:block>
+			<t:block id="logDetails">
+				<a href="#"  t:type="eventLink" t:event="hideLog" t:zone="logZone" class="button rounded">
+					<span>${message:hide-log}</span>
+				</a>
+				<pre><code>${processLog}</code></pre>
+			</t:block>
+			<div class="footer">
+				<a href="#" t:type="pageLink" page="admin/project/batchcreateproject" class="button squared">
+			 		<span>OK, Back to previous page</span>
+				</a>
+			</div>
+		</div>
+ 	</t:block>
+</html>

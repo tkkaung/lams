@@ -1,0 +1,47 @@
+<html t:type="layout" 
+   title="${message:student-upload-file}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/assessment/assesseehome?${project.id}
+		,${message:student-upload-file}=modules/assessment/assesseeupload"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+  
+<style>
+</style>
+
+<p:legendBlk>
+		<div class="legend">
+			<div class="title">${message:note}</div>
+			<div class="content">
+				After uploaded, only instructor can remove the file.
+			</div>
+		</div>
+	</p:legendBlk>
+	
+
+<form t:type="form" t:id="form" class="e-formeditor">
+	<div class="t-beaneditor">
+	<t:errors />
+
+	<div class="t-beaneditor-row">
+			<label >For Assessment</label>
+			${assmt.name}
+    </div>
+    
+	<div class="t-beaneditor-row">
+			<t:label for="file"><span class="required">*</span> File to upload</t:label>
+			<input t:type="upload" t:id="file" validate="required"/>
+    </div>
+      
+    <div class="t-beaneditor-row" style="margin-top:15px;">
+			<input t:type="submit" value="Start Upload" class="squared t-beaneditor-submit"/>
+	</div>
+		
+			
+	</div>
+</form>
+
+
+</html>

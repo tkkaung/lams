@@ -1,0 +1,72 @@
+<html t:type="layout" 
+	title="${message:manage} ${message:systemannouncement} "
+	breadcrumb="${message:control-panel}=admin,${message:manage} ${message:systemannouncement}=admin/systemannouncement/manage"
+	totalShowOption="${totalSize}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="announcement"/></p:leftMenuBlk>
+	
+	<p:actionBtns >
+		<a href="#" t:type="pageLink" page="admin/systemannouncement/edit" class="button rounded">
+			<span>${message:add-new} ${message:systemannouncement}</span>
+		</a>
+	</p:actionBtns>
+	
+	<style>
+		.urgent{
+			text-align:center;
+		}
+	</style>
+    
+	<table class="actionToolBar">
+		<tr>
+			<td class="right">		 	
+			</td>
+		</tr>
+	</table>
+			
+	
+	<t:grid source="annmts" row="annmt" class="stickyHeader t-data-grid"
+		model="model"
+		rowsPerPage="rowsPerPage"
+		pagerPosition="bottom" 
+		>
+		<p:empty>
+			<div class="notfoundtext">${message:no-announcement-found}</div>
+		</p:empty>
+		<p:urgentCell>
+			<t:if test="annmt.urgent">
+				<img src="${context:lib/img/icon_urgent.png}"  alt="${message:annmt-urgent-tip}" title="${message:annmt-urgent-tip}" />
+			</t:if>
+		</p:urgentCell>
+		<p:contentCell>
+			<t:ck.TrimmedString value="stripTags(annmt.content)" maxLength="300"/>
+		</p:contentCell>
+		<p:sdateCell>
+			<span class="date">${annmt.sdateDisplay}</span>
+		</p:sdateCell>
+		<p:edateCell>
+			<span class="date">${annmt.edateDisplay}</span>
+		</p:edateCell>
+		<p:mdateCell>
+			<span class="date">${annmt.mdateDisplay}</span>
+		</p:mdateCell>
+		<p:enabledCell>
+			<t:actionLink t:id="toggleEnabled" context="annmt.id" title="${message:click-to-toggle-enabled}">${annmt.enabled}</t:actionLink>
+		</p:enabledCell>
+		<p:creatorCell>
+			<t:pageLink page="user/view" context="annmt.creator.id">${annmt.creator.displayname}</t:pageLink>
+		</p:creatorCell>
+		<p:actionCell>
+				<t:pagelink page="admin/systemannouncement/edit" context="annmt.id" class="button rounded">
+	          	<span>${message:edit}</span>
+	         </t:pagelink>
+	         <t:actionlink t:id="delete" context="annmt.id" class="button rounded"
+	         	onclick="return confirmDelete('${message:confirm-permanent-delete-item}')">
+	          	<span>${message:delete}</span>
+	         </t:actionlink>
+		</p:actionCell>
+	</t:grid>
+		
+	 
+</html>

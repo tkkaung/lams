@@ -1,0 +1,174 @@
+<html t:type="layout" 
+   title="${message:view} ${message:assessment}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/assessment/assesseehome?${project.id}
+		,${message:view}=modules/assessment/assesseeview"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+  
+
+	<div class="t-beaneditor e-formeditor">
+		<table >
+			<tr>
+				<td class="label">${message:assessment}</td>
+				<td>
+					${assmt.name}
+					<div>
+				   		<span class="subdes"><t:outputraw value="assmt.des"/></span>
+				   	</div>
+				</td>
+			</tr>
+			
+			
+			
+			
+			<t:if test="canViewCrit(assmt)">
+			
+			<tr>
+				<td class="label">Rubric</td>
+				<td>		   			
+	   			</td>
+			</tr>
+			</t:if>
+		</table>
+		
+		<t:if test="canViewCrit(assmt)">
+		<t:if test="assmt.criterias">
+			<p:else>
+				<table >
+					<tr>
+						<td class="label"></td>
+						<td>
+							<span >${message:no-criteria-found}</span>
+						</td>
+					</tr>
+				</table>
+				
+			</p:else>
+			
+			<div class="rubricDetailZone view">
+				<style>.rubricDetailZone td{
+					width: ${getCritNameWidthPercentNum(60,getFirstCriterions().size())};
+				}
+				</style>
+				
+				<table >
+					<tr>
+						<th rowspan="2" class="criteria">${message:criteria-objective}</th>
+						<th colspan="${getFirstCriterions().size()}">${message:criterion}</th>
+					</tr>
+					<tr>
+						<t:loop source="getFirstCriterions()" value="tempRCriterion" index="colIndex">
+							<th>
+								<span title="${message:columnScore-label}">${tempRCriterion.score}</span>
+							</th>
+						</t:loop>
+					</tr>
+					<t:loop source="assmt.getCriterias()" value="tempRCrit" index="rowIndex">
+						<tr>
+							<th class="critName">
+								<span title="${message:critName-label}"><t:outputraw value="${textarea2html(tempRCrit.name)}"/></span>
+								<t:outputraw value="getSpace()"/>
+							</th>
+							<t:loop source="tempRCrit.criterions" value="tempRCriterion" index="colIndex">
+								<td class="crionDes">
+									<t:outputraw value="${textarea2html(tempRCriterion.des)}"/>
+								</td>
+							</t:loop>
+						</tr>
+					</t:loop>
+				</table>
+			</div>
+		</t:if>
+		</t:if>
+		
+		
+		
+		
+			
+		    <table >
+			    <t:if test="hasGraded()">
+					<t:if test="canViewComments(assmtUser)">
+					<t:if test="assmtUser.comments">
+						<tr>
+							<td class="label">${message:comments-label}</td>
+							<td>
+								
+				   				<t:outputraw value="textarea2html(assmtUser.comments)"/>
+					   			
+				   			</td>
+						</tr>
+					</t:if>
+					</t:if>
+				
+					<t:if test="assmtUser.files">
+						<tr>
+							<td class="label">File Uploaded</td>
+							<td>
+							<t:loop source="assmtUser.files" value="tempFile">
+									<div class="existDiv">
+										<t:eventLink event="retrieveFile" context="tempFile.id"  
+											title="${tempFile.displayName}  ${tempFile.getUploadTimeDisplay()}">
+											<img src="${getAttachFileIcon(tempFile)}" style="vertical-align:bottom;"/>
+											${tempFile.displaySize}	
+										</t:eventLink>
+										
+									</div>
+								</t:loop>
+							</td>
+						</tr>
+						
+					</t:if>
+				</t:if>
+				
+				<t:if test="assmt.getAllowSubmitFile()">
+					<form t:type="form" t:id="form" >
+					<t:errors />
+					<tr>
+						<td class="label"><t:label for="file">Submit a File</t:label>
+						</td>
+						<td>
+							<div>
+								<input t:type="upload" t:id="file" />
+								<input t:type="submit" value="Start Upload" class="squared t-beaneditor-submit"/>
+							</div>
+							
+			   			</td>
+					</tr>
+						      
+		   			</form>
+				</t:if>
+				
+				<t:if test="hasGraded()">
+					<t:if test="assesseeHome.canRelease(assmt)">
+					<t:if test="assmtUser.instructorFiles">
+						<tr>
+						<td class="label">Instructor Uploaded</td>
+						<td>
+			   			<t:loop source="assmtUser.instructorFiles" value="tempInstructorFile">
+							<div class="existDiv">
+								<t:eventLink event="retrieveInstructorFile" context="tempInstructorFile.id"  
+									title="${tempInstructorFile.displayName}">
+									<img src="${getAttachFileIcon(tempInstructorFile)}" style="vertical-align:bottom;"/>
+									${tempInstructorFile.displaySize}	
+								</t:eventLink>
+								
+							</div>
+						</t:loop>
+						</td>
+						</tr>
+					</t:if>
+					</t:if>
+				</t:if>
+			</table>
+	
+		
+			
+	
+
+	</div>
+
+
+</html>

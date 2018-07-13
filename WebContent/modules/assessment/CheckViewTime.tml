@@ -1,0 +1,104 @@
+<html t:type="layout" 
+	title="${message:check-view-time}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/assessment/home?${project.id}
+		,${message:manage} ${message:assessment}=modules/assessment/manage?${project.id}
+		,${message:check-view-time}=modules/assessment/checkviewtime"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+<style>
+	table.t-data-grid tbody tr td{
+		text-align: center;
+		vertical-align: middle;
+	}
+	.assmttbl th{
+		padding:5px
+	}
+	.assmttbl .name{
+		text-align: left;
+	}
+</style>
+
+<table class="actionToolBar">
+	<tr>
+		<td class="right">
+		</td>
+	</tr>
+</table>
+
+<div class="e-formeditor t-beaneditor">
+	<table >
+			<tr>
+				<td class="label">${message:assessment}</td>
+				<td>
+					<t:pagelink page="modules/assessment/view" context="assmt.id">
+							${assmt.name}
+					</t:pagelink>
+					<div><t:outputraw value="${textarea2html(assmt.des)}"/></div>
+				</td>
+			</tr>
+		</table>
+</div>
+		
+<div id="assmtContainer">
+<t:if test="assmt.criterias">
+	
+	<div id="scroller">
+	<table class="t-data-grid assmttbl stickyHeader" style="width:100%;">
+	<thead>
+		<tr>
+			<th class="no_bot_border no_top_border">${message:no}</th>
+			<th class="no_bot_border no_top_border">${getAssesseeRoleNames(project)}</th>
+			<t:if test="assmt.group">
+				<th class="no_bot_border no_top_border">Group: ${assmt.group.groupType}</th>
+			</t:if>
+			<th class="no_bot_border no_top_border">First view time</th>
+			<th class="no_bot_border no_top_border">Last view time </th>
+		</tr>
+		</thead>
+		<tbody>
+		<t:loop source="assessees" value="user" index="rowIndex">
+			<tr >
+				${loadAssmtUser(assmt,user)}
+				
+				<td>${getRowNum()}</td>
+				<td class="name">
+							${user.displayName}
+				</td>
+				<t:if test="assmt.group">
+					<td >${getGroupTypeName(assmt.group, user)}</td>
+				</t:if>
+				
+				<td >
+					<t:if test="hasGraded()">
+						<span>
+							${assmtUser.getFirstAssesseeViewTimeDisplay()}
+						</span>
+					</t:if>
+					<t:outputraw value="getSpace()"/>
+				</td>
+				<td >
+					<t:if test="hasGraded()">
+						<span>
+							${assmtUser.getLastAssesseeViewTimeDisplay()}
+						</span>
+					</t:if>
+					<t:outputraw value="getSpace()"/>
+				</td>
+			</tr>
+		</t:loop>
+		
+		</tbody>
+	</table>
+	</div>
+</t:if>	
+	
+	
+	<div style="height:20px;"><t:outputraw value="getSpace()"/></div>
+	
+</div>
+
+</html>

@@ -1,0 +1,11 @@
+<html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd">
+	<head>
+		<title>eUreka 2.0 Logout</title>
+	</head>
+	<body>
+		
+		You have been logout.
+
+	</body>
+	
+</html>

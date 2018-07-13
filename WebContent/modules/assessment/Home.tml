@@ -1,0 +1,246 @@
+<html t:type="layout" 
+	title="${module.displayName}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/assessment/home?${project.id}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+<style>
+	table.t-data-grid thead tr th{
+		text-align: center;
+	}
+	.assmttbl td{
+		text-align: center;
+	}
+	.assmttbl .assmt{
+		width: ${getAssmtColumnWidth()}px;
+		white-space: normal;
+	}
+	.assmttbl .no{
+		width: 15px;
+	}
+	.assmttbl .assessee{
+		min-width: 200px;
+	}
+	.assmttbl td.assessee {
+		text-align: left;
+	}
+	.assmttbl .total{
+		width: 50px;
+		font-weight: bold;
+	}
+	span.grade{
+		padding: 0 0 0 10px;
+		font-size: 11px;
+	}
+	
+</style>
+
+<p:actionBtns>
+	<t:if test="canCreateAssessment(project)">
+		<a class="button rounded" t:type="pageLink" page="modules/assessment/new" context="project.id" >
+			<span>${message:add-new} ${message:assessment}</span>
+		</a>
+		<a class="button rounded" t:type="pageLink" page="modules/assessment/manage" context="project.id"  >
+			<span>${message:manage} ${message:assessment}</span>
+		</a>
+		|
+	</t:if>
+	<t:if test="canViewAssessmentGrade()">
+		<a class="button rounded" t:type="eventlink" t:event="ExportXls" context="project.id" 
+			title="${message:export-tip}">
+			<span>${message:export-xls}</span>
+		</a>
+	</t:if>
+	
+</p:actionBtns>	
+
+<p:legendBlk>
+		<div class="legend">
+			<div class="title">${message:legend}</div>
+			<div class="content">
+				<table>
+					<tr>
+							<td><div class="legendmark aplus" /></td>
+					<td class="label">${getColorCodeGradeAplus()}</td>
+					<td><div class="legendmark a" /></td>
+					<td class="label">${getColorCodeGradeA()}</td>
+					<td><div class="legendmark aminus" /></td>
+					<td class="label">${getColorCodeGradeAminus()}</td>
+					<td><div class="legendmark bplus" /></td>
+					<td class="label">${getColorCodeGradeBplus()}</td>
+					<td><div class="legendmark b" /></td>
+					<td class="label">${getColorCodeGradeB()}</td>
+					<td><div class="legendmark bminus" /></td>
+					<td class="label">${getColorCodeGradeBminus()}</td>
+					<td><div class="legendmark cplus" /></td>
+					<td class="label">${getColorCodeGradeCplus()}</td>
+					<td><div class="legendmark c" /></td>
+					<td class="label">${getColorCodeGradeC()}</td>
+					<td><div class="legendmark dplus" /></td>
+					<td class="label">${getColorCodeGradeDplus()}</td>
+					<td><div class="legendmark d" /></td>
+					<td class="label">${getColorCodeGradeD()}</td>
+					<td><div class="legendmark f" /></td>
+					<td class="label">${getColorCodeGradeF()}</td>
+			</tr>
+				</table>
+			</div>
+		</div>
+</p:legendBlk>
+
+
+
+<table class="actionToolBar">
+	<tr>
+		<td class="right">
+		</td>
+	</tr>
+</table>
+
+<div class="assmtContainer">
+<div id="scroller">
+	<table class="t-data-grid assmttbl stickyHeader"  >
+		<thead>
+			<tr>
+				<th rowspan="2" class="no"></th>
+				<th rowspan="2" class="assessee">${getAssesseeRoleNames(project)}</th>
+				<th colspan="${assmts.size()}">${message:assessment}</th>
+				<th rowspan="2" class="total">
+					${message:total}
+					<span class="formtip">(%)</span>
+				</th>
+			</tr>
+			<tr>
+				<t:loop source="assmts" value="assmt">
+					<p:empty>
+						<th></th>
+					</p:empty>
+				
+					<th title="${assmt.name}" class="assmt ">
+						<t:if test="canViewAssessment(assmt)">
+							<t:pagelink page="modules/assessment/score" context="assmt.id">
+								${assmt.shortnameDisplay}
+							</t:pagelink>
+							
+							<p:else>
+								${assmt.shortnameDisplay}
+							</p:else>
+						</t:if>
+						<span class="formtip">(%)</span>
+						<br/>
+						<span class="formtip">${message:weightage-label}: ${assmt.weightage}</span>
+					</th>
+				</t:loop>
+			</tr>
+		</thead>
+		<tbody>
+			<t:loop source="assesseesDisplay" value="tempUser" index="rowIndex">
+				<p:empty>
+					<tr><td colspan="${addInt(assmts.size(),2)}"><span class="notfoundtext">${message:no-assessee-found}</span></td></tr>	
+				</p:empty>
+				
+				<tr>
+					<td class="no">${getRowNum()}</td>
+					<td class="assessee">
+						<t:pagelink page="user/view" context="tempUser.id">${tempUser.displayName}</t:pagelink>
+					</td>
+					<t:loop source="assmts" value="assmt">
+						<p:empty>
+							<t:if test="isFirst(rowIndex)">
+								<td rowspan="${assessees.size()}" colspan="2"><span class="notfoundtext">${message:no-assessment-found}</span></td>
+							</t:if>
+						</p:empty>
+						<td>
+							<t:if test="canViewAssessmentGrade()">
+								${loadAssmtUser(assmt,tempUser)}
+								
+								<t:if test="canGradeAssessment()">
+									<t:if test="hasGraded()">
+										<t:delegate to="block:viewGradeBlk"/>
+										<p:else>
+											<t:delegate to="block:gradeBlk"/>
+										</p:else>
+									</t:if>	
+								
+									<p:else>
+										<t:delegate to="block:viewGradeBlk"/>
+									</p:else>
+								</t:if>
+								
+								<p:else>
+									<t:outputraw value="getSpace()"/>
+								</p:else>
+							</t:if>
+							
+							<t:block t:id="viewGradeBlk">
+								<t:pagelink page="modules/assessment/viewgrade" context="getParams(assmt.id,tempUser.id)">
+									<div class="${getAssmtUserDisplayGradeClass()}" >
+										<span title="${getAssmtUserScoreTip()}">
+											<t:outputraw value="getSpace()"/>
+											<span >${getAssmtUserDisplayScore()}</span>
+										</span>
+										
+										<t:if test="${assmtUser.comments}">
+											<span class="grade" title="${message:comment-added}">
+												<img src="${context:lib/img/cmmt.png}"/>
+											</span>
+										</t:if>
+									
+									</div>
+								</t:pagelink>
+							</t:block>
+							<t:block t:id="gradeBlk">
+								<t:pagelink page="modules/assessment/grade" context="getParams(assmt.id,tempUser.id)">
+									<div class="${getAssmtUserDisplayGradeClass()}" title="${getAssmtUserScoreTip()}">
+										<t:outputraw value="getSpace()"/>
+										
+									</div>
+								</t:pagelink>
+							</t:block>
+						</td>
+					</t:loop>
+					<t:if test="assmts">
+						${loadTotalScore(tempUser)}
+						<td class="total">
+							<div class="${getDisplayTotalScoreClass()}" >
+								${getDisplayTotalScore()}
+							</div>
+						</td>
+					</t:if>
+				</tr>
+			</t:loop>
+			
+		</tbody>
+		<tfoot>
+			<tr>
+				<td ><t:outputraw value="getSpace()"/></td>
+				<td style="text-align:right;">${message:average}:</td>
+				<t:loop source="assmts" value="assmt">
+					<td class="average " >${getAVG(assmt)} </td>
+				</t:loop>
+				<td class="average ">
+					${getTotalAvg()}
+				</td>
+			</tr>
+			<tr>
+				<td ><t:outputraw value="getSpace()"/></td>
+				<td style="text-align:right;">${message:stdev}:</td>
+				<t:loop source="assmts" value="assmt">
+					<td class="stdev " >${getSTDEV(assmt)}</td>
+				</t:loop>
+				<td class="stdev ">
+					${getTotalSTDEV()}
+				</td>
+			</tr>
+		</tfoot>
+	</table>
+	<!--<t:if test="isMoreThan(totalSize, rowsPerPage)">
+		<t:GridPager currentPage="curPageNo" rowsPerPage="rowsPerPage" source="assessees" />
+	</t:if>
+	
+-->
+</div>
+</div>
+</html>

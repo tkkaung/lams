@@ -1,0 +1,39 @@
+<html t:type="layout" 
+	title="${message:import-assessment-setting}"
+	currentModule="${moduleName}"
+	currentProj="proj"
+	breadcrumb="${proj.encodeddisplayname}=project/home?${proj.id}
+		,${module.displayName}=modules/assessment/home?${proj.id}
+		,${message:manage} ${message:assessment}=modules/assessment/manage?${proj.id}
+		,${message:import-assessment-setting}=modules/assessment/import"
+	
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+	
+	
+	<p:legendBlk>
+		<div class="legend">
+			<div class="title">${message:note}</div>
+			<div class="content">
+				The grouping information was not exported when creating CSV file, 
+				so the grouping of students (if any) will have to be re-created.
+			</div>
+		</div>
+	</p:legendBlk>
+			
+	
+	
+		<div class="t-beaneditor">
+			<t:form t:id="form" autofocus="false">
+				<t:errors/>
+				<div class="t-beaneditor-row">
+					<t:label for="file"><span class="required">*</span> ${message:file-label}</t:label>
+					<input t:type="upload" t:id="file" validate="required, regexp"/>
+		      </div>
+		      
+		       <div class="t-beaneditor-row" style="margin-top:15px;">
+					<input t:type="submit" value="${message:upload-n-run}" class="squared t-beaneditor-submit"/>
+				</div>
+		    </t:form>
+	   </div>
+</html>

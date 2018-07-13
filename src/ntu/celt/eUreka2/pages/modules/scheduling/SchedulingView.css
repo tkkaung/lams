@@ -1,0 +1,217 @@
+body, th, td {
+	font-family: Arial,Helvetica,sans-serif; 
+	font-size: 12px;
+}
+a:link, a:visited {
+	text-decoration: none;
+	color: #3399cc;
+}
+a:hover {
+	text-decoration: underline;
+}
+.chartbar{
+	font-size: 10px;
+	text-align: right;
+}
+span.uName{
+	display: block;
+	margin-bottom: 5px;
+}
+span.date{
+	font-style: italic;
+}
+div.legend{
+	font-weight: bold;
+}
+div.legend td.label{
+	padding-right: 20px;
+}
+span.nowrap{
+	white-space:nowrap;
+}
+#schdBlk {
+	background: #f4f4f4;
+	margin-bottom: 20px;
+}
+#schdBlk thead th{
+	background: #969696 url('images/action_tool_bar2_bg.png}') ;
+	border: 1px solid #f9f9f9;
+}
+#schdBlk td{
+	border: 1px solid #f9f9f9;
+}
+#schdBlk .tooltip{
+	border: 1px solid #ccc;
+	background-color: #ffc;
+	position: absolute;
+	margin-left: 5px;  /* offset */
+	display: none;
+}
+#schdBlk .tooltip th{
+	text-align: left;
+	font-size: 11px;
+	font-weight: bold;
+	border: 0px;
+	white-space:nowrap;
+}
+#schdBlk .tooltip td{
+	border: 0px;
+	font-size: 11px;
+	width: 100%;
+	background: none transparent;
+}
+td.duration, td.description, td.manager, td.assignedPerson, td.urgency{
+	font-size: 11px;
+}
+.description{
+	width: 200px;
+}
+.manager, .assignedPerson{
+	width: 95px;
+}
+.urgency{
+	width: 40px;
+	text-align: center;
+}
+
+#scheduleContainer {
+	
+}
+#schdBlk .iconspan{
+	width: 18px;
+	border-right: 0px;
+}
+#schdBlk .description{
+	border-left: 0;
+}
+
+.percentDone{
+	width: 40px;
+}
+.hiddenCol{
+	width: 0;
+	border: 0;
+	padding: 0;
+	margin: 0;
+	vertical-align: top;
+}
+
+
+#schdBlk td.duration, 
+#schdBlk td.percentDone, #schdBlk td.addMilestoneRole{
+	padding: 3px;
+}
+
+.milestone-row td.description{
+	padding-left: 0px;
+	font-size: 12px;
+}
+.phase-row td.description{
+	padding-left: 10px;
+	font-size: 12px;
+}
+.task-row td.description{
+	padding-left: 10px;
+	font-size: 11px;
+}
+.task2-row td.description{
+	padding-left: 20px;
+	font-size: 11px;
+}
+
+.highLightRed{
+	color: #ff0000;
+}
+.highLightGreen{
+	color: #00cc00;
+}
+
+.iconspan span{
+	float: left;
+  	height: 14px;
+  	width: 12px;
+  	cursor: pointer;
+}
+.milestoneclose {
+   background: transparent url(images/scheduling-folder-closed.gif) 
+   		no-repeat scroll 0%;
+}
+.milestoneopen {
+   background: transparent url(images/scheduling-folder-open.gif)
+           no-repeat scroll 0%;
+}
+.phaseclose {
+   background: transparent url(images/scheduling-folder-closed.gif) 
+   		no-repeat scroll 0%;
+  	margin-left: 5px;
+}
+.phaseopen {
+   background: transparent url(images/scheduling-folder-open.gif)
+           no-repeat scroll 0%;
+   float: left;
+   height: 14px;
+   width: 12px;
+   cursor: pointer;
+   margin-left: 5px;
+}
+.icontask {
+   
+   width: 6px;
+   margin-left: 5px;
+}
+
+.percentT{
+	cursor: pointer;
+}
+select.editPercentT{
+	font-size: 9px;
+	width: 40px;
+}
+
+.chartBarWrapper{
+	position: relative;
+}
+.todayBar{
+	position: absolute;
+	top: 0px;
+}
+.chartBar{
+	position: absolute;
+	top: 5px;
+	height: 12px;
+}
+.phase, .milestone, .task{
+	font-size: 9px;
+}
+
+.phase{
+	background-color: #cad7e7;
+	background-image: url(images/gantt-phase.png); 
+}
+.milestone{
+	width:12px; 
+	height:12px;
+	background-image: url(images/gantt-milestone.png);
+}
+.task{
+	background-color: #999;
+	background-image: url(images/gantt-task-ongoing.png); 
+}
+.task.done{
+	font-size: 9px;
+	text-align: right;
+	color: #fff;
+	background-color: #4a4;
+	background-image: url(images/gantt-task-complete.png); 
+}
+.today{
+	width: 3px;
+	/*background-color: #ff9999;*/
+	background-image: url(images/today-marker.png);
+}
+.con1{
+	margin-right: 20px;
+} 
+.con1 .label{
+	padding-left: 3px;
+}

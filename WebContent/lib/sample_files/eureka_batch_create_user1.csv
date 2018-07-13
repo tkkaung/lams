@@ -1,0 +1,7 @@
+External key (e.g. Matric No. or NRIC),"Username  (this will also be used as default password for External Users, Internal Users must login through edventure)",First Name,Last Name,Job title,"School or Department (must be defined first, if leave empty, ""others"" will be used as default)","External User (set to TRUE for user without NTU account, otherwise set to FALSE)","Organization (if user is exteral user, leave 'School' field blank and use 'Organization' field instead)",Office phone,Mobile phone,Email,"System role (must be pre-defined, default roles are: ADMIN, INSTRUCTOR, STUDENT)",Remarks
+G2344321B,admin,admin1,admin1,,CELT,FALSE,,,81103213,abc@ntu.edu.sg,ADMIN,
+G1234567G,student1,student1,student1,Student,SCE,FALSE,,,81103213,abc@ntu.edu.sg,USER,
+04459A06,instructor1,Instructor01,Instructor01,Lecturer,MAE,FALSE,,,,abc@ntu.edu.sg,FACULTY,
+02229A06,ext_user1,Instructor02,Instructor02,Manager,Others,TRUE,IBM,61230987,,abc@gmail.com,USER,
+123456A87,student2,student2,student2,,SCE,FALSE,,,81103213,abc@ntu.edu.sg,USER,
+053342X10,superadmin,super admin ,super admin ,Administrator,CELT,FALSE,,,,abc@ntu.edu.sg,SUPER_ADMIN,

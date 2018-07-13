@@ -1,0 +1,225 @@
+<html t:type="layout" 
+	title="${message:view-school-evaluation}"
+	breadcrumb="${message:control-panel}=admin
+		,${message:school-evaluations}=admin/report/schoolevaluations
+		,${message:view-school-evaluation}=admin/report/schoolevaluationview"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="rubric"/></p:leftMenuBlk>
+	
+	
+
+<style>
+	
+	#evalContainer {
+		overflow-x: auto;
+	<t:if test="${isMoreThan(eval.criterias.size(), 7)}">	
+		_overflow-x: scroll;  /* IE */
+	</t:if>
+		width: 100%;
+		/*		width: 972px;*/
+	}
+	table.t-data-grid th.no_bot_border{
+		border-bottom-color: #ccc !important; 
+	}
+	table.t-data-grid th.no_top_border{
+		border-top-color: #ccc !important; 
+	}
+	
+	table.t-data-grid tbody tr td{
+		text-align: center;
+		vertical-align: middle;
+	}
+	.evaltbl th{
+		padding:5px
+	}
+	.evaltbl .name{
+		text-align: left;
+	}
+	.evaltbl .crit{
+		vertical-align: top;
+		width: ${getCritNameWidth()}px;
+		text-align: left;
+		font-size: 11px;
+	}
+	.evaltbl td.strength, .evaltbl td.weakness {
+		vertical-align: top;
+		text-align: left;
+		width: 180px;
+	}
+</style>
+
+
+<p:legendBlk>
+	<div class="legend">
+		<div class="title">${message:legend}</div>
+		<div class="content">
+			<table>
+				<tr>
+						<td><div class="legendmark aplus" /></td>
+					<td class="label">${getColorCodeGradeAplus()}</td>
+					<td><div class="legendmark a" /></td>
+					<td class="label">${getColorCodeGradeA()}</td>
+					<td><div class="legendmark aminus" /></td>
+					<td class="label">${getColorCodeGradeAminus()}</td>
+					<td><div class="legendmark bplus" /></td>
+					<td class="label">${getColorCodeGradeBplus()}</td>
+					<td><div class="legendmark b" /></td>
+					<td class="label">${getColorCodeGradeB()}</td>
+					<td><div class="legendmark bminus" /></td>
+					<td class="label">${getColorCodeGradeBminus()}</td>
+					<td><div class="legendmark cplus" /></td>
+					<td class="label">${getColorCodeGradeCplus()}</td>
+					<td><div class="legendmark c" /></td>
+					<td class="label">${getColorCodeGradeC()}</td>
+					<td><div class="legendmark dplus" /></td>
+					<td class="label">${getColorCodeGradeDplus()}</td>
+					<td><div class="legendmark d" /></td>
+					<td class="label">${getColorCodeGradeD()}</td>
+					<td><div class="legendmark f" /></td>
+					<td class="label">${getColorCodeGradeF()}</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</p:legendBlk>
+
+<p:actionBtns>
+<a class="button rounded" t:type="eventlink" t:event="ExportXls" context="eval.id" 
+				title="${message:export-tip}">
+				<span>${message:export-xls}</span>
+			</a>
+</p:actionBtns>
+
+<table class="actionToolBar">
+	<tr>
+		<td class="right">
+			
+		</td>
+	</tr>
+</table>
+
+<div id="evalContainer">
+<t:if test="eval.criterias">
+	
+	<table class="t-data-grid evaltbl stickyHeader" style="width:${getTableWidth()};">
+		<thead>
+		<tr>
+			<th rowspan="2" colspan="3"><t:outputraw value="getSpace()"/></th>
+	
+			<th colspan="${eval.criterias.size()}" >
+				<t:if test="eval.rubric">
+					${eval.rubric.name}
+				</t:if>
+			</th>
+			<th  colspan="2">${message:comment}</th>
+			
+			<th class="no_bot_border"><t:outputraw value="getSpace()"/></th>
+		</tr>
+		<tr>
+			<t:loop source="eval.criterias" value="tempCrit" index="colIndex" >
+				<th class="crit" title="${tempCrit.name}">
+					${tempCrit.name}
+				</th>
+			</t:loop>
+			<th class="no_bot_border">${message:cmtStrength-label}</th>
+			<th class="no_bot_border">${message:cmtWeakness-label}</th>
+			<th class="no_bot_border no_top_border">${message:total-average} 
+				<br/> <span class="formtip">(%)</span> 
+			</th>
+		</tr>
+		<tr>
+			<th class="no_top_border">${message:no}</th>
+			<th class="no_top_border">${message:group}</th>
+			<th class="no_top_border">${message:student}</th>
+			<t:loop source="eval.criterias" value="tempCrit" index="colIndex" >
+				<th class="weight">
+					<span class="formtip">${message:weightage-label}: ${tempCrit.weightage}</span>
+					<br/>
+					<span class="formtip">${tempCrit.minScore}-${tempCrit.maxScore}</span>
+				</th>
+			</t:loop>
+			<th class="no_top_border"><t:outputraw value="getSpace()"/></th>
+			<th class="no_top_border"><t:outputraw value="getSpace()"/></th>
+			<th class="no_top_border"><t:outputraw value="getSpace()"/></th>
+		</tr>
+		</thead>		
+				
+		<t:loop source="assessees" value="user" index="rowIndex">
+			<tr>
+				<td>${getRowNum()}</td>
+				<td >${getGroupTypeName(eval.group, user)}</td>
+				<td class="name">
+						${user.displayName} 
+				</td>
+				${loadEvalUserList(eval, user)}
+				<t:loop source="eval.criterias" value="tempCrit" index="colIndex" >
+					<td>
+						<t:if test="hasGraded()">
+							${getComputedCritScoreDisplay(tempCrit, evalUserList)}
+						</t:if>
+						<t:outputraw value="getSpace()"/>
+					</td>
+				</t:loop>
+				
+				<td class="strength" >
+					<t:loop source="evalUserList" value="evalUser">
+						<t:if test="evalUser.getCmtStrengthDisplay()">
+							<div title="by ${evalUser.assessor.displayname}">
+							- ${evalUser.getCmtStrengthDisplay()}
+							</div>
+						</t:if>
+					</t:loop>
+				</td>
+				<td class="weakness" >
+					<t:loop source="evalUserList" value="evalUser">
+						<t:if test="evalUser.getCmtWeaknessDisplay()">
+							<div title="by ${evalUser.assessor.displayname}">
+							- ${evalUser.getCmtWeaknessDisplay()}
+							</div>
+						</t:if>
+					</t:loop>
+				</td>
+				<td class="total ${getTotalScoreClass()}">
+					<t:if test="hasGraded()">
+						${getTotalScoreDisplay()}
+					</t:if>
+					<t:outputraw value="getSpace()"/>
+				</td>
+			</tr>
+		</t:loop>
+		
+		<tr>
+			<th colspan="3" style="text-align:right;">${message:average}:</th>
+
+			<t:loop source="eval.criterias" value="tempCrit" index="colIndex" >
+				<td class="average ${getAverageScoreClass(tempCrit)}" >${getAverageScoreDisplay(tempCrit)}</td>
+			</t:loop>
+			<td ><t:outputraw value="getSpace()"/></td>
+			<td ><t:outputraw value="getSpace()"/></td>
+			<td class="${getTotalAverageScoreClass()}">
+				${getTotalAverageScoreDisplay()}
+			</td>
+		</tr>
+				<tr>
+			<th colspan="3" style="text-align:right;">${message:stdev}:</th>
+
+			<t:loop source="eval.criterias" value="tempCrit" index="colIndex" >
+				<td class="stdev " >${getSTDEV(tempCrit, eval)}</td>
+			</t:loop>
+			<td ><t:outputraw value="getSpace()"/></td>
+			<td ><t:outputraw value="getSpace()"/></td>
+			<td class="stdev">
+				${getTotalSTDEV(eval)}
+			</td>
+		</tr>
+	</table>
+</t:if>	
+	
+	
+	<div style="height:20px;"><t:outputraw value="getSpace()"/></div>
+	
+</div>
+
+	
+</html>

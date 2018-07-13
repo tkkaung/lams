@@ -1,0 +1,91 @@
+<html t:type="layout" 
+	title="${message:manage-group}"
+	currentModule="${moduleName}"
+	currentProj="curProj"
+	breadcrumb="${curProj.encodeddisplayname}=project/home?${curProj.id}
+			,${message:manage-group}=modules/group?${curProj.id}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+	
+	<style>
+	div.t-data-grid .chkBox, .No, .allowSelfEnroll, .numOfGroup, .maxPerGroup {
+	    text-align: center;
+	}
+	</style>
+	
+	<table class="actionToolBar">
+		<tr>
+			<td class="right">
+			
+			</td>
+		</tr>
+	</table>	
+
+	<form t:type="form" t:id="GridForm">
+		<t:errors/>	
+		<table class="actionToolBar2">
+			<tr>
+			 <td align="left">
+		 		<t:if test="groups">
+		 	
+		 		<t:submit value="${message:delete}" t:id="delete" class="squared"
+		 			onclick="return checkChBoxAndConfirmDelete('groupGrid','${message:select-at-least-one-item}','${message:confirm-delete-group-text}')"/>
+				</t:if> 
+				<a class="button squared" t:type="pageLink" page="modules/group/edit" context="getParams(curProj.id, 0)" >
+					<span>${message:create}</span>
+				</a><!--
+		
+				<a class="button squared" t:type="pageLink" page="modules/group" context="getParams(curProj.id, 0)" >
+					<span>${message:import}</span>
+				</a>
+			 -->
+			 </td>
+			</tr>
+		</table>
+		
+	<t:grid source="groups" class="stickyHeader t-data-grid"
+		row="group" 
+		pagerPosition="bottom" 
+		id="groupGrid"
+		rowIndex="rowIndex" 
+		model="model"
+		>
+		<p:empty>
+			<div class="notfoundtext">${message:no-group-found}</div>
+		</p:empty>
+		
+       <t:parameter name="NoCell">${getNo()}</t:parameter>
+	       <t:parameter name="chkBoxHeader">
+	       	<input type="checkBox" id="chkBoxAll" value="1" onclick="chkboxAll('groupGrid','chkBoxAll')" />
+	       </t:parameter>
+	       <t:parameter name="chkBoxCell">
+	    		<input type="checkBox" name="gridChkBox" value="${group.id}" onclick="chkbox('groupGrid','chkBoxAll')" />
+     	   </t:parameter>
+			<t:parameter name="mdateCell">
+	       	<span class="date">${group.mdateDisplay}</span>
+	       </t:parameter>
+	       <t:parameter name="groupTypeCell">
+	          ${group.groupType}
+ 	       	  <t:pageLink page="modules/group/edit" context="group.id" class="button rounded"><span>${message:edit}</span></t:pageLink>
+	       </t:parameter>
+	    <t:parameter name="AllowSelfEnrollCell">
+				<t:if test="group.allowSelfEnroll">
+					${message:yes}
+			        <t:pageLink page="modules/group/checkstatus" context="group.id" class="button rounded"><span>Check Status</span></t:pageLink>
+					<p:else>
+						${message:no}
+					</p:else>
+				</t:if>
+		   </t:parameter>
+	       
+		<t:parameter name="EnrollmentCell">
+				${group.getTotalEnrolled()} of ${numNonLeaderMembers}
+	          <t:pageLink page="modules/group/enrollUser" context="group.id" class="button rounded"><span>${message:enroll-remove}</span></t:pageLink>
+	          <t:if test="canEnrollTutor(curProj)">
+	          	<t:pageLink page="modules/group/enrollTutor" context="group.id" class="button rounded"><span>Enroll Tutor</span></t:pageLink>
+	     	 </t:if>
+	     </t:parameter>
+	       
+	</t:grid>
+	</form>
+</html>

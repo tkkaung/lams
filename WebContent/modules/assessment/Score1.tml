@@ -1,0 +1,258 @@
+<html t:type="layout" 
+	title="${message:assessment-score}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/assessment/home?${project.id}
+		,${message:assessment-score}=modules/assessment/score"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+<style>
+	.assmttbl td, .assmttbl th{
+		padding:5px;
+	}
+	.name{
+		height: 100px;
+		width: 20px;
+		vertical-align:bottom !important;
+	}
+	.nameTh{
+		width: 20px;
+	}
+	.score{
+		text-align:center;
+		font-size:11px;
+	}
+	.average, .total{
+		text-align:center;
+	}
+	.goal{
+		width: 70px;
+		vertical-align:middle !important;
+	}
+	.minmax{
+		text-align:right;
+		padding-right: 5px;
+	}
+	#assmtContainer {
+		overflow-x: auto;
+	<t:if test="${isMoreThan(assessees.size(), 15)}">	
+		_overflow-x: scroll;  /* IE */
+	</t:if>
+		width: 100%;
+		/*		width: 972px;*/
+	}
+	#numScoreSelected{
+		margin:10px;
+	}
+	#numScoreSelected td{
+		text-align: center;
+	}
+</style>
+
+<p:actionBtns>
+	
+</p:actionBtns>	
+
+
+
+<p:legendBlk>
+		<div class="legend">
+			<div class="title">${message:legend}</div>
+			<div class="content">
+				<table>
+					<tr>
+		<td><div class="legendmark aplus" /></td>
+					<td class="label">${getColorCodeGradeAplus()}</td>
+					<td><div class="legendmark a" /></td>
+					<td class="label">${getColorCodeGradeA()}</td>
+					<td><div class="legendmark aminus" /></td>
+					<td class="label">${getColorCodeGradeAminus()}</td>
+					<td><div class="legendmark bplus" /></td>
+					<td class="label">${getColorCodeGradeBplus()}</td>
+					<td><div class="legendmark b" /></td>
+					<td class="label">${getColorCodeGradeB()}</td>
+					<td><div class="legendmark bminus" /></td>
+					<td class="label">${getColorCodeGradeBminus()}</td>
+					<td><div class="legendmark cplus" /></td>
+					<td class="label">${getColorCodeGradeCplus()}</td>
+					<td><div class="legendmark c" /></td>
+					<td class="label">${getColorCodeGradeC()}</td>
+					<td><div class="legendmark dplus" /></td>
+					<td class="label">${getColorCodeGradeDplus()}</td>
+					<td><div class="legendmark d" /></td>
+					<td class="label">${getColorCodeGradeD()}</td>
+					<td><div class="legendmark f" /></td>
+					<td class="label">${getColorCodeGradeF()}</td>
+				</tr>
+				</table>
+			</div>
+		</div>
+</p:legendBlk>
+
+
+<table class="actionToolBar">
+	<tr>
+		<td class="right">
+		</td>
+	</tr>
+</table>
+
+<div class="e-formeditor t-beaneditor">
+	<table >
+			<tr>
+				<td class="label">${message:assessment}</td>
+				<td>
+					<t:pagelink page="modules/assessment/view" context="assmt.id">
+							${assmt.name}
+					</t:pagelink>
+					<div><t:outputraw value="assmt.des"/></div>
+				</td>
+			</tr>
+			<t:if test="assmt.sdate">
+				<tr>
+					<td class="label">${message:sdate-label}</td>
+					<td>${assmt.sdateDisplay}</td>
+				</tr>
+			</t:if>
+			<t:if test="assmt.edate">
+				<tr>
+					<td class="label">${message:edate-label}</td>
+					<td>${assmt.edateDisplay}</td>
+				</tr>
+			</t:if>
+			
+		</table>
+</div>
+		
+<div id="assmtContainer">
+	<table class="t-data-grid assmttbl" style="width:${getTableWidth()};">
+			<tr>
+				<td colspan="3" class="id"><t:outputraw value="getSpace()"/></td>
+				<th class="nameTh "><div class="rotateVertical">${getAssesseeRoleNames(project)}</div></th>
+				<t:loop source="assessees" value="user">
+					<p:empty>
+						<td rowspan="${getTotalTableRow()}">
+							<span class="notfoundtext">${message:no-assessee-found}</span>
+						</td>
+					</p:empty>
+				
+					<td class="name ">
+						<div class="rotateVertical">
+							<t:pagelink page="user/view" context="user.id" class="nowrap">
+								${user.displayName}
+							</t:pagelink>
+						</div>
+					</td>
+				</t:loop>
+				<td class="average"><t:outputraw value="getSpace()"/></td>
+			</tr>
+			<tr>
+				<th class="goal">${message:rubric}</th>
+				<th class="objective">${message:criteria-objective}</th>
+				<th class="weightage">${message:weightage-label} <span class="formtip">(%)</span></th>
+				<th class="no"><div class="rotateVertical">${message:no}</div></th>
+				<t:loop source="assessees" value="user" index="colIndex">
+					<th class="no">
+						<div class="rotateVertical">
+							${getColNum()}
+						</div>
+					</th>
+				</t:loop>
+				<th class="average">${message:average} <span class="formtip">(%)</span></th>
+			</tr>
+				
+				
+				<t:loop source="assmt.criterias" value="tempCrit" index="rowIndex" >
+					<tr>
+						<t:if test="isFirst(rowIndex)">
+							<td class="goal" rowspan="${assmt.criterias.size()}"><t:if test="assmt.rubric">${assmt.rubric.name}</t:if></td>
+						</t:if>
+						
+						<td  class="objective">
+							<t:outputraw value="${textarea2html(tempCrit.name)}"/>
+							<t:outputraw value="getSpace()"/>
+						</td>
+						<th>${tempCrit.weightage}</th>
+						<th><t:outputraw value="getSpace()"/></th>
+						<t:loop source="assessees" value="user" index="colIndex">
+							<td class="score">
+								${loadAssmtUser(assmt,user)}
+								<t:if test="hasGraded()">
+									${getComputedCritScoreDisplay(tempCrit,assmtUser)}
+								</t:if>
+								<t:outputraw value="getSpace()"/>
+							</td>
+						</t:loop>
+						<td class="average">${getAverageScore(tempCrit)}</td>
+					</tr>
+				</t:loop>
+				
+			<tr>
+				<th colspan="3" class="minmax">
+					${message:total} <span class="formtip">(%)</span>:
+				</th>
+				<th><t:outputraw value="getSpace()"/></th>
+				<t:loop source="assessees" value="user" index="colIndex">
+					
+					${loadAssmtUser(assmt,user)}
+					<td class="total ${getAssmtUserDisplayGradeClass()}">
+						<t:if test="hasGraded()">
+							${assmtUser.totalScoreDisplay}
+						</t:if>
+						<t:outputraw value="getSpace()"/>
+					</td>
+				</t:loop>
+				<td class="average ${getAvgAssmtUserDisplayGradeClass()}">
+					${getTotalAverageScoreDisplay()}
+					<t:outputraw value="getSpace()"/>
+				</td>
+			</tr>
+	</table>
+	<div style="height:20px;"><t:outputraw value="getSpace()"/></div>
+	
+</div>
+<!-- 
+<t:if test="assmt.criterias">
+	<div>
+	${loadCountScore()}
+		<table class="t-data-grid" id="numScoreSelected" style="width:300px;">
+			<tr>
+				<th>${message:score}</th>
+				<th>${message:number-of-score-selected}</th>
+			</tr>
+			<t:loop source="getFirstCriterions()" value="tempCriterion">
+				<tr>
+					<td >${tempCriterion.getScore()}</td>
+					<td>${getScoreCount(tempCriterion.getScore())}</td>
+				</tr>
+			</t:loop>
+			
+		</table>
+	</div>
+</t:if>
+ -->
+<script>
+	document.observe("dom:loaded", function(){
+		var maxWidth=0;
+		var nameWidth = ${getNameWidth()};
+		$$(".name .rotateVertical, .nameTh .rotateVertical").each(function(e){
+			var w = e.getWidth()+5;
+			if(lessThan(maxWidth, w)){
+				 maxWidth = w;
+			}
+			
+			e.setStyle({ 
+				width: nameWidth
+			});
+		});
+	
+		$$(".name").each(function(e){
+			e.setStyle({ height: maxWidth , width: nameWidth});
+		});
+				
+	});
+</script>
+
+</html>

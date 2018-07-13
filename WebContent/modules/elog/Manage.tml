@@ -1,0 +1,83 @@
+<html t:type="layout" 
+	title="${message:manage} ${message:elog}"
+	currentModule="${moduleName}"
+   currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/elog/home?${project.id}
+		,${message:manage-elog}=modules/elog/manage?${project.id}"
+	totalShowOption="${totalSize}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+		
+	<p:actionBtns>
+		<t:if test="canCreateElog(project)">
+			<a class="button rounded" t:type="pageLink" page="modules/elog/edit" context="getParams(project.id, getNull())" >
+				<span>${message:add-new} ${message:elog}</span>
+			</a>
+		</t:if>
+	</p:actionBtns>	
+		
+	<table class="actionToolBar">
+		<tr>
+			<td class="right">
+				<form t:type="form" t:id="filterForm" autofocus="false">
+					<span class="fTitle">${message:filter}:</span> 
+					<t:textfield t:id="filterText" value="filterText"/>
+					${message:status-label} 
+					<t:select t:id="filterStatus" value="filterStatus" blanklabel="${message:-all-}"/>
+					<t:submit value="${message:go}" class="squared"/>
+				</form>
+			</td>
+		</tr>
+	</table>	
+
+	<t:grid source="elogs" 
+		row="elog" 
+		pagerPosition="bottom" 
+		rowClass="prop:evenodd.next"
+		model="model"
+		>
+		<p:empty>
+			<div class="notfoundtext">${message:no-elog-found}</div>
+		</p:empty>
+		
+		<p:subjectCell>
+			<t:pagelink page="modules/elog/view" context="elog.id"><t:ck.TrimmedString value="elog.subject" maxLength="70"/></t:pagelink>
+			<span style="margin-left:5px;vertical-align:bottom;">
+				<t:loop source="elog.files" value="tempFile">
+					<t:eventLink event="retrieveFile" context="tempFile.id">
+						<img src="${context:lib/img/icon-attachment.gif}"  alt="" title="${message:click-to-download}"/>
+					</t:eventLink>
+				</t:loop>
+			</span>
+			<br/>
+			<span class="subdes"><t:ck.TrimmedString value="stripTags(elog.content)" maxLength="200"/></span>
+		</p:subjectCell>
+		<p:mdateCell>
+			<span class="date">${elog.mdatedisplay}</span>
+		</p:mdateCell>
+		<p:statusCell>
+			${capitalize(elog.status)}
+			<t:if test="isApprovedUnpublished(elog)">
+				<div>(${message:unpublished})</div>
+			</t:if>
+		</p:statusCell>
+		<p:remarksCell>
+			<span class="subdes"><t:outputraw value="elog.remarks"/></span>
+		</p:remarksCell>
+		<p:actionCell>
+			<t:if test="canEditElog(elog)">
+				<a href="#" t:type="pageLink" page="modules/elog/edit" context="elog.id" class="button rounded">
+					<span>${message:edit}</span>
+				</a>
+			</t:if>
+			<t:if test="canDeleteElog(elog)">
+				<a href="#" t:type="actionLink" t:id="delete" context="elog.id" class="button rounded"
+						onclick="return confirmDelete('${message:confirm-delete-elog}')">
+					<span>${message:delete}</span>
+				</a>
+			</t:if>
+		</p:actionCell>
+		
+	</t:grid>
+</html>

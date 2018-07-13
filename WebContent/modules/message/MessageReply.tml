@@ -1,0 +1,164 @@
+<html t:type="layout" 
+	title="${message:reply} ${message:message}"
+	currentModule="${moduleName}"
+	currentProj="curProj"
+	breadcrumb="${curProj.encodeddisplayname}=project/home?${curProj.id}
+		,${module.displayName} - ${getTypeNameDisplay(type)}=modules/message?${curProj.id}:${type}
+		,${message:view}=modules/message/view?${toMsg.id}
+		,${message:reply} ${message:message}=modules/message/reply?${toMsg.id}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+		
+	<style>
+		div.msgeditblk td.label{
+			font-weight: bold;
+			vertical-align: top;
+			padding-top: 4px;
+		}
+	</style>
+	
+	<p:actionBtns>
+		<t:if test="canCreateMessage(curProj)">
+			<a class="button rounded" t:type="pageLink" page="modules/message/new" context="curProj.id" >
+				<span>${message:add-new} ${message:message}</span>
+			</a>
+		</t:if>
+	</p:actionBtns>
+	
+	<table class="actionToolBar">
+		<tr>
+			<td class="right">
+				<form t:type="form" t:id="searchForm" autofocus="false">
+					<input t:type="textfield" value="searchText" style="width: 200px;" />
+					<t:submit value="${message:search-message}" class="squared"/>
+				</form>
+			</td>
+		</tr>
+	</table>	
+	
+	<table width="100%">
+		<tr>
+			<td class="mleftTd" width="140px" valign="top">
+				<div class="msgleftpan">
+					<t:loop t:type="loop" source="msgTypes" value="tempType" >
+						<div class="type ${typeSelectedClass}">
+							<a t:type="pageLink" page="modules/message" context="getParams(curProj.id, tempType)">
+								${getTypeNameDisplay(tempType)}
+								<t:if test="getUnreadCount(tempType)">(${unreadCount})</t:if>
+							</a>
+						</div>
+					</t:loop>
+				</div>
+			</td>
+			<td class="mRightTd" valign="top">
+				<div id="msgBody" style="min-height:200px">
+					<t:delegate to="block:defaultBlock"/>
+				</div>
+			</td>
+		</tr>
+	</table>	
+
+
+<t:block t:id="defaultBlock">	
+	<form t:type="form" t:id="gridForm" clientValidation="false" >
+		<table class="actionToolBar2">
+			<tr>
+				<td class="left">
+				  <t:submit value="${message:send}" t:id="send" class="squared" onclick="return formSubmitSend(); " /> 
+				  <t:submit value="${message:save}" t:id="save" class="squared" /> 
+				  <input type="hidden" id="mode" name="mode" value=""/>
+				</td>
+			</tr>
+		</table>
+		<div class="msgeditblk">
+			<table>
+				<tr>
+					<td class="label"><t:label for="toUsers" ><span class="required">*</span> ${message:to-label}:</t:label></td>
+					<td>
+						<div t:type="Palette" t:id="toUsers" t:model="availableUsersModel"
+							t:selected="toUsersId" t:encoder="stringEncoder"
+							deselect="context:lib/img/move_left.jpg"
+							select="context:lib/img/move_right.jpg"
+							/>
+						<a id="addExtEmail" href="javascript:void(0);" onclick="showExtEmail();return false;">${message:add-external-email}</a>
+					</td>
+				</tr>
+				<tr id="extEmailRow" >
+					<td class="label"><t:label for="extEmails" >${message:to-external-email}:</t:label></td>
+					<td>
+						<input t:type="textfield" t:id="extEmails" value="extEmails" maxlenght="255" class="lwidth" />
+						<br/>
+						<span class="formtip">${message:to-external-email-tip}</span>
+					</td>
+				</tr>
+				<tr>
+					<td class="label"><t:label for="subject" />:</td>
+					<td>
+						<input t:type="textfield" t:id="subject" value="msg.subject" maxlenght="255" class="lwidth"/>
+					</td>
+				</tr>
+				<tr>
+					<td class="label"><t:label for="content" />:</td>
+					<td >
+						<textarea t:type="ck/editor" t:id="content" value="msg.content"
+	    		            customConfiguration="context:lib/js_config/ckeditor.js" toolbarSet="simpleToolbar"
+	                		width="660px" height="300px" class="lwidth"></textarea>
+					</td>
+				</tr>
+				<tr>
+					<td class="label"></td>
+					<td><t:submit value="${message:send}" t:id="send1" class="squared" onclick="return formSubmitSend(); " /></td>
+				</tr>
+			</table>
+		</div>
+	</form>
+	<br/>
+	<span class="required">*</span>  ${message:required-fields}
+</t:block>	
+			
+	<script type="text/javascript">
+		function formSubmitSend(){
+			if(! $('toUsers').getValue()){
+				if(! $('extEmails').getValue()){
+					alert('${message:select-at-least-one-user}');
+					return false;
+				}
+			}
+			if(! $('subject').getValue()){
+				var ans = confirm('${message:confirm-subject-empty}');
+				if(!ans)
+					return false;
+			}
+			var oEditor = FCKeditorAPI.GetInstance('content') ;
+			var contentValue = oEditor.GetHTML();
+			if(! contentValue){
+				var ans1 = confirm('${message:confirm-content-empty}');
+				if(!ans1)
+					return false;
+			}
+			
+			return true;
+		}
+		
+		function showExtEmail(){
+			$('extEmailRow').show();
+			$('addExtEmail').hide();
+		}
+		
+		function autoAction() {
+		   $('mode').value = "auto";
+		   $('gridForm').submit();
+		}
+		
+		document.observe("dom:loaded", function() {
+			
+			if($('extEmails').getValue())
+				$('addExtEmail').hide();
+			else
+				$('extEmailRow').hide();
+			
+			setInterval("autoAction()", 300000);
+		});
+		
+	</script>
+</html>

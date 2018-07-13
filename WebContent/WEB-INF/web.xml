@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE web-app
+        PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+        "http://java.sun.com/dtd/web-app_2_3.dtd">
+<web-app>
+    <display-name>eUreka 2.0</display-name>
+    <context-param>
+        <!-- The only significant configuration for Tapestry 5, this informs Tapestry
+of where to look for pages, components and mixins. -->
+        <param-name>tapestry.app-package</param-name>
+        <param-value>ntu.celt.eUreka2</param-value>
+    </context-param>
+    
+    <servlet>
+      <servlet-name>UploadFileServlet</servlet-name>
+      <servlet-class>ntu.celt.eUreka2.util.UploadFileServlet</servlet-class>
+    </servlet>
+    
+    <servlet-mapping>
+      <servlet-name>UploadFileServlet</servlet-name>
+      <url-pattern>/Handler</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+      <servlet-name>SamlServlet</servlet-name>
+      <servlet-class>ntu.celt.eUreka2.util.SamlServlet</servlet-class>
+    </servlet>
+    
+    <servlet-mapping>
+      <servlet-name>SamlServlet</servlet-name>
+      <url-pattern>/saml/*</url-pattern>
+    </servlet-mapping>
+    
+    <filter>
+        <filter-name>app</filter-name>
+        <filter-class>org.apache.tapestry5.TapestryFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>app</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <session-config>
+    	<session-timeout>60</session-timeout>
+    </session-config>
+</web-app>
+      

@@ -1,0 +1,51 @@
+<html t:type="layout" 
+	title="${message:self-select-group-set}"
+	currentModule="${moduleName}"
+	currentProj="curProj"
+	breadcrumb="${curProj.encodeddisplayname}=project/home?${curProj.id}
+			,${message:self-select-group-set}=modules/group/selfselectset?${curProj.id}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+	
+	<table class="actionToolBar">
+		<tr>
+			<td class="right">
+			
+			</td>
+		</tr>
+	</table>	
+
+		
+	<t:grid source="groups" 
+		row="group" 
+		pagerPosition="bottom" 
+		id="groupGrid"
+		rowIndex="rowIndex" 
+		model="model"
+		>
+		<p:empty>
+			<div class="notfoundtext">${message:no-group-found}</div>
+		</p:empty>
+		
+       <t:parameter name="NoCell" >${getNo()}</t:parameter>
+	   
+	   <t:parameter name="groupCell">
+	   		${loadGroupUser(group, getCurUser())}
+	   		<t:if test="groupUser">
+	   			<span >${groupUser.getGroupNumNameDisplay()}</span>
+	   		</t:if>
+	   </t:parameter>
+		<t:parameter name="ActionCell">
+			${loadGroupUser(group, getCurUser())}
+	   		<t:if test="groupUser">
+	   			Enrolled
+	   			<p:else>
+	   				<t:pageLink page="modules/group/selfselectgroupno" context="group.id" class="button rounded">
+			        	<span>Select</span>
+			        </t:pageLink>
+	   			</p:else>
+	   		</t:if>
+	    </t:parameter>
+	       
+	</t:grid>
+</html>

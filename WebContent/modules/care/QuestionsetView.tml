@@ -1,0 +1,138 @@
+<html t:type="layout" 
+	title="${message:view} ${message:questionset}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/care/home?${project.id}
+		,${message:manage-care}=modules/care/manage?${project.id}
+		,${message:manage-questionset}=modules/care/managequestionset?${project.id}
+		,${message:view} ${message:questionset}=modules/care/questionsetview?${project.id}
+		"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+
+
+<p:actionBtns>
+	<t:if test="canEditQSet(qset, project)">
+	<a class="button rounded" t:type="pageLink" page="modules/care/questionsetedit" context="getParams(project.id, qset.id)" >
+				<span>${message:edit} ${message:questionset}</span>
+	</a>
+	</t:if>
+</p:actionBtns>	
+
+
+<div class="e-formeditor">
+	<div class="t-beaneditor ">
+		<table >
+			<tr>
+				<td class="label">${message:name-label}</td>
+				<td>${qset.name}</td>
+			</tr>
+			<tr>
+				<td class="label">${message:des-label}</td>
+				<td><t:outputraw value="${textarea2html(qset.des)}"/></td>
+			</tr>
+			<tr>
+				<td class="label">${message:owner-label}</td>
+				<td>${qset.owner.getDisplayName()}</td>
+			</tr>
+			<tr>
+				<td class="label">${message:mdate-label}</td>
+				<td>${qset.getMdateDisplay()}</td>
+			</tr>
+			<tr>
+				<td class="label">Questons</td>
+				<td>
+						<div class="rubricDetailZone view ">
+							<table class="stickyHeader">
+							<thead>
+								<tr>
+									<th >No</th>
+									<th >Question</th>
+									<t:loop source="cdimensions" value="cdimension" index="rowIndex">
+										<th style="font-size:9px;">${cdimension.name}</th>
+									</t:loop>
+								</tr>
+							</thead>
+							<tbody>	
+								<t:loop source="qset.questions" value="que" index="rowIndex">
+									<tr>
+										<td>
+											${que.number}
+										</td>
+										<td>
+											<t:outputraw value="${textarea2html(que.des)}"/>
+										</td>
+										<td>
+											${nvl(que.dimension1)}
+										</td>
+										<td>
+											${nvl(que.dimension2)}
+										</td>
+										<td>
+											${nvl(que.dimension3)}
+										</td>
+										<td>
+											${nvl(que.dimension4)}
+										</td>
+										<td>
+											${nvl(que.dimension5)}
+										</td>
+										<td>
+											${nvl(que.dimension6)}
+										</td>
+										<td>
+											${nvl(que.dimension7)}
+										</td>
+										<td>
+											${nvl(que.dimension8)}
+										</td>
+										<td>
+											${nvl(que.dimension9)}
+										</td>
+										<td>
+											${nvl(que.dimension10)}
+										</td>
+										<td>
+											${nvl(que.dimension11)}
+										</td>
+										<td>
+											${nvl(que.dimension12)}
+										</td>
+										<td>
+											${nvl(que.dimension13)}
+										</td>
+										<td>
+											${nvl(que.dimension14)}
+										</td>
+										<td>
+											${nvl(que.dimension15)}
+										</td>
+										
+									</tr>
+									
+									<p:empty>
+										<tr ><td colspan="7">${message:no-question-defined}</td></tr>
+									</p:empty>
+								</t:loop>
+							</tbody>			
+							</table>
+						</div>
+						
+					</td>
+				</tr>
+				
+			</table>
+
+			
+			
+		
+		
+		
+		
+	</div>
+	
+</div>
+
+</html>

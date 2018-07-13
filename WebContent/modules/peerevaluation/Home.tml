@@ -1,0 +1,210 @@
+<html t:type="layout" 
+	title="${module.displayName}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/peerevaluation/home?${project.id}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+<style>
+	table.t-data-grid thead tr th{
+		text-align: center;
+	}
+	.evaltbl td{
+		text-align: center;
+	}
+	.evaltbl .assmt{
+		width: ${getAssmtColumnWidth()}px;
+		white-space: normal;
+	}
+	.evaltbl .no{
+		width: 15px;
+	}
+	.evaltbl .assessee{
+		min-width: 200px;
+	}
+	.evaltbl td.assessee {
+		text-align: left;
+	}
+	.evaltbl .total{
+		width: 50px;
+		font-weight: bold;
+	}
+	span.grade{
+		padding: 0 0 0 10px;
+		font-size: 11px;
+	}
+	
+</style>
+
+<p:actionBtns>
+	<a class="button rounded" t:type="pageLink" page="modules/peerevaluation/new" context="project.id" >
+		<span>${message:add-new} ${message:evaluation}</span>
+	</a>
+	<a class="button rounded" t:type="pageLink" page="modules/peerevaluation/manage" context="project.id"  >
+		<span>${message:manage-evaluation}</span>
+	</a>
+|
+		<a class="button rounded" t:type="eventlink" t:event="ExportXls" context="project.id" 
+			title="${message:export-tip}">
+			<span>${message:export-xls}</span>
+		</a>
+|
+		<a class="button rounded" t:type="eventlink" t:event="ExportXlsByStudent" context="project.id" 
+			title="${message:export-tip}">
+			<span>${message:export-xls-detail-student}</span>
+		</a>
+
+
+</p:actionBtns>	
+
+<p:legendBlk>
+		<div class="legend">
+			<div class="title">${message:legend}</div>
+			<div class="content">
+				<table>
+					<tr>
+								<td><div class="legendmark aplus" /></td>
+					<td class="label">${getColorCodeGradeAplus()}</td>
+					<td><div class="legendmark a" /></td>
+					<td class="label">${getColorCodeGradeA()}</td>
+					<td><div class="legendmark aminus" /></td>
+					<td class="label">${getColorCodeGradeAminus()}</td>
+					<td><div class="legendmark bplus" /></td>
+					<td class="label">${getColorCodeGradeBplus()}</td>
+					<td><div class="legendmark b" /></td>
+					<td class="label">${getColorCodeGradeB()}</td>
+					<td><div class="legendmark bminus" /></td>
+					<td class="label">${getColorCodeGradeBminus()}</td>
+					<td><div class="legendmark cplus" /></td>
+					<td class="label">${getColorCodeGradeCplus()}</td>
+					<td><div class="legendmark c" /></td>
+					<td class="label">${getColorCodeGradeC()}</td>
+					<td><div class="legendmark dplus" /></td>
+					<td class="label">${getColorCodeGradeDplus()}</td>
+					<td><div class="legendmark d" /></td>
+					<td class="label">${getColorCodeGradeD()}</td>
+					<td><div class="legendmark f" /></td>
+					<td class="label">${getColorCodeGradeF()}</td>
+				</tr>
+				</table>
+			</div>
+		</div>
+</p:legendBlk>
+
+
+
+<table class="actionToolBar">
+	<tr>
+		<td class="right">
+		</td>
+	</tr>
+</table>
+
+<div class="assmtContainer">
+<div id="scroller">
+	<table class="t-data-grid evaltbl stickyHeader" >
+		<thead>
+			<tr>
+				<th rowspan="2" class="no"></th>
+				<th rowspan="2" class="assessee">${message:student}</th>
+				<th colspan="${evals.size()}">${message:evaluation}</th>
+				<th rowspan="2" class="total">
+					${message:total}
+					<span class="formtip">(%)</span>
+				</th>
+			</tr>
+			<tr>
+				<t:loop source="evals" value="eval">
+					<p:empty>
+						<th></th>
+					</p:empty>
+				
+					<th title="${eval.name}" class="assmt ">
+							<t:pagelink page="modules/peerevaluation/viewaverage" context="eval.id">
+								${eval.name}
+							</t:pagelink>
+						<br/>
+						<span class="formtip">${message:weightage-label}: ${eval.weightage}</span>
+					</th>
+				</t:loop>
+			</tr>
+		</thead>
+		<tbody>
+			<t:loop source="assessees" value="tempUser" index="rowIndex">
+				<p:empty>
+					<tr><td colspan="${addInt(evals.size(),2)}"><span class="notfoundtext">${message:no-assessee-found}</span></td></tr>	
+				</p:empty>
+				
+				<tr>
+					<td class="no">${getRowNum()}</td>
+					<td class="assessee">
+						${tempUser.displayName}
+					</td>
+					<t:loop source="evals" value="eval">
+						<p:empty>
+							<t:if test="isFirst(rowIndex)">
+								<td rowspan="${assessees.size()}" colspan="2"><span class="notfoundtext">${message:no-evaluation-found}</span></td>
+							</t:if>
+						</p:empty>
+						<td>
+							${loadEvalUserList(eval,tempUser)}
+							
+							<t:pagelink page="modules/peerevaluation/viewdetailbyassessee" context="getParams(eval.id,tempUser.id)">
+								<t:if test="hasGraded()">
+									<div class="${getEvalUserScoreClass()}" >
+										<span >${getEvalUserScoreDisplay(tempUser)}</span>
+									</div>
+									<p:else>
+										<div>
+											<t:outputraw value="getSpace()"/>
+										</div>
+									</p:else>
+								</t:if>	
+							</t:pagelink>
+						</td>
+					</t:loop>
+					<t:if test="evals">
+						${loadTotalScore(tempUser)}
+						
+						<td class="total">
+							<div class="${getTotalScoreClass()}" >
+								${getTotalScoreDisplay()}
+							</div>
+						</td>
+					</t:if>
+				</tr>
+			</t:loop>
+			
+		</tbody>
+		
+		<tfoot>
+			<tr>
+				<td ><t:outputraw value="getSpace()"/></td>
+				<td style="text-align:right;">${message:average}:</td>
+				<t:loop source="evals" value="eval">
+					<td class="average " >${getAVG(eval)} </td>
+				</t:loop>
+				<td class="average ">
+					${getTotalAvg()}
+				</td>
+			</tr>
+			<tr>
+				<td ><t:outputraw value="getSpace()"/></td>
+				<td style="text-align:right;">${message:stdev}:</td>
+				<t:loop source="evals" value="eval">
+					<td class="stdev " >${getSTDEV(eval)}</td>
+				</t:loop>
+				<td class="stdev ">
+					${getTotalSTDEV()}
+				</td>
+			</tr>
+		</tfoot>
+
+	</table>
+	</div>
+</div>
+
+
+</html>

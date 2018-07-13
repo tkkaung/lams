@@ -1,0 +1,190 @@
+<html t:type="layout" 
+	title="${message:edit} ${message:user}"
+	breadcrumb="${message:control-panel}=admin
+	,${message:admin-manage-user}=admin/user
+	,${message:edit} ${message:user}=admin/user/edit"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="user"/></p:leftMenuBlk>
+	<p:legendBlk>
+		<span class="required">*</span>  ${message:required-fields}
+	</p:legendBlk>
+	
+	<style>
+		table.extraRoleTbl td{
+			padding-right: 10px ;
+			font-size: 0.9em;
+		}
+	</style>
+	
+	<t:form t:id="userForm" class="e-formeditor">
+		<t:errors/>
+		<div class="t-beaneditor">
+			<table>
+				<tr>
+					<td class="label">
+						<t:label for="username"><span class="required">*</span> ${message:username-label}</t:label>
+	      		</td>
+					<td><t:textfield t:id="username" value="user.username"/></td>
+				</tr>
+				<tr>
+					<td class="label">
+						<t:label for="firstname"><span class="required">*</span>  ${message:firstname-label}</t:label>
+	    			</td>
+					<td><t:textfield t:id="firstname" value="user.firstname" class="mwidth"/></td>
+				</tr>
+				<tr>
+					<td class="label">
+						<t:label for="lastname"><span class="required">*</span>  ${message:lastname-label}</t:label>
+	      		</td>
+					<td><t:textfield t:id="lastname" value="user.lastname" class="mwidth"/></td>
+				</tr>
+				<tr>
+					<td class="label">
+						<t:label for="externalKey">  ${message:externalKey-label}</t:label>
+	      		</td>
+					<td><t:textfield t:id="externalKey" value="user.externalKey" class="mwidth"/></td>
+				</tr>
+				<tr>
+					<td class="label">
+						<t:label for="school"><span class="required">*</span> ${message:school-label}</t:label>
+		      	</td>
+					<td>
+						<t:select t:id="school" value="user.school" model="schoolModel" validate="required"/>
+		      	</td>
+				</tr>
+				<tr>
+					<td class="label"><t:label for="organization"/></td>
+					<td><t:textfield t:id="organization" value="user.organization" class="mwidth"/></td>
+				</tr>
+				<tr>
+					<td class="label"><t:label for="jobTitle"/></td>
+					<td><t:textfield t:id="jobTitle" value="user.jobTitle" class="mwidth"/></td>
+				</tr>
+				<tr>
+					<td class="label"><t:label for="phone"/></td>
+					<td><t:textfield t:id="phone" value="user.phone" /></td>
+				</tr>
+				<tr>
+					<td class="label"><t:label for="mphone"/></td>
+					<td><t:textfield t:id="mphone" value="user.mphone" /></td>
+				</tr>
+				<tr>
+					<td class="label"><t:label for="email"><span class="required">*</span>  ${message:email-label}</t:label></td>
+					<td><t:textfield t:id="email" value="user.email" class="mwidth" validate="required,email"/></td>
+				</tr>
+				<tr>
+					<td class="label">
+						<t:label for="sysRole"><span class="required">*</span> ${message:sysRole-label}</t:label>
+					</td>
+					<td>
+		      		<div>
+		      			<t:select t:id="sysRole" value="user.sysRole" model="sysRoleModel" />
+		      		</div>
+		      		<table style="width:auto;" class="extraRoleTbl">
+							<t:loop source="user.extraRoles" value="sRoleUser">
+					      	<tr>
+					      		<td>${sRoleUser.sysRole.displayName} </td>
+					      		<td><em>${getExtraRoleParamDisplay(sRoleUser)}</em></td>
+					      		<td>
+					      			[<t:eventLink event="removeRole" context="sRoleUser.id">
+					      				${message:remove}
+					      			</t:eventLink>]
+					      		</td>
+					      	</tr>
+					      </t:loop>
+				      </table>
+				      <div id="eRole1" class="eRole">
+				      	<t:select t:id="eRoleS1" value="eRole1" model="allSysRoleModel" onchange="eRoleChanged(this)"/>
+				      	<t:select t:id="eProjType1" class="eProjType" model="projTypeModel" validate="required" />
+				      	<t:select t:id="eSchl1" class="eSchl" model="schoolModel" validate="required" />
+				      </div>
+				      <div id="eRole2" class="eRole">
+				      	<t:select t:id="eRoleS2" value="eRole2" model="allSysRoleModel" onchange="eRoleChanged(this)"/>
+				      	<t:select t:id="eProjType2" class="eProjType" model="projTypeModel" validate="required" />
+				      	<t:select t:id="eSchl2" class="eSchl" model="schoolModel" validate="required" />
+				      </div>
+				      <div id="eRole3" class="eRole">
+				      	<t:select t:id="eRoleS3" value="eRole3" model="allSysRoleModel" onchange="eRoleChanged(this)"/>
+				      	<t:select t:id="eProjType3" class="eProjType" model="projTypeModel" validate="required" />
+				      	<t:select t:id="eSchl3" class="eSchl" model="schoolModel" validate="required" />
+				      </div>
+				      <div id="eRole4" class="eRole">
+				      	<t:select t:id="eRoleS4" value="eRole4" model="allSysRoleModel" onchange="eRoleChanged(this)"/>
+				      	<t:select t:id="eProjType4" class="eProjType" model="projTypeModel" validate="required" />
+				      	<t:select t:id="eSchl4" class="eSchl" model="schoolModel" validate="required" />
+				      </div>
+				      <div id="eRole5" class="eRole">
+				      	<t:select t:id="eRoleS5" value="eRole5" model="allSysRoleModel" onchange="eRoleChanged(this)"/>
+				      	<t:select t:id="eProjType5" class="eProjType" model="projTypeModel" validate="required" />
+				      	<t:select t:id="eSchl5" class="eSchl" model="schoolModel" validate="required" />
+				      </div>
+				      <div>
+				      	<a href="#" id="addMoreRoleLink" onclick="addMoreRole(); return false;">${message:add-more-role}</a>
+							<span id="addMoreRoleMsg" class="formtip">${message:max-5-roles-to-add}</span>
+				      </div>
+		      	</td>
+				</tr>
+				<tr>
+					<td class="label"><t:label for="enabled"/></td>
+					<td>
+						<t:checkbox t:id="enabled" value="user.enabled"/>
+					</td>
+				</tr>
+				<tr>
+					<td class="label"><t:label for="remarks"/></td>
+					<td>
+					 	<textarea t:type="textarea" t:id="remarks" value="user.remarks" cols="50" rows="5" class="mwidth"/>
+		      	</td>
+				</tr>
+				
+			</table>
+			<t:submit t:id="bsubmit" value="${message:submit-label}" class="submit squared" />
+		</div>
+	</t:form>
+     
+	    
+  	
+<script language="javascript">
+	function eRoleChanged(roleSelect){
+		var typeAdminId = ${getTypeAdminID()};
+		var schlAdminId = ${getSchoolAdminID()};
+		$(roleSelect.id).adjacent('.eProjType , .eSchl').invoke('hide');
+		if(roleSelect.value == typeAdminId){
+			$(roleSelect.id).adjacent('.eProjType').invoke('show');
+		}
+		else if(roleSelect.value == schlAdminId){
+			$(roleSelect.id).adjacent('.eSchl').invoke('show');
+		}
+		
+	}
+
+	function addMoreRole(){
+		 if($('eRole4').visible()){
+			showElm('eRole5');
+			$('addMoreRoleLink').hide();
+			$('addMoreRoleMsg').show();
+		}
+		else if($('eRole3').visible())
+			showElm('eRole4');
+		else if($('eRole2').visible())
+			showElm('eRole3');
+		else if($('eRole1').visible())
+			showElm('eRole2');
+		else{
+			showElm('eRole1');
+		}
+	
+		return false;
+	}
+	
+	document.observe("dom:loaded", function() {
+		$$('.eProjType').invoke('hide');
+		$$('.eSchl').invoke('hide');
+		$$('.eRole').invoke('hide');
+		$('addMoreRoleMsg').hide();
+
+	});
+</script>
+  
+</html>

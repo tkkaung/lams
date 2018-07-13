@@ -1,0 +1,44 @@
+<html t:type="layout" 
+	title="${getPageTitle()}"
+	currentModule="${moduleName}"
+	currentProj="curProj"
+	breadcrumb="${curProj.encodeddisplayname}=project/home?${curProj.id}
+		,${module.displayName}=modules/scheduling?${curProj.id}
+		,${getBreadcrumbLink()}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+		
+<p:legendBlk>
+	<span class="required">*</span>  ${message:required-fields}
+</p:legendBlk>
+
+	<div class="t-beaneditor">
+		<form t:type="form" t:id="editForm" autofocus="false">
+			<t:errors />
+			<div class="t-beaneditor-row">
+				<t:label for="name" ><span class="required">*</span> ${message:name-label}</t:label>
+				<t:textfield t:id="name" value="milestone.name" validate="required" maxlength="255" class="lwidth" ></t:textfield>
+			</div>
+			<div class="t-beaneditor-row">
+				<t:label for="deadline" ><span class="required">*</span> ${message:deadline-label}</t:label>
+				<t:datefield t:id="deadline"  value="milestone.deadline" validate="required"  class="swidth" format="${message:datefield-format}" />
+				<span class="formtip">(${message:project} ${message:date-label}: ${curProj.sdateDisplay} - ${curProj.edateDisplay})</span>
+			</div>
+			<div class="t-beaneditor-row">
+				<t:label for="comment" />
+				<t:textarea t:id="comment" value="milestone.comment" cols="50" rows="5" class="lwidth" ></t:textarea>
+			</div>
+			<div class="t-beaneditor-row">
+				<label for="manager" >${message:manager-label}</label>
+				<t:if test="${milestone.manager}">
+					<t:pagelink page="user/view" context="milestone.manager.id">${milestone.manager.displayname}</t:pagelink>
+				</t:if>
+				<t:outputraw value="${getSpace()}"/>
+			</div>
+			<div class="t-beaneditor-row">
+				<input t:type="submit" value="${message:submit-label}" class="t-beaneditor-submit" />
+			</div>
+		</form>
+	</div>
+	
+</html>

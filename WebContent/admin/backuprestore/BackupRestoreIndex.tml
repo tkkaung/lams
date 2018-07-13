@@ -1,0 +1,69 @@
+<html t:type="layout" 
+	title="${message:backup-restore} ${message:project}"
+	breadcrumb="${message:control-panel}=admin,${message:backup-restore} ${message:project}=admin/backuprestore"
+   totalShowOption="${totalSize}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="project"/></p:leftMenuBlk>
+
+	<p:actionBtns >
+		<a href="#" t:type="pageLink" page="admin/backuprestore/backupproject" class="button rounded">
+					 	<span>${message:add-new} ${message:backup-entry}</span></a>
+	</p:actionBtns>
+	
+	<table class="actionToolBar">
+		<tr>
+			<td class="right">		 	
+			</td>
+		</tr>
+	</table>
+   
+   
+<form t:type="form" t:id="bEntryForm">
+	<table class="actionToolBar2">
+		<tr>
+			<td align="left">
+				<t:submit class="squared" t:id="restore" value="message:restore"  
+					onclick="return checkHasSelectOneChBox('bEntryGrid','${message:select-exactly-one-item}')"/>
+				<t:submit class="squared" t:id="delete" value="message:delete"  
+					onclick="return checkHasSelectChBox('bEntryGrid','${message:select-at-least-one-item}')"/>
+			</td>
+		</tr>
+	</table>
+	
+	<t:grid source="bEntries" row="bEntry"
+		model="model"
+		id="bEntryGrid"
+		pagerPosition="bottom" 
+    	rowsperpage="rowsperpage"
+		>
+		 <t:parameter name="chkBoxHeader">
+			<input type="checkBox" id="chkBoxAll" value="1" onclick="chkboxAll('bEntryGrid','chkBoxAll')" />
+       </t:parameter>
+       <t:parameter name="chkBoxCell">
+       	<input type="checkBox" name="gridChkBox" value="${bEntry.id}" onclick="chkbox('bEntryGrid','chkBoxAll')" />
+       </t:parameter>
+       
+		<p:fileNameCell>
+			<a href="#" t:type="actionLink" t:id="retrieveAttachment" context="bEntry.id" >
+				${bEntry.attachedFile.displayName}
+			</a>
+		</p:fileNameCell>
+		<p:creatorCell>
+			<t:pageLink page="user/view" context="bEntry.creator.id">
+				${bEntry.creator.displayName}
+			</t:pageLink>
+		</p:creatorCell>
+		<p:projectCell>
+			<t:pageLink page="project/home" context="bEntry.project.id">
+				${bEntry.project.displayName}
+			</t:pageLink>
+		</p:projectCell>
+		
+		<p:fileSizeCell>${bEntry.attachedFile.displaySize}</p:fileSizeCell>
+		<p:createDateCell>${bEntry.createDateDisplay}</p:createDateCell>
+		
+		<p:empty><div class="notfoundtext">${message:no-backup-entry-found}</div></p:empty>
+	</t:grid>
+	</form>
+</html>

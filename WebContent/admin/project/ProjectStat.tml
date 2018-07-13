@@ -1,0 +1,300 @@
+<html t:type="layout"
+		title="${message:project-statistic}"
+      breadcrumb="${message:control-panel}=admin
+       ,${getBreadCrumbAdmin()}
+      ,${message:project-statistic}=admin/project/stat"
+		xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+      xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="project"/></p:leftMenuBlk>
+   
+   <style>
+   	.statBlk td.label{
+	   	text-align: right;
+			vertical-align: top;
+			padding: 1px 5px 0 0;
+			width: 200px;
+		}
+		.statBlk td.label:after {
+		    content: ":";
+		}
+		.statBlk .mTitle{
+			text-align: right;
+			font-weight: bold;
+		}
+   </style>
+   
+   
+	<table class="actionToolBar">
+		<tr>
+			<td class="right">
+			</td>
+		</tr>
+	</table>
+	
+	
+ <div class="projStatDiv">
+ 	<table class="statBlk">
+  		<tr>
+  			<td class="label">${message:project-name} </td>
+  			<td>
+  				<a href="#" t:type="pageLink" page="project/home" context="proj.Id">${proj.displayname}</a>
+  			</td>
+  		</tr>
+  		<tr>
+  			<td class="label">${message:status-label} </td>
+  			<td>${proj.status.displayname}</td>
+  		</tr>
+  		<tr>
+  			<td class="label">${message:date}</td>
+  			<td>
+  				<span class="date">${proj.sdatedisplay} - ${proj.edatedisplay}</span>
+  			</td>
+  		</tr>
+  		<tr>
+  			<td class="label">${message:lastAccess-label}</td>
+  			<td>
+  				<span class="date">${proj.lastAccessdisplay}</span>
+  			</td>
+  		</tr>
+  		<tr>
+  			<td class="label">${message:num-visit}</td>
+  			<td>${getNumView()}</td>
+  		</tr>
+  		<tr>
+  			<td class="label">${message:num-member}</td>
+  			<td>${getNumMember()}</td>
+  		</tr>
+  		<tr>
+  			<td class="label">${message:num-admin-announcement}</td>
+  			<td>${getNumAdminAnnouncement()}</td>
+  		</tr>
+  		
+  		
+  		
+  		
+  		<t:if test="annmtModule">
+	  		<tr>
+	  			<td> 
+	  				<a t:type="pageLink" page="modules/announcement" context="proj.id" >
+		  				<div class="mTitle">
+		  				<img src="${context:lib/img/16/m_Announcement.png}" />
+		  				${annmtModule.displayName}</div>
+	  				</a>
+	  			</td>
+	  		</tr>
+	  		<tr>
+     			<td class="label">${message:num-announcement} </td>
+     			<td>
+     				${getNumAnnouncement()}
+     			</td>
+     		</tr>
+  		</t:if>
+  		<t:if test="assmtModule">
+	  		<tr>
+	  			<td> 
+	  				<a t:type="pageLink" page="modules/assessment/home" context="proj.id" >
+		  				<div class="mTitle">
+		  				<img src="${context:lib/img/16/m_Assessment.png}" />
+		  				${assmtModule.displayName}</div>
+	  				</a>
+	  			</td>
+	  		</tr>
+	  		<tr>
+     			<td class="label">${message:num-assessment} </td>
+     			<td>
+     				${getNumAssessment()}
+     			</td>
+     		</tr>
+  		</t:if>
+  		<t:if test="budgetModule">
+	  		<tr>
+	  			<td> 
+		  			<a t:type="pageLink" page="modules/budget" context="proj.id" >
+		  				<div class="mTitle">
+		  				<img src="${context:lib/img/16/m_Budget.png}" />
+		  				${budgetModule.displayName}</div>
+	  				</a>
+	  			</td>
+	  		</tr>
+	  		<tr>
+     			<td class="label">${message:num-transaction} </td>
+     			<td>
+     				${getNumTransaction()}
+     			</td>
+     		</tr>
+  		</t:if>
+  		
+  		<t:if test="blogModule">
+	  		<tr>
+	  			<td>
+		  			<a t:type="pageLink" page="modules/blog/home" context="proj.id" >
+		  				<div class="mTitle">
+		  				<img src="${context:lib/img/16/m_Blog.png}" />
+		  				${blogModule.displayName}</div>
+	  				</a>
+	  			</td>
+	  		</tr>
+	  		<tr>
+     			<td class="label">${message:num-blog} </td>
+     			<td>
+     				${getNumBlog()}
+     			</td>
+     		</tr>
+     		<tr>
+     			<td class="label">${message:num-comment} </td>
+     			<td>
+     				${getNumBlogComment()}
+     			</td>
+     		</tr>
+  		</t:if>
+  		
+  		<t:if test="elogModule">
+	  		<tr>
+	  			<td>
+		  			<a t:type="pageLink" page="modules/elog/home" context="proj.id" >
+		  				<div class="mTitle">
+		  				<img src="${context:lib/img/16/m_eLog.png}" />
+		  				${elogModule.displayName}</div>
+	  				</a>
+	  			</td>
+	  		</tr>
+	  		<tr>
+     			<td class="label">${message:num-elog} </td>
+     			<td>
+     				${getNumElog()}
+     			</td>
+     		</tr>
+     		<tr>
+     			<td class="label">${message:num-comment} </td>
+     			<td>
+     				${getNumElogComment()}
+     			</td>
+     		</tr>
+  		</t:if>
+  		
+  		<t:if test="resourceModule">
+	  		<tr>
+	  			<td> 
+	  				<a t:type="pageLink" page="modules/resources/home" context="proj.id" >
+		  				<div class="mTitle">
+		  				<img src="${context:lib/img/16/m_Resource.png}" />
+		  				${resourceModule.displayName}</div>
+	  				</a>
+	  			</td>
+	  		</tr>
+	  		<tr>
+     			<td class="label">${message:num-folder} </td>
+     			<td>
+     				${getNumFolder()}
+     			</td>
+     		</tr>
+     		<tr>
+     			<td class="label">${message:num-file} </td>
+     			<td>
+     				${getNumFile()}
+     			</td>
+     		</tr>
+     		<tr>
+     			<td class="label">${message:num-link} </td>
+     			<td>
+     				${getNumLink()}
+     			</td>
+     		</tr>
+     		<tr>
+     			<td class="label">${message:num-download} </td>
+     			<td>
+     				${getNumDownload()}
+     			</td>
+     		</tr>
+  		</t:if>
+  		
+  		<t:if test="forumModule">
+	  		<tr>
+	  			<td>
+		  			<a t:type="pageLink" page="modules/forum" context="proj.id" > 
+		  				<div class="mTitle">
+		  				<img src="${context:lib/img/16/m_Forum.png}" />
+		  				${forumModule.displayName}</div>
+		  			</a>
+	  			</td>
+	  		</tr>
+	  		<tr>
+     			<td class="label">${message:num-forum} </td>
+     			<td>
+     				${getNumForum()}
+     			</td>
+     		</tr>
+     		<tr>
+     			<td class="label">${message:num-thread} </td>
+     			<td>
+     				${getNumThread()}
+     			</td>
+     		</tr>
+     		<tr>
+     			<td class="label">${message:num-thread-reply} </td>
+     			<td>
+     				${getNumThreadReply()}
+     			</td>
+     		</tr>
+     		<tr>
+     			<td class="label">${message:num-thread-reflection} </td>
+     			<td>
+     				${getNumThreadReflection()}
+     			</td>
+     		</tr>
+     	</t:if>
+  		
+  		<t:if test="schedulingModule">
+	  		<tr>
+	  			<td> 
+	  				<a t:type="pageLink" page="modules/scheduling" context="proj.id" >
+					 	<div class="mTitle">
+		  				<img src="${context:lib/img/16/m_Scheduling.png}" />
+		  				${schedulingModule.displayName}</div>
+	  				</a>
+	  			</td>
+	  		</tr>
+	  		<tr>
+     			<td class="label">${message:num-milestone} </td>
+     			<td>
+     				${getNumMilestone()}
+     			</td>
+     		</tr>
+     		<tr>
+     			<td class="label">${message:num-phase} </td>
+     			<td>
+     				${getNumPhase()}
+     			</td>
+     		</tr>
+     		<tr>
+     			<td class="label">${message:num-task} </td>
+     			<td>
+     				${getNumTask()}
+     			</td>
+     		</tr>
+     	</t:if>
+  		
+  		<t:if test="llogModule">
+	  		<tr>
+	  			<td>
+	  				<a t:type="pageLink" page="modules/learninglog" context="proj.id" >
+	  				<div class="mTitle">
+	  				<img src="${context:lib/img/16/m_LearningLog.png}" />
+	  				${llogModule.displayName}</div>
+	  				</a>
+	  			</td>
+	  		</tr>
+	  		<tr>
+     			<td class="label">${message:num-llog} </td>
+     			<td>
+     				${getNumllog()}
+     			</td>
+     		</tr>
+     	</t:if>
+  	
+  	
+  	</table>
+ 	
+	
+</div>
+</html>

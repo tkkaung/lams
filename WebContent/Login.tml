@@ -1,0 +1,348 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+   "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+	xmlns:p="tapestry:parameter" dir="ltr" lang="en-US">
+
+	<head>
+		<title>eUreka 2.0 Login</title>
+
+		<style>
+			body{
+			}
+			table.loginFormTbl td{
+			text-align: left;
+			}
+			input[type="text"]{
+			witdh: 160px;
+			}
+			.attention{
+			color:red;
+			}
+			div.capchaTxt {
+			margin: 3px;
+			padding: 2px 6px;
+			border: 2px solid #999;
+			background: #eee;
+			color: #1d9de4;
+			font-size: 14px;
+			font-weight: bold;
+			display: inline-block;
+			_display: inline;
+			text-align: center;
+			height: 20px;
+			}
+			.leftpanel a, .leftpanel a:visited{
+				color: #3D66DD
+			}
+		</style>
+
+	<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width" />
+
+<link rel="stylesheet" type="text/css" media="all" t:type="any" href="context:lib/eureka/wp-content/themes/celt-theme-20120325/style.css" />
+<link rel='stylesheet' id='promoslider_main-css' t:type="any" href='context:lib/eureka/wp-content/plugins/promotion-slider/css/sliderd617.css' type='text/css' media='all' />
+
+
+	</head>
+	<body>
+
+
+
+
+		<table width="100%">
+			<tr>
+				<td width="195px" style="vertical-align:top;" class="leftpanel">
+					<table width="100%" height="700" align="center" border="0"
+						cellspacing="2" cellpadding="5" class="loginboxmain">
+						<tr>
+							<td style="background:#003c7b; text-align:center;">
+								<img t:type="any" src="context:lib/img/eUrekaBanner.jpg"
+									border="0" />
+							</td>
+						</tr>
+						<tr>
+							<td valign="top" align="center" class="body-text-normal"
+								colspan="2">
+								<table width="100%" height="100" border="0" cellpadding="3"
+									cellspacing="0" class="loginbox">
+									<tr>
+										<td height="20" bgcolor="#0066FF" align="left" colspan="2">
+											<b>
+												<font color="white">Login for non NTU users</font>
+											</b>
+
+										</td>
+									</tr>
+									<tr>
+										<td>
+
+											<t:form t:id="loginForm">
+												<t:errors banner="literal:Problem when try to login:" />
+												<t:if test="${getWaitwarningMessage()}">
+													<span class="attention">${getWaitwarningMessage()}</span>
+												</t:if>
+												<table class="loginFormTbl">
+													<tr>
+														<td>
+															<t:label for="usernameeu">${message:username-label}</t:label>
+														</td>
+														<td>
+															<t:textfield t:id="usernameeu" validate="required"
+																value="username" />
+														</td>
+													</tr>
+													<tr>
+														<td>
+															<t:label for="passwordeu">${message:password-label}</t:label>
+														</td>
+														<td>
+															<t:passwordfield t:id="passwordeu"  autocomplete="off" value="password" />
+														</td>
+													</tr>
+													<t:if test="ctext1">
+														<tr>
+															<td>CAPTCHA: </td>
+															<td>
+																<div>
+																	Enter what you see in the CAPTCHA text box below
+																	<div class="capchaTxt">${ctext1}</div>
+																	<t:textfield t:id="ctext2" value="ctext2" />
+																</div>
+															</td>
+														</tr>
+													</t:if>
+
+													<tr>
+														<td>&nbsp;
+														</td>
+														<td>
+															<t:submit id="LoginSubmit" value="Login" />
+														</td>
+													</tr>
+												</table>
+											</t:form>
+										</td>
+									</tr>
+
+									<tr>
+										<td colspan="2" valign="top" align="center" height="18">
+											<span class="function_headline" style="color:red"></span>
+											<br />
+											<i>
+												For NTU users, please login via
+												<a href="https://ntulearn.ntu.edu.sg">NTULearn</a>
+												.
+											</i>
+										</td>
+
+									</tr>
+
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td valign="top" align="center" class="body-text-normal"
+								colspan="2">
+								<table width="100%" height="100" border="0" cellpadding="3"
+									cellspacing="0" class="loginbox">
+									<tr>
+
+										<td height="20" bgcolor="#FF9745" align="left">
+											<b>
+												<font color="white">Login Problems</font>
+											</b>
+										</td>
+									</tr>
+									<tr>
+										<td width="100%" height="80" align="left" valign="top"
+											class="body-text-normal">
+											Please contact service desk at
+											<a href="mailto:servicedesk@ntu.edu.sg">servicedesk@ntu.edu.sg</a>
+											.
+											<br />
+											<br />
+											Click
+											<a href="#"
+												onClick="javascript:window.open('${getLoginFAQLink()}','FAQs','dependent=no,titlebar=no,status=no,toolbar=no,menubar=no,resizable=yes,scrollbars=no,height=600,width=500')">here</a>
+											if you have enquiries on eUreka external user account.
+										</td>
+									</tr>
+								</table>
+							</td>
+
+						</tr>
+						<tr>
+							<td class="header-text-small" align="left">
+								${getServerId()} Copyright 2004-${getYear()}
+								<br />
+								</td>
+						</tr>
+
+
+					</table>
+
+
+
+				</td>
+				<td>
+
+					<div
+						class="home page page-id-2 page-template page-template-page-slider-double-php singular">
+
+						<div id="wrapper">
+
+
+
+							<div id="header">
+								<div id="header_logo"></div>
+								
+							</div>
+
+
+
+
+
+							<div id="menu-top">
+								<nav id="access" role="navigation">
+									<div class="menu-main-menu-container">
+										<ul id="menu-main-menu" class="menu">
+											<li id="menu-item-305"
+												class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-2 current_page_item menu-item-305">
+												<a href="#forfaculty" onclick="windowname = window.open('http://www.ntu.edu.sg/cits/lsa/eureka/Pages/default.aspx', 'eUreka', 'width=800,height=600,scrollbars=yes,location=0,status=0').focus()">Home</a>
+											</li>
+											<li id="menu-item-104"
+												class="menu-item menu-item-type-post_type menu-item-object-page menu-item-104">
+												<a href="#forstudents"
+													onclick="windowname = window.open('http://www.ntu.edu.sg/cits/lsa/eureka/for-students/Pages/default.aspx', 'For Students', 'width=800,height=600,scrollbars=yes,location=0,status=0').focus()">For Students</a>
+											</li>
+											<li id="menu-item-103"
+												class="menu-item menu-item-type-post_type menu-item-object-page menu-item-103">
+												<a href="#forfaculty"
+													onclick="windowname = window.open('http://www.ntu.edu.sg/cits/lsa/eureka/for-faculty/Pages/default.aspx', 'For Faculty', 'width=800,height=600,scrollbars=yes,location=0,status=0').focus()">For Faculty</a>
+											</li>
+
+										</ul>
+									</div>
+								</nav><!-- #access -->
+							</div>
+
+
+
+	<div id="landing_single_slider">
+
+		<div class="promo_slider_wrapper first fancy_nav no_pause">
+
+			<div class="promo_slider_nav tabbed_ps_nav slider_selections">
+			</div>
+<div class="promo_slider ">
+				<span class="promo_slider_time_delay" style="display:none;">6</span>
+				<div class="panel panel-3">
+					<span class="panel-title" style="display:none;">Slider 01</span>
+					<div class="promo_slider_background_image">
+						<img width="750" height="250" t:type="any"
+							src="context:lib/eureka/images/eureka-01.png" class="attachment-full wp-post-image"
+							alt="eureka-01" title="eureka-01" />
+					</div>
+				</div>
+
+				<div class="promo_slider_nav fancy_ps_nav">
+					<span class="move_backward pointer" title="Move Backward">&lt;&lt;</span>
+							<span class="slider_selections pointer"></span>
+							<span class="move_forward pointer" title="Move Forward">&gt;&gt;</span>
+										</div>
+		
+						<div class="clear"></div>
+
+					</div>
+			
+		</div>
+	</div>  
+ 
+ 
+ 
+<h4 style="text-align: center;"><img t:type="any" src="context:lib/eureka/images/site-logo.png" alt="logo"/></h4> 
+<div id="bodycontent_landing">
+	<a href="#Students" onclick="windowname = window.open('http://www.ntu.edu.sg/cits/lsa/eureka/for-students/Pages/default.aspx', 'Benifits', 'width=800,height=600,scrollbars=yes,location=0,status=0').focus()"><h1 class="h1_std"><span class="cursive">Click Here For</span><br /> STUDENTS</h1></a>
+	<div id="landing_std">
+        <nav id="access" role="navigation">
+        
+            <div class="menu-for-students-container">
+            	<ul id="menu-for-students" class="menu">
+                <li id="menu-item-105" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-105"> <a href="#Students" onclick="windowname = window.open('http://www.ntu.edu.sg/cits/lsa/eureka/for-students/Pages/default.aspx', 'Benifits', 'width=800,height=600,scrollbars=yes,location=0,status=0').focus()">Benefits</a></li>
+                    <li id="menu-item-106" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-106"> <a href="#Students" onclick="windowname = window.open('http://www.ntu.edu.sg/cits/lsa/eureka/for-students/Pages/Features.aspx', 'Features', 'width=800,height=600,scrollbars=yes,location=0,status=0').focus()">Features</a></li>
+                    <li id="menu-item-431" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-431"> <a href="#Students" onclick="windowname = window.open('http://www.ntu.edu.sg/cits/lsa/eureka/for-students/Pages/getting-started.aspx', 'Getting Started', 'width=800,height=600,scrollbars=yes,location=0,status=0').focus()">Getting Started</a></li>
+                    <li id="menu-item-619" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-619"> <a href="#Students" onclick="windowname = window.open('http://www.ntu.edu.sg/cits/lsa/eureka/for-students/usecases/Pages/default.aspx', 'Use Cases', 'width=800,height=600,scrollbars=yes,location=0,status=0').focus()">Use Cases</a></li>
+                    <li id="menu-item-112" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-112"> <a href="#Students" onclick="windowname = window.open('http://www.ntu.edu.sg/cits/lsa/eureka/for-students/Pages/Resources.aspx', 'Resources', 'width=800,height=600,scrollbars=yes,location=0,status=0').focus()">Resources</a></li>
+                    <li id="menu-item-115" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-115"> <a href="#Students" onclick="windowname = window.open('http://www.ntu.edu.sg/cits/lsa/eureka/for-students/Pages/User-Guides.aspx', 'User Guides', 'width=800,height=600,scrollbars=yes,location=0,status=0').focus()">User Guides</a></li>
+                    <li id="menu-item-117" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-117"> <a href="#Students" onclick="windowname = window.open('http://www.ntu.edu.sg/cits/lsa/eureka/for-students/Pages/Support.aspx', 'Support', 'width=800,height=600,scrollbars=yes,location=0,status=0').focus()">Support</a></li>
+                </ul>
+           </div> 
+        </nav><!-- #access -->
+    </div>
+   <a href="#Faculty" onclick="windowname = window.open('http://www.ntu.edu.sg/cits/lsa/eureka/for-faculty/Pages/default.aspx', 'Benifits', 'width=800,height=600,scrollbars=yes,location=0,status=0').focus()"> <h1 class="h1_fac"><span class="cursive">Click Here For</span><br /> FACULTY</h1></a>
+    <div id="landing_fac">
+    	<nav id="access" role="navigation">
+        
+            <div class="menu-for-faculty-container">
+            	<ul id="menu-for-faculty" class="menu">
+                	
+                	<li id="menu-item-120" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-120"> <a href="#Faculty" onclick="windowname = window.open('http://www.ntu.edu.sg/cits/lsa/eureka/for-faculty/Pages/default.aspx', 'Benifits', 'width=800,height=600,scrollbars=yes,location=0,status=0').focus()">Benefits</a></li>
+                    <li id="menu-item-121" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-121"> <a href="#Faculty" onclick="windowname = window.open('http://www.ntu.edu.sg/cits/lsa/eureka/for-faculty/Pages/Features.aspx', 'Features', 'width=800,height=600,scrollbars=yes,location=0,status=0').focus()">Features</a></li>
+                    <li id="menu-item-615" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-615"> <a href="#Faculty" onclick="windowname = window.open('http://www.ntu.edu.sg/cits/lsa/eureka/for-faculty/Pages/Getting-Started.aspx', 'Getting Started', 'width=800,height=600,scrollbars=yes,location=0,status=0').focus()">Getting Started</a></li>
+                    <li id="menu-item-612" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-612"> <a href="#Faculty" onclick="windowname = window.open('http://www.ntu.edu.sg/cits/lsa/eureka/for-faculty/UseCases/Pages/default.aspx', 'Use Cases', 'width=800,height=600,scrollbars=yes,location=0,status=0').focus()">Use Cases</a></li>
+                    <li id="menu-item-613" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-613"> <a href="#Faculty" onclick="windowname = window.open('http://www.ntu.edu.sg/cits/lsa/eureka/for-faculty/Pages/Resources.aspx', 'Resources', 'width=800,height=600,scrollbars=yes,location=0,status=0').focus()">Resources</a></li>
+                    <li id="menu-item-615" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-615"> <a href="#Faculty" onclick="windowname = window.open('http://www.ntu.edu.sg/cits/lsa/eureka/for-faculty/Pages/User-Guides.aspx', 'User Guides', 'width=800,height=600,scrollbars=yes,location=0,status=0').focus()">User Guides</a></li>
+                    <li id="menu-item-127" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-127"> <a href="#Faculty" onclick="windowname = window.open('http://www.ntu.edu.sg/cits/lsa/eureka/for-faculty/support/Pages/default.aspx', 'Support', 'width=800,height=600,scrollbars=yes,location=0,status=0').focus()">Support</a></li>
+                	
+                	</ul>
+            </div> 
+        </nav><!-- #access -->
+    </div>
+</div>
+
+
+
+	
+    
+        
+	<div id="footer">
+	    <!--div id="celt-logo" ><a href="http://www.ntu.edu.sg/celt/" target="_blank" ></a></div-->
+    	<div id="footer_copy">
+			&copy;Nanyang Technological University<br />
+            
+        </div>
+        <div id="footer_reg">
+			 <a href="#" onclick="windowname = window.open('http://www.ntu.edu.sg/Pages/copyright.aspx', 'copyright', 'width=800,height=600,scrollbars=yes,location=0,status=0').focus()">Copyright</a> |
+       <a href="#" onclick="windowname = window.open('http://www.ntu.edu.sg/Pages/disclaimer.aspx', 'disclaimer', 'width=800,height=600,scrollbars=yes,location=0,status=0').focus()">Disclaimer</a> |
+       <a href="#" onclick="windowname = window.open('http://www.ntu.edu.sg/Pages/privacy.aspx', 'privacy', 'width=800,height=600,scrollbars=yes,location=0,status=0').focus()">Privacy Statement</a>
+         
+            
+             <br />
+            Reg. No. 200604393R        
+        </div>
+    </div>
+
+
+    
+</div>	
+
+				
+				
+				</div>
+				
+				</td>
+			</tr>
+		</table>
+	</body>
+	
+	<script>
+		document.observe("dom:loaded", function(){
+  			var WindowSize = Class.create({
+			   width: window.innerWidth || (window.document.documentElement.clientWidth || window.document.body.clientWidth),
+			   height: window.innerHeight || (window.document.documentElement.clientHeight || window.document.body.clientHeight)
+			});
+  		});
+	</script>
+	
+</html>
+

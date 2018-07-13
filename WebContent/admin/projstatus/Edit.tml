@@ -1,0 +1,31 @@
+<html t:type="layout" 
+	title="${message:add-edit} ${message:projstatus}"
+	breadcrumb="${message:control-panel}=admin,${message:manage} ${message:projstatus}=admin/projstatus/manage,${message:add-edit} ${message:projstatus}=admin/projstatus/edit"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+	xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="systemtools"/></p:leftMenuBlk>
+   <p:legendBlk>
+		<span class="required">*</span>  ${message:required-fields}
+	</p:legendBlk>
+	
+   <t:beaneditform t:id="form" object="status" 
+   	submitLabel="${message:submit-label}" 
+   	exclude="system">
+    	<p:name>
+			<t:label for="name" ><span class="required">*</span>  ${message:name-label}</t:label>
+			<t:textfield t:id="name" value="status.name" validate="required" class="mwidth"/>
+			<span class="formtip">${message:name-known-to-system-tip}</span>
+    	</p:name>
+    	<p:alias>
+    		<t:label for="alias"/>
+    		<t:textfield t:id="alias" value="status.alias" />
+    		<span class="formtip">${message:alias-tip}</span>
+    	</p:alias>
+    	<p:description>
+			<t:label for="description" />
+			<textarea t:type="textarea" t:id="description" value="status.description" cols="50" rows="5" class="lwidth"/>
+		</p:description>
+		
+   </t:beaneditform>
+    
+</html>

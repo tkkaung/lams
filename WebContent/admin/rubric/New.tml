@@ -1,0 +1,293 @@
+<html t:type="layout" 
+	title="${message:add-new} ${message:rubric}"
+	breadcrumb="${message:control-panel}=admin
+		,${getBreadcrumbAdmin()}
+		,${message:manage-my-rubric}=admin/rubric/home
+		,${message:add-new} ${message:rubric}=admin/rubric/edit"
+   xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" xmlns:p="tapestry:parameter">
+
+	<p:leftMenuBlk><t:ControlPanMenu initTab="rubric"/></p:leftMenuBlk>
+
+
+<style>
+	.rubricDetailZone{
+		overflow:auto;
+	}
+	.rubricDetailZone input[type="text"]{
+		width: 70px;
+	}
+	.rubricDetailZone textarea{
+		font-size:0.9em;
+	}
+	
+	
+</style>
+  
+	<p:legendBlk>
+		<span class="required">*</span>  ${message:required-fields}
+		<t:if test="canUseOpenQuestion()">
+			<div>
+				<b>${message:qualitative-feedback-label}</b> and <b>${message:open-question-label}</b> ${message:note-apply-to-pe-only}
+			</div>
+		</t:if>
+		
+	</p:legendBlk>
+
+	<form t:type="form" t:id="form" class="e-formeditor">
+		<t:errors />
+		<div class="t-beaneditor">
+		<table >
+			<tr>
+				<td class="label" ><t:label for="name" ><span class="required">*</span>  ${message:name-label}</t:label></td>
+				<td><t:textfield t:id="name" value="rubric.name"  class="lwidth"  validate="required"/></td>
+			</tr>
+			<tr>
+				<td class="label"><t:label for="des" /></td>
+				<td><textarea t:type="textarea" t:id="des" value="rubric.des" cols="50" rows="5" class="lwidth"/></td>
+			</tr>
+			<tr>
+				<td class="label"><t:label for="shared" /></td>
+				<td>
+					<t:checkbox t:id="shared" value="rubric.shared" onClick="JavaScript:warningMe('shared');" />
+					<span class="formtip">${message:shared-tip}</span>
+				</td>
+			</tr>
+			<t:if test="canManageSchoolRubrics()">
+				<tr>
+					<td class="label"><t:label for="master" /></td>
+					<td>
+						<t:checkbox t:id="master" value="rubric.master"/>
+						<span class="formtip">${message:master-tip}</span>
+						${message:for}
+						<t:if test="canManageRubrics()">
+							<t:select value="rubric.school" model="getSchoolModel()" blanklabel="message:scope-all-school"/>
+							<p:else>
+								<t:select value="rubric.school" model="getSchoolModel()" validate="required"/>
+							</p:else>
+						</t:if>
+					</td>
+				</tr>
+			</t:if>
+			
+			<tr>
+				<td class="label"><label for="template" ><span class="required">*</span> ${message:template-label}</label></td>
+				<td>
+					<t:RadioGroup t:id="temCreate" value="temCreate" >
+					<table style="width:auto;">
+						<tr>
+							<td style="vertical-align:top;padding-right:10px;">
+								<t:Radio t:id="temCreate0" value="0" /> 
+								<t:label for="temCreate0">${message:create-from-scratch}</t:label>
+							</td>
+							<td>
+								
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<t:Radio t:id="temCreate1" value="1" /> 
+								<t:label for="temCreate1">${message:load-from-template}</t:label>
+							</td>
+							<td>
+								<t:select value="rubricToLoad" t:id="rubricToLoad" model="RubricModel" onchange="onLoadRubricChanged()" />
+								<t:submit value="${message:update}" t:id="loadTemplate" class="squared disabled" 
+								  />
+							</td>
+						</tr>
+					</table>
+					</t:RadioGroup>
+				</td>
+			</tr>
+			<tr>
+				<td class="label">Is GMAT scoring</td>
+				<td>
+					<t:checkbox t:id="gmat" value="rubric.gmat"/> Yes
+					<span class="formtip">${message:gmat-tip}</span>
+				</td>
+			</tr>
+			
+			<tr>
+				<td class="label"><span class="required">*</span> ${message:dimension-label}</td>
+				<td>
+					<table style="width:auto;">
+						<tr>
+							<td >${message:numCrit-label}</td>
+							<td>
+								<t:textfield t:id="numCrit" style="width:50px;" onChange="numFieldChanged()" onKeyup="numFieldChanged()" validate="required,min=1,max=20" value="numCrit" />
+							</td>
+							<td>
+							</td>
+						</tr>
+						<tr>
+							<td >${message:numCriterion-label} </td>
+							<td>
+								<t:textfield t:id="numCriterion" style="width:50px;" onChange="numFieldChanged()" onKeyup="numFieldChanged()" validate="required,min=1,max=20" value="numCriterion" />
+							</td>
+							<td>
+								<t:submit value="${message:update}" t:id="updateNumFields" class="squared disabled" />
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+		<div class="rubricDetailZone">
+			<table class="stickyHeader t-data-grid">
+			<thead>
+				<tr>
+					<th rowspan="3" colspan="2">${message:criteria-objective} <t:submit value="${message:insert-row}" t:id="insertRow" class="squared" />  <t:submit t:id="deleteRow" value="${message:delete-row}" class="squared" /></th>
+					<th rowspan="3"><span class="required">*</span> ${message:weightage-label} <span class="formtip">(%)</span></th>
+					<th colspan="${numCol}">${message:criterion}  <t:submit value="${message:insert-column}" t:id="insertCol" class="squared" /> <t:submit t:id="deleteCol" value="${message:delete-column}" class="squared" /></th>
+				</tr>
+				<tr>
+					<t:loop source="getFirstCriterions()" value="tempRCriterion" index="colIndex">
+						<th>
+						  <t:if test="checkCol">
+						    <input type="radio" name="colIdx" value="${colIndex}" checked="true" />
+						    <p:else>
+						    <input type="radio" name="colIdx" value="${colIndex}" />
+						    </p:else>
+						  </t:if>
+						</th>
+					</t:loop>
+				</tr>
+				<tr>
+					<t:loop source="getFirstCriterions()" value="tempRCriterion" index="colIndex" >
+						<th>
+							<t:textfield t:id="columnScore" value="getRCriterion(0,colIndex).score" 
+								validate="required,min=0,max=100" 
+								class="columnScore swidth" 
+								title="${message:columnScore-label}" t:defer="false"/>
+						</th>
+					</t:loop>
+				</tr>
+				</thead>
+				<t:loop source="rubric.getCriterias()" value="tempRCrit" index="rowIndex">
+					<tr>
+						<th>
+						  <t:if test="checkRow">
+						    <input type="radio" name="rowIdx" value="${rowIndex}" checked="true" />
+						    <p:else>
+						      <input type="radio" name="rowIdx" value="${rowIndex}" />
+						    </p:else>
+						  </t:if>
+						</th>
+						<th>
+							<textarea t:type="textarea" t:id="rName" value="getRCrit(rowIndex).name" cols="15" rows="4"  
+							 	validate="maxlength=1000" title="${message:critName-label}"/>
+						</th>
+						<th class="weightage">
+							<input t:type="textfield" t:id="weight" class="rWeightage" 
+								value="getRCrit(rowIndex).weightage" 
+								validate="required,min=0,max=100"
+								onkeyup="updateTotalWeight();"
+								style="width:40px;"/>
+						</th>
+						<t:loop source="tempRCrit.criterions" value="tempRCriterion" index="colIndex">
+							<td>
+								<textarea t:type="textarea" t:id="rcDes"  value="getRCriterion(rowIndex,colIndex).des" cols="15" rows="4"
+							 	validate="maxlength=1000" title="${message:desPerformance-label}"/>
+							</td>
+						</t:loop>
+					</tr>
+				</t:loop>
+				<tr>
+					<td colspan="2"><t:outputraw value="getSpace()"/></td>
+					<th><span id="totalWeight">${getTotalWeight(rubric.getCriterias())}</span></th>
+					<td colspan="${numCol}"><t:outputraw value="getSpace()"/></td>
+				</tr>
+			</table>
+		 </div>
+
+		
+		 <div class="t-beaneditor">
+		<table >
+			<tr>
+				<td class="label" ><label > ${message:qualitative-feedback-label}</label></td>
+				<td>
+				<div>
+					<t:textfield t:id="cmtStrength" value="rubric.cmtStrength"  class="mwidth"  />
+					<t:checkbox t:id="useCmtStrength" value="rubric.useCmtStrength"  />	
+				</div>
+				<div>
+					<t:textfield t:id="cmtWeakness" value="rubric.cmtWeakness"  class="mwidth"  />
+					<t:checkbox t:id="useCmtWeakness" value="rubric.useCmtWeakness"  />	
+				</div>
+				<div>
+					<t:textfield t:id="cmtOther" value="rubric.cmtOther"  class="mwidth"  />
+					<t:checkbox t:id="useCmtOther" value="rubric.useCmtOther"  /> 
+				</div>
+				</td>
+			</tr>
+			<t:if test="canUseOpenQuestion()">
+				<tr>
+					<td class="label" ><label > ${message:open-question-label}</label></td>
+					<td>
+					 <div t:type="ajaxformloop" t:id="questions" source="rubric.openEndedQuestions" value="oQuestion"  >
+					 	
+					 	<input t:type="textarea"  cols="15" rows="4" class="lwidth" t:id="questionField" value="openQuestion" />
+	
+				          |
+				
+				          <t:removerowlink>remove</t:removerowlink>
+					</div>
+					</td>
+				</tr>
+				
+			</t:if>
+			</table>
+		</div>
+			
+		
+		
+		
+		<t:submit t:id="bsubmit" value="${message:submit-label}" class="submit squared" 
+			style="margin-top:10px;"
+			onclick="return onSubmitClicked();"/>
+		</div>
+	</form>
+	<script>
+		function onLoadRubricChanged(){
+			$('temCreate1').checked = true;
+			$('loadTemplate').removeClassName('disabled');
+		}
+		function numFieldChanged(){
+			$('updateNumFields').removeClassName('disabled');
+		}
+		
+		
+		function updateTotalWeight(){
+			var numRow = ${rubric.getCriterias().size()};
+			var total = 0;
+			$$('.rWeightage').each(function(elm){
+					total = total + parseInt(elm.value, 10);
+			});
+			$('totalWeight').update(total);
+		}
+		function onSubmitClicked(){
+			if(!checkGMAT())
+				return false;
+			
+			if($('totalWeight').innerHTML != '100'){
+				alert('${message:total-weight-must-equal-100}');
+				return false;
+			}
+			return true;
+		}
+		function checkGMAT()
+		{
+			if($('gmat')){
+				if($('gmat').checked){
+					if($('numCriterion').value!='6'){
+						alert('The GMAT rubric must have 6 columns, scoring 1,2,3,4,5,6');
+						return false;
+					}
+				}
+			}
+			return true;
+		}
+		
+		
+		
+	</script>
+</html>

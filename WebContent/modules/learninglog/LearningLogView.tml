@@ -1,0 +1,102 @@
+<html t:type="layout" 
+	title="${message:view} ${message:logentry}"
+	currentModule="${moduleName}"
+	currentProj="curProj"
+	breadcrumb="${curProj.encodeddisplayname}=project/home?${curProj.id}
+		,${module.displayName}=modules/learninglog?${curProj.id},
+		${message:view} ${message:logentry}=modules/learninglog?${entry.id}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+	
+	<p:actionBtns>
+		<a href="#" t:type="pageLink" page="modules/learninglog/edit" context="entry.id" class="button rounded">
+			<span>${message:edit}</span>
+		</a>
+	</p:actionBtns>
+	
+	<table class="actionToolBar">
+		<tr>
+			<td class="right">
+			</td>
+		</tr>
+	</table>	
+	
+	<div style="padding:5px;">
+		<t:if test="entry.type">
+			<div>
+				<strong>${message:type-label}: </strong> ${entry.type}
+			</div>
+		</t:if>
+		<t:if test="entry.forumThreadId">
+			<div>
+				<strong>${message:link-back-label}: </strong> 
+				<t:pagelink page="modules/forum/threadview" context="entry.forumThreadId">${message:forum-thread}</t:pagelink>
+			</div>
+		</t:if>
+		<t:if test="entry.blogId">
+			<div>
+				<strong>${message:link-back-label}: </strong> 
+				<t:pagelink page="modules/blog/view" context="entry.blogId">${message:blog}</t:pagelink>
+			</div>
+		</t:if>
+		<t:if test="entry.elogId">
+			<div>
+				<strong>${message:link-back-label}: </strong> 
+				<t:pagelink page="modules/elog/view" context="entry.elogId">${message:elog}</t:pagelink>
+			</div>
+		</t:if>
+	</div>
+	
+	<div class="learnLogBlk">
+		<div class="head">
+			<table width="100%">
+				<tr>
+					<td>
+						<span class="subject" >
+					 		${entry.title}
+					 	</span>
+					 </td>
+					<td style="text-align:right;">
+						<span class="date">${entry.mdateDisplay}</span> 
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="container">
+			<span class="content" ><t:outputraw value="entry.content"/></span>
+		</div>
+		
+		<div class="container">
+			<t:if test="entry.files">
+				<div class="attFiles">
+					<div class="attLabel">
+						${message:attachment} <img src="${context:lib/img/icon-attachment.gif}" />
+						:
+					</div>
+					<div>
+						<t:loop source="getNonImageAttachedFiles(entry.files)" value="tempFile">
+							<div class="attFile">
+								<t:eventLink event="retrieveFile" context="tempFile.id" title="${message:click-to-download}">
+									${tempFile.displayName}
+								</t:eventLink>
+								(${tempFile.displaySize})
+							</div>
+						</t:loop>
+					</div>
+					<div class="imgBlks">
+						<t:loop source="getImageAttachedFiles(entry.files)" value="tempFile">
+							<div class="imgBlk" >
+								<a href="${getRetrieveImageLink(tempFile.id)}" target="_blank" >
+									<img src="${getRetrieveImageThumbLink(tempFile.id)}" alt="" title="${message:click-to-view-originalsize}"/>
+								</a>
+								<t:eventLink event="retrieveFile" context="tempFile.id"  title="${message:click-to-download}">
+								${message:download}</t:eventLink>
+								(${tempFile.displaySize})
+							</div>
+						</t:loop>
+					</div>					
+				</div>
+			</t:if>
+		</div>
+	</div>
+</html>

@@ -1,0 +1,24 @@
+  div.slider { 
+  width:200px; 
+  margin:10px 0; 
+  background:#ddd url('img/track.png');
+   
+  height:4px; 
+  position: relative; 
+  }
+  div.slider div.handle { 
+  width:10px; 
+  height:15px; 
+  background: url('img/handle.png') !important; 
+  cursor:move; 
+  position: absolute; 
+  }
+  div.slider div.value { 
+  width:10px; 
+  height:15px; 
+  margin-left: 10px;
+  margin-top: 20px;
+  position: absolute; 
+  
+  }
+  

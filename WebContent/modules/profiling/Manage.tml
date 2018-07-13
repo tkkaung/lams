@@ -1,0 +1,96 @@
+<html t:type="layout" 
+	title="${message:manage-profiling}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/profiling/home?${project.id}
+		,${message:manage-profiling}=modules/profiling/manage?${project.id}
+		"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+<style>
+	.released, .orderNumber{
+		text-align: center;
+	}
+</style>
+
+<p:actionBtns>
+	
+	<a class="button rounded" t:type="pageLink" page="modules/profiling/managequestionset" context="project.id" >
+		<span>${message:manage-questionset}</span>
+	</a>
+	<a class="button rounded" t:type="pageLink" page="modules/group" context="project.id" >
+		<span>${message:manage-group}</span>
+	</a>
+</p:actionBtns>	
+
+
+<t:grid source="profs" row="prof" 
+	model="model"
+	rowIndex="rowIndex"
+	pagerPosition="bottom" 
+	>
+	<p:empty>
+		<div class="notfoundtext">
+			${message:no-profiling-found}
+		</div>
+	</p:empty>
+   <t:parameter name="orderNumberCell">
+   	${prof.ordernumber}
+   </t:parameter>
+   
+   <t:parameter name="nameCell">
+   		<span>${prof.name}</span> 
+   </t:parameter>
+   <t:parameter name="mdateCell">
+   	<span class="date">${prof.mdatedisplay}</span>
+   	<t:if test="prof.isDiffEditor()">
+			<div style="font-size:0.9em">
+				${message:by} 
+				<t:pagelink page="user/view" context="prof.editor.id">${prof.editor.displayname}</t:pagelink>
+			</div>
+		</t:if>
+   </t:parameter>
+   <t:parameter name="groupCell">
+   	<t:if test="prof.group">
+   		${prof.group.groupType}
+   	</t:if>
+   </t:parameter>
+   <t:parameter name="questionSetNameCell">
+   		<t:if test="prof.questionSet">
+   			<t:pagelink page="modules/profiling/QuestionsetView" context="getParams(project.id, prof.questionSet.id)">${prof.questionSetName}</t:pagelink>
+   		</t:if>
+   </t:parameter>
+   <t:parameter name="edateCell">
+   		<t:if test="prof.sdate" >
+   			<span class="date">${prof.sdatedisplay}</span>
+   		</t:if> -
+   		<span class="date">${prof.edatedisplay}</span>
+   	</t:parameter>
+     
+     <t:parameter name="releasedCell">
+     	<t:actionLink t:id="toggleReleased" context="prof.id" title="Click to toggle Release">
+   			<t:if test="prof.released" >
+	   			<span >Yes</span>
+	   			<p:else>
+	   				No
+	   			</p:else>
+	   		</t:if>
+   		</t:actionLink>
+   	</t:parameter>
+     
+   <t:parameter name="actionCell">
+			<t:pagelink page="modules/profiling/edit" context="prof.id" class="button rounded">
+				<span>${message:edit}</span> 
+			</t:pagelink>
+			<t:pagelink page="modules/profiling/checkstatus" context="prof.id" class="button rounded">
+				<span>${message:check-status}</span> 
+			</t:pagelink>
+			
+			
+	</t:parameter>
+</t:grid>
+
+
+</html>

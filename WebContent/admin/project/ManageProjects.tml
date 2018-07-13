@@ -1,0 +1,220 @@
+<html t:type="layout" 
+		title="${message:manage-my-project}"
+		breadcrumb="${message:control-panel}=admin
+			,${message:manage-my-project}=admin/project/manageprojects"
+      totalShowOption="${totalSize}"
+		xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+      xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="project"/></p:leftMenuBlk>
+   
+   <style>
+	#projGrid span.uName{
+		display: block;
+		margin-bottom: 5px;
+	}     	
+	#projGrid span.mName{
+		display: block;
+	}	
+	.moreBtn, .lessBtn {
+		font-size: 0.9em;
+		font-style: italic;
+	}
+	</style>
+	
+	<p:actionBtns >
+		<t:if test="canCreateProject()">
+			<a href="#" t:type="pageLink" page="admin/project/edit" class="button rounded">
+					 	<span>${message:new-adhoc-project}</span></a>
+		</t:if>
+	</p:actionBtns>
+	
+	<table class="actionToolBar">
+		<tr>
+			<td class="right">
+				<form t:type="form" t:id="filterForm">
+					${message:filter}:
+					<t:textfield value="filterText" title="${message:filter-text-id-name-des-username}"/>
+					${message:status-label}
+					<t:select t:id="filterStatus" value="filterStatus" model="projStatusModel" blankLabel="${message:-all-}"/>
+					<t:submit value="${message:go}" class="squared"/>	
+				</form>	 	
+			</td>
+		</tr>
+	</table>
+	
+	<t:if test="projs">
+		<p:else>
+			<div class="notfoundtext">${message:no-project-to-manage}</div>
+		</p:else>
+	
+		<form t:type="form" t:id="projForm">
+	    <t:errors/>
+	    
+	    <table class="actionToolBar2">
+				<tr>
+				 <td align="left">
+				 	<span style="margin-right: 5px;">
+					 	<input class="squared"  t:type="submit"  t:id="delete" value="${message:delete}" 
+					 		onclick="return checkHasSelectChBox('projGrid','${message:select-at-least-one-item}');"/>
+					</span>
+					<span style="margin-right: 5px;">
+					 	<input class="squared"  t:type="submit"  t:id="archive" value="Archive" 
+					 		onclick="return checkHasSelectChBox('projGrid','${message:select-at-least-one-item}');"/>
+					</span>
+					<span style="margin-right: 5px;">
+					 	<input class="squared"  t:type="submit"  t:id="active" value="Active" 
+					 		onclick="return checkHasSelectChBox('projGrid','${message:select-at-least-one-item}');"/>
+					</span>
+						
+				 </td>
+				</tr>
+			</table>
+	    <t:grid source="projs" row="proj" model="model" class="stickyHeader t-data-grid"
+	    		 id="projGrid"
+	    		 rowIndex="rowIndex" 
+	    		 pagerPosition="bottom" 
+	    		 rowsperpage="rowsperpage">
+	    		 
+	       <t:parameter name="NoCell">${getNo()}</t:parameter>
+	       <t:parameter name="chkBoxHeader">
+	       	<input type="checkBox" id="chkBoxAll" value="1" onclick="chkboxAll('projGrid','chkBoxAll')" />
+	       </t:parameter>
+	       <t:parameter name="chkBoxCell">
+	       	<t:if test="canDeleteProject(proj)">
+					<input type="checkBox" name="gridChkBox" value="${proj.id}" onclick="chkbox('projGrid','chkBoxAll')" />
+     				<p:else>
+						<input type="checkBox" name="selChkBox" disabled="disabled"/>
+					</p:else>
+				</t:if>
+	       </t:parameter>
+	       <t:parameter name="nameCell">
+	       	<t:pageLink page="project/home" context="proj.id" >
+		       	${proj.id}
+		       	<br/>
+		       	${proj.name}
+		       </t:pageLink>
+	       	<t:if test="proj.attachedFiles" > 
+  					<div>
+  						${message:attachment-label} : 
+  						<t:loop source="proj.attachedFiles" value="tempAttFile">
+						<span >
+							<t:eventLink t:event="retrieveAttachment" context="tempAttFile.id"  title="${message:click-to-download}">
+								<img src="${context:lib/img/icon-attachment.gif}"/> 
+								${tempAttFile.displayName}
+							</t:eventLink>
+						</span>
+					</t:loop>
+  					</div>
+  				</t:if>
+  				<div>
+	       	<span class='subdes'>
+	       		<t:outputraw value="${truncateString(proj.description)}" />
+	       	</span>
+	       	</div>
+	       	<t:if test="canEditProject(proj)">
+					<div>
+		       		<t:pageLink page="admin/project/projectEdit" context="proj.id" class="button rounded"><span>${message:edit}</span></t:pageLink>
+		       	</div>
+	       	</t:if>
+	       </t:parameter>
+	       <t:parameter name="sdateCell">
+	       	<span class="date nowrap">${proj.sdateDisplay}</span> - <span class="date nowrap">${proj.edateDisplay}</span>
+	       </t:parameter>
+	       <t:parameter name="mdateCell">
+	       	<span class="date">${proj.mdateDisplay}</span>
+	       	<t:if test="proj.editor">
+	       		<div class="small">
+	       			${message:by} 
+	       			<t:pageLink page="user/view" context="proj.editor.id">${proj.editor.displayName}</t:pageLink>
+	       		</div>
+	       	</t:if>
+	       </t:parameter>
+	        <t:parameter name="lastAccessCell">
+	       	<span class="date">${proj.lastAccessDisplay}</span>
+	       	<div class="statBtn">
+	       		<a class="button rounded" t:type="pageLink" page="admin/project/stat" context="proj.id" >
+						 <span>${message:statistic}</span>
+					</a>
+	       	</div>
+	       </t:parameter>
+	       <t:parameter name="statusCell">
+	       	<span title="${proj.status.description}">${proj.status.displayName}</span>
+	       	<t:if test="canChangeProjectStatus(proj)">
+					<br/>
+		       	<t:pageLink page="admin/project/projectEditStatus" context="proj.id" class="button rounded"><span>${message:edit}</span></t:pageLink>
+	       	</t:if>
+	       </t:parameter>
+	       <t:parameter name="typeCell">
+	       	<span title="${proj.type.des}">${proj.type.displayname}</span>
+	       	<t:if test="proj.courseId"> 
+	       		<br/><span class="small">(${message:courseId-label}: <em>${proj.courseId}</em>)</span> 
+	       	</t:if> 
+	       </t:parameter>
+	       <t:parameter name="schoolCell">
+	       	<t:if test="${proj.school}">
+	       		<span title="${proj.school.des}">${proj.school.displayname}</span>
+	       	</t:if>
+	       </t:parameter>
+	       <t:parameter name="membersCell">
+	       	<t:loop source="projRoles" value="projRole">
+		       	<t:if test="proj.hasMembersByRole(projRole)">
+			       	<div>
+			       	<div class="prName">${projRole.displayName}:</div>
+			       	<t:loop source="getMembersByRole(proj, projRole)" value="tempUser" index="userIndex">
+			       		<span class="uName ${getOverListUserClass(userIndex)}">
+			       			<t:pagelink page="user/view" class="userlink" context="tempUser.id" >
+			       				${tempUser.displayName}
+			       			</t:pagelink>
+			       		</span>
+			       		<t:if test="isLast(userIndex, membersByRole)">
+			       			<t:if test="hasOverListUser(userIndex)">
+			       				<div class="moreBtn">
+			       					...
+			       					(<a href="#" onclick="moreUserClicked(this); return false;">
+			       						${getNumMoreText(membersByRole)}
+			       					</a>)
+			       				</div>
+			       			</t:if>
+		       			</t:if>
+			       	</t:loop>
+			       	</div>
+		       	</t:if>
+	       	</t:loop>
+	       	<t:if test="canEnrollMember(proj)">
+		       	<a class="button rounded" t:type="pageLink" page="admin/project/manageMember" context="proj.id" >
+						 <span>${message:add-remove}</span>
+					</a>
+				</t:if>
+	       </t:parameter>
+	       <t:parameter name="modulesCell">
+	       	<t:loop source="proj.projmodules" value="tempPModule" >
+	       		<span class="mName">
+	       			<t:pagelink page="${tempPModule.module.rooturl}" context="proj.id">
+	       				${tempPModule.module.displayName}
+	       			</t:pagelink>
+	       		</span>
+	       	</t:loop>
+	       	<t:if test="canAssignModule(proj)">
+		       	<a class="button rounded" t:type="pageLink" page="admin/project/manageModule" context="proj.id" >
+						 <span>${message:add-remove}</span>
+					</a>
+				</t:if>
+	       </t:parameter>
+	    </t:grid>
+		</form>
+	</t:if>
+	
+	<script>
+		document.observe("dom:loaded", function(){
+			$$('.oUser').invoke('hide');
+		});
+  		
+ 		function moreUserClicked(elm){
+ 			var elmId = Element.identify(elm);
+ 			$(elmId).up('.moreBtn').adjacent('.oUser').each(function(elmt){
+ 				showElm(elmt.identify());
+ 			});
+ 			$(elmId).up('.moreBtn').hide();
+ 		}
+	</script>
+</html>

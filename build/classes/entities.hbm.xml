@@ -1,0 +1,486 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<!-- caution: database table name should contain only lowercase (otherwise, it can cause problem when migrate between Linux and Windows) -->
+<hibernate-mapping package="ntu.celt.eUreka2.entities">
+	
+	<class name="User" table="tbl_user" >
+		<id name="id" type="integer">
+			<generator class="hilo" />
+		</id>
+		<property name="externalKey" type="string" column="externalkey" index="index_externalkey" />
+		<property name="username" type="string" index="index_username" unique="true" />
+		<property name="password" type="string" />
+		<property name="title" type="string" />
+		<property name="firstName" type="string" column="firstname" index="index_fname" />
+		<property name="lastName" type="string" column="lastname" index="index_lname" />
+		<property name="jobTitle" type="string" column="jobtitle" />
+		<property name="organization" type="string" />
+		<property name="phone" type="string"  />
+		<property name="mphone" type="string"  />
+		<property name="email" type="string" index="index_email" />
+		<property name="enabled" type="boolean"  />
+		<property name="createDate" type="timestamp" column="createdate" />
+		<property name="modifyDate" type="timestamp" column="modifydate" />
+		<property name="ip" type="string" />
+		<property name="remarks" type="text" />
+		
+		<many-to-one name="school" class="School"  />
+		<many-to-one name="sysRole" class="SysRole"	not-null="true"   />
+		<set name="projects" inverse="true" lazy="true" table="tbl_projuser" order-by="id" >
+	       <key>
+	         <column name="userId" not-null="true" />
+	       </key>
+	       <one-to-many class="ProjUser" />
+	   </set>
+	   <set name="extraRoles" cascade="all,delete-orphan" order-by="id">
+	       <key >
+	         <column name="userId" not-null="true" />
+	       </key>
+	       <one-to-many class="SysroleUser" />
+	   </set>
+	</class>
+	
+	<class name="School" table="tbl_school">
+		<id name="id">
+			<generator class="native" />
+		</id>
+		<property name="name" type="string" index="index_name" unique="true"/>
+		<property name="alias" type="string"/>
+		<property name="des" type="string" length="1000" />
+		<property name="system" type="boolean"/>
+	</class>
+	
+	<class name="SchoolNameMap" table="tbl_school_duplicatenamemap">
+		<id name="id" type="integer">
+			<generator class="hilo" />
+		</id>
+		<property name="nameFrom" type="string"  index="index_namefrom" />
+		<property name="nameTo" type="string"  index="index_nameto" />
+	</class>
+	
+	<class name="SysRole" table="tbl_sysrole" >
+		<id name="id" >
+			<generator class="native" />
+		</id>
+		<property name="name" type="string" index="index_name" unique="true"/>
+		<property name="alias" type="string" />
+		<property name="description" type="text" />
+		<property name="system" type="boolean"/>
+		
+		<set name="privileges" table="tbl_sysrole_privilege" >
+	        <key column="sysRoleId"/>
+	        <many-to-many column="privilegeId" class="Privilege"/>
+	    </set>
+	</class>
+	<class name="SysroleUser" table="tbl_sysroleuser" >
+		<id name="id" type="long">
+			<generator class="hilo" />
+		</id>
+		<many-to-one name="sysRole" class="SysRole" not-null="true" />
+		<many-to-one name="user" class="User" column="userId" not-null="true" />
+		<property name="param" type="integer" />
+	</class>
+	
+	
+	<class name="Privilege" table="tbl_privilege">
+		<id name="id" type="string" >
+			<generator class="assigned" />
+		</id>
+		<property name="name" type="string" index="index_name"/>
+		<property name="description" type="text" />
+		<property name="type" not-null="true">		
+			<type name="org.hibernate.type.EnumType">
+         		<param name="enumClass">ntu.celt.eUreka2.data.PrivilegeType</param>
+     	 	</type>
+   	</property>
+	</class>
+	
+	
+	<class name="Preference" table="tbl_preference">
+		<id name="id" >
+			<generator class="native" />
+		</id>
+		<many-to-one name="user" class="User" column="userid" not-null="true" />
+		<property name="themeColor" >		
+			<type name="org.hibernate.type.EnumType">
+         		<param name="enumClass">ntu.celt.eUreka2.data.ThemeColor</param>
+     	 	</type>
+   	</property>
+	</class>
+
+
+	<class name="WebSessionData" table="tbl_websession" >
+		<id name="id" type="string" >
+			<generator class="assigned" />
+		</id>
+		<property name="username" type="string" index="index_username"/>
+		<property name="loginTime" type="timestamp" />
+		<property name="lastActiveTime" type="timestamp" />
+		<property name="ip" type="string" />
+	</class>
+	
+	<class name="SessionVisitStatistic" table="tbl_sessionvisit" >
+		<id name="id" type="long" >
+			<generator class="native" />
+		</id>
+		<property name="username" type="string" />
+		<property name="url" type="string" />
+		<property name="pageName" type="string" />
+		<property name="accessTime" type="timestamp" />
+		<property name="ip" type="string" />
+		<property name="sessionID" type="string" />
+		<many-to-one name="proj" class="Project" column="projID"  />
+		<many-to-one name="projRole" class="ProjRole" column="projRoleID"  />
+		<property name="moduleName" column="moduleName"  />
+		
+	</class>
+	
+	
+	
+	<class name="Project" table="tbl_project" >
+		<id name="id" type="string" >
+			<generator class="assigned" />
+		</id>
+		<property name="name" type="string"/>
+		<property name="description" type="text" />
+		<many-to-one name="creator" class="User" /> 
+		<many-to-one name="editor" class="User" /> 
+		<property name="cdate" type="timestamp" column="createdate" />
+		<property name="mdate" type="timestamp" column="modifydate" />
+		<property name="sdate" type="timestamp" column="startdate" />
+		<property name="edate" type="timestamp" column="enddate" />
+		<many-to-one name="type" class="ProjType" not-null="true" />
+		<property name="courseId" type="string" index="index_courseId" />
+		<property name="groupId" type="string" index="index_groupId" />
+		<property name="seqNo" type="string"  />
+		<property name="term" type="string"  />
+		<property name="courseCode" type="string"  />
+		
+		<many-to-one name="school" class="School" />
+		<many-to-one name="status" class="ProjStatus" not-null="true" />
+		<property name="shared" type="boolean"  />
+		<property name="remarks" type="text"  />
+		<property name="lastAccess" type="timestamp"  />
+		<property name="numVisit" type="integer" not-null="true" />
+		<property name="lastStatusChange" type="timestamp"  />
+		<property name="noAutoChangeStatus" type="boolean"  />
+		<list name="members"  cascade="all,delete-orphan">
+	       <key >
+	         <column name="projId" not-null="true" />
+	       </key>
+	       <list-index column="idx" />
+	       <one-to-many class="ProjUser" />
+	   </list>
+
+	   <list name="projmodules"  cascade="all,delete-orphan">
+	       <key>
+	         <column name="projId" not-null="true" />
+	       </key>
+	       <list-index column="idx" />
+	       <one-to-many class="ProjModule" />
+	   </list>
+	   <property name="companyInfo" type="text"  />
+	   <list name="attachedFiles"  cascade="all,delete-orphan" >
+	       <key>
+	       		<column name="projId" not-null="true" />
+	       </key> 
+	       <list-index column="idx" />
+	       <one-to-many class="ProjectAttachedFile" />
+	   </list>
+	   <set name="keywords" table="tbl_project_keywords" cascade="all,delete-orphan">
+	       <key><column name="projId" not-null="true" /></key>
+	       <element type="string" column="keyword"></element>
+	   </set>
+		
+		<set name="projCAOExtraInfos" inverse="true" cascade="all,delete-orphan">
+	       <key><column name="project" /></key>
+	       <one-to-many class="ProjCAOExtraInfo" />
+	   </set>
+		<set name="projFYPExtraInfos" inverse="true" cascade="all,delete-orphan">
+	       <key><column name="project" /></key>
+	       <one-to-many class="ProjFYPExtraInfo" />
+	   </set>
+	   <set name="announcements" inverse="true" cascade="all,delete-orphan">
+	       <key><column name="project" /></key>
+	       <one-to-many class="ntu.celt.eUreka2.modules.announcement.Announcement" />
+	   </set>
+	   <set name="forums" inverse="true" cascade="all,delete-orphan">
+	       <key><column name="projId" /></key>
+	       <one-to-many class="ntu.celt.eUreka2.modules.forum.Forum" />
+	   </set>
+	   <set name="schedules" inverse="true" cascade="all,delete-orphan">
+	       <key><column name="projId" /></key>
+	       <one-to-many class="ntu.celt.eUreka2.modules.scheduling.Schedule" />
+	   </set>
+	   <set name="budgets" inverse="true" cascade="all,delete-orphan">
+	       <key><column name="projId" /></key>
+	       <one-to-many class="ntu.celt.eUreka2.modules.budget.Budget" />
+	   </set>
+	   <set name="messages" inverse="true" cascade="all,delete-orphan">
+	       <key><column name="projId" /></key>
+	       <one-to-many class="ntu.celt.eUreka2.modules.message.Message" />
+	   </set>
+	   <set name="backupEntrys" inverse="true" cascade="all,delete-orphan">
+	       <key><column name="projId" /></key>
+	       <one-to-many class="ntu.celt.eUreka2.modules.backuprestore.BackupEntry" />
+	   </set>
+	   <set name="logEntrys" inverse="true" cascade="all,delete-orphan">
+	       <key><column name="project" /></key>
+	       <one-to-many class="ntu.celt.eUreka2.modules.learninglog.LogEntry" />
+	   </set>
+	   <set name="elogs" inverse="true" cascade="all,delete-orphan">
+	       <key><column name="project" /></key>
+	       <one-to-many class="ntu.celt.eUreka2.modules.elog.Elog" />
+	   </set>
+	   <set name="assessments" inverse="true" cascade="all,delete-orphan">
+	       <key><column name="project" /></key>
+	       <one-to-many class="ntu.celt.eUreka2.modules.assessment.Assessment" />
+	   </set>
+	   <set name="resources" inverse="true" cascade="all,delete-orphan">
+	       <key><column name="proj" /></key>
+	       <one-to-many class="ntu.celt.eUreka2.modules.resources.Resource" />
+	   </set>
+	   <set name="blogs" inverse="true" cascade="all,delete-orphan">
+	       <key><column name="projectid" /></key>
+	       <one-to-many class="ntu.celt.eUreka2.modules.blog.Blog" />
+	   </set>
+	   <set name="evaluations" inverse="true" cascade="all,delete-orphan">
+	       <key><column name="project" /></key>
+	       <one-to-many class="ntu.celt.eUreka2.modules.peerevaluation.Evaluation" />
+	   </set>
+	   <set name="profilings" inverse="true" cascade="all,delete-orphan">
+	       <key><column name="project" /></key>
+	       <one-to-many class="ntu.celt.eUreka2.modules.profiling.Profiling" />
+	   </set>
+
+	</class>
+	
+	<class name="Module" table="tbl_module" >
+		<id name="id" type="integer">
+			<generator class="hilo" />
+		</id>
+		<property name="name" type="string" index="index_name" unique="true"/>
+		<property name="alias" type="string" />
+		<property name="description" type="text"/>
+		<property name="rooturl" type="string"/>
+		<property name="iconUrl" type="string"/>
+		<property name="available" type="boolean"/>
+		<property name="version" type="string"/>
+		<property name="cdate" type="timestamp" column="createdate"/>
+		<property name="remarks" type="text"/>
+	</class>
+	
+	<class name="ProjModule" table="tbl_projmodule" >
+		<id name="id" type="integer">
+			<generator class="hilo" />
+		</id>
+		<many-to-one name="project" class="Project" column="projId"  />
+		<many-to-one name="module" class="Module" column="moduleId"  />
+	</class>
+	
+	<class name="ProjRole" table="tbl_projrole" >
+		<id name="id" type="integer" >
+			<generator class="hilo" />
+		</id>
+		<property name="name" type="string" index="index_name" unique="true"/>
+		<property name="alias" type="string" />
+		<property name="des" type="text" column="description"/>
+		<property name="system" type="boolean"/>
+		
+		<set name="privileges" table="tbl_projrole_privilege" >
+	        <key column="projRoleId"/>
+	          <many-to-many column="privilegeId" class="Privilege"/>
+	    </set>
+	</class>
+	<class name="ProjStatus" table="tbl_projstatus" >
+		<id name="id" type="integer">
+			<generator class="hilo" />
+		</id>
+		<property name="name" type="string" index="index_name" unique="true"/>
+		<property name="alias" type="string" />
+		<property name="description" type="text" />
+		<property name="system" type="boolean"/>
+	</class>
+	
+	<class name="ProjType" table="tbl_projtype" >
+		<id name="id" type="integer" >
+			<generator class="hilo" />
+		</id>
+		<property name="name" type="string" index="index_name" unique="true"/>
+		<property name="alias" type="string" />
+		<property name="des" type="text" column="description"/>
+		<property name="system" type="boolean"/>
+		<list name="defaultModules" table="tbl_projtype_defaultmodule" >
+	       <key>
+	         <column name="projTypeId" not-null="true" />
+	       </key>
+	       <list-index column="idx" />
+	       <many-to-many class="Module" />
+	   </list>
+		<list name="modules" table="tbl_projtype_module" >
+	       <key>
+	         <column name="projTypeId" not-null="true" />
+	       </key>
+	       <list-index column="idx" />
+	       <many-to-many class="Module" />
+	   </list>
+	   <list name="nonModules" table="tbl_projtype_nonmodule" >
+	       <key>
+	         <column name="projTypeId" not-null="true" />
+	       </key>
+	       <list-index column="idx" />
+	       <many-to-many class="Module" />
+	   </list>
+	   <list name="roles" table="tbl_projtype_role" >
+	       <key>
+	         <column name="projTypeId" not-null="true" />
+	       </key>
+	       <list-index column="idx" />
+	       <many-to-many class="ProjRole" />
+	   </list>
+	   <list name="settings" table="tbl_projtype_settings" >
+	       <key>
+	         <column name="projTypeId" />
+	       </key>
+	       <list-index column="idx" />
+	       <element column="settingEnum">
+	       	<type name="org.hibernate.type.EnumType">
+         		<param name="enumClass">ntu.celt.eUreka2.data.ProjTypeSetting</param>
+     	 		</type>
+	       </element>
+	   </list>
+	</class>
+	<class name="ProjCAOExtraInfo" table="tbl_project_extrainfo" >
+		<id name="id" type="integer" >
+			<generator class="hilo" />
+		</id>
+		<property name="originalScope" type="text"/>
+		<property name="originalPrerequisite" type="text" />
+		<property name="approvedScope" type="text"/>
+		<property name="approvedPrerequisite" type="text" />
+		<property name="rejectedScope" type="text"/>
+		<property name="rejectedPrerequisite" type="text" />
+		<property name="scope" type="text"/>
+		<property name="prerequisite" type="text" />
+		<property name="cdate" type="timestamp" not-null="true"/>
+		<property name="mdate" type="timestamp" not-null="true"/>
+		<many-to-one name="project" class="Project" not-null="true" />
+		<many-to-one name="user" class="User" column="userId" /> 
+		<property name="prevStatus" >		
+			<type name="org.hibernate.type.EnumType">
+         	<param name="enumClass">ntu.celt.eUreka2.data.ApproveItemStatus</param>
+     	 	</type>
+   	</property>
+   	<property name="status" >		
+			<type name="org.hibernate.type.EnumType">
+         	<param name="enumClass">ntu.celt.eUreka2.data.ApproveItemStatus</param>
+     	 	</type>
+   	</property>
+   	<many-to-one name="approver" class="User"  /> 
+		<property name="approveTime" type="timestamp"  />
+		<property name="logs" type="text"  />
+		<property name="caoID" type="string" index="index_caoId" />
+		<property name="caoType" type="string"  />
+		
+	</class>
+	
+	<class name="ProjFYPExtraInfo" table="tbl_project_fyp_extrainfo" >
+		<id name="id" type="integer" >
+			<generator class="hilo" />
+		</id>
+		<many-to-one name="project" class="Project" not-null="true" />
+		<property name="fypID" type="string" index="index_fypID" />
+		<property name="fypNo" type="string"  />
+		<property name="acadYear" type="string"  />
+		<property name="acadSem" type="string"  />
+		<property name="examDateTime" type="timestamp"  />
+		<property name="examVenue" type="string"  />
+	</class>
+	
+	<class name="ProjUser" table="tbl_projuser" >
+		<id name="id" type="integer" >
+			<generator class="hilo" />
+		</id>
+		<many-to-one name="project" class="Project" column="projId" not-null="true"/>
+		<many-to-one name="user" class="User" column="userId" not-null="true"/>
+		<many-to-one name="role" class="ProjRole" column="roleId" not-null="true" />
+		<property name="customRoleName" type="string"/>
+	</class>
+	
+	<class name="ProjectAttachedFile" table="tbl_project_attachedfile" >
+		<id name="id" type="string">
+			<generator class="assigned" />
+		</id>
+		<property name="fileName" type="string"/>
+		<property name="aliasName" type="string"/>
+		<property name="path" type="string" length="1000"/>
+		<property name="contentType" type="string"/>
+		<property name="size" type="long"/>
+		<many-to-one name="creator" class="User" column="creatorId"  />
+		<many-to-one name="proj" class="Project" column="projId"  />
+	</class>
+	
+	
+	
+	<class name="SysAnnouncement" table="tbl_system_announcement" >
+		<id name="id" type="integer" >
+			<generator class="native" />
+		</id>
+		<property name="subject" type="string" />
+		<property name="content" type="text" />
+		<property name="sdate" type="timestamp" />
+		<property name="edate" type="timestamp" />
+		<property name="cdate" type="timestamp" not-null="true"/>
+		<property name="mdate" type="timestamp" not-null="true"/>
+		<property name="urgent" type="boolean" />
+		<property name="enabled" type="boolean" />
+		<many-to-one name="creator" class="ntu.celt.eUreka2.entities.User" column="creatorId" not-null="true" />
+	</class>
+	
+	<class name="SchlTypeAnnouncement" table="tbl_schl_type_announcement" >
+		<id name="id" type="integer" >
+			<generator class="native" />
+		</id>
+		<property name="subject" type="string" />
+		<property name="content" type="text" />
+		<property name="sdate" type="timestamp" />
+		<property name="edate" type="timestamp" />
+		<property name="cdate" type="timestamp" not-null="true"/>
+		<property name="mdate" type="timestamp" not-null="true"/>
+		<property name="urgent" type="boolean" />
+		<property name="enabled" type="boolean" />
+		<many-to-one name="creator" class="ntu.celt.eUreka2.entities.User" not-null="true" />
+		<many-to-one name="school" class="ntu.celt.eUreka2.entities.School"   />
+		<many-to-one name="projType" class="ntu.celt.eUreka2.entities.ProjType" />
+		<set name="hasReadUsers" table="tbl_schl_type_announcement_hasreadusers">
+	       <key><column name="anmtId" not-null="true" /></key>
+	        <many-to-many column="userId" class="ntu.celt.eUreka2.entities.User" />
+	    </set>
+	</class>
+
+	
+	<class name="AuditTrail" table="tbl_audittrail" >
+		<id name="id" type="string" >
+			<generator class="assigned" />
+		</id>
+		<many-to-one name="proj" class="ntu.celt.eUreka2.entities.Project"  />
+		<property name="moduleName" type="string" />
+		<property name="objID" type="string" />
+		<property name="actionName" type="string" />
+		<property name="actionTime" type="timestamp" not-null="true"/>
+		<many-to-one name="actionUser" class="ntu.celt.eUreka2.entities.User" not-null="true" />
+		<property name="prevValue" type="text" />
+		<property name="newValue" type="text" />
+	</class>
+	
+	
+<!-- Chen Rui  -->
+
+
+
+<!-- Chen Rui  -->
+
+</hibernate-mapping>

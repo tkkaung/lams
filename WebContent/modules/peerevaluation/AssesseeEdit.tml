@@ -1,0 +1,455 @@
+<html t:type="layout" 
+	title="${message:assessee-edit}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/peerevaluation/assesseehome?${project.id}
+		,${message:assessee-edit}=modules/peerevaluation/assesseeedit"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+<style>
+	.rubricDetailZone .critCol{
+	}
+	.rubricDetailZone .critCol.last{
+		border-right:2px solid #ccc;
+	}
+	.rubricDetailZone .critCol.first{
+		border-left:none;
+	}
+	
+	.legend .non-selected{
+		background: #FFF url('${context:lib/img/e-block-bg.png}') repeat-x 0px top;
+	}
+	.legend .selected{
+		background: #acebff;
+	}
+	.rubricDetailZone .cr_obj{
+		background: #FFF url('${context:lib/img/e-block-bg.png}') repeat-x 0px top;
+		cursor: pointer;
+	}
+	.rubricDetailZone .cr_obj:hover{
+		background: #FFF url('${context:lib/img/e-block-bg-s.png}') repeat-x 0px top;
+	}
+	.rubricDetailZone .cr_obj.selected{
+		background: #acebff;
+	}
+	.rubricDetailZone .score{
+		text-align: center;
+		font-weight:bold;
+		width: 40px;
+	}
+	.rubricDetailZone .totalScoreR{
+		text-align: center;
+		font-weight:bold;
+		width: 40px;
+	}
+	.rubricDetailZone th.critName{
+		text-align:left;
+	}
+	
+	#assmtContainer {
+		overflow-x: auto;
+	<t:if test="${isMoreThan(eval.criterias.size(), 7)}">	
+		_overflow-x: scroll;  /* IE */
+	</t:if>
+		width: 100%;
+		/*		width: 972px;*/
+	}
+	table.t-data-grid th.no_bot_border{
+		border-bottom-color: #ccc !important; 
+	}
+	table.t-data-grid th.no_top_border{
+		border-top-color: #ccc !important; 
+	}
+	
+	table.t-data-grid tbody tr td{
+		text-align: center;
+		vertical-align: middle;
+	}
+	.evaltbl th{
+		padding:5px
+	}
+	.evaltbl .name{
+		text-align: left;
+	}
+	.evaltbl .crit {
+		vertical-align: top;
+		width: ${getCritNameWidthPercent(60, eval)};
+		text-align: left;
+		font-size: 11px;
+	}
+	.evaltbl .opques, .evaltbl .cmtOpQues{
+		vertical-align: top;
+		height: 100px;		
+		text-align: left;
+		font-size: 11px;
+	}
+	
+	.cmtStr , .cmtWeak, .cmtOther{
+	/*	width: 100px;*/
+	}
+</style>
+
+<p:actionBtns>
+<t:if test="eval.getGroup()" negate="true">
+<a class="button rounded" t:type="pageLink" page="modules/peerevaluation/assesseeselect" context="eval.id"  >
+		<span>Re-select Student to Evaluate</span>
+	</a>
+</t:if>
+</p:actionBtns>	
+
+<p:legendBlk>
+	<div class="legend">
+		<div class="title">${message:legend}</div>
+		<div class="content">
+			<table>
+				<tr>
+					<td><div class="legendmark non-selected" /></td>
+					<td class="label">${message:non-selected}</td>
+					<td><div class="legendmark selected" /></td>
+					<td class="label">${message:selected}</td>
+				</tr>
+				<tr>
+					<td colspan="4">* ${message:bigger-number-higher-score}</td>
+				</tr>
+				<tr>
+					<td colspan="4">** You may submit again while evaluation period has not over.</td>
+				</tr>
+				
+				
+			</table>
+		</div>
+	</div>
+</p:legendBlk>
+
+<form t:type="form" t:id="form" class="e-formeditor" autofocus="false">
+<t:errors />
+<div class="e-formeditor t-beaneditor">
+	<table >
+			<tr>
+				<td class="label">${message:evaluation}</td>
+				<td >
+					${eval.name}
+					<div><t:outputraw value="${textarea2html(eval.des)}"/></div>
+					
+				</td>
+			</tr>
+		</table>
+<br />
+	<div class="rubricDetailZone view">
+		
+<div id="assmtContainer">
+
+<t:if test="eval.criterias">
+<div id="scroller">
+	<table class="t-data-grid evaltbl stickyHeader" >
+	<thead>
+		<tr>
+			<th class="no_bot_border " rowspan="2">${message:no}</th>
+			<th class="no_bot_border " rowspan="2">Student</th>
+			<th colspan="${totalNumCriterions}" >${message:rubric} : <t:if test="eval.rubric">${eval.rubric.name}</t:if></th>
+			<t:if test="hasQualitativeFeedback(eval)">
+				<th  colspan="${getNumQualitativeFeedback(eval)}">${message:comment}</th>
+			</t:if>
+			<t:if test="eval.useFixedPoint">
+				<th rowspan="2" >Total 
+					<br/><span class="formtip">Max selectable point: ${getTotalFixedPoint()} </span>
+					</th>
+			</t:if>
+			
+		</tr>
+		<tr>
+			<t:loop source="eval.criterias" value="tempCrit" index="colIndex" >
+				<th colspan="${numCriterions}" class="crit" title="${tempCrit.name}">
+					<t:outputraw value="${truncateString(textarea2html(tempCrit.name),300)}"/>
+				</th>
+			</t:loop>
+			<t:if test="eval.getUseCmtStrength()">
+				<th class="no_bot_border cmmtnamebox" >
+					 <span id="csDisplay">${getCmmtStrengthName(eval)}</span>
+				</th>
+		   	</t:if>
+			<t:if test="eval.getUseCmtWeakness()">
+				<th class="no_bot_border cmmtnamebox" >
+					  	<span id="cwDisplay">${getCmmtWeaknessName(eval)}</span>
+				</th>
+			</t:if>
+			<t:if test="eval.getUseCmtOther()">
+				<th class="no_bot_border cmmtnamebox" >
+					   	<span id="coDisplay">${getCmmtOtherName(eval)}</span>
+				</th>
+			</t:if>
+		</tr>
+		
+		</thead>
+		<tbody><t:loop source="assessees" value="user" index="rowIndex">
+			<tr>
+				<td>${getRowNum()}
+			<input name="${user.id}_selCriterions" id="${user.id}_selCriterions" type="hidden" value=""/>
+				</td>
+				<td class="name" id="${user.id}">${user.displayName} ${getIsSelf(user)}</td>
+				<t:loop source="eval.criterias" value="tempCrit" index="colIndex" >
+					${loadEvalUser(user)}
+					<t:if test="hasGraded()">
+					<p:else>
+						<t:loop source="getCriterions(tempCrit)" value="tempCriterion" index="colIndex">
+							<td id="${tempCriterion.id}_${user.id}" class="critCol cr_obj cr_${tempCrit.id} c_cr_${tempCrit.id}_${user.id} ${getFirstClass(colIndex)} ${getLastClass(colIndex,getCriterions(tempCrit))}" 
+							onClick="criterionSelectedGroup(this.id, ${tempCriterion.score}, ${tempCrit.weightage}, ${tempCrit.getMaxScore()}, '${tempCrit.id}', '${user.id}','${tempCriterion.id}')">${tempCriterion.score}</td>
+						</t:loop>
+					</p:else>
+						<t:loop source="getCriterions(tempCrit)" value="tempCriterion" index="colIndex">
+							<td id="${tempCriterion.id}_${user.id}" 
+							class="critCol cr_obj cr_${tempCrit.id} c_cr_${tempCrit.id}_${user.id} ${getSelectedClass(tempCrit, tempCriterion, user)}  ${getFirstClass(colIndex)} ${getLastClass(colIndex,getCriterions(tempCrit))}" 
+							onClick="criterionSelectedGroup(this.id, ${tempCriterion.score}, ${tempCrit.weightage}, ${tempCrit.getMaxScore()}, '${tempCrit.id}', '${user.id}','${tempCriterion.id}')">${tempCriterion.score}</td>
+						</t:loop>
+					</t:if>
+				</t:loop>
+				<t:if test="eval.getUseCmtStrength()">
+				<td class="strength" >
+					<textarea class="cmtStr" id="cmtStr_${user.id}" name="cmtStr_${user.id}"><t:if test="hasGraded()">
+					${evalUser.cmtStrength}</t:if></textarea>
+				</td>
+				</t:if>
+				<t:if test="eval.getUseCmtWeakness()">
+				<td class="weakness" >
+					<textarea class="cmtWeak" id="cmtWeak_${user.id}" name="cmtWeak_${user.id}"><t:if test="hasGraded()">
+					${evalUser.cmtWeakness}</t:if></textarea>
+				</td>
+				</t:if>
+				<t:if test="eval.getUseCmtOther()">
+				<td class="other" >
+					<textarea class="cmtOther" id="cmtOther_${user.id}" name="cmtOther_${user.id}"><t:if test="hasGraded()">
+					${evalUser.cmtOther}</t:if></textarea>
+				</td>
+				</t:if>
+				<t:if test="eval.useFixedPoint">
+					<td id="total_${user.id}" class="total_user" >0</td>
+				</t:if>
+				
+		
+				</tr>
+				
+				<t:if test="eval.openEndedQuestions">
+				<tr>
+					<td></td>
+					<td colspan="100">
+						<table class="no_border" width="100%">
+							<tbody>
+							<t:loop source="eval.openEndedQuestions" value="oQuestion" index="quesIndex" >
+								<tr>
+									<th width="30%" class=" opques" title="${oQuestion}"  >
+										<t:outputraw value="${truncateString(textarea2html(oQuestion),300)}"/>
+									</th>
+									<td >
+										<textarea class="cmtOpQues" id="cmtOpQues_${user.id}_${quesIndex}" 
+										name="cmtOpQues_${user.id}_${quesIndex}" ><t:if test="hasGraded()">
+										${evalUser.getOpenEndedQuestionAnswers(quesIndex)}</t:if></textarea>
+									
+									</td>
+								</tr>
+							</t:loop>
+							</tbody>
+						</table>
+					</td>
+				</tr>
+				</t:if>	
+				
+		</t:loop>
+		</tbody>
+		<t:if test="eval.useFixedPoint">
+			<tfoot>
+				<tr>
+					<th class="no_bot_border " ></th>
+					<th class="no_bot_border " ></th>
+					<th colspan="${totalNumCriterions}" ></th>
+					<t:if test="hasQualitativeFeedback(eval)">
+						<th  colspan="${getNumQualitativeFeedback(eval)}"></th>
+					</t:if>
+					<t:if test="eval.useFixedPoint">
+						<th id="total_point">0</th>
+					</t:if>
+				</tr>
+			</tfoot>
+		</t:if>
+	</table>
+	</div>
+	
+	
+	
+</t:if>	
+
+</div>
+
+	</div>
+	<div align="right" style="padding-right:10px;">
+		<t:submit t:id="submit" value="${message:submit}" class="squared" style="margin-left:10px;margin-top:10px;font-size:18px;"
+			onclick="return submitClicked(); "
+		/>
+	</div>
+</div>
+</form>
+<script>
+	var critIDList = ${getJSArrCritID()};
+	var userIDList = ${getJSArrUserID()};
+	var hasGroup = <t:if test="eval.getGroup()">true <p:else>false</p:else></t:if>;
+	var useFixedPoint = <t:if test="eval.getUseFixedPoint()">true <p:else>false</p:else></t:if>;
+	var totalFixedPoint = ${getTotalFixedPoint()};
+	
+	
+	function criterionSelected(elmId, score, weight, maxScore, critId, usrId, markSelect){
+
+		if(markSelect){
+			$$('.c_cr_'+critId + '_' + usrId).invoke('removeClassName','selected');
+			$(elmId).addClassName('selected');
+		}
+		else{
+			$$('.c_cr_'+critId + '_' + usrId).invoke('removeClassName','selected');
+		}
+		reUpdateSelected();
+	}
+
+	function criterionSelectedGroup(elmId, score, weight, maxScore, critId, usrId, crionId){
+		var markSelected = !($(elmId).hasClassName('selected'));
+		
+		criterionSelected(elmId, score, weight, maxScore, critId, usrId, markSelected);
+	}
+	
+	
+	function reUpdateSelected(){
+		$$('.cr_obj').each(function(elm){
+			var str = elm.identify();
+			var usrId = str.substring(str.indexOf("_") + 1);
+			$(usrId + '_selCriterions').value = "";
+			if(useFixedPoint){
+				$('total_' + usrId ).innerHTML = 0;
+			}
+		});
+		$$('.cr_obj.selected').each(function(elm){
+				var str = elm.identify();
+				var usrId = str.substring(str.indexOf("_") + 1);
+				str = str.substring(0, str.length - usrId.length - 1);
+				$(usrId + '_selCriterions').value = $(usrId + '_selCriterions').value + str + ",";
+				
+			if(useFixedPoint){
+				var elmScore = elm.innerHTML.trim();
+				$('total_' + usrId ).innerHTML = parseFloat($('total_' + usrId ).innerHTML) + parseFloat(elmScore);
+			}
+		});
+		
+		if(useFixedPoint){
+			var total_point = 0;
+			$$('.total_user').each(function(elm){
+				total_point += parseFloat(elm.innerHTML );
+			});
+			$('total_point'  ).innerHTML = total_point;
+		}
+	}
+	
+	
+	
+	
+	function submitClicked(){
+	
+	//	if(hasGroup){
+			var totalPoint = 0;
+			for(var i=0; lessThan(i,critIDList.length); i++){
+				var critId = critIDList[i];
+				
+
+				for(var j=0; lessThan(j,userIDList.length); j++){
+				var usrId = userIDList[j];
+					var hasSelected = false;
+					$$('.c_cr_'+critId + '_' + usrId).each(function(elm){
+						if(elm.hasClassName('selected')){
+							hasSelected = true;
+							totalPoint += parseInt(elm.innerHTML);
+						}
+					});
+					if(!hasSelected){
+						alert("${message:error-select-all-field}");
+						return false;
+					}
+				}
+				
+			}
+			if(useFixedPoint){
+				if(greaterThan(totalPoint, totalFixedPoint)){
+					alert("Please adjust points, Maximum points possible to allocate : " + totalFixedPoint +
+						", but you selected " + totalPoint);
+					return false;
+				}
+			}
+			
+	/*	}
+		else{
+			for(var j=0; lessThan(j,userIDList.length); j++){
+				var usrId = userIDList[j];
+				var hasSelectedForUser = false;
+				var selectedAllFieldsForUser = true;
+				for(var i=0; lessThan(i,critIDList.length); i++){
+					var critId = critIDList[i];
+					var hasSelected = false;
+					$$('.c_cr_'+critId + '_' + usrId).each(function(elm){
+						if(elm.hasClassName('selected')){
+							hasSelected = true;
+							hasSelectedForUser = true;
+						}
+					});
+					if(!hasSelected){
+						selectedAllFieldsForUser = false;
+					}	
+				}
+				if(hasSelectedForUser){
+					if(!selectedAllFieldsForUser){
+						alert("You choose to evaluate '" + $(usrId).innerHTML + "' but not select score for some criteria, please select one score for each criteria");
+						return false;
+					}	
+				}
+			}
+		}
+	*/	
+	
+		var ans = confirm("${message:confirm-submit-grade}");
+		if(ans){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+	
+	document.observe("dom:loaded", function(){
+		reUpdateSelected();
+		
+	});
+	
+	
+    
+
+    
+   function FitToContent(id, maxHeight)
+{
+   var text = and(id , id.style) ? id : document.getElementById(id);
+   if ( !text )
+      return;
+
+   /* Accounts for rows being deleted, pixel value may need adjusting */
+   if (text.clientHeight == text.scrollHeight) {
+      text.style.height = "30px";
+   }       
+
+   var adjustedHeight = text.clientHeight;
+   if ( !maxHeight || greaterThan(maxHeight , adjustedHeight) )
+   {
+      adjustedHeight = Math.max(text.scrollHeight, adjustedHeight);
+      if ( maxHeight )
+         adjustedHeight = Math.min(maxHeight, adjustedHeight);
+      if ( greaterThan(adjustedHeight , text.clientHeight) )
+         text.style.height = adjustedHeight + "px";
+   }
+}
+     
+     
+</script>
+</html>

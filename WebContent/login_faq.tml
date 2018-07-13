@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+   "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+	xmlns:p="tapestry:parameter" dir="ltr" lang="en-US">
+<head>
+
+</head>
+<body>
+<table width="100%" border="0" cellpadding="3" cellspacing="0" class="loginbox">
+    <tr>
+        <td height="20" bgcolor="#FF9745" align="left" class="body-text-normal">
+            <b><font color="white" face="Arial">FAQs</font></b>
+        </td>
+    </tr>
+
+    <tr>
+    	  <td width="100%" class="table-header" align="left">
+            <b>What is an eUreka External Login Account?</b>
+        </td>
+    </tr>
+    <tr>
+    	  <td width="100%" class="bodytext" align="left">
+            It is an account given by NTU to external parties that wish/need to access the eUreka system.
+        </td>
+
+    </tr>
+    <tr>
+    	  <td width="100%" class="table-header" align="left">
+            <b>How can I obtain an eUreka External Login Account?</b>
+        </td>
+    </tr>
+    <tr>
+    	  <td width="100%" class="bodytext" align="left">
+
+            You will have to forward your request for external user account to service desk at servicedesk@ntu.edu.sg
+        </td>
+    </tr>
+    <tr>
+    	  <td width="100%" class="table-header" align="left">
+            <b>What access rights do I have as an external user?</b>
+        </td>
+    </tr>
+    <tr>
+
+    	  <td width="100%" class="bodytext" align="left">
+            You will have the same read and write access rights as that given to a project member.
+        </td>
+    </tr>
+    <tr>
+    	  <td width="100%" class="table-header" align="left">
+            <b>If I have more enquiries, where can I find further help?</b>
+        </td>
+    </tr>
+
+    <tr>
+    	  <td width="100%" class="bodytext" align="left">
+            You may contact our eUreka support team through servicedesk@ntu.edu.sg
+        </td>
+    </tr>
+    <tr>
+    	  <td width="100%" class="table-header" align="left">
+            <b>What if I have forgotten my password?</b>
+        </td>
+    </tr>
+
+    <tr>
+    	  <td width="100%" class="bodytext" align="left">
+            Click <a href="/webapp/LoginForgetPassword">here</a>.
+        </td>
+    </tr>
+</table>
+</body>
+</html>

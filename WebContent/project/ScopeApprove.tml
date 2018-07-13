@@ -1,0 +1,153 @@
+<html t:type="layout" 
+	title="${message:pending-approval-scope-n-prerequisite}"
+	currentModule="${moduleName}"
+   currentProj="curProj"
+	breadcrumb="${curProj.encodeddisplayname}=project/home?${curProj.id}
+		,${message:pending-approval-scope-n-prerequisite}=project/scopeapprove?${peInfo.id}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+
+	<style>
+		.projScopeRequisiteBLK{
+			width: 620px;
+		}
+	</style>
+	
+	<p:legendBlk>
+		<span class="required">*</span>  ${message:required-fields}
+	</p:legendBlk>
+
+	
+	<t:form t:id="form" class="e-formeditor" autofocus="false">
+		<t:errors />
+		<div class="t-beaneditor">
+			<table >
+				<tr>
+					<td class="label">${message:original-scope-prerequisite}</td>
+					<td>
+						<div class="projScopeRequisiteBLK defaultBlkBg">
+							<div >
+			    				<div>
+			    					<span class='title'>${message:project-scope}</span>
+			    				</div>
+			    				<div class="content">
+			    					<t:outputraw value="peInfo.originalScope"/>
+			    				</div>
+			    			</div>
+			    			<div>
+			    				<div>
+			    					<span class='title'>${message:project-prerequisite}</span>
+			    				</div>
+			    				<div class="content">
+			    					<t:outputraw value="peInfo.originalPrerequisite"/>
+			    				</div>
+			    			</div>
+		    			</div>
+					</td>
+				</tr>
+				<t:if test="peInfo.approvedScope">
+					<tr>
+						<td class="label">${message:previously-approved}</td>
+						<td>
+							<div class="projScopeRequisiteBLK defaultBlkBg">
+								<div >
+				    				<div>
+				    					<span class='title'>${message:project-scope}</span>
+				    				</div>
+				    				<div class="content">
+				    					<t:outputraw value="peInfo.approvedScope"/>
+				    				</div>
+				    			</div>
+				    			<div>
+				    				<div>
+				    					<span class='title'>${message:project-prerequisite}</span>
+				    				</div>
+				    				<div class="content">
+				    					<t:outputraw value="peInfo.approvedPrerequisite"/>
+				    				</div>
+				    			</div>
+			    			</div>
+						</td>
+					</tr>
+				</t:if>
+				<t:if test="peInfo.isPrevRejected()">
+					<tr>
+						<td class="label">${message:previously-rejected}</td>
+						<td>
+						
+							<div class="projScopeRequisiteBLK defaultBlkBg">
+								<div >
+				    				<div>
+				    					<span class='title'>${message:project-scope}</span>
+				    				</div>
+				    				<div class="content">
+				    					<t:outputraw value="peInfo.rejectedScope"/>
+				    				</div>
+				    			</div>
+				    			<div>
+				    				<div>
+				    					<span class='title'>${message:project-prerequisite}</span>
+				    				</div>
+				    				<div class="content">
+				    					<t:outputraw value="peInfo.rejectedPrerequisite"/>
+				    				</div>
+				    			</div>
+			    			</div>
+						</td>
+					</tr>
+				</t:if>
+				<tr>
+					<td class="label"><span class="required">*</span> ${message:new-scope-prerequisite}</td>
+					<td>
+						<div class="projScopeRequisiteBLK defaultBlkBg">
+							<div >
+			    				<div>
+			    					<span class='title'>${message:project-scope}</span>
+			    				</div>
+			    				<div class="content">
+			    					<t:outputraw value="peInfo.scope"/>
+			    				</div>
+			    			</div>
+			    			<div>
+			    				<div>
+			    					<span class='title'>${message:project-prerequisite}</span>
+			    				</div>
+			    				<div class="content">
+			    					<t:outputraw value="peInfo.prerequisite"/>
+			    				</div>
+			    			</div>
+		    			</div>
+					
+					</td>
+				</tr>
+				
+				
+				<tr>
+					<td class="label"><span class="required">*</span><t:label for="decision">${message:decision}</t:label></td>
+					<td>
+						<t:select t:id="decision" value="decision" model="getApproveDecisionModel()" validate="required"/>
+					</td>
+				</tr>
+				<tr>
+					<td class="label"><t:label for="remarks"/></td>
+					<td>
+						<t:textarea t:id="remarks" value="remarks" cols="50" rows="3" class="lwidth"/>
+					</td>
+				</tr>
+				<tr>
+					<td class="label">${message:logs-label}</td>
+					<td>
+						<span class="subdes"><t:outputraw value="peInfo.logs"/></span>
+					</td>
+				</tr>
+				
+				
+			</table>
+			<t:submit t:id="submit" value="${message:submit-label}" class="submit squared" />
+			
+						
+
+		</div>
+	</t:form>
+</html>

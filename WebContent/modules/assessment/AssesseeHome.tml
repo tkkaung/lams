@@ -1,0 +1,154 @@
+<html t:type="layout" 
+	title="${module.displayName}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+	,${module.displayName}=modules/assessment/assesseehome?${project.id}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+<style>
+	.order{
+		text-align: center;
+	}
+	.gradingCriteria{
+		text-align: center;
+		width: 100px;
+	}
+	.scoredCriteria{
+		text-align: center;
+		width: 100px;
+	}
+	.grade{
+		text-align: center;
+		width: 100px;
+	}
+	.comment{
+		text-align: center;
+		width: 100px;
+	}
+	
+</style>
+
+
+<table class="actionToolBar">
+	<tr>
+		<td class="right">
+		</td>
+	</tr>
+</table>
+
+<t:grid source="assmts" row="assmt" 
+	model="model"
+	rowIndex="rowIndex"
+	rowsPerPage="rowsPerPage"
+	pagerPosition="bottom" 
+	>
+	<p:empty>
+		<div class="notfoundtext">
+			${message:no-assessee-assessment-found}
+		</div>
+	</p:empty>
+   
+   <t:parameter name="orderCell">
+   	${getRowNum()}
+   </t:parameter>
+   <t:parameter name="nameCell">
+   	
+   	<t:pagelink page="modules/assessment/assesseeview" context="assmt.id">
+   			<strong>${assmt.name}</strong>
+   		</t:pagelink>
+   		
+   	${loadAssmtUser(assmt)}
+   	
+   	<t:if test="isSetsdateORedate(assmt)">
+	   	<div>
+		   	<span class="date">${assmt.sdatedisplay}</span>
+		   	-
+		   	<span class="date">${assmt.edatedisplay}</span>
+		  </div>
+   	</t:if>
+   	<div>
+   		<span class="subdes"><t:outputraw value="assmt.des"/></span>
+   	</div>
+   </t:parameter>
+   <t:parameter name="gradingCriteriaCell">
+   	<t:if test="canViewCrit(assmt)">
+   		<t:pagelink page="modules/assessment/assesseeviewcrit" context="assmt.id">
+   			${message:view}
+   		</t:pagelink>
+   	</t:if>
+   </t:parameter>
+   <t:parameter name="scoredCriteriaCell">
+   	<t:if test="canViewScoredCrit(assmt)">
+   	  <t:if test="hasGraded()">
+   		<t:pagelink page="modules/assessment/assesseescorecrit" context="assmt.id">
+   			${message:view}
+   		</t:pagelink>
+   	  </t:if>
+   	</t:if>
+   </t:parameter>
+   <t:parameter name="gradeCell">
+   	<t:if test="canViewGrade(assmt)">
+   			<t:if test="canViewGradeDetail(assmtUser)">
+   				<t:pagelink page="modules/assessment/assesseeviewgrade" context="assmt.id">
+							<span >${getAssmtUserDisplayGrade()}</span>
+   				</t:pagelink>
+   				
+   				<p:else>
+							<span >${getAssmtUserDisplayGrade()}</span>
+   				</p:else>
+   			</t:if>
+   	</t:if>
+   </t:parameter>
+   <t:parameter name="commentCell">
+   		<t:if test="canViewComments(assmtUser)">
+   		<t:if test="${assmtUser.comments}">
+   		
+			<a href="javascript:void(0);" onclick="openPopup('${getViewCommmentURL(assmt.id)}', 'assmtCmmt', 500, 300)">
+				<img src="${context:lib/img/cmmt.png}"/>
+			</a>
+	   	</t:if>
+	   	</t:if>
+   </t:parameter>
+   <t:parameter name="uploadCell">
+   	<t:if test="hasGraded()">
+   		<t:loop source="assmtUser.files" value="tempFile">
+			<div class="existDiv">
+				<t:eventLink event="retrieveFile" context="tempFile.id"  
+					title="${tempFile.displayName}  ${tempFile.getUploadTimeDisplay()}">
+					<img src="${getAttachFileIcon(tempFile)}" style="vertical-align:bottom;"/>
+					${tempFile.displaySize}	
+				</t:eventLink>
+				
+			</div>
+		</t:loop>
+	</t:if>			
+   	<t:if test="canUploadFile(assmt)">
+   		<div>
+   			<t:pagelink page="modules/assessment/assesseeupload" context="assmt.id" class="button rounded">
+				<span >Submit File</span>
+   			</t:pagelink>
+   		</div>		
+   	</t:if>
+   </t:parameter>
+   <t:parameter name="InstructorUploadedCell">
+	   	<t:if test="hasGraded()">
+	   		<t:if test="canRelease(assmt)">
+	   			<t:loop source="assmtUser.instructorFiles" value="tempInstructorFile">
+					<div class="existDiv">
+						<t:eventLink event="retrieveInstructorFile" context="tempInstructorFile.id"  
+							title="${tempInstructorFile.displayName}">
+							<img src="${getAttachFileIcon(tempInstructorFile)}" style="vertical-align:bottom;"/>
+							${tempInstructorFile.displaySize}	
+						</t:eventLink>
+						
+					</div>
+				</t:loop>
+			</t:if>
+		</t:if>	
+	</t:parameter>
+   
+</t:grid>
+
+</html>

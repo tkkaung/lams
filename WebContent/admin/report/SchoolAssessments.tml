@@ -1,0 +1,122 @@
+<html t:type="layout" 
+	title="${message:school-assessments}"
+	breadcrumb="${message:control-panel}=admin
+		,${message:school-assessments}=admin/report/schoolassessments"
+	totalShowOption="${totalSize}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="rubric"/></p:leftMenuBlk>
+	
+	
+	
+	<style>
+		.urgent{
+			text-align:center;
+		}
+	</style>
+    
+	<table class="actionToolBar">
+			<tr>
+				<td class="right">
+					<form t:type="form" t:id="filterForm">
+						<t:errors/>	
+						${message:project}: 
+						<t:textfield value="searchProjName" />
+						${message:assessment-name}: 
+						<t:textfield value="searchName" />
+						${message:school-label}:
+						<t:if test="canManageReport()">
+							<t:select value="searchSchool" model="getSchoolModel()" blankLabel="-Please Select-"
+							t:mixins="zoneUpdater"	t:clientEvent="change" t:event1="selectSchool" 
+							t:zone1="courseCodeZone"
+							context="searchSchool"
+							class="dropdownSel"
+							/>
+							<p:else>
+								<t:select value="searchSchool" model="getSchoolModel()" validate="required" 
+								t:mixins="zoneUpdater"	t:clientEvent="change" 
+								t:event1="selectSchool" 
+								t:zone1="courseCodeZone"
+								context="searchSchool"
+								class="dropdownSel"
+							/>
+							</p:else>
+						</t:if>
+						${message:term-label}:
+						<t:select value="searchTerm" model="getTermModel()" blankLabel="${message:-all-}"
+							t:mixins="zoneUpdater"
+							t:clientEvent="change" t:event1="selectTerm" t:zone1="courseCodeZone"
+							context="searchTerm"
+							class="dropdownSelSmall"
+							/>
+						<t:zone t:id="courseCodeZone" style="display:inline-block;margin-right:10px;">
+							${message:courseCode-label}:
+							<t:select value="searchCourseCode" model="getCourseCodeModel()" 
+							blankLabel="${message:-all-}"
+							class="dropdownSelSmall"
+							 />
+						</t:zone>		
+						<t:submit value="${message:go}" class="squared"/>	
+					</form>
+				</td>
+			</tr>
+		</table>
+			
+	
+	 <form t:type="form" t:id="assmtForm">
+	 	<t:errors/>
+		 <table class="actionToolBar2">
+				<tr>
+				 <td align="left">
+				 	<span style="margin-right: 5px;">
+					 	<input class="squared"  t:type="submit"  t:id="export" value="${message:export-xls}" 
+					 		onclick="return checkHasSelectChBox('assmtGrid','${message:select-at-least-one-item}');"/>
+					</span>
+						
+				 </td>
+				</tr>
+			</table>
+	<t:grid source="assmts" row="assmt" class="stickyHeader t-data-grid"
+		model="model"
+		id="assmtGrid"
+		rowIndex="rowIndex" 
+	  	rowsPerPage="rowsPerPage"
+		pagerPosition="bottom" 
+		>
+		<p:empty>
+			<div class="notfoundtext">${message:no-assessment-found}</div>
+		</p:empty>
+		<t:parameter name="NoCell">${getNo()}</t:parameter>
+	       <t:parameter name="chkBoxHeader">
+	       	<input type="checkBox" id="chkBoxAll" value="1" onclick="chkboxAll('assmtGrid','chkBoxAll')" />
+	       </t:parameter>
+	       <t:parameter name="chkBoxCell">
+	       	<input type="checkBox" name="chkBox" value="${assmt.id}" onclick="chkbox('assmtGrid','chkBoxAll')" />
+	       </t:parameter>
+	       
+		<t:parameter name="nameCell">
+			<t:pagelink page="admin/report/schoolassessmentview" context="assmt.id">${assmt.name}</t:pagelink>
+			<div>
+	   		<span class="subdes">
+	   			<t:outputraw value="${truncateString(textarea2html(assmt.des))}"/>
+	   		</span>
+	   	</div>
+	   </t:parameter>
+		<t:parameter name="rubricCell">
+			<t:if test="assmt.rubric">
+	   		<t:pagelink page="admin/rubric/view" context="assmt.rubric.id">${assmt.rubric.name}</t:pagelink>
+	   	</t:if>
+		</t:parameter>
+		<t:parameter name="creatorCell">
+			<t:pagelink page="user/view" context="assmt.creator.id">${assmt.creator.displayname}</t:pagelink>
+		</t:parameter>
+		<t:parameter name="cdateCell">
+			<span class="date">${assmt.cdatedisplay}</span>
+		</t:parameter>
+		
+		
+		
+	</t:grid>
+		
+	 </form>
+</html>

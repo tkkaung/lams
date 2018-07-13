@@ -1,0 +1,14 @@
+<html t:type="layout" 
+	title="${message:view} ${message:user}"
+	breadcrumb="${message:view} ${message:user}=user/view"
+   xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+   
+	<t:beandisplay  object="user" 
+		include="username,firstName,lastName,displayname,email">
+	</t:beandisplay>
+	
+	<div class="botpage">
+		<a href="javascript:history.go(-1);" class="button welBtn"><span>${message:back}</span></a>
+	</div>
+</html>

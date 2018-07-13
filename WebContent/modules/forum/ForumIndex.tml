@@ -1,0 +1,102 @@
+<html t:type="layout" 
+	title="${getModuleDisplayName(curProj)}"
+	currentModule="${moduleName}"
+	currentProj="curProj"
+	breadcrumb="${curProj.encodeddisplayname}=project/home?${curProj.id}
+		,${getModuleDisplayName(curProj)}=modules/forum?${curProj.id}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+	<style>
+		td.forum{
+			width: 60%;
+		}
+	</style>	
+		
+	<p:actionBtns>
+		<t:if test="canCreateForum(curProj)">
+			<a class="button rounded" t:type="pageLink" page="modules/forum/forumedit" context="getParams(curProj.id, 0)" >
+				<span>${message:add-new} ${message:forum}</span>
+			</a>
+		</t:if>
+	</p:actionBtns>	
+		
+	<table class="actionToolBar">
+		<tr>
+			<td class="right">
+			</td>
+		</tr>
+	</table>	
+
+	<t:grid source="forums" 
+		row="forum" 
+		pagerPosition="bottom" 
+		rowClass="prop:evenodd.next"
+		model="model"
+		>
+		<p:empty>
+			<div class="notfoundtext">${message:no-forum-found}</div>
+		</p:empty>
+		<p:forumCell>
+			<div style="float:left; padding:5px;">
+				<img src="${context:lib/img/16/m_Forum.png}" class="icon" />
+			</div>
+			<a t:type="pageLink" page="modules/forum/forumview" context="forum.id">${forum.name}</a>
+				<br/>${forum.description}
+		</p:forumCell>
+		<p:threadsCell>${getTotalThreads(forum)}</p:threadsCell>
+		<p:repliesCell>${getTotalReplies(forum)}</p:repliesCell>
+		<p:lastPostCell>
+			<t:if test="loadRecentPost(forum)">
+				<t:if test="after(recentThread, recentThreadR)">
+					<t:pagelink page="modules/forum/threadview" context="recentThread.id">
+						<t:ck.TrimmedString maxLength="30" value="recentThread.name"/>
+					</t:pagelink>
+					<br/>
+					<span class="small">
+						${message:by} 
+						<t:if test="recentThread.anonymous">
+							${recentThread.authorDisplayName}
+							<p:else>
+								<t:pagelink page="user/view" context="recentThread.author.id">${recentThread.authorDisplayName}</t:pagelink>
+							</p:else>
+						</t:if>
+						<br/>
+						<span class="date">${recentThread.modifyDateDisplay}</span>
+					</span>
+					
+					<p:else>
+						<t:pagelink page="modules/forum/threadview" context="recentThreadR.thread.id" anchor="thR${recentThreadR.id}">
+							<t:ck.TrimmedString maxLength="30" value="recentThreadR.name"/>
+						</t:pagelink>
+						<br/>
+						<span class="small">
+							${message:by} 
+							<t:if test="recentThreadR.anonymous">
+								${recentThreadR.authorDisplayName}
+								<p:else>
+									<t:pagelink page="user/view" context="recentThreadR.author.id">${recentThreadR.authorDisplayName}</t:pagelink>
+								</p:else>
+							</t:if>
+							<br/>
+							<span class="date">${recentThreadR.modifyDateDisplay}</span>
+						</span>
+					</p:else>
+				</t:if>
+			</t:if>
+		</p:lastPostCell>
+		<p:actionCell>
+			<t:if test="canEditForum(forum)">
+				<a href="#" t:type="pageLink" page="modules/forum/forumedit" context="forum.id" class="button rounded">
+					<span>${message:edit}</span>
+				</a>
+			</t:if>
+			<t:if test="canDeleteForum(forum)">
+				<a href="#" t:type="actionLink" t:id="delete" context="forum.id" class="button rounded"
+						onclick="return confirmDelete('${message:confirm-delete-forum}')">
+					<span>${message:delete}</span>
+				</a>
+			</t:if>
+		</p:actionCell>
+		
+	</t:grid>
+</html>

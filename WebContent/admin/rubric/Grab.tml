@@ -1,0 +1,189 @@
+<html t:type="layout" 
+	title="${message:add-new} ${message:rubric}"
+	breadcrumb="${message:control-panel}=admin
+		,${getBreadcrumbAdmin()}
+		,${message:manage-my-rubric}=admin/rubric/home
+		,${encode(templateRubric.name)}=admin/rubric/view?${templateRubric.id}
+		,${message:add-new} ${message:rubric}=admin/rubric/grab"
+   xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="rubric"/></p:leftMenuBlk>
+
+<style>
+	.rubricDetailZone{
+		overflow:auto;
+	}
+	.rubricDetailZone input[type="text"]{
+		width: 70px;
+	}
+	.rubricDetailZone textarea{
+		font-size:0.9em;
+		width: ${getTextareaWidth(getFirstCriterions().size())}px;
+	}
+	.rubricDetailZone th textarea{
+		width:330px;
+	}
+	
+</style>
+  
+	<p:legendBlk>
+		<span class="required">*</span>  ${message:required-fields}
+	</p:legendBlk>
+
+
+
+	<form t:type="form" t:id="form" class="e-formeditor">
+		<t:errors />
+		<div class="t-beaneditor">
+		<table >
+			<tr>
+				<td class="label" ><t:label for="name" ><span class="required">*</span>  ${message:name-label}</t:label></td>
+				<td><t:textfield t:id="name" value="rubric.name"  class="lwidth"  validate="required"/></td>
+			</tr>
+			<tr>
+				<td class="label"><t:label for="des" /></td>
+				<td><textarea t:type="textarea" t:id="des" value="rubric.des" cols="50" rows="5" class="lwidth"/></td>
+			</tr>
+			<tr>
+				<td class="label"><t:label for="shared" /></td>
+				<td>
+					<t:checkbox t:id="shared" value="rubric.shared" onClick="JavaScript:warningMe('shared');" />
+					<span class="formtip">${message:shared-tip}</span>
+				</td>
+			</tr>
+			<t:if test="canManageSchoolRubrics()">
+				<tr>
+					<td class="label"><t:label for="master" /></td>
+					<td>
+						<t:checkbox t:id="master" value="rubric.master"/>
+						<span class="formtip">${message:master-tip}</span>
+						${message:for}
+						<t:if test="canManageRubrics()">
+							<t:select value="rubric.school" model="getSchoolModel()" blanklabel="message:scope-all-school"/>
+							<p:else>
+								<t:select value="rubric.school" model="getSchoolModel()" validate="required"/>
+							</p:else>
+						</t:if>
+					</td>
+				</tr>
+			</t:if>
+			
+			<tr>
+				<td class="label"><span class="required">*</span> ${message:dimension-label}</td>
+				<td>
+					<table style="width:auto;">
+						<tr>
+							<td >${message:numCrit-label}</td>
+							<td>
+								<t:textfield t:id="numCrit" style="width:50px;" onChange="numFieldChanged()" onKeyup="numFieldChanged()" validate="required,min=1,max=20" value="numCrit" />
+							</td>
+							<td>
+							</td>
+						</tr>
+						<tr>
+							<td >${message:numCriterion-label} </td>
+							<td>
+								<t:textfield t:id="numCriterion" style="width:50px;" onChange="numFieldChanged()" onKeyup="numFieldChanged()" validate="required,min=1,max=20" value="numCriterion" />
+							</td>
+							<td>
+								<t:submit value="${message:update}" t:id="updateNumFields" class="squared disabled" />
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+			
+		</table>
+		<div class="rubricDetailZone">
+			<table class="stickyHeader t-data-grid">
+			<thead>
+				<tr>
+					<th rowspan="3" colspan="2">${message:criteria-objective} <t:submit value="${message:insert-row}" t:id="insertRow" class="squared" /> <t:submit t:id="deleteRow" value="${message:delete-row}" class="squared" /></th>
+					<th rowspan="3"><span class="required">*</span> ${message:weightage-label} <span class="formtip">(%)</span></th>
+					<th colspan="${numCol}">${message:criterion} <t:submit value="${message:insert-column}" t:id="insertCol" class="squared" /> <t:submit t:id="deleteCol" value="${message:delete-column}" class="squared" /></th>
+				</tr>
+				<tr>
+					<t:loop source="getFirstCriterions()" value="tempRCriterion" index="colIndex">
+						<th>
+						  <t:if test="checkCol">
+						    <input type="radio" name="colIdx" value="${colIndex}" checked="true" />
+						    <p:else>
+						    <input type="radio" name="colIdx" value="${colIndex}" />
+						    </p:else>
+						  </t:if>
+						</th>
+					</t:loop>
+				</tr>
+				<tr>
+					<t:loop source="getFirstCriterions()" value="tempRCriterion" index="colIndex">
+						<th>
+							<t:textfield t:id="columnScore" value="getRCriterion(0,colIndex).score" 
+								validate="required,min=0,max=100" 
+								class="columnScore swidth" 
+								title="${message:columnScore-label}"/>
+						</th>
+					</t:loop>
+				</tr>
+				</thead>
+				<t:loop source="rCritList" value="tempRCrit" index="rowIndex">
+					<tr>
+						<th>
+						  <t:if test="checkRow">
+						    <input type="radio" name="rowIdx" value="${rowIndex}" checked="true" />
+						    <p:else>
+						      <input type="radio" name="rowIdx" value="${rowIndex}" />
+						    </p:else>
+						  </t:if>
+						</th>
+						<th>
+							<textarea t:type="textarea" t:id="rName" value="getRCrit(rowIndex).name" cols="15" rows="4" class="swidth" 
+							 	validate="maxlength=1000" title="${message:critName-label}"/>
+						</th>
+						<th class="weightage">
+							<input t:type="textfield" t:id="weight" class="rWeightage" 
+								value="getRCrit(rowIndex).weightage" 
+								validate="required,min=0,max=100"
+								onkeyup="updateTotalWeight();"
+								style="width:40px;"/>
+						</th>
+						<t:loop source="tempRCrit.criterions" value="tempRCriterion" index="colIndex">
+							<td>
+								<textarea t:type="textarea" t:id="rcDes"  value="getRCriterion(rowIndex,colIndex).des" cols="15" rows="4" class="swidth" 
+									 validate="maxlength=1000" title="${message:desPerformance-label}"/>
+							</td>
+						</t:loop>
+					</tr>
+				</t:loop>
+				<tr>
+					<td colspan="2"><t:outputraw value="getSpace()"/></td>
+					<th><span id="totalWeight">${getTotalWeight(rCritList)}</span></th>
+					<td colspan="${numCol}"><t:outputraw value="getSpace()"/></td>
+				</tr>
+			</table>
+		 </div>
+		<t:submit t:id="bsubmit" value="${message:submit-label}" class="submit squared" 
+			style="margin-top:10px;"
+			onclick="return onSubmitClicked();"/>
+		</div>
+	</form>
+	<script>
+		function numFieldChanged(){
+			$('updateNumFields').removeClassName('disabled');
+		}
+		
+		function updateTotalWeight(){
+			var numRow = ${rCritList.size()};
+			var total = 0;
+			$$('.rWeightage').each(function(elm){
+					total = total + parseInt(elm.value, 10);
+			});
+			$('totalWeight').update(total);
+		}
+		function onSubmitClicked(){
+			if($('totalWeight').innerHTML != '100'){
+				alert('${message:total-weight-must-equal-100}');
+				return false;
+			}
+			return true;
+		}
+	</script>
+</html>

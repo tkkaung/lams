@@ -1,0 +1,55 @@
+<html t:type="layout" 
+	title="${message:manage} ${message:email-template}"
+	breadcrumb="${message:control-panel}=admin,${message:manage} ${message:email-template}=admin/emailtemplate"
+	totalShowOption="${totalSize}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="systemtools"/></p:leftMenuBlk>
+	
+	<p:actionBtns >
+		<a href="#" t:type="pageLink" page="admin/emailtemplate/edit" class="button rounded">
+					 	<span>${message:add-new} ${message:email-template}</span></a>
+	</p:actionBtns>
+	
+	<table class="actionToolBar">
+		<tr>
+			<td class="right">		 	
+				<form t:type="form" t:id="searchForm">
+					${message:filter}:
+					<t:textfield t:id="searchText" value="searchText" />
+					<input t:type="submit" value="${message:go}" class="squared" />
+				</form>
+			</td>
+		</tr>
+	</table>
+	
+	
+	<t:grid t:id="emailTemplateGrid" source="emailTems" row="emailTem"  class="stickyHeader t-data-grid"
+		add="No,action"
+		exclude="modifyDateDisplay,contentAsText,content"
+		reorder="No" 
+		rowIndex="rowIndex"
+		t:rowsPerPage="rowsPerPage" 
+		t:pagerPosition="bottom" 
+		>
+		
+		<p:NoCell>
+			${getNo()}
+		</p:NoCell>
+		<p:typeCell>
+			${emailTem.type}
+		</p:typeCell>
+		<p:modifyDateCell>
+			${emailTem.modifyDateDisplay}
+		</p:modifyDateCell>
+		<p:contentCell>
+			<t:ck.TrimmedString value="emailTem.contentAsText" maxLength="100"/>
+		</p:contentCell>
+		<p:actionCell>
+          <t:pagelink t:id="edit" page="admin/emailtemplate/edit" context="emailTem.id" class="button rounded">
+          	<span>${message:edit}</span></t:pagelink>
+          <t:actionlink t:id="delete" context="emailTem.id" class="button rounded"
+          	onclick="return confirmDelete('${message:confirm-permanent-delete-item}')">
+          	<span>${message:delete}</span></t:actionlink>
+       </p:actionCell>>
+	</t:grid>
+</html>

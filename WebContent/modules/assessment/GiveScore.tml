@@ -1,0 +1,626 @@
+<html t:type="layout" 
+	title="${message:assessment-givescore}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/assessment/home?${project.id}
+		,${message:assessment-score}=modules/assessment/score?${assmt.id}
+		,${message:assessment-givescore}=modules/assessment/givescore"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+<style>
+	.rubricDetailZone .critCol{
+	/*	width: ${getCritNameWidthPercentNum(50,getNumCritCols())};*/
+	}
+	.legend .non-selected{
+		background: #FFF url('${context:lib/img/e-block-bg.png}') repeat-x 0px top;
+	}
+	.legend .selected{
+		background: #acebff;
+	}
+	.rubricDetailZone .cr_obj{
+		background: #FFF url('${context:lib/img/e-block-bg.png}') repeat-x 0px top;
+		cursor: pointer;
+	}
+	.rubricDetailZone .cr_obj:hover{
+		background: #FFF url('${context:lib/img/e-block-bg-s.png}') repeat-x 0px top;
+	}
+	.rubricDetailZone .cr_obj.selected{
+		background: #acebff;
+	}
+	.rubricDetailZone .score{
+		text-align: center;
+		font-weight:bold;
+		width: 40px;
+	}
+	.rubricDetailZone .totalScoreR{
+		text-align: center;
+		font-weight:bold;
+		width: 40px;
+	}
+	.rubricDetailZone th.critName{
+		text-align:left;
+	}
+	
+	#assmtContainer {
+		overflow-x: auto;
+	<t:if test="${isMoreThan(assmt.criterias.size(), 7)}">	
+		_overflow-x: scroll;  /* IE */
+	</t:if>
+		width: 100%;
+		/*		width: 972px;*/
+	}
+	table.t-data-grid th.no_bot_border{
+		border-bottom-color: #ccc !important; 
+	}
+	table.t-data-grid th.no_top_border{
+		border-top-color: #ccc !important; 
+	}
+	
+	table.t-data-grid tbody tr td{
+		text-align: center;
+		vertical-align: middle;
+	}
+	.assmttbl th{
+		padding:5px
+	}
+	.assmttbl .name{
+		text-align: left;
+	}
+	.assmttbl .crit{
+		vertical-align: top;
+		width: ${getCritNameWidthPercentNum(70,getNumCritCols())};
+		text-align: left;
+		font-size: 11px;
+	}
+</style>
+
+<p:actionBtns>
+	<t:if test="canGradeAssessment(project)">
+		<a class="button rounded" t:type="actionLink" t:id="clearGrade" 
+			context="assmt.id" onclick="return confirmDelete('WARNING: You are about to clear grades of all students in this Assessment, Are you sure to continue?')">
+			<span>Clear this assessment grades</span>
+		</a>
+	</t:if>
+</p:actionBtns>	
+
+<p:legendBlk>
+	<div class="legend">
+		<div class="title">${message:legend}</div>
+		<div class="content">
+			<table>
+				<tr>
+						<td><div class="legendmark aplus" /></td>
+					<td class="label">${getColorCodeGradeAplus()}</td>
+					<td><div class="legendmark a" /></td>
+					<td class="label">${getColorCodeGradeA()}</td>
+					<td><div class="legendmark aminus" /></td>
+					<td class="label">${getColorCodeGradeAminus()}</td>
+					<td><div class="legendmark bplus" /></td>
+					<td class="label">${getColorCodeGradeBplus()}</td>
+					<td><div class="legendmark b" /></td>
+					<td class="label">${getColorCodeGradeB()}</td>
+					<td><div class="legendmark bminus" /></td>
+					<td class="label">${getColorCodeGradeBminus()}</td>
+					<td><div class="legendmark cplus" /></td>
+					<td class="label">${getColorCodeGradeCplus()}</td>
+					<td><div class="legendmark c" /></td>
+					<td class="label">${getColorCodeGradeC()}</td>
+					<td><div class="legendmark dplus" /></td>
+					<td class="label">${getColorCodeGradeDplus()}</td>
+					<td><div class="legendmark d" /></td>
+					<td class="label">${getColorCodeGradeD()}</td>
+					<td><div class="legendmark f" /></td>
+					<td class="label">${getColorCodeGradeF()}</td>
+				</tr>
+				<tr>
+					<td><div class="legendmark non-selected" /></td>
+					<td class="label">${message:non-selected}</td>
+					<td><div class="legendmark selected" /></td>
+					<td class="label">${message:selected}</td>
+				</tr>
+			</table>
+			<div><span class="important">WARNING:</span> if you have graded individual students with decimal point scores, Saving at this page may cause mis-match of Total score, because this page contain only Whole value of criteria score.</div>
+		</div>
+	</div>
+</p:legendBlk>
+
+<form t:type="form" t:id="form" class="e-formeditor" autofocus="false">
+<div class="e-formeditor t-beaneditor">
+	<table >
+			<tr>
+				<td class="label">${message:assessment}</td>
+				<td>
+					<t:pagelink page="modules/assessment/view" context="assmt.id">
+							${assmt.name}
+					</t:pagelink>
+					<div><t:outputraw value="${textarea2html(assmt.des)}"/></div>
+				</td>
+			</tr>
+			<t:if test="assmt.group">
+				<tr>
+					<td class="label">${message:chkGroupGrading-label}</td>
+					<td>
+						<input type="checkbox" id="chkGroupGrading" name="chkGroupGrading" checked="checked" />
+						<span class="formtip"> ${message:chkGroupGrading-tip}</span>
+					</td>
+				</tr>
+			</t:if>
+		</table>
+<br />
+	<div style="margin-left:160px;"> 
+		<span >${message:givescore-tip}</span>
+	</div>
+	<div class="rubricDetailZone view">
+		
+<div id="assmtContainer">
+<t:if test="assmt.criterias">
+	<p:else>
+	<div id="scroller">
+		<table class="t-data-grid assmttbl stickyHeader" >
+		<thead>
+		<tr>
+			<th >${message:no}</th>
+			<th >${getAssesseeRoleNames(project)}</th>
+			<t:if test="assmt.group">
+				<th >Group: ${assmt.group.groupType}</th>
+			</t:if>
+			<th >${message:total} <span class="formtip">(%)</span></th>
+		</tr>
+		</thead>
+		<tbody>
+		<t:loop source="assessees" value="user" index="rowIndex" volatile="true" formState="NONE">
+			${loadAssmtUser(assmt,user)}
+			<tr id="tr_${user.id}">
+				<td class="${getTotalScoreClass()}">${getRowNum()}</td>
+				<td class="name assessee ${getTotalScoreClass()}" id="${user.id}">
+					<t:pagelink page="modules/assessment/grade" context="getParams(assmt.id,user.id)">
+							${user.displayName}
+						</t:pagelink>
+				</td>
+				<t:if test="assmt.group">
+					<td class="${getTotalScoreClass()}">${getGroupTypeName(assmt.group, user)}</td>
+				</t:if>
+				<td class="${getTotalScoreClass()}">
+				<t:textfield t:id="totalScore" clientId="totalScore_${user.id}" value="tempScore" 
+								 validate="min=0,max=100,regexp=^[0-9]+$"  class="swidth" onchange="totalUpdateNonRubric(this.value, ${user.id})"/>
+				</td>
+				
+				<td class="total ${getTotalScoreClass()}" id="t_${user.id}">
+					<t:if test="hasGraded()">
+						${getTotalScoreDisplay()}
+					</t:if>
+					<t:outputraw value="getSpace()"/>
+				</td>
+			</tr>
+		</t:loop>
+		</tbody>
+		</table>
+		</div>
+	</p:else>
+<t:if test="assmt.gmat">
+<div id="scroller">
+<table class="t-data-grid assmttbl stickyHeader" >
+		<thead>
+		<tr>
+			<th class="no_bot_border"><t:outputraw value="getSpace()"/></th>
+			<th class="no_bot_border"><t:outputraw value="getSpace()"/></th>
+			<t:if test="assmt.group">
+				<th class="no_bot_border"><t:outputraw value="getSpace()"/></th>
+			</t:if>
+			<t:if test="assmt.criterias">
+				<th colspan="${multipleInt(totalNumCriterions,2)}" >${message:rubric} : <t:if test="assmt.rubric">${assmt.rubric.name}</t:if></th>
+			</t:if>
+			<th class="no_bot_border"><t:outputraw value="getSpace()"/></th>
+		</tr>
+		<tr>
+			<th class="no_bot_border no_top_border">${message:no}</th>
+			<th class="no_bot_border no_top_border">${getAssesseeRoleNames(project)}</th>
+			<t:if test="assmt.group">
+				<th class="no_bot_border no_top_border">Group: ${assmt.group.groupType}</th>
+			</t:if>
+			<t:loop source="assmt.criterias" value="tempCrit" index="colIndex" >
+				<th colspan="12" class="crit" title="${tempCrit.name}">
+					<t:outputraw value="${truncateString(textarea2html(tempCrit.name),100)}"/>
+				</th>
+			</t:loop>
+			<th class="no_bot_border no_top_border">
+				<input type="hidden" name="maxScore" id="maxScore" value="${tempCrit.getMaxCritScore()}"/>
+				${message:total} <span class="formtip">(%)</span>
+			</th>
+		</tr>
+		<tr>
+			<th class="no_top_border"><t:outputraw value="getSpace()"/></th>
+			<th class="no_top_border"><t:outputraw value="getSpace()"/></th>
+			<t:if test="assmt.group">
+				<th class="no_top_border"><t:outputraw value="getSpace()"/></th>
+			</t:if>
+			<t:loop source="assmt.criterias" value="tempCrit" index="colIndex" >
+				<th class="weight" colspan="12">
+					<span class="formtip">${message:weightage-label}: <span id="w_${tempCrit.id}">${tempCrit.weightage}</span></span>
+				</th>
+			</t:loop>
+			<th class="no_top_border"><t:outputraw value="getSpace()"/></th>
+		</tr>
+		</thead>
+		<tbody>
+		<t:loop source="assessees" value="user" index="rowIndex">
+			<tr>
+				<td>${getRowNum()}
+			<input name="${user.id}_selCriterions" id="${user.id}_selCriterions" type="hidden" value=""/>
+				</td>
+				<td class="name" id="u_${user.id}">
+					<t:pagelink page="modules/assessment/grade" context="getParams(assmt.id,user.id)">
+							${user.displayName}
+						</t:pagelink>
+				</td>
+				<t:if test="assmt.group">
+				 	${loadGroupNum(assmt.group, user)}
+					<td class="g_${curGroupNumber}">${getGroupTypeName(assmt.group, user)}</td>
+				</t:if>
+				<t:loop source="assmt.criterias" value="tempCrit" index="colIndex" >
+					${loadAssmtUser(assmt,user)}
+					<t:loop source="tempCrit.Criterions" value="tempCriterion" index="colIndex">
+						<td id="crn_${tempCriterion.id}_${user.id}_L" 
+						class="critCol cr_obj cu_${user.id} cr_${tempCrit.id} cr_${tempCrit.id}_${user.id} ${getSelectedClassGMATL(tempCriterion)}" 
+						onClick="criterionSelectedGMAT('${tempCrit.id}','${tempCriterion.id}', '${user.id}', '${curGroupNumber}', 'L' )"
+						>${tempCriterion.score}</td>
+						<td id="crn_${tempCriterion.id}_${user.id}_H" 
+						class="${isLastClass(colIndex,tempCrit.Criterions)} critCol cr_obj cu_${user.id} cr_${tempCrit.id} cr_${tempCrit.id}_${user.id} ${getSelectedClassGMATH(tempCriterion)}" 
+						onClick="criterionSelectedGMAT('${tempCrit.id}','${tempCriterion.id}', '${user.id}', '${curGroupNumber}', 'H' )"
+						>
+							 ${tempCriterion.score}H
+							
+						</td>
+					</t:loop>
+				</t:loop>
+				<td class="total ${getTotalScoreClass()}" id="t_${user.id}">
+					<t:if test="hasGraded()">
+					<p:else>
+						-
+					</p:else>
+						${getTotalScoreDisplay()}
+					</t:if>
+					<t:outputraw value="getSpace()"/>
+				</td>
+			</tr>
+			
+		</t:loop>
+		</tbody>
+	</table>
+</div>
+
+
+
+
+<p:else>
+<div id="scroller">
+<table class="t-data-grid assmttbl stickyHeader">
+		<thead>
+		<tr>
+			<th class="no_bot_border"><t:outputraw value="getSpace()"/></th>
+			<th class="no_bot_border"><t:outputraw value="getSpace()"/></th>
+			<t:if test="assmt.group">
+				<th class="no_bot_border"><t:outputraw value="getSpace()"/></th>
+			</t:if>
+			<t:if test="assmt.criterias">
+				<th colspan="${totalNumCriterions}" >${message:rubric} : <t:if test="assmt.rubric">${assmt.rubric.name}</t:if></th>
+			</t:if>
+			<th class="no_bot_border"><t:outputraw value="getSpace()"/></th>
+		</tr>
+		<tr>
+			<th class="no_bot_border no_top_border">${message:no}</th>
+			<th class="no_bot_border no_top_border">${getAssesseeRoleNames(project)}</th>
+			<t:if test="assmt.group">
+				<th class="no_bot_border no_top_border">Group: ${assmt.group.groupType}</th>
+			</t:if>
+			<t:loop source="assmt.criterias" value="tempCrit" index="colIndex" >
+				<th colspan="${numCriterions}" class="crit" title="${tempCrit.name}">
+					<t:outputraw value="${truncateString(textarea2html(tempCrit.name),100)}"/>
+				</th>
+			</t:loop>
+			<th class="no_bot_border no_top_border">
+				<input type="hidden" name="maxScore" id="maxScore" value="${tempCrit.getMaxCritScore()}"/>
+				${message:total} <span class="formtip">(%)</span>
+			</th>
+		</tr>
+		<tr>
+			<th class="no_top_border"><t:outputraw value="getSpace()"/></th>
+			<th class="no_top_border"><t:outputraw value="getSpace()"/></th>
+			<t:if test="assmt.group">
+				<th class="no_top_border"><t:outputraw value="getSpace()"/></th>
+			</t:if>
+			<t:loop source="assmt.criterias" value="tempCrit" index="colIndex" >
+				<th class="weight" colspan="${numCriterions}">
+					<span class="formtip">${message:weightage-label}: <span id="w_${tempCrit.id}">${tempCrit.weightage}</span></span>
+				</th>
+			</t:loop>
+			<th class="no_top_border"><t:outputraw value="getSpace()"/></th>
+		</tr>
+		</thead>
+		<tbody>
+		<t:loop source="assessees" value="user" index="rowIndex">
+			<tr>
+				<td>${getRowNum()}
+			<input name="${user.id}_selCriterions" id="${user.id}_selCriterions" type="hidden" value=""/>
+				</td>
+				<td class="name" id="u_${user.id}">
+					<t:pagelink page="modules/assessment/grade" context="getParams(assmt.id,user.id)">
+							${user.displayName}
+						</t:pagelink>
+				</td>
+				<t:if test="assmt.group">
+				 	${loadGroupNum(assmt.group, user)}
+					<td class="g_${curGroupNumber}">${getGroupTypeName(assmt.group, user)}</td>
+				</t:if>
+				<t:loop source="assmt.criterias" value="tempCrit" index="colIndex" >
+					${loadAssmtUser(assmt,user)}
+					<t:loop source="tempCrit.Criterions" value="tempCriterion" index="colIndex">
+						<td id="crn_${tempCriterion.id}_${user.id}" 
+						class="${isLastClass(colIndex,tempCrit.Criterions)} critCol cr_obj cu_${user.id} cr_${tempCrit.id} cr_${tempCrit.id}_${user.id} ${getSelectedClass(tempCriterion)}" 
+						onClick="criterionSelected('${tempCrit.id}','${tempCriterion.id}', '${user.id}', '${curGroupNumber}' )"
+						>${tempCriterion.score}</td>
+						
+					</t:loop>
+				</t:loop>
+				<td class="total ${getTotalScoreClass()}" id="t_${user.id}">
+					<t:if test="hasGraded()">
+					<p:else>
+						-
+					</p:else>
+						${getTotalScoreDisplay()}
+					</t:if>
+					<t:outputraw value="getSpace()"/>
+				</td>
+			</tr>
+		</t:loop>
+<!-- 		
+		<tr>
+			<th><t:outputraw value="getSpace()"/></th>
+			<th style="text-align:right;">${message:average}:</th>
+			<t:loop source="assmt.criterias" value="tempCrit" index="colIndex" >
+				<td colspan="${numCriterions}" class="average ${getAvgGradeClass(tempCrit)}" >${getAverageScore(tempCrit)}</td>
+			</t:loop>
+			<td class="average ${getTotalAvgGradeClass()}">
+				${getTotalAvgScoreDisplay()}
+				<t:outputraw value="getSpace()"/>
+			</td>
+		</tr>
+ -->
+ 		</tbody>
+	</table>
+	</div>
+</p:else>
+</t:if>	
+	
+	
+</t:if>	
+</div>
+
+	</div>
+	<div align="right">
+		<t:submit t:id="bsubmit" value="${message:save-grade}" class="submit squared" style="margin-top:10px;"/>
+		<t:pagelink page="modules/assessment/score" context="assmt.id" class="button squared">
+			<span>${message:cancel}</span>
+		</t:pagelink>
+
+	</div>
+</div>
+</form>
+<script>
+	function criterionSelectedGMAT(critId,crionId, usrId, grpNum, HL ){
+		var markSelected = !($('crn_'+ crionId + '_' + usrId + '_'+HL).hasClassName('selected'));
+		if(grpNum!=""   ){
+			if($('chkGroupGrading').checked){
+				$$('.g_'+ grpNum).each(function(elm){
+					var u_usrId = elm.previous(".name").identify();
+					var usrId1 = u_usrId.substring(u_usrId.indexOf("_") + 1);
+					markCriterionSelectedGMAT(critId, crionId, usrId1, markSelected, HL);
+				});
+			}
+			else{
+				markCriterionSelectedGMAT(critId, crionId, usrId, markSelected, HL);
+			}
+		}
+		else{
+			markCriterionSelectedGMAT(critId, crionId, usrId, markSelected, HL);
+		}
+		reUpdateSelected();
+	}
+	function criterionSelected(critId,crionId, usrId, grpNum ){
+		var markSelected = !($('crn_'+ crionId + '_' + usrId).hasClassName('selected'));
+		if(grpNum!=""   ){
+			if($('chkGroupGrading').checked){
+				$$('.g_'+ grpNum).each(function(elm){
+					var u_usrId = elm.previous(".name").identify();
+					var usrId1 = u_usrId.substring(u_usrId.indexOf("_") + 1);
+					markCriterionSelected(critId, crionId, usrId1, markSelected);
+				});
+			}
+			else{
+				markCriterionSelected(critId, crionId, usrId, markSelected);
+			}
+		}
+		else{
+			markCriterionSelected(critId, crionId, usrId, markSelected);
+		}
+		reUpdateSelected();
+	}
+
+	function markCriterionSelectedGMAT(critId, crionId, usrId, markSelected, HL){
+		if(markSelected){
+			$$('.cr_'+critId + '_' + usrId).invoke('removeClassName','selected');
+			
+			$('crn_'+ crionId + '_' + usrId+ '_'+HL).addClassName('selected');
+		}
+		else{
+			$$('.cr_'+critId + '_' + usrId).invoke('removeClassName','selected');
+		}
+		
+		//compute Total
+		var total = 0;
+		var count = 0;
+		for(var i=0; lessThan(i,critIDList.length); i++){
+			 $$('.cr_'+critIDList[i] + '_' + usrId).each(function(elm){
+				 if(elm.hasClassName('selected')){
+				 	var elmScore = elm.innerHTML.trim();
+				 	var gmatScore = convertGMATtoScore(elmScore);
+				 	total += parseFloat(gmatScore * $('w_'+critIDList[i]).innerHTML ) / 100;
+				 	count++;
+				 }
+			 });
+		}
+		if(count==0){
+			$('t_' + usrId).update("-");
+			for(var i=0; lessThan(i,classList.length); i++){
+				$('t_' + usrId).removeClassName(classList[i]);
+			}
+		}
+		else{
+			total = Math.round(total*100)/100;
+			$('t_' + usrId).update(total);
+			reUpdateTotalClass(total, usrId);
+		}
+		
+	}
+	function markCriterionSelected(critId, crionId, usrId, markSelected){
+		if(markSelected){
+			$$('.cr_'+critId + '_' + usrId).invoke('removeClassName','selected');
+			$('crn_'+ crionId + '_' + usrId).addClassName('selected');
+		}
+		else{
+			$$('.cr_'+critId + '_' + usrId).invoke('removeClassName','selected');
+		}
+		
+		//compute Total
+		var total = 0;
+		var count = 0;
+		for(var i=0; lessThan(i,critIDList.length); i++){
+			 $$('.cr_'+critIDList[i] + '_' + usrId).each(function(elm){
+				 if(elm.hasClassName('selected')){
+				 	total += parseFloat(elm.innerHTML * $('w_'+critIDList[i]).innerHTML ) / $('maxScore').value;
+				 	count++;
+				 }
+			 });
+		}
+		if(count==0){
+			$('t_' + usrId).update("-");
+			for(var i=0; lessThan(i,classList.length); i++){
+				$('t_' + usrId).removeClassName(classList[i]);
+			}
+		}
+		else{
+			total = Math.round(total*100)/100;
+			$('t_' + usrId).update(total);
+			reUpdateTotalClass(total, usrId);
+		}
+		
+	}
+
+	function reUpdateTotalClass(total, usrId){
+		var possibleScore = 100;
+		for(var i=0; lessThan(i,classList.length); i++){
+			$('t_' + usrId).removeClassName(classList[i]);
+		}
+		var colorCodeClassName = convertScoreToGradeClass(total, possibleScore ) ;
+		$('t_' + usrId).addClassName(colorCodeClassName );
+	}
+	function reUpdateTotalClassNonRubric(total, usrId){
+		var possibleScore = 100;
+		for(var i=0; lessThan(i,classList.length); i++){
+			$$('#tr_' + usrId + ' td').each(function(elm){
+				elm.removeClassName(classList[i]);
+			});
+		}
+		var colorCodeClassName = convertScoreToGradeClass(total, possibleScore ) ;
+		$$('#tr_' + usrId + ' td').each(function(elm){
+				elm.addClassName(colorCodeClassName);
+			});
+	}
+	
+	var critIDList = ${getJSArrCritID()};
+	var userIDList = ${getJSArrUserID()};
+	var gradeList = ['A+','A','A-','B+','B','B-','C+','C','D+','D','F'];
+	var classList = ['aplus','a','aminus','bplus','b','bminus','cplus','c','dplus','d','f'];
+	var classScore = [${message:grade-a-plus},${message:grade-a},${message:grade-a-minus}
+					,${message:grade-b-plus},${message:grade-b},${message:grade-b-minus}
+					,${message:grade-c-plus},${message:grade-c}
+					,${message:grade-d-plus},${message:grade-d},${message:grade-f} ];
+	var gmatScoreList = [${message:gmat-6-H},${message:gmat-6-L},${message:gmat-5-H},${message:gmat-5-L}
+	                 ,${message:gmat-4-H},${message:gmat-4-L},${message:gmat-3-H},${message:gmat-3-L}
+	                 ,${message:gmat-2-H},${message:gmat-2-L},${message:gmat-1-H},${message:gmat-1-L}];
+	var gmatNumList = ['6H','6','5H','5','4H','4','3H','3'
+	                 ,'2H','2','1H','1'];
+	
+	function convertGMATtoScore(scoreHL){
+		var i = 0;
+		var score = 0;
+		while(lessThan(i,gmatNumList.length)){
+			if(gmatNumList[i]==scoreHL){
+				score = gmatScoreList[i];
+				break;
+			}
+			i++;
+		}
+		return score;
+	}
+	
+	function convertScoreToGradeClass(score, possibleScore){
+		if(possibleScore!=0){
+			var percent = 100 * score / possibleScore;
+			for(var i=0; lessThan(i,classScore.length); i++){
+				if(greaterThan(percent, classScore[i]) || percent == classScore[i])
+					return classList[i];
+			}
+		}
+		return "na";
+	}
+	
+	
+	function reUpdateSelected(){
+		<t:if test="assmt.criterias" >
+		<p:else>
+		return;
+		</p:else>
+		</t:if>
+		for(var i=0; lessThan(i,userIDList.length); i++){
+			$(userIDList[i] + '_selCriterions').value = "";
+		}
+		$$('.cr_obj.selected').each(function(elm){
+				var id = elm.identify();
+				var crionId_usrId = id.substring(id.indexOf("_") + 1);
+				
+				<t:if test="assmt.gmat">
+					var usrId_HL = crionId_usrId.substring(crionId_usrId.indexOf("_") + 1);
+					var HL = usrId_HL.substring(usrId_HL.indexOf("_") + 1);
+					var crionId = crionId_usrId.substring(0 , crionId_usrId.length - usrId_HL.length - 1);
+					var usrId = usrId_HL.substring(0, usrId_HL.length -2);
+					$(usrId + '_selCriterions').value = $(usrId + '_selCriterions').value + crionId + "_" + HL + ",";
+					<p:else>
+						var usrId = crionId_usrId.substring(crionId_usrId.indexOf("_") + 1);
+						var crionId = crionId_usrId.substring(0 , crionId_usrId.length - usrId.length - 1);
+						$(usrId + '_selCriterions').value = $(usrId + '_selCriterions').value + crionId + ",";
+					</p:else>
+				</t:if>
+				
+		});
+		/*var str = "";
+		for(var i=0; lessThan(i,userIDList.length); i++){
+			str += "..."+$(userIDList[i] + '_selCriterions').value +"\n";
+		}
+		alert(str);
+		*/
+	}
+	
+	function totalUpdateNonRubric(total, usrId ){
+		$('t_' + usrId).update(total);
+		reUpdateTotalClassNonRubric(total, usrId);
+	}
+	
+	document.observe("dom:loaded", function(){
+		reUpdateSelected();
+		
+	});
+</script>
+</html>

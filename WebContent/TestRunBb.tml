@@ -1,0 +1,98 @@
+<html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+      xmlns:p="tapestry:parameter">
+      
+    Just to simulate click from Bb, it can be delete later.
+    <br/>
+   
+    <a t:type="actionLink" t:id="userLogin" href="#">UserLogin</a>
+    <br/>
+    <a t:type="actionLink" t:id="getProject" href="#">getProject</a>
+    <br/>
+    <a t:type="actionLink" t:id="getProjectsByUser" href="#">getProjectsByUser</a>
+    <br/>
+    <a t:type="actionLink" t:id="CreateProject" href="#">CreateProject</a>
+    <br/>
+    <a t:type="actionLink" t:id="getProjectsByCourseIdGroupId" href="#">getProjectsByCourseIdGroupId</a>
+    <br/>
+    <a t:type="actionLink" t:id="getProjectsByCourseId" href="#">getProjectsByCourseId</a>
+    <br/>
+   <a t:type="actionLink" t:id="getGradesByCourseId" href="#">getGradesByCourseId</a>
+    <br/>
+    <a t:type="actionLink" t:id="getSystemRolesByUsername" href="#">getSystemRolesByUsername</a>
+    <br/>
+    <a t:type="actionLink" t:id="getProjectRoleByUsernameByProjectId" href="#">getProjectRoleByUsernameByProjectId</a>
+    <br/>
+    <a t:type="actionLink" t:id="getAllGroups" href="#">getAllGroups</a>
+    <br/>
+    <a t:type="actionLink" t:id="getGroupById" href="#">getGroupById</a>
+    <br/>
+    <a t:type="actionLink" t:id="getActiveAnnouncementsByProjId" href="#">getActiveAnnouncementsByProjId</a>
+    <br/>
+    <a t:type="actionLink" t:id="getActiveAnnouncementsByCourseId" href="#">getActiveAnnouncementsByCourseId</a>
+    <br/>
+     <a t:type="actionLink" t:id="CreateGroup" href="#">CreateGroup</a>
+    <br/>
+     <a t:type="actionLink" t:id="addUserToGroup" href="#">addUserToGroup</a>
+    <br/>
+     <a t:type="actionLink" t:id="removeUserFromGroup" href="#">removeUserFromGroup</a>
+    <br/>
+    <a t:type="actionLink" t:id="getAllSchools" href="#">getAllSchools</a>
+    <br/>
+    <a t:type="actionLink" t:id="updateSysRoleOfUser" href="#">updateSysRoleOfUser</a>
+    <br/>
+    <a t:type="actionLink" t:id="addSysRoleOfUser" href="#">addSysRoleOfUser</a>
+    <br/>
+    <a t:type="actionLink" t:id="removeSysRoleOfUser" href="#">removeSysRoleOfUser</a>
+    <br/>
+    <a t:type="actionLink" t:id="getRubricsByUser" href="#">getRubricsByUser</a>
+    <br/>
+    <a t:type="actionLink" t:id="getSchoolRubricsByUser" href="#">getSchoolRubricsByUser</a>
+    <br/>
+    <a t:type="actionLink" t:id="searchSharedRubrics" href="#">searchSharedRubrics</a>
+    <br/>
+    <a t:type="actionLink" t:id="getRubricsByID" href="#">getRubricsByID</a>
+    <br/>
+    <a t:type="actionLink" t:id="getAssessmentsByProjectId" href="#">getAssessmentsByProjectId</a>
+    <br/>
+    <a t:type="actionLink" t:id="getPeerEvaluationsByProjectId" href="#">getPeerEvaluationsByProjectId</a>
+    <br/>
+    <a t:type="actionLink" t:id="getAssessmentMarksByProjectIdByStudentUsername" href="#">getAssessmentMarksByProjectIdByStudentUsername</a>
+    <br/>
+    <a t:type="actionLink" t:id="getPeerEvaluationMarksByProjectIdByStudentUsername" href="#">getPeerEvaluationMarksByProjectIdByStudentUsername</a>
+    <br/>
+    <a t:type="actionLink" t:id="SyncGroups" href="#">SyncGroups</a>
+    <br/>
+      <a t:type="actionLink" t:id="deleteGroup" href="#">deleteGroup</a>
+    <br/>
+       <a t:type="actionLink" t:id="getPeerEvaluationsByProjectIdByStudentUsername" href="#">getPeerEvaluationsByProjectIdByStudentUsername</a>
+    <br/>
+     
+    
+    
+    <t:form t:id="uploadForm">
+    <t:errors/>
+    <input t:type="upload" t:id="file1" t:value="file1" validate="required"/>
+    <br/>
+    <input type="submit" value="Upload"/>
+</t:form>
+    						
+    
+    <t:loop source="pIdList" value="var:pid">
+    	<a t:type="actionLink" t:id="UserLoginProj" href="#" t:context="${var:pid}">UserLoginProj: ${var:pid}</a> <br/>
+    </t:loop>
+    <br/>
+    
+    
+    
+    <br/>
+    ResultText:
+    <br/>
+    ${msg}
+    
+     <br/>
+     <br/>
+    logMsg:
+    <br/>
+    ${logMsg}
+    
+</html>

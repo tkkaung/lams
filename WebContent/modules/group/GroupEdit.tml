@@ -1,0 +1,48 @@
+<html t:type="layout" 
+	title="${message:add-edit} ${message:group}"
+	currentModule="${moduleName}"
+	currentProj="curProj"
+	breadcrumb="${curProj.encodeddisplayname}=project/home?${curProj.id}
+			,${message:manage-group}=modules/group?${curProj.id}
+			,${message:add-edit} ${message:group}=modules/group/groupedit"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+	
+	
+<p:legendBlk>
+	<span class="required">*</span>  ${message:required-fields}
+</p:legendBlk>
+		
+		<div class="t-beaneditor">
+		<form t:type="form" t:id="form">
+			<t:errors />
+			<div class="t-beaneditor-row">
+				<t:label for="groupType" ><span class="required">*</span> ${message:groupType-label}</t:label>
+				<t:textfield t:id="groupType" value="group.groupType" validate="required" class="mwidth"></t:textfield>
+			</div>
+			<div class="t-beaneditor-row">
+				<t:label for="numGroup" ><span class="required">*</span> ${message:numGroup-label}</t:label>
+				<t:textfield t:id="numGroup" value="numOfGroup" validate="required,min=1,max=100" 
+					class="swidth ${getShouldDisableInput()}" disabled="getShouldDisableInput()"></t:textfield>
+			</div>
+			<div class="t-beaneditor-row">
+				<t:label for="allowSelfEnroll" >${message:allowSelfEnroll-label}</t:label>
+				<t:checkbox t:id="allowSelfEnroll" value="group.allowSelfEnroll" 
+					class="${getShouldDisableInput()}" disabled="getShouldDisableInput()"></t:checkbox>
+					<span class="formtip">${message:allowSelfEnroll-tip}</span>
+			</div>
+			<div class="t-beaneditor-row">
+				<t:label for="maxPerGroup" ><span class="required">*</span> ${message:maxPerGroup-label}</t:label>
+				<t:textfield t:id="maxPerGroup" value="group.maxPerGroup" validate="required,min=0,max=100" 
+					class="swidth ${getShouldDisableInput()}" disabled="getShouldDisableInput()"></t:textfield>
+					<span class="formtip">${message:maxPerGroup-tip}</span>
+			</div>
+			
+			
+			<div class="t-beaneditor-row">
+				<input t:type="submit" value="${message:next-btn}" 
+					class="t-beaneditor-submit ${getShouldDisableInput()}" disabled="getShouldDisableInput()" />
+			</div>
+		</form>
+	</div>
+</html>

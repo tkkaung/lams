@@ -1,0 +1,94 @@
+<html t:type="layout" 
+	title="${message:preview-elog}"
+	currentModule="${moduleName}"
+   currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/elog/home?${project.id}
+		,${getBreadcrumb()}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+
+
+<div style="border:1px solid #ccc;margin:5px;">
+	<div class="elogEntry">
+		<div class="head">
+			<table class="nomargin">
+				<tr>
+					<td>
+						<img src="${context:lib/img/16/m_eLog.png}"  class="icon" />
+						<span class="subject">${elog.subject}</span>
+						<t:if test="isApproved(elog)" negate="true">
+							- <span class="status attention">${elog.status}</span>
+							<p:else>
+								<t:if test="elog.published" negate="true">
+									- <span class="status attention">${message:unpublished}</span>
+								</t:if>
+							</p:else>
+						</t:if>
+						<br/>
+						<span class="author-date">
+							${message:by} <span class="author"><t:pageLink page="user/view" context="elog.author.id">${elog.author.displayname}</t:pageLink></span>
+							, <span class="date">${elog.cdateDisplay}</span>
+						</span>
+					</td>
+					<td align="right">
+						
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="content"><t:outputraw t:value="elog.content" /></div>
+		
+		<t:if test="elog.files">
+			<div class="attFiles">
+				<div >
+					${message:attachment} <img src="${context:lib/img/icon-attachment.gif}" />
+					:
+				</div>
+				<div >
+					<t:loop source="getNonImageAttachedFiles(elog.files)" value="attFile">
+						<div class="attFile">
+							<t:eventLink event="retrieveFile" context="attFile.id"  title="${message:click-to-download}">
+							<img src="${getAttachFileIcon(attFile)}" style="vertical-align:bottom;"/>
+							${attFile.displayName}
+							</t:eventLink>
+							(${attFile.displaySize})
+						</div>
+					</t:loop>
+				</div>
+				<div class="imgBlks">
+					<t:loop source="getImageAttachedFiles(elog.files)" value="attFile">
+						<div class="imgBlk" >
+							<a href="${getRetrieveImageLink(attFile.id)}" target="_blank" >
+								<img src="${getRetrieveImageThumbLink(attFile.id)}" alt="" title="${message:click-to-view-originalsize}"/>
+							</a>
+							<t:eventLink event="retrieveFile" context="attFile.id"  title="${message:click-to-download}">
+							${message:download}</t:eventLink>
+							(${attFile.displaySize})
+						</div>
+					</t:loop>
+				</div>
+			</div>
+		</t:if>
+		<t:if test="elog.hasEditor()">
+			<div class="mdate" >
+					${message:edited-on}: ${elog.mDateDisplay}
+					, ${message:by} 
+					<t:pagelink page="user/view" context="elog.editor.id">${elog.editor.displayName}</t:pagelink>
+			</div>
+		</t:if>
+	</div>
+</div>
+				
+<table  >
+		<tr>
+			<td class="label" style="font-weight:bold;vertical-align:top;text-align:right;padding-right:10px;width:80px;">
+				<label >${message:logs-label}:</label>
+			</td>
+			<td >
+				<t:outputraw value="elog.remarks"/>
+			</td>
+		</tr>
+	</table>
+</html>

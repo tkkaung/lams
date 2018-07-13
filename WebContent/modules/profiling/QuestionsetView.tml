@@ -1,0 +1,107 @@
+<html t:type="layout" 
+	title="${message:view} ${message:questionset}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/profiling/home?${project.id}
+		,${message:manage-profiling}=modules/profiling/manage?${project.id}
+		,${message:manage-questionset}=modules/profiling/managequestionset?${project.id}
+		,${message:view} ${message:questionset}=modules/profiling/questionsetview?${project.id}
+		"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+
+
+<p:actionBtns>
+	<t:if test="canEditQSet(qset, project)">
+	<a class="button rounded" t:type="pageLink" page="modules/profiling/questionsetedit" context="getParams(project.id, qset.id)" >
+				<span>${message:edit} ${message:questionset}</span>
+	</a>
+	</t:if>
+</p:actionBtns>	
+
+
+<div class="e-formeditor">
+	<div class="t-beaneditor ">
+		<table >
+			<tr>
+				<td class="label">${message:name-label}</td>
+				<td>${qset.name}</td>
+			</tr>
+			<tr>
+				<td class="label">${message:des-label}</td>
+				<td><t:outputraw value="${textarea2html(qset.des)}"/></td>
+			</tr>
+			<tr>
+				<td class="label">${message:owner-label}</td>
+				<td>${qset.owner.getDisplayName()}</td>
+			</tr>
+			<tr>
+				<td class="label">${message:mdate-label}</td>
+				<td>${qset.getMdateDisplay()}</td>
+			</tr>
+			<tr>
+				<td class="label">Question Type</td>
+				<td>${qset.questionType.name()}</td>
+			</tr>
+			<tr>
+				<td class="label">Questons</td>
+				<td>
+						<div class="rubricDetailZone view ">
+							<table class="stickyHeader">
+								<thead>
+								<tr>
+									<th >No</th>
+									<th >Question</th>
+									<th >Dimension Type</th>
+									<th >Is Reverse score</th>
+									<th >Is Ten Scale</th>
+								</tr>
+								</thead>
+								<tbody>
+								<t:loop source="qset.questions" value="que" index="rowIndex">
+									<tr>
+										<td>
+											${que.number}
+										</td>
+										<td>
+											<t:outputraw value="${textarea2html(que.des)}"/>
+										</td>
+										<td>
+											<t:if test="que.dimension">
+												${que.dimension.name}
+											</t:if>
+										</td>
+										<td>
+											${boolean2Y(que.reverseScore)}
+										</td>
+										<td>
+											${boolean2Y(que.tenScale)}
+										</td>
+									</tr>
+									
+									<p:empty>
+										<tr ><td colspan="7">${message:no-question-defined}</td></tr>
+									</p:empty>
+								</t:loop>
+								</tbody>
+							</table>
+						</div>
+						
+					</td>
+				</tr>
+				
+			</table>
+
+			
+			
+		
+		
+		
+		
+	</div>
+	
+</div>
+
+</html>

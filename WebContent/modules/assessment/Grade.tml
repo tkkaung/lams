@@ -1,0 +1,914 @@
+<html t:type="layout" 
+   title="${message:grade} ${message:assessment}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/assessment/home?${project.id}
+		,${message:assessment-score}=modules/assessment/score?${assmt.id}
+		,${message:grade} ${message:assessment}=modules/assessment/grade"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+  
+  
+<style>
+	.legend .non-selected{
+		background: #FFF url('${context:lib/img/e-block-bg.png}') repeat-x 0px top;
+	}
+	.legend .selected{
+		background: #acebff;
+	}
+	.rubricDetailZone .cr_obj{
+		cursor: pointer;
+	}
+	.rubricDetailZone .cr_obj:hover{
+/*		background: #FFF url('${context:lib/img/e-block-bg-s.png}') repeat-x 0px top;
+	*/	background: #acebff;
+	}
+	
+	.rubricDetailZone .score{
+		text-align: center;
+		font-weight:bold;
+		width: 40px;
+	}
+	.rubricDetailZone .totalScoreR{
+		text-align: center;
+		font-weight:bold;
+		width: 40px;
+	}
+	.rubricDetailZone th.critName{
+		text-align:left;
+	}
+	.rubricDetailZone table.gmat td.critCol.H{
+		border-right: 1px solid #ee5;
+	}
+	
+	.rubricDetailZone table.gmat td.critCol.c1.L:hover{
+		background-image:none;
+		background-color: #999999 ;
+	}
+	.rubricDetailZone table.gmat td.critCol.c1.H:hover{
+		background-image:none;
+		background-color: #cc99cc ;
+	}
+	.rubricDetailZone table.gmat td.critCol.c2.L:hover{
+		background-image:none;
+		background-color: #9933cc ;
+	}
+	.rubricDetailZone table.gmat td.critCol.c2.H:hover{
+		background-image:none;
+		background-color: #0099ff ;
+	}
+	.rubricDetailZone table.gmat td.critCol.c3.L:hover{
+		background-image:none;
+		background-color: #006699 ;
+	}
+	.rubricDetailZone table.gmat td.critCol.c3.H:hover{
+		background-image:none;
+		background-color: #ccff99 ;
+	}
+	.rubricDetailZone table.gmat td.critCol.c4.L:hover{
+		background-image:none;
+		background-color: #00cc33 ;
+	}
+	.rubricDetailZone table.gmat td.critCol.c4.H:hover{
+		background-image:none;
+		background-color: #008822 ;
+	}
+	.rubricDetailZone table.gmat td.critCol.c5.L:hover{
+		background-image:none;
+		background-color: #ff9999 ;
+	}
+	.rubricDetailZone table.gmat td.critCol.c5.H:hover{
+		background-image:none;
+		background-color: #ff9933 ;
+	}
+	.rubricDetailZone table.gmat td.critCol.c6.L:hover{
+		background-image:none;
+		background-color: #cc3300 ;
+	}
+	.rubricDetailZone table.gmat td.critCol.c6.H:hover{
+		background-image:none;
+		background-color: #cc3300 ;
+	}
+	
+	.value{
+		width: 50px;
+	}
+	
+</style>
+
+
+<p:legendBlk>
+	<t:if test="assmt.criterias">
+		<div class="legend">
+			<div class="title">${message:legend}</div>
+			<div class="content">
+				<table>
+					<tr>
+						<td><div class="legendmark non-selected" /></td>
+						<td class="label">${message:non-selected}</td>
+						<td><div class="legendmark selected" /></td>
+						<td class="label">${message:selected}</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</t:if>
+</p:legendBlk>
+
+<p:actionBtns>
+	<t:if test="canGradeAssessment(project)">
+		<a class="button rounded" t:type="actionLink" t:id="clearGrade" 
+			context="getParams(assmt.id,user.id)" onclick="return confirmDelete('Are you sure to clear grade for this student?')">
+			<span>Clear Grade</span>
+		</a>
+	</t:if>
+</p:actionBtns>	
+
+
+
+
+
+<form t:type="form" t:id="form" class="e-formeditor" autofocus="false">
+	<div class="t-beaneditor">
+	<t:errors />
+		<table style="padding-bottom:10px;">
+			<tr>
+				<td class="label">${message:assessment}</td>
+				<td>
+					<t:pagelink page="modules/assessment/view" context="assmt.id">
+						${assmt.name}
+					</t:pagelink>
+					<div style="font-size:11px;padding:5px 5px 2px 10px;">
+						${message:current-permission}:
+						<div style="padding-left:15px;">
+							<t:if test="assmt.allowViewGradeCriteria">
+								<div>
+									- ${message:allowViewGradeCriteria-label}
+									<span class="formtip">${message:allowViewGradeCriteria-tip}</span>
+								</div>
+							</t:if>
+							<t:if test="assmt.allowViewGrade">
+								<div>
+									- ${message:allowViewGrade-label}
+									<span class="formtip">${message:allowViewGrade-tip}</span>
+								</div>
+							</t:if>
+							
+						</div>		
+						<div style="padding-top:5px;">
+							${message:weightage-label}:
+							${assmt.weightage}%
+						</div>	
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td class="label">${getAssesseeRoleNames(project)}</td>
+				<td>
+					<t:pagelink page="user/view" context="user.id">
+						${user.displayname}
+					</t:pagelink>
+				</td>
+			</tr>
+			<t:if test="assmt.group">
+				<t:if test="getGroupUser(assmt.group, user)">
+				<tr>
+					<td class="label">${message:group}</td>
+					<td>
+						${assmt.group.groupType} : 
+						<t:pagelink page="modules/group/userview" context="${getGroupUser(assmt.group, user).id}">
+							<strong>${message:groupNum-label} ${getGroupTypeName(assmt.group, user)}</strong> 
+						</t:pagelink>
+						<br/>
+						<t:checkbox t:id="groupGrading" value="groupGrading" />
+						<span class="formtip">${message:chkGroupGrading-tip}</span>
+					</td>
+				</tr>
+				</t:if>
+			</t:if>
+		</table>
+		
+		<t:if test="assmt.criterias">
+			<p:else>
+				
+				<table>
+					<tr>
+						<td class="label"><t:label for="totalscore">${message:totalScore-label}</t:label></td>
+						<td>
+							<t:textfield t:id="totalscore" value="assmtUser.totalScore" 
+								 class="swidth" onchange="totalScoreChange(this)"/>
+						</td>
+					</tr>
+				</table>
+			</p:else>
+		
+			<style>
+			.rubricDetailZone .critCol{
+				width: ${getCritNameWidthPercentNum(50,getFirstCriterions().size())};
+				
+			}
+			</style>
+			<div style="margin-left:160px;"> 
+				<span >${message:grade-rubric-tip}</span>
+			</div>
+			<div class="rubricDetailZone view ">
+				<t:if test="assmt.gmat">
+				<div id="scroller">
+				<table class="gmat stickyHeader">
+				<thead>
+					<tr>
+						<th rowspan="2" class="criteria">${message:criteria-objective}</th>
+						<th rowspan="2" class="weightage">
+							${message:weightage-label} <span class="formtip">(%)</span>
+						</th>
+						<th colspan="12">${message:criterion}</th>
+						<th rowspan="2" class="comment">
+							${message:comment-label}
+						</th>
+						<th rowspan="2" class="weightedScore">
+							${message:weightedScore-label}
+							<span class="formtip">(%)</span>
+						</th>
+					</tr>
+					<tr>
+						<t:loop source="getFirstCriterions()" value="tempRCriterion" index="colIndex">
+							<th class="critCol" colspan="2">
+								<span title="${message:columnScore-label}">${tempRCriterion.score}</span>
+							</th>
+						</t:loop>
+					</tr>
+					</thead>
+					<tbody>
+					<t:loop source="assmt.getCriterias()" value="tempRCrit" index="rowIndex">
+						<tr>
+							<th class="critName" >
+								<span title="${message:critName-label}"><t:outputraw value="${textarea2html(tempRCrit.name)}"/></span>
+								<t:outputraw value="getSpace()"/>
+								<div id="score_slider_${tempRCrit.id}" class="slider" style="margin-bottom:30px;">
+								    <div class="handle"></div>
+								    
+								    <input name="selCritScore_${tempRCrit.id}" id="selCritScore_${tempRCrit.id}" 
+								    	type="hidden" value="${getCritScoreDisplay(tempRCrit,assmtUser)}"/>
+								  </div>
+						<input class="value" 
+							id="ms_${tempRCrit.id}" name="ms_${tempRCrit.id}" 
+							onchange="manualScoreChanged(this, '${tempRCrit.id}')"
+							value="${getCritScoreDisplay(tempRCrit,assmtUser)}"/>
+
+								  
+							</th>
+							<th class="weightage">
+								${tempRCrit.weightage}
+							</th>
+							<t:loop source="tempRCrit.criterions" value="tempRCriterion" index="colIndex">
+								<td id="${tempRCriterion.id}_L" 
+									title="${tempRCriterion.score}L"
+									class="critCol cr_obj c_cr_${tempRCrit.id} ${getSelectedClassGMATL(tempRCriterion)} col_${getColIndexGMAT()} L c${tempRCriterion.score}" 
+									onclick="criterionSelectedGMAT(this.id,'L',${tempRCriterion.score},${tempRCrit.weightage},${tempRCrit.getMaxCritScore()},'${tempRCrit.id}')">
+									<t:outputraw value="${textarea2html(tempRCriterion.des)}"/>
+								</td>
+								<td id="${tempRCriterion.id}_H" 
+									title="${tempRCriterion.score}H"
+									class="critCol cr_obj c_cr_${tempRCrit.id} ${getSelectedClassGMATH(tempRCriterion)} col_${getColIndexGMATplus1()} H c${tempRCriterion.score}" 
+									onclick="criterionSelectedGMAT(this.id,'H',${tempRCriterion.score},${tempRCrit.weightage},${tempRCrit.getMaxCritScore()},'${tempRCrit.id}')">
+								</td>
+								
+							</t:loop>
+							<td  class="cmmt">
+								<textarea id="cmmt_${tempRCrit.id}" name="cmmt_${tempRCrit.id}" 
+									cols="20" rows="6" >${getCritComment(tempRCrit, assmtUser)}</textarea>
+							</td>
+							<td id="s_${tempRCrit.id}" class="score">${getComputedCritScoreDisplayGMAT(tempRCrit,assmtUser)}</td>
+						</tr>
+					</t:loop>
+					<tr>
+						<td colspan="15" 
+							style="text-align:right;margin-right:10px;font-weight:bold;background:transparent;">
+							${message:totalScore-label} :
+						</td>
+						
+						<td class="totalScoreR " id="totalScoreR">
+							-
+						</td>
+					</tr>
+					</tbody>
+				</table>
+					</div>
+					
+					
+					
+					
+					<p:else>
+					<div id="scroller">
+						<table style="width:100%;" class="stickyHeader" >
+						<thead>
+					<tr>
+						<th rowspan="2" class="criteria">${message:criteria-objective}</th>
+						<th rowspan="2" class="weightage">
+							${message:weightage-label} <span class="formtip">(%)</span>
+						</th>
+						<th colspan="${getFirstCriterions().size()}">${message:criterion}</th>
+						<th rowspan="2" class="comment">
+							${message:comment-label}
+						</th>
+						<th rowspan="2" class="weightedScore">
+							${message:weightedScore-label}
+							<span class="formtip">(%)</span>
+						</th>
+					</tr>
+					<tr>
+						<t:if test="isASC(getRubricOrderBy(assmt))">
+							<t:loop source="getFirstCriterions()" value="tempRCriterion" index="colIndex">
+								<th class="critCol numScoreCol">
+									<t:if test="isFirst(colIndex)">
+										<span style="float:left;">0</span>
+									</t:if>
+									<span style="float:right;">${tempRCriterion.score}</span>
+								</th>
+							</t:loop>
+							<p:else>
+								<t:loop source="getFirstCriterions()" value="tempRCriterion" index="colIndex">
+									<th class="critCol numScoreCol">
+										<t:if test="isLast(colIndex, getFirstCriterions())">
+											<span style="float:right;">0</span>
+										</t:if>
+										<span style="float:left;">${tempRCriterion.score}</span>
+									</th>
+								</t:loop>
+							</p:else>
+						</t:if>
+						
+					</tr>
+					</thead>
+					<tbody>
+					<t:loop source="assmt.getCriterias()" value="tempRCrit" index="rowIndex">
+						<tr>
+							<th class="critName" >
+								<span title="${message:critName-label}"><t:outputraw value="${textarea2html(tempRCrit.name)}"/></span>
+								<t:outputraw value="getSpace()"/>
+								<div id="score_slider_${tempRCrit.id}" class="slider" >
+								    <div class="handle"></div>
+						
+									    
+								    <input name="selCritScore_${tempRCrit.id}" id="selCritScore_${tempRCrit.id}" 
+								    	type="hidden" value="${getCritScoreDisplay(tempRCrit,assmtUser)}"/>
+								  </div>
+						<input class="value" 
+							id="ms_${tempRCrit.id}" name="ms_${tempRCrit.id}" 
+							onchange="manualScoreChanged(this, '${tempRCrit.id}')"
+							value="${getCritScoreDisplay(tempRCrit,assmtUser)}"/>
+							
+	  
+							</th>
+							<th class="weightage">
+								${tempRCrit.weightage}
+							</th>
+							<t:loop source="tempRCrit.criterions" value="tempRCriterion" index="colIndex">
+								<td id="${tempRCriterion.id}" 
+									class="critCol cr_obj c_cr_${tempRCrit.id} ${getSelectedClass(assmtUser, rubricOrder, tempRCriterion, tempRCrit, colIndex)} col_${colIndex}" 
+									onclick="criterionSelected(this.id,${tempRCriterion.score},${tempRCrit.weightage},${tempRCrit.getMaxCritScore()},'${tempRCrit.id}')">
+									<t:outputraw value="${textarea2html(tempRCriterion.des)}"/>
+								</td>
+							</t:loop>
+							<td  class="cmmt">
+								<textarea id="cmmt_${tempRCrit.id}" name="cmmt_${tempRCrit.id}" 
+									cols="20" rows="6" >${getCritComment(tempRCrit, assmtUser)}</textarea>
+							</td>
+							<td id="s_${tempRCrit.id}" class="score">${getComputedCritScoreDisplay(tempRCrit,assmtUser)}</td>
+						</tr>
+					</t:loop>
+					<tr>
+						<td colspan="${addInt(getFirstCriterions().size(), 3)}" 
+							style="text-align:right;margin-right:10px;font-weight:bold;background:transparent;">
+							${message:totalScore-label} :
+						</td>
+						
+						<td class="totalScoreR " id="totalScoreR">
+							-
+						</td>
+					</tr>
+					</tbody>
+				</table>
+			</div>
+					
+					
+					</p:else>		
+				</t:if>
+				
+					</div>
+		</t:if>
+		
+		<table>
+			<tr>
+				<td class="label"><t:label for="totalGrade">${message:totalGrade-label}</t:label></td>
+				<td>
+					<t:select t:id="totalGrade" value="assmtUser.totalGrade"  
+						model="getGradeModel()" blanklabel="${message:blanklabel-noGrade}" 
+						onchange="gradeDropDownChanged()"/>
+					<span class="formtip">${message:totalGrade-tip}</span>
+				</td>
+			</tr>
+			<tr>
+				<td class="label"><t:label for="comments">${message:comments-label}</t:label></td>
+				<td>
+					<t:textarea t:id="comments" value="assmtUser.comments" cols="50" rows="10" class="lwidth"/>
+					<br/>
+				<!-- 	<t:checkbox t:id="studentViewCmt" value="assmtUser.studentViewComments"/>
+					<t:label for="studentViewCmt"><span class="formtip">${message:student-view-comments-tip}</span></t:label>
+				 -->
+				</td>
+			</tr>
+		</table>
+				
+		<input name="selCriterions" id="selCriterions" type="hidden" value=""/>
+		<t:submit t:id="bsubmit" value="${message:save-grade}" class="submit squared" style="margin-top:10px;"/>
+		<t:if test="isCreateMode()">
+			<t:pagelink page="modules/assessment/home" context="project.id" class="button squared">
+				<span>${message:cancel}</span>
+			</t:pagelink>
+			
+			<p:else>
+				<t:pagelink page="modules/assessment/viewgrade" context="getParams(assmt.id,user.id)" class="button squared">
+					<span>${message:cancel}</span>
+				</t:pagelink>
+			</p:else> 
+		</t:if>
+	</div>
+	
+</form>
+
+
+		
+
+
+
+<script>
+function criterionSelectedGMAT(elmId, HL, score, weight, maxScore, critId){
+		if($(elmId).hasClassName('selected')){
+			$(elmId).removeClassName('selected');
+			$('s_'+critId).update("-");
+			$('score_slider_'+ critId ).next(".value").value = "-";
+			$('selCritScore_'+ critId ).value = "-";
+			
+			eval('s_slider_'+ critId ).setValue(0);
+		}
+		else{
+			$$('.c_cr_'+critId).invoke('removeClassName','selected');
+			$(elmId).addClassName('selected');
+			var lookupScore = convertGMATtoScore(score + "-" + HL);
+			var computedScore = Math.round(lookupScore*weight)/100;
+			$('s_'+critId).update(computedScore);	
+
+			$('score_slider_'+ critId ).next(".value").value = (lookupScore);
+			$('selCritScore_'+ critId ).value = lookupScore;
+			eval('s_slider_'+ critId ).setValue(lookupScore);
+		
+		}
+		reComputeTotal();
+		reUpdateSelected();
+	}
+	
+
+	function criterionSelected(elmId, score, weight, maxScore, critId){
+		if($(elmId).hasClassName('selected') || $(elmId).hasClassName('selected0') || $(elmId).hasClassName('selected1') 
+			|| $(elmId).hasClassName('selected2') || $(elmId).hasClassName('selected3')
+			|| $(elmId).hasClassName('selected4')){
+			$(elmId).classList.removeMany('selected selected0 selected1 selected2 selected3 selected4');
+			$('s_'+critId).update("-");
+			$('score_slider_'+ critId ).next(".value").value = "-";
+			$('selCritScore_'+ critId ).value = "-";
+			
+			eval('s_slider_'+ critId ).setValue(0);
+		}
+		else{
+			$$('.c_cr_'+critId).invoke('removeClassName','selected');
+			$$('.c_cr_'+critId).invoke('removeClassName','selected0');
+			$$('.c_cr_'+critId).invoke('removeClassName','selected1');
+			$$('.c_cr_'+critId).invoke('removeClassName','selected2');
+			$$('.c_cr_'+critId).invoke('removeClassName','selected3');
+			$$('.c_cr_'+critId).invoke('removeClassName','selected4');
+			
+			$(elmId).addClassName('selected0');
+			var computedScore = weight * score / maxScore;
+			computedScore = Math.round(computedScore*100)/100;
+			$('s_'+critId).update(computedScore);	
+
+			$('score_slider_'+ critId ).next(".value").value = score;
+			$('selCritScore_'+ critId ).value = score;
+			eval('s_slider_'+ critId ).setValue(score);
+		
+		}
+		reComputeTotal();
+		reUpdateSelected();
+	}
+	
+	function manualScoreChanged(elm, critId){
+		var score = elm.value;
+		
+		if(!isNumber(score)){
+			return;
+		}
+		score = parseFloat(score);
+		
+		//$('score_slider_'+ critId ).next(".value").value = score;
+		//$('selCritScore_'+ critId ).value = score;
+		eval('s_slider_'+ critId ).setValue(score);
+		
+	}
+	
+	function reComputeTotal(){
+		var total = 0;
+		var count = 0;
+		$$('.score').each(function(elm){
+			if(elm.innerHTML){
+				var s;
+				if (elm.innerHTML == "-")
+					s = 0;
+				else{
+					s = parseFloat(elm.innerHTML, 10);
+					count++;
+				}
+				total += s;
+			}
+		});
+		total = Math.round(total*10)/10;
+		$('totalScoreR').update(total);
+		reUpdateGradeClassName(total);
+		if(count == 0)
+			$('totalScoreR').update("-");
+	}
+	function reUpdateSelected(){
+		var sel = "";
+		$$('.cr_obj.selected').each(function(elm){
+			sel += elm.identify()+',';
+		});
+		$$('.cr_obj.selected0').each(function(elm){
+			sel += elm.identify()+',';
+		});
+		$$('.cr_obj.selected1').each(function(elm){
+			sel += elm.identify()+',';
+		});
+		$$('.cr_obj.selected2').each(function(elm){
+			sel += elm.identify()+',';
+		});
+		$$('.cr_obj.selected3').each(function(elm){
+			sel += elm.identify()+',';
+		});
+		$$('.cr_obj.selected4').each(function(elm){
+			sel += elm.identify()+',';
+		});
+		if(sel!=""){
+			sel = sel.substring(0,sel.length -1);
+		}
+		$('selCriterions').value = sel; 
+		
+		
+		
+	}
+	function reUpdateGradeClassName(total){
+		var possibleScore = 100;
+		
+		for(var i=0; lessThan(i,classList.length); i++){
+			$('totalScoreR').removeClassName(classList[i]);
+		}
+		var colorCodeClassName = convertScoreToGradeClass(total, possibleScore ) ;
+		$('totalScoreR').addClassName(colorCodeClassName );
+		reUpdateGradeDropdownlist(colorCodeClassName);
+	}
+	
+	var gradeList = ['A+','A','A-','B+','B','B-','C+','C','D+','D','F'];
+	var classList = ['aplus','a','aminus','bplus','b','bminus','cplus','c','dplus','d','f'];
+	var classScore = [${message:grade-a-plus},${message:grade-a},${message:grade-a-minus}
+					,${message:grade-b-plus},${message:grade-b},${message:grade-b-minus}
+					,${message:grade-c-plus},${message:grade-c}
+					,${message:grade-d-plus},${message:grade-d},${message:grade-f} ];
+	var gmatScoreList = [${message:gmat-6-H},${message:gmat-6-L},${message:gmat-5-H},${message:gmat-5-L}
+	                 ,${message:gmat-4-H},${message:gmat-4-L},${message:gmat-3-H},${message:gmat-3-L}
+	                 ,${message:gmat-2-H},${message:gmat-2-L},${message:gmat-1-H},${message:gmat-1-L}];
+	var gmatNumList = ['6-H','6-L','5-H','5-L','4-H','4-L','3-H','3-L'
+	                 ,'2-H','2-L','1-H','1-L'];
+	
+	function convertGMATtoScore(scoreHL){
+		var i = 0;
+		var score = 0;
+		while(lessThan(i,gmatNumList.length)){
+			if(gmatNumList[i]==scoreHL){
+				score = gmatScoreList[i];
+				break;
+			}
+			i++;
+		}
+		
+		return score;
+	}
+	
+	function convertScoreToGradeClass(score, possibleScore){
+		if(possibleScore!=0){
+			var percent = 100 * score / possibleScore;
+			for(var i=0; lessThan(i,classScore.length); i++){
+				if(greaterThanOrEqual(percent, classScore[i]))
+					return classList[i];
+			}
+		}
+		return "na";
+	}
+	function reUpdateGradeDropdownlist(colorCodeClassName){
+		var i = 0;
+		var grade = "";
+		while(lessThan(i,classList.length)){
+			if(classList[i]===colorCodeClassName){
+				grade = gradeList[i];
+				break;
+			}
+			i++;
+		}
+		$$('select#totalGrade option').each(function(o){
+			if(o.readAttribute('value') == grade){
+				o.selected = true;
+				$break;
+			}
+		});
+		
+		for(var i=0; lessThan(i,classList.length); i++){
+			$('totalGrade').removeClassName(classList[i]);
+		}
+		$('totalGrade').addClassName(colorCodeClassName );
+		
+	}
+	
+	function totalScoreChange(elm){
+		var score = elm.value;
+		
+		if(!isInt(score)){
+			alert("Please fill in Integer value. Your input: " +score);
+			reUpdateGradeDropdownlist("na");
+			return false;
+		}
+		else 
+		if(lessThan(100,score)){
+			alert("Must input integer no larger than 100.");
+			score = 100;
+			elm.value = 100;
+		}
+		else if(lessThan(score,0)){
+			alert("Must input integer no smaller than 0 ");
+		}
+		var colorCodeClassName = convertScoreToGradeClass(score, 100 ) ;
+		reUpdateGradeDropdownlist(colorCodeClassName);
+		
+		
+		return true;
+		
+	}
+	
+	function setGradeDropdownBg(){
+		var i = -1;
+		$$('select#totalGrade option').each(function(o){
+			if(o.readAttribute('value') == gradeList[i]){
+				o.addClassName(classList[i]);	
+			}
+			i++;
+		});		
+	}
+	function gradeDropDownChanged(){
+		for(var i=0; lessThan(i,classList.length); i++){
+			$('totalGrade').removeClassName(classList[i]);
+		}
+		$('totalGrade').addClassName( classList[gradeList.indexOf($('totalGrade').getValue())]);
+		
+	}
+	
+	document.observe("dom:loaded", function(){
+		if($('totalScoreR')){
+			reComputeTotal();
+			reUpdateSelected();
+		}
+		setGradeDropdownBg();
+	});
+     
+</script>
+<t:if test="assmt.criterias">
+
+<script type="text/javascript">
+
+<t:if test="assmt.gmat">
+<t:loop source="assmt.getCriterias()" value="tempRCrit" index="rowIndex">
+	var score_slider1_${tempRCrit.id} = $('score_slider_${tempRCrit.id}');
+    var s_slider_${tempRCrit.id} = new Control.Slider(score_slider1_${tempRCrit.id}.down('.handle'), score_slider1_${tempRCrit.id}, {
+      range: $R(0, 100),
+      sliderValue: ${getCritScore(tempRCrit,assmtUser)},
+      onSlide: function(value) {
+        value = Math.round(value);
+        var critCol = scoreToCritColGMAT(value)
+        
+      	$$('.c_cr_${tempRCrit.id}').invoke('removeClassName','selected');
+		$$('.c_cr_${tempRCrit.id}.col_' + critCol).each(function(elm){
+			elm.addClassName('selected');
+		});
+		
+		var computedScore = Math.round(value * ${tempRCrit.weightage})/100;
+		$('s_${tempRCrit.id}').update(computedScore);	
+		score_slider1_${tempRCrit.id}.next('.value').value= value;
+		$('selCritScore_${tempRCrit.id}' ).value = value;
+		
+    	reComputeTotal();
+		reUpdateSelected();
+	  
+      },
+      onChange: function(value) { 
+        value = Math.round(value);
+        if (value==0 ){
+        	if( score_slider_${tempRCrit.id}.next('.value').value=="-") {
+        		return;
+        	}
+        }
+        var critCol = scoreToCritColGMAT(value)
+        
+      	$$('.c_cr_${tempRCrit.id}').invoke('removeClassName','selected');
+		$$('.c_cr_${tempRCrit.id}.col_' + critCol).each(function(elm){
+			elm.addClassName('selected');
+		});
+		
+		var computedScore = Math.round(value * ${tempRCrit.weightage})/100;
+		$('s_${tempRCrit.id}').update(computedScore);	
+		score_slider1_${tempRCrit.id}.next('.value').value = (value );
+		$('selCritScore_${tempRCrit.id}' ).value = value;
+		
+    	reComputeTotal();
+		reUpdateSelected();
+      
+      }
+    });
+		
+</t:loop>
+
+
+<p:else>
+<t:loop source="assmt.getCriterias()" value="tempRCrit" index="rowIndex">
+	var score_slider1_${tempRCrit.id} = $('score_slider_${tempRCrit.id}');
+    var s_slider_${tempRCrit.id} = new Control.Slider(score_slider1_${tempRCrit.id}.down('.handle'), score_slider1_${tempRCrit.id}, {
+      range: $R(0, ${tempRCrit.getMaxCritScore()}),
+      sliderValue: ${getCritScore(tempRCrit,assmtUser)},
+      onSlide: function(value) {
+        value = Math.round(value*10)/10;
+        var critCol = scoreToCritCol(value)
+		
+		var computedScore = ${tempRCrit.weightage} * value / ${tempRCrit.getMaxCritScore()};
+		computedScore = Math.round(computedScore*100)/100;
+		$('s_${tempRCrit.id}').update(computedScore);	
+		score_slider1_${tempRCrit.id}.next('.value').value = value;
+		$('selCritScore_${tempRCrit.id}' ).value = value;
+		
+		$$('.c_cr_${tempRCrit.id}').invoke('removeClassName','selected');
+		$$('.c_cr_${tempRCrit.id}').invoke('removeClassName','selected0');
+		$$('.c_cr_${tempRCrit.id}').invoke('removeClassName','selected1');
+		$$('.c_cr_${tempRCrit.id}').invoke('removeClassName','selected2');
+		$$('.c_cr_${tempRCrit.id}').invoke('removeClassName','selected3');
+		$$('.c_cr_${tempRCrit.id}').invoke('removeClassName','selected4');
+		$$('.c_cr_${tempRCrit.id}.col_' + critCol).each(function(elm){
+				elm.addClassName('selected');
+		//elm.addClassName('selected' + scoreshaderange(scoreValueList, critCol, value));
+		});
+		
+    	reComputeTotal();
+		reUpdateSelected();
+	  
+      },
+      onChange: function(value) { 
+        value = Math.round(value*10)/10;
+        if (value==0 ){
+        	if( score_slider_${tempRCrit.id}.next('.value').value=="-") {
+        		return;
+        	}
+        }
+        var critCol = scoreToCritCol(value);
+        
+      	$$('.c_cr_${tempRCrit.id}').invoke('removeClassName','selected');
+      	$$('.c_cr_${tempRCrit.id}').invoke('removeClassName','selected0');
+		$$('.c_cr_${tempRCrit.id}').invoke('removeClassName','selected1');
+		$$('.c_cr_${tempRCrit.id}').invoke('removeClassName','selected2');
+		$$('.c_cr_${tempRCrit.id}').invoke('removeClassName','selected3');
+		$$('.c_cr_${tempRCrit.id}').invoke('removeClassName','selected4');
+		$$('.c_cr_${tempRCrit.id}.col_' + critCol).each(function(elm){
+		
+		elm.addClassName('selected');
+	/*		elm.addClassName('selected' + scoreshaderange(scoreValueList, critCol, value));*/
+	
+		});
+		
+		var computedScore = ${tempRCrit.weightage} * value / ${tempRCrit.getMaxCritScore()};
+		computedScore = Math.round(computedScore*100)/100;
+		$('s_${tempRCrit.id}').update(computedScore);	
+		score_slider1_${tempRCrit.id}.next('.value').value = value ;
+   		 $('selCritScore_${tempRCrit.id}' ).value = value;
+		
+    	reComputeTotal();
+		reUpdateSelected();
+      
+      }
+    });
+		
+</t:loop>
+
+
+
+</p:else>
+</t:if>
+
+
+var scoreValueList = ${getScoreValues()};
+		
+	function scoreToCritCol(score){
+		var prev = 0;
+		
+		
+		if(greaterThan(scoreValueList.length, 1)){
+			
+			if(greaterThan(scoreValueList[(scoreValueList.length-1)], scoreValueList[0])){//ascending
+				if(lessThanOrEqual(score , scoreValueList[prev]))
+					return prev;
+				for(var i=1; lessThan(i , scoreValueList.length); i++ ){
+					var cur = i;
+					if(lessThanOrEqual(score , scoreValueList[cur])){
+						var mid = (scoreValueList[prev] + scoreValueList[cur]) / 2;
+						if(lessThan(score , mid )){
+							return prev;
+						}
+						else{
+							return cur;
+						}
+					}
+					prev = cur;
+				}
+				return cur;
+			}else{//descending
+				if(greaterThanOrEqual(score , scoreValueList[prev]))
+					return prev;
+				for(var i=1; lessThan(i , scoreValueList.length); i++ ){
+					var cur = i;
+					var mid = (scoreValueList[prev] + scoreValueList[cur]) / 2;
+					if(greaterThanOrEqual(score , mid)){
+						return prev;
+					}
+					prev = cur;
+				}
+				return cur;
+			}
+		}else{
+			return 0;
+		}
+		
+		
+		return -1;
+	}
+	function scoreToCritColGMAT(value){
+		for(var i=0; lessThan(i,gmatScoreList.length); i++){
+			if(greaterThanOrEqual(value, gmatScoreList[i]))
+				return (gmatScoreList.length -1 - i);
+		}
+		return -1;
+	}
+	
+   if(IE(10)) {
+		loadScript("${context:lib/js/prototype.1.7.js}");
+		loadScript("${context:lib/js/scriptaculous.1.9.0.js}");
+	
+	}
+   
+   
+   function scoreshaderange(scoreValueList, index, score){
+   		var numRange = 1;
+	 /*  if(greaterThan(2, scoreValueList.length)){
+	   		return 0;
+	   }
+	*/	var lowerScore = 0;
+		var upperScore = scoreValueList[index];
+		if(greaterThan(scoreValueList[(scoreValueList.length-1)], scoreValueList[0])){//ascending
+			if(greaterThan(index, 0))
+			   		lowerScore = scoreValueList[index-1];   		
+			if(upperScore == lowerScore || lessThan(score, lowerScore)){
+				return 0;
+			}
+			var range = Math.round((numRange*(score - lowerScore)) / (upperScore - lowerScore));
+			return range;
+		}
+		else{ // DESC
+			if(lessThan(index, scoreValueList.length-1))
+			   		lowerScore = scoreValueList[index+1];
+	   		
+			if(upperScore == lowerScore || lessThan(score, lowerScore)){
+				return numRange;
+			}   
+			var range = Math.round((numRange*(score - lowerScore)) / (upperScore - lowerScore));
+			return numRange - range;
+		}	
+		
+		return 0;
+   }
+   
+   
+</script>
+</t:if>
+
+</html>

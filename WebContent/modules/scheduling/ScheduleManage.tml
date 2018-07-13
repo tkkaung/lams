@@ -1,0 +1,141 @@
+<html t:type="layout" 
+	title="${message:manage-version-page-title}"
+	currentModule="${moduleName}"
+	currentProj="curProj"
+	breadcrumb="${curProj.encodeddisplayname}=project/home?${curProj.id}
+		,${module.displayName}=modules/scheduling?${curProj.id}
+		,${message:manage-version-page-title}=modules/scheduling/schedulemanage?${curProj.id}"
+	totalShowOption="${totalSize}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+	
+	
+<p:actionBtns>
+	<a class="button rounded" t:type="pageLink" page="modules/scheduling/scheduleImport" context="curProj.id" title="${message:import-tip}">
+		<span>${message:import-xls}</span>
+	</a>
+</p:actionBtns>	
+
+	<table class="actionToolBar">
+		<tr><td class="right">
+		</td>
+		</tr>
+	</table>	
+		
+		<table style="padding: 5px;">
+			<tbody>
+				<tr>
+					<td>${message:current-gantt-chart} (${getSummaryCount(activeSchedule)}) : </td>
+					<td >
+						<div >
+							<a class="button squared" t:type="eventlink" t:event="ExportXls" context="activeSchedule.id" 
+								title="${message:export-tip}"
+							>
+								<span>${message:export-xls}</span>
+							</a>
+							<a href="#" t:type="pageLink" page="modules/scheduling/scheduleView" context="activeSchedule.id" 
+								onclick="popup(this.href , 'schd_Window'); return false;"
+								target="_blank" class="button squared"
+								title="${message:view-tip}"
+								>
+								<span>${message:view}</span>
+							</a> 
+							<span id="saveTrigger">
+								<a href="#" onclick="showElm('saveFormContainer'); hideElm('saveTrigger'); return false;" 
+									title="${message:save-version-tip}"
+									class="button squared">
+									<span>${message:save-version}</span> 
+								</a>
+							</span>
+						</div>
+					</td>
+				</tr>
+				<tr>	
+					<td colspan="2" >
+						<div id="saveFormContainer">
+						<div>
+							<form t:type="form" t:id="saveForm">
+								${message:remarks-label}
+								<table>
+									<tr>
+										<td class="mwidth">
+											<span class="formtip">${message:add-remark-tip}</span>
+											<br/>
+											<textarea t:type="textarea" t:id="remarks" value="remarks" cols="50" rows="3" class="mwidth" />
+										</td>
+									</tr>
+									<tr>
+										<td style="text-align:right;">
+											<t:submit value="${message:save}" class="squared"/>
+											<a href="#" onclick="showElm('saveTrigger'); hideElm('saveFormContainer'); return false;"><button class="button squared">${message:cancel}</button></a>
+										</td>
+									</tr>
+								</table>
+							</form>
+							</div>
+						</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<div >
+			<t:grid source="schedules" 
+					row="schedule"
+					rowClass="prop:evenodd.next"
+					rowsPerPage="rowsPerPage"
+					pagerPosition="bottom" 
+					model="Model">
+				<p:empty><div class="notfoundtext">${message:no-version-found}</div></p:empty>
+				<p:createDateCell>
+					${schedule.CreateDateDisplay}
+				</p:createDateCell>
+				<p:containCell>
+					${getSummaryCount(schedule)}
+				</p:containCell>
+				<p:createdByCell>
+					<t:pagelink page="user/view" context="schedule.user.id">
+						${schedule.user.displayname}
+					</t:pagelink>
+				</p:createdByCell>
+				<p:actionCell>
+					<a class="button rounded" t:type="eventlink" t:event="ExportXls" context="schedule.id" title="${message:export-tip}">
+						<span>${message:export-xls}</span>
+					</a>
+					<a href="#" t:type="pageLink" page="modules/scheduling/scheduleView" context="schedule.id" 
+						onclick="popup(this.href , 'schd_Window'); return false;"
+						target="_blank" class="button rounded"
+						title="${message:view-tip}"
+						>
+						<span>${message:view}</span>
+					</a>
+					<a href="#" t:type="pageLink" page="modules/scheduling/scheduleCompare" context="activeScheduleIdAndScheduleId" 
+						class="button rounded"
+						title="${message:compare-tip}" 
+						>
+						<span>${message:compare}</span>
+					</a>
+					<a href="#" t:type="actionLink" t:id="restore" context="schedule.id"  class="button rounded"
+						t:mixins="Confirm" t:message="${message:confirm-restore-version}"
+						title="${message:restore-tip}" 
+					>
+						<span>${message:restore}</span>
+					</a>
+					<a href="#" t:type="actionLink" t:id="remove" context="schedule.id" class="button rounded"
+						t:mixins="Confirm" t:message="${message:confirm-remove-version}"
+						title="${message:remove-tip}"
+					>
+						<span>${message:remove}</span>
+					</a>
+					
+				</p:actionCell>
+				
+			</t:grid>
+		</div>
+		
+		<script>
+			document.observe("dom:loaded", function() {
+				$('saveFormContainer').hide();
+			});
+		</script>
+		
+</html>

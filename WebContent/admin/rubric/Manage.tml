@@ -1,0 +1,100 @@
+<html t:type="layout" 
+	title="${message:admin-manage-rubric}"
+	breadcrumb="${message:control-panel}=admin
+		,${message:admin-manage-rubric}=admin/rubric/home"
+   totalShowOption="${totalSize}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" xmlns:p="tapestry:parameter">
+
+	<p:leftMenuBlk><t:ControlPanMenu initTab="rubric"/></p:leftMenuBlk>
+
+	<style>
+		.info{
+			width: 175px;
+		}
+		.name{
+			width: 35%;
+		}
+	</style>
+	
+	<p:actionBtns >
+		<a href="#" t:type="pageLink" page="admin/rubric/searchshared" class="button rounded">
+			 	<span>${message:search-shared-rubric}</span>
+		</a>
+		<a href="#" t:type="pageLink" page="admin/rubric/new" context="true" class="button rounded">
+			 	<span>${message:add-new} ${message:rubric}</span>
+		</a>
+	</p:actionBtns>
+
+	<table class="actionToolBar">
+		<tr>
+			<td class="right">		 	
+				<form t:type="form" t:id="searchForm">
+					<t:label for="searchText">${message:filter}: </t:label>
+					
+					<t:textfield t:id="searchText" value="searchText" ></t:textfield>
+					Sch/Dept:
+					<t:if test="canManageRubrics()">
+							<t:select value="searchSchool" model="getSchoolModel()" blanklabel="message:scope-all-school"/>
+							<p:else>
+								<t:select value="searchSchool" model="getSchoolModel()" validate="required"/>
+							</p:else>
+						</t:if>
+					<input type="submit" value="${message:go}" class="squared"/>
+				</form>
+			</td>
+		</tr>
+	</table>
+
+	<t:grid source="rubrics" row="rubric" class="stickyHeader t-data-grid"
+		model="model"
+		rowsPerPage="rowsPerPage"
+		pagerPosition="bottom" 
+		>
+		<p:empty>
+			<div class="notfoundtext">
+				${message:no-rubric-defined}
+			</div>
+		</p:empty>
+	   
+	   <t:parameter name="nameCell">
+	   	<t:pagelink page="admin/rubric/view" context="rubric.id">${rubric.name}</t:pagelink>
+	   	<br/>
+	   	<span class="subdes"><t:outputraw value="${textarea2html(rubric.des)}"/></span>
+	   </t:parameter>
+	   <t:parameter name="mdateCell">
+	   	<span class="date">${rubric.mdateDisplay}</span>
+	   </t:parameter>
+	   <t:parameter name="ownerCell">
+	   	<t:pagelink page="user/view" context="rubric.owner.id">${rubric.owner.displayName}</t:pagelink>
+	   </t:parameter>
+	   <t:parameter name="masterCell">
+	   	<t:if test="rubric.master">
+	   		<t:if test="rubric.school">
+	   			<span title="${rubric.school.des}">${rubric.school.displayname}</span>
+	   			<p:else>
+	   				${message:scope-all-school}
+	   			</p:else>
+	   		</t:if>
+	   	</t:if>
+	   </t:parameter>
+	   <t:parameter name="infoCell">
+	   	<span style="font-size:0.9em;">
+		   	<div>${message:numCrit-label}: <strong>${rubric.criterias.size()}</strong></div>
+		   	<div>${message:numCriterion-label}: <strong>${getFirstCriterions().size()}</strong></div>
+		   	<div>${message:assessmtCount-label}: <strong>${getCountAssessmentByRubric(rubric)}</strong></div>
+		 	<div>${message:evaluationCount-label}: <strong>${getCountEvaluationByRubric(rubric)}</strong></div>
+		 	</span>
+	   </t:parameter>
+	   
+	   <t:parameter name="actionCell">
+			<t:pagelink page="admin/rubric/edit" context="getParams(rubric.id,true)" class="button rounded">
+				<span>${message:edit}</span> 
+			</t:pagelink>
+			<t:actionlink t:id="delete" context="rubric.id" class="button rounded"
+				onclick="return confirmDelete('${message:confirm-permanent-delete-item}')">
+				<span>${message:delete}</span>
+			</t:actionlink>
+		</t:parameter>
+	</t:grid>
+
+</html>

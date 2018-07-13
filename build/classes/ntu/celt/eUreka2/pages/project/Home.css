@@ -1,0 +1,23 @@
+div.schd_statusBar{
+	background: #d0d0d0;
+}
+div.schd_statusBar.overdue{
+	background: #dc1933;
+}
+div.schd_statusBar .done{
+	height: 15px;
+	text-align: right;
+	font-size: 0.9em;
+	color: #ffffff;
+	background: #693;
+}
+span.taskCompleted{
+	color: #693;
+	margin-right: 15px;
+}
+span.taskOutstanding{
+	color: #666;
+}
+span.taskOutstanding.overdue{
+	color: #dc1933;
+}

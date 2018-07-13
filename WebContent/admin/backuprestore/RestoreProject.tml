@@ -1,0 +1,79 @@
+<html t:type="layout" 
+	title="${message:restore} ${message:project}"
+	breadcrumb="${message:control-panel}=admin,${message:backup-restore} ${message:project}=admin/backuprestore,${message:restore} ${message:project}=admin/backuprestore/restoreproject"
+   xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="project"/></p:leftMenuBlk>
+
+	<t:if test="showResult">
+		<t:delegate to="block:resultBlock"/>
+		<p:else>
+			<t:delegate to="block:formBlock"/>
+		</p:else>
+	</t:if>
+	
+
+	<t:block t:id="formBlock">
+		<t:if test="bEntry">
+			<p:else>
+					<p>${message:not-found}</p>
+			</p:else>
+			
+			<div class="proc-form" >
+				<div class="title">
+					${message:project}: 
+					<a href="#" t:type="pageLink" page="project/home" context="bEntry.project.Id">${bEntry.project.displayname}</a>
+				</div>
+		 		<form t:type="form" t:id="restoreForm">
+					<t:errors/>
+					<div class="instruction">
+						${message:instruction}
+					</div>
+					<div class="proc-area">
+						<div>
+							<t:loop source="bEntry.succeededBackups" value="tempModName" formState="NONE" >
+								<div>
+									<input type="checkBox" name="moduleChkBox" value="${tempModName}" id="${tempModName}" />
+									<label for="${tempModName}">${tempModName}</label>
+								</div>
+							</t:loop>
+						</div>
+					</div>
+					<div class="footer">
+						<t:submit value="${message:submit-label}" class="squared"/>
+					</div>
+				</form>
+			</div>
+		</t:if>
+	</t:block>
+	
+	
+	<t:block t:id="resultBlock">
+		<div class="page-result-block">
+			<div class="title">${message:result}:</div>
+	 		<div class="title2">${resultSucceededRestores.size()} ${message:successful-restored}:</div>
+	 		<div class="content">
+		 		<ul>
+					<li t:type="loop" source="resultSucceededRestores" value="var:modName">
+						${var:modName}
+					</li>
+				</ul>
+				<t:if test="resultFailedRestores">
+					<div class="title2">${resultFailedRestores.size()} ${message:failed-restored}:</div>
+		 			<ul>
+						<li t:type="loop" source="resultFailedRestores" value="var:modName">
+							${var:modName}
+						</li>
+					</ul>
+				</t:if>
+			</div>
+			<div class="footer">			
+				<a href="#" t:type="pageLink" page="admin/backupRestore" class="button squared">
+			 		<span>${message:ok}</span>
+				</a>
+			</div>
+		</div>
+	</t:block>
+	
+	
+</html>

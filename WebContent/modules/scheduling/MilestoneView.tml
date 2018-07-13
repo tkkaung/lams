@@ -1,0 +1,85 @@
+<html t:type="layout" 
+	title="${message:view} ${message:milestone}"
+	currentModule="${moduleName}"
+	currentProj="curProj"
+	breadcrumb="${curProj.encodeddisplayname}=project/home?${curProj.id}
+		,${module.displayName}=modules/scheduling?${curProj.id}
+		,${message:view} ${message:milestone}=modules/scheduling/milestoneview?{milestone.id}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+		
+
+<p:actionBtns>
+	<t:if test="canEditMilestone(milestone)">
+		<a class="button rounded" t:type="pageLink" page="modules/scheduling/milestoneedit" context="milestone.id" >
+			<span>${message:edit} ${message:milestone}</span>
+		</a>
+	</t:if>
+	<t:if test="canCreatePhase(curProj)">
+		<a class="button rounded" t:type="pageLink" page="modules/scheduling/phaseEdit" context="milestoneIdAndPhaseId">
+			<span>${message:addPhase}</span>
+		</a>
+	</t:if>
+	<t:if test="canCreateTask(curProj)">
+		<a class="button rounded" t:type="pageLink" page="modules/scheduling/taskEdit" context="milestoneIdAndPhaseIdAndTaskId">
+			<span>${message:addTask}</span>
+		</a>
+	</t:if>
+</p:actionBtns>	
+
+
+<t:beandisplay object="milestone" 
+	include="name,deadline,averagePercentDone,comment"
+	add="creator,divideInto"
+	>
+	<t:parameter name="name">
+		<strong>${milestone.name}</strong>
+	</t:parameter>
+	<t:parameter name="deadline">
+		${milestone.deadlinedisplay}
+	</t:parameter>
+	<t:parameter name="creator">
+		<t:if test="${milestone.manager}">
+			<t:pagelink page="user/view" context="milestone.manager.id">${milestone.manager.displayname}</t:pagelink>
+		</t:if>
+	</t:parameter>
+	<t:parameter name="averagePercentDone">${milestone.getAveragePercentDone()}</t:parameter>
+	<t:parameter name="divideInto">
+		<div style="display:inline-block;">
+			<ul style="list-style:disc;padding:0px;margin: 0 20px;">
+				<t:loop source="milestone.phases" value="tempPhase">
+					<li>
+						
+						<t:pageLink page="modules/scheduling/phaseview" context="tempPhase.id">
+							${tempPhase.name}
+						</t:pageLink>
+						<span class="formtip">[${message:phase}]</span>
+						<ul style="list-style:square;padding:0px;margin: 0 20px;">
+							<t:loop source="tempPhase.tasks" value="tempTask">
+								<li>	
+									<t:pageLink page="modules/scheduling/taskview" context="tempTask.id">
+										${tempTask.name}
+									</t:pageLink>
+									- <span class="formtip"> ${tempTask.percentageDone} ${message:percentDone-label}</span>
+								</li>
+							</t:loop>
+						</ul>
+					</li>
+				</t:loop>
+				<t:loop source="milestone.noPhaseTasks" value="tempTask">
+					<li>	
+						<t:pageLink page="modules/scheduling/taskview" context="tempTask.id">
+							${tempTask.name}
+						</t:pageLink>
+						- <span class="formtip"> ${tempTask.percentageDone} ${message:percentDone-label}</span>
+					</li>
+				</t:loop>
+			</ul>
+		</div>
+		<t:outputraw value="${getSpace()}"/>
+	</t:parameter>
+	
+
+</t:beandisplay>
+	
+</html>

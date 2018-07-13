@@ -1,0 +1,395 @@
+<html t:type="layout" 
+	title="View Grade Detail"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/peerevaluation/assesseehome?${project.id}
+		,View Grade Detail=modules/peerevaluation/assesseeviewgradedetail
+		"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+<style>
+	
+	#evalContainer {
+		overflow-x: auto;
+	<t:if test="${isMoreThan(eval.criterias.size(), 7)}">	
+		_overflow-x: scroll;  /* IE */
+	</t:if>
+		width: 100%;
+		/*		width: 972px;*/
+	}
+	table.t-data-grid th.no_bot_border{
+		border-bottom-color: #ccc !important; 
+	}
+	table.t-data-grid th.no_top_border{
+		border-top-color: #ccc !important; 
+	}
+	
+	table.t-data-grid tbody tr td{
+		text-align: center;
+		vertical-align: middle;
+	}
+	.evaltbl th{
+		padding:5px
+	}
+	.evaltbl .name{
+		text-align: left;
+	}
+	
+	.evaltbl .crit {
+		vertical-align: top;
+		width: ${getCritNameWidthPercent(60, eval)};
+		text-align: left;
+		font-size: 11px;
+	}
+	.evaltbl .opques{
+		vertical-align: top;
+		text-align: left;
+		font-size: 11px;
+	}
+	.evaltbl td.strength, .evaltbl td.weakness , .evaltbl td.other {
+		vertical-align: top;
+		text-align: left;
+	/*	width: 180px;*/
+	}
+	.evaltbl tr.self td {
+		background-color: #999;
+		background-image: none;
+	}
+</style>
+
+
+
+
+
+<table class="actionToolBar">
+	<tr>
+		<td class="right">
+		</td>
+	</tr>
+</table>
+
+<div class="e-formeditor t-beaneditor">
+	<table >
+		<tr>
+			<td class="label">${message:evaluation-name}</td>
+			<td>
+				${eval.name}
+			</td>
+		</tr>
+		<tr>
+			<td class="label">${message:evaluating-student}</td>
+			<td>
+				${selectedUser.displayName}
+			</td>
+		</tr>
+		<t:if test="eval.group">
+			<tr>
+				<td class="label">${message:group}</td>
+				<td>
+					<t:if test="groupUser">${groupUser.getGroupNumNameDisplay()}</t:if>
+				</td>
+			</tr>
+		</t:if>
+			
+		
+	</table>
+<br />
+</div>		
+
+<div id="evalContainer">
+<t:if test="eval.criterias">
+	
+	<table class="t-data-grid evaltbl" >
+		<tr>
+			<th rowspan="2" >${message:evaluator}</th>
+	
+			<th colspan="${eval.criterias.size()}" ><t:if test="eval.rubric">${eval.rubric.name}</t:if></th>
+			<t:if test="hasQualitativeFeedback(eval)">
+				<th  colspan="${getNumQualitativeFeedback(eval)}">${message:comment}</th>
+			</t:if>
+	
+			
+		</tr>
+			
+		<tr>
+		
+			<t:loop source="eval.criterias" value="tempCrit" index="colIndex" >
+				<th class="crit" title="${tempCrit.name}">
+					<t:outputraw value="${textarea2html(tempCrit.name)}"/>
+				</th>
+			</t:loop>
+				<t:if test="eval.getUseCmtStrength()">
+				<th class="no_bot_border cmmtnamebox" >
+					  	<span id="csDisplay">${getCmmtStrengthName(eval)}</span>
+				</th>
+		   	</t:if>
+			<t:if test="eval.getUseCmtWeakness()">
+				<th class="no_bot_border cmmtnamebox" >
+					  	<span id="cwDisplay">${getCmmtWeaknessName(eval)}</span>
+				</th>
+			</t:if>
+			<t:if test="eval.getUseCmtOther()">
+				<th class="no_bot_border cmmtnamebox" >
+					   	<span id="coDisplay">${getCmmtOtherName(eval)}</span>
+				</th>
+			</t:if>
+		
+		</tr>
+		
+		${loadEvalUserList(eval, selectedUser)}
+		
+
+		<t:if test="assessors" negate="true">
+			<tr><td colspan="50">- No one evaluated yet -</td></tr>
+		</t:if>	
+		
+		
+		
+	<t:if test="eval.allowViewGradeDetail">
+		
+		<t:loop source="assessors" value="user" index="rowIndex">
+			<tr >
+				<td class="name">
+						${user.displayName}
+				</td>
+				
+				${loadEvalUser(eval,user)}
+				<t:loop source="eval.criterias" value="tempCrit" index="colIndex" >
+					<td>
+						<t:if test="hasGraded()">
+							${getCritScoreDisplay(tempCrit,evalUser)}
+						</t:if>
+						<t:outputraw value="getSpace()"/>
+					</td>
+				</t:loop>
+				
+				<t:if test="eval.getUseCmtStrength()">		
+					<td class="strength" >
+						<t:if test="hasGraded()">
+							<t:outputraw value="${textarea2html(evalUser.cmtStrengthDisplay)}"/>
+						</t:if>
+					</td>
+				</t:if>
+				<t:if test="eval.getUseCmtWeakness()">		
+					<td class="weakness" >
+						<t:if test="hasGraded()">
+							<t:outputraw value="${textarea2html(evalUser.cmtWeaknessDisplay)}"/>
+						</t:if>
+					</td>
+				</t:if>
+				<t:if test="eval.getUseCmtOther()">		
+					<td class="other" >
+						<t:if test="hasGraded()">
+							<t:outputraw value="${textarea2html(evalUser.cmtOtherDisplay)}"/>
+						</t:if>
+					</td>
+				</t:if>
+				
+				
+				<t:if test="eval.openEndedQuestions">
+				<t:if test="hasGraded()">
+				<tr>
+					<td></td>
+					<td colspan="100">
+						<table width="100%">
+							<tbody>
+							<t:loop source="eval.openEndedQuestions" value="oQuestion" index="quesIndex" >
+								<tr>
+									<th width="30%" class=" opques" title="${oQuestion}"  >
+										<t:outputraw value="${truncateString(textarea2html(oQuestion),300)}"/>
+									</th>
+									<td class=" opques">
+										<t:outputraw value="${textarea2html(evalUser.getOpenEndedQuestionAnswers(quesIndex))}"/>
+				
+									</td>
+								</tr>
+							</t:loop>
+							</tbody>
+						</table>
+					</td>
+				</tr>
+				</t:if>
+				</t:if>	
+			</tr>
+		</t:loop>
+	</t:if>		
+
+
+	<t:if test="eval.allowViewGradeDetailPeer">
+			<!-- Start PEER -->		
+			<tr >
+				<td class="name">
+					PEERS 
+					<t:if test="eval.useFixedPoint">
+						(Sum)
+						<p:else>
+							(Average) 
+						</p:else>
+					</t:if>	
+				</td>
+				<t:loop source="eval.criterias" value="tempCrit" index="colIndex" >
+					<td>
+						<t:if test="hasGradedList()">
+							<t:if test="eval.useFixedPoint">
+								${getStudentCritFixedPoint(tempCrit, evalUserList, true)}
+								<p:else>
+									${getComputedCritScoreDisplay(tempCrit,evalUserList)} 
+								</p:else>
+							</t:if>
+						</t:if>
+						<t:outputraw value="getSpace()"/>
+					</td>
+				</t:loop>
+				
+				<t:if test="eval.getUseCmtStrength()">
+					<td class="strength" >
+						<t:loop source="evalUserList" value="evalUser">
+							<t:if test="evalUser.getCmtStrengthDisplay()">
+								<div >
+								- <t:outputraw value="${textarea2html(evalUser.getCmtStrengthDisplay())}"/>
+								</div>
+							</t:if>
+						</t:loop>
+					</td>
+				</t:if>
+				<t:if test="eval.getUseCmtWeakness()">		
+					<td class="weakness" >
+						<t:loop source="evalUserList" value="evalUser">
+							<t:if test="evalUser.getCmtWeaknessDisplay()">
+								<div >
+								- <t:outputraw value="${textarea2html(evalUser.getCmtWeaknessDisplay())}"/>
+								</div>
+							</t:if>
+						</t:loop>
+					</td>
+				</t:if>
+				<t:if test="eval.getUseCmtOther()">
+					<td class="Other" >
+						<t:loop source="evalUserList" value="evalUser">
+							<t:if test="evalUser.getCmtOtherDisplay()">
+								<div >
+								- <t:outputraw value="${textarea2html(evalUser.getCmtOtherDisplay())}"/>
+								</div>
+							</t:if>
+						</t:loop>
+					</td>
+				</t:if>
+
+				<t:if test="eval.openEndedQuestions">
+				<t:if test="hasGraded()">
+				<tr>
+					<td></td>
+					<td colspan="100">
+						<table width="100%">
+							<tbody>
+							<t:loop source="eval.openEndedQuestions" value="oQuestion" index="quesIndex" >
+								<tr>
+									<th width="30%" class=" opques" title="${oQuestion}"  >
+										<t:outputraw value="${truncateString(textarea2html(oQuestion),300)}"/>
+									</th>
+									<td class=" opques">
+									<t:loop source="evalUserList" value="evalUser">
+										<t:if test="evalUser.getOpenEndedQuestionAnswers(quesIndex)">
+											<div >
+											- <t:outputraw value="${textarea2html(evalUser.getOpenEndedQuestionAnswers(quesIndex))}"/>
+											</div>
+										</t:if>
+									</t:loop>
+										
+									</td>
+								</tr>
+							</t:loop>
+							</tbody>
+						</table>
+					</td>
+				</tr>
+				</t:if>
+				</t:if>	
+			</tr>
+				
+			<!-- End PEER -->
+		
+		</t:if>	
+		
+		
+		
+		<t:if test="eval.AllowSelfEvaluation">
+			<!-- SELF -->		
+			<tr >
+				<td class="name">
+					${selectedUser.displayName} (SELF)
+				</td>
+				
+				${loadEvalUser(eval,selectedUser)}
+				<t:loop source="eval.criterias" value="tempCrit" index="colIndex" >
+					<td>
+						<t:if test="hasGraded()">
+							${getCritScoreDisplay(tempCrit,evalUser)}
+						</t:if>
+						<t:outputraw value="getSpace()"/>
+					</td>
+				</t:loop>
+				
+				<t:if test="eval.getUseCmtStrength()">		
+					<td class="strength" >
+						<t:if test="hasGraded()">
+							<t:outputraw value="${textarea2html(evalUser.cmtStrengthDisplay)}"/>
+						</t:if>
+					</td>
+				</t:if>
+				<t:if test="eval.getUseCmtWeakness()">		
+					<td class="weakness" >
+						<t:if test="hasGraded()">
+							<t:outputraw value="${textarea2html(evalUser.cmtWeaknessDisplay)}"/>
+						</t:if>
+					</td>
+				</t:if>
+				<t:if test="eval.getUseCmtOther()">		
+					<td class="other" >
+						<t:if test="hasGraded()">
+							<t:outputraw value="${textarea2html(evalUser.cmtOtherDisplay)}"/>
+						</t:if>
+					</td>
+				</t:if>
+				<t:if test="eval.openEndedQuestions">
+				<t:if test="hasGraded()">
+				<tr>
+					<td></td>
+					<td colspan="100">
+						<table width="100%">
+							<tbody>
+							<t:loop source="eval.openEndedQuestions" value="oQuestion" index="quesIndex" >
+								<tr>
+									<th width="30%" class=" opques" title="${oQuestion}"  >
+										<t:outputraw value="${truncateString(textarea2html(oQuestion),300)}"/>
+									</th>
+									<td class=" opques">
+										<t:outputraw value="${textarea2html(evalUser.getOpenEndedQuestionAnswers(quesIndex))}"/>
+				
+									</td>
+								</tr>
+							</t:loop>
+							</tbody>
+						</table>
+					</td>
+				</tr>
+				</t:if>
+				</t:if>	
+			</tr>
+			<!-- End SELF -->			
+		</t:if>
+		
+		
+	</table>
+
+</t:if>	
+	
+	
+	<div style="height:20px;"><t:outputraw value="getSpace()"/></div>
+	
+</div>
+
+
+</html>

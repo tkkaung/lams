@@ -1,0 +1,228 @@
+<html t:type="layout" 
+	title="${module.displayName}"
+	currentModule="Leadership Profiling"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/profiling/home?${project.id}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+<style>
+	
+	table.t-data-grid thead tr th, table.t-data-grid tbody tr td {
+	    text-align: center;
+	    vertical-align: middle;
+	}
+	table.t-data-grid tbody tr td.assessee {
+	    text-align: left;
+	}
+	
+	
+</style>
+
+<p:actionBtns>
+	
+	<a class="button rounded" t:type="eventlink" t:event="ExportXls" context="project.id" 
+		title="${message:export-tip}">
+		<span>${message:export-xls}</span>
+	</a>
+	|
+	<a class="button rounded" t:type="pageLink" page="modules/profiling/managequestionset" context="project.id" >
+		<span>${message:manage-questionset}</span>
+	</a>
+	<a class="button rounded" t:type="pageLink" page="modules/profiling/manage" context="project.id" >
+		<span>${message:manage-profiling}</span>
+	</a>
+	
+			
+</p:actionBtns>	
+
+
+
+
+<table class="actionToolBar">
+	<tr>
+		<td class="right">
+		</td>
+	</tr>
+</table>
+
+<div class="assmtContainer">
+<div id="scroller">
+	<table class="t-data-grid assmttbl stickyHeader"  >
+		<thead>
+			<tr>
+				<th rowspan="2" class="no"></th>
+				<th rowspan="2" class="assessee">Student</th>
+				<t:if test="profPEER.group">
+					<th rowspan="2">Group</th>
+				</t:if>
+				<th > ${profSELFpre.name} </th>
+				<th > ${profSELFpost.name} </th>
+				<t:if test="isMoreThan(maxPeersInGroup, 0)">
+					<t:loop source="1..maxPeersInGroup" value="colIndex" >
+						<th > PEER ${colIndex} </th>
+					</t:loop>
+					<p:else>
+						<th > ${profPEER.name}
+							<div >
+							<t:pagelink page="modules/profiling/edit" context="profPEER.id" class="attention">
+					${message:no-group-yet}
+							</t:pagelink>
+							</div>
+						</th>
+					</p:else>
+				</t:if>
+				
+				<th rowspan="2"> ${profINSTRUCTOR.name} 
+				<t:if test="profINSTRUCTOR.questionSet" negate="true">
+					<div >
+					<t:pagelink page="modules/profiling/edit" context="profINSTRUCTOR.id" class="attention">
+						${message:no-questionset-yet}
+					</t:pagelink>
+					</div>
+				</t:if>
+				<div>${profINSTRUCTOR.getSdateDisplay()} - ${profINSTRUCTOR.getEdateDisplay()} </div>
+				
+				
+				
+				</th>
+				<th rowspan="2"> Result</th>
+				
+				
+			</tr>
+			<tr>
+				<th > 
+					<t:if test="profSELFpre.questionSet" negate="true">
+						<div >
+						<t:pagelink page="modules/profiling/edit" context="profSELFpre.id" class="attention">
+							${message:no-questionset-yet}
+						</t:pagelink>
+						</div>
+					</t:if>
+					${profSELFpre.getSdateDisplay()} - ${profSELFpre.getEdateDisplay()} 
+					<br/> 
+					<t:pageLink page="modules/profiling/sendemails" context="getParams(profSELFpre.id, 1)" >
+						${message:send-reminder}
+					</t:pageLink>
+				</th>
+				<th > 
+					<t:if test="profSELFpost.questionSet" negate="true">
+						<div >
+						<t:pagelink page="modules/profiling/edit" context="profSELFpost.id" class="attention">
+							${message:no-questionset-yet}
+						</t:pagelink>
+						</div>
+					</t:if>
+					${profSELFpost.getSdateDisplay()} - ${profSELFpost.getEdateDisplay()} 
+					<br/> 
+					<t:pageLink page="modules/profiling/sendemails" context="getParams(profSELFpost.id, 1)" >
+						${message:send-reminder}
+					</t:pageLink>
+				</th>
+				<th colspan="${getPeerColspan()}">
+					<t:if test="profPEER.questionSet" negate="true">
+						<div >
+						<t:pagelink page="modules/profiling/edit" context="profPEER.id" class="attention">
+				${message:no-questionset-yet}
+						</t:pagelink>
+						</div>
+					</t:if> 
+					${profPEER.getSdateDisplay()} - ${profPEER.getEdateDisplay()} 
+					<br/> 
+					<t:pageLink page="modules/profiling/sendemails" context="getParams(profPEER.id, 1)" >
+						${message:send-reminder}
+					</t:pageLink>
+				</th>
+			</tr>
+			
+		</thead>
+		<tbody>
+			<t:loop source="assessees" value="user" index="rowIndex">
+				
+				<tr>
+					<td>${getRowNum()}</td>
+					<td class="assessee" id="${user.username}">
+						${user.displayName}
+					</td>
+					<t:if test="profPEER.group">
+						<td >${getGroupTypeName(profPEER.group, user)}</td>
+					</t:if>
+					<td>
+						${loadProfUser(profSELFpre,user, user)}
+						<t:if test="hasGraded()">
+							<t:pageLink page="modules/profiling/viewscore" context="profUser.id" >
+								${getStatus(profUser)}
+							</t:pageLink>
+						</t:if>
+					</td>
+					<td>
+						${loadProfUser(profSELFpost,user, user)}
+						<t:if test="hasGraded()">
+							<t:pageLink page="modules/profiling/viewscore" context="profUser.id" >
+								${getStatus(profUser)}
+							</t:pageLink>
+						</t:if>
+					</td>
+					<t:if test="isMoreThan(maxPeersInGroup, 0)">
+						<p:else>
+							<td><t:outputraw value="getSpace()"/></td>
+						</p:else>
+						
+						${loadPeerMember(profPEER, user)}
+						<t:loop source="groupMembers" value="peer">
+							<td>
+								${loadProfUser(profPEER, peer, user)}
+								<div ><span class="formtip">${peer.getDisplayName()}</span></div>
+								<t:if test="hasGraded()">
+									<t:pageLink page="modules/profiling/viewscore" context="profUser.id" >
+										${getStatus(profUser)}
+									</t:pageLink>
+								</t:if>
+							</td>
+						</t:loop>
+						<t:if test="isMoreThan(maxPeersInGroup, groupMembers.size())">
+							<t:loop source="1..substractInt(maxPeersInGroup, groupMembers.size())" value="colIndex" >
+								<td><t:outputraw value="getSpace()"/></td>
+							</t:loop>
+						</t:if>
+					</t:if>
+					
+					
+					<td>
+					<t:if test="profPEER.group">
+						<div><span class="formtip">${getGroupTutorName(profPEER.group, user)}</span></div>
+						
+					</t:if>
+							
+						${loadProfUser(profINSTRUCTOR, getNull(), user)}
+						<t:if test="hasGraded()">
+							
+							<t:if test="profUser.isFinished()">
+								<t:pageLink page="modules/profiling/viewscore" context="profUser.id" >
+									${getStatus(profUser)}
+								</t:pageLink>
+								
+								<p:else>
+									${getStatus(profUser)}
+								</p:else>
+							</t:if>
+							
+						</t:if>
+					</td>
+					<td>
+						<t:pageLink page="modules/profiling/result" context="getParams(project.id, user.id)" >
+							Result
+						</t:pageLink>
+						
+					</td>
+					
+				</tr>
+			</t:loop>
+			
+		</tbody>
+		
+	</table>
+	
+</div>
+</div>
+</html>

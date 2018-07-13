@@ -1,0 +1,201 @@
+<html t:type="layout" 
+   title="${message:view} ${message:assessment}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/assessment/home?${project.id}
+		,${message:manage} ${message:assessment}=modules/assessment/manage?${project.id}
+		,${message:view} ${message:assessment}=modules/assessment/view"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+  
+<p:actionBtns>
+	<t:if test="canEditAssessment(assmt)">
+		<a class="button rounded" t:type="pageLink" page="modules/assessment/edit" context="assmt.id" >
+			<span>${message:edit} ${message:assessment}</span>
+		</a>
+	</t:if>
+</p:actionBtns>  
+  
+  
+<div class="e-formeditor">
+	<div class="t-beaneditor ">
+		<table >
+			<tr>
+				<td class="label">${message:name-label}</td>
+				<td>${assmt.name}</td>
+			</tr>
+			<tr>
+				<td class="label">${message:shortName-label}</td>
+				<td>
+					${assmt.shortname}
+				</td>
+			</tr>
+			<tr>
+				<td class="label">${message:des-label}</td>
+				<td><t:outputraw value="${textarea2html(assmt.des)}"/></td>
+			</tr>
+			<t:if test="assmt.sdate">
+				<tr>
+					<td class="label">${message:sdate-label}</td>
+					<td>${assmt.sdateDisplay}</td>
+				</tr>
+			</t:if>
+			<t:if test="assmt.edate">
+				<tr>
+					<td class="label">${message:edate-label}</td>
+					<td>${assmt.edateDisplay}</td>
+				</tr>
+			</t:if>
+			<tr>
+				<td class="label">${message:weightage-label}</td>
+				<td>${assmt.weightage}%</td>
+			</tr>	
+			<tr>
+				<td class="label">${message:select-group}</td>
+				<td>
+				<t:if test="${assmt.group}">
+				   ${assmt.group.groupType}
+				<p:else>
+					${message:dont-use-group}
+				</p:else>
+				</t:if>
+				</td>
+			</tr>	
+			<tr>
+				<td class="label">${message:rubric}</td>
+				<td>
+					<t:if test="assmt.rubric">
+						<t:pagelink page="admin/rubric/view" context="assmt.rubric.id">
+							${assmt.rubric.name}
+						</t:pagelink>
+						
+						<p:else>
+							${message:no-rubric-selected}
+						</p:else>
+					</t:if>
+				</td>
+			</tr>
+		</table>
+		
+		<t:if test="assmt.criterias">
+			<div class="rubricDetailZone view">
+				<style>
+				.rubricDetailZone td{
+					width: ${getCritNameWidthPercentNum(60,getFirstCriterions().size())};
+					
+				}
+				</style>
+				
+				<table >
+					<tr>
+						<th rowspan="2" class="criteria">${message:criteria-objective}</th>
+						<th rowspan="2" class="weightage">${message:weightage-label} <span class="formtip">(%)</span></th>
+						<th colspan="${getFirstCriterions().size()}">${message:criterion}</th>
+					</tr>
+					<tr>
+						
+						<t:if test="isASC(getRubricOrderBy(assmt))">
+							<t:loop source="getFirstCriterions()" value="tempRCriterion" index="colIndex">
+								<th class="critCol numScoreCol">
+									<t:if test="isFirst(colIndex)">
+										<span style="float:left;">0</span>
+									</t:if>
+									<span style="float:right;">${tempRCriterion.score}</span>
+								</th>
+							</t:loop>
+							<p:else>
+								<t:loop source="getFirstCriterions()" value="tempRCriterion" index="colIndex">
+									<th class="critCol numScoreCol">
+										<t:if test="isLast(colIndex, getFirstCriterions())">
+											<span style="float:right;">0</span>
+										</t:if>
+										<span style="float:left;">${tempRCriterion.score}</span>
+									</th>
+								</t:loop>
+							</p:else>
+						</t:if>
+					</tr>
+					<t:loop source="assmt.getCriterias()" value="tempRCrit" index="rowIndex">
+						<tr>
+							<th class="critName">
+								<span title="${message:critName-label}"><t:outputraw value="${textarea2html(tempRCrit.name)}"/></span>
+								<t:outputraw value="getSpace()"/>
+							</th>
+							<th class="weightage">
+								${tempRCrit.weightage}
+							</th>
+							<t:loop source="tempRCrit.criterions" value="tempRCriterion" index="colIndex">
+								<td class="crionDes">
+									<t:outputraw value="${textarea2html(tempRCriterion.des)}"/>
+								</td>
+							</t:loop>
+						</tr>
+					</t:loop>
+				</table>
+			</div>
+		</t:if>
+		
+		
+		<table>
+			<tr>
+				<td class="label">${message:rdate-label}</td>
+				<td>${assmt.rdate}<span class="formtip">${message:releaseDate-tip}</span></td>
+			</tr>	
+			<tr>
+				<td class="label">${message:allowSubmitFile-label}</td>
+				<td>${assmt.allowSubmitFile}</td>
+			</tr>	
+			<tr>
+				<td class="label">${message:permission-label}</td>
+				<td>
+					<t:if test="assmt.allowViewGradeCriteria">
+						<div>
+							- ${message:allowViewGradeCriteria-label}
+							<span class="formtip">${message:allowViewGradeCriteria-tip}</span>
+						</div>
+					</t:if>
+					<t:if test="assmt.allowViewScoredCriteria">
+						<div>
+							- ${message:allowViewScoredCriteria-label}
+							<span class="formtip">${message:allowViewScoredCriteria-tip}</span>
+						</div>
+					</t:if>
+					<t:if test="assmt.allowViewGrade">
+						<div>
+							- ${message:allowViewGrade-label}
+							<span class="formtip">${message:allowViewGrade-tip}</span>
+						</div>
+					</t:if>
+					<t:if test="assmt.allowViewComment">
+						<div>
+							- ${message:allowViewComment-label}
+							<span class="formtip">${message:allowViewComment-tip}</span>
+						</div>
+					</t:if>
+					
+				</td>
+			</tr>
+			
+			<tr>
+				<td class="label">${message:creator-label}</td>
+				<td>
+					<t:pagelink page="user/view" context="assmt.creator.id">${assmt.creator.displayname}</t:pagelink>
+				</td>
+			</tr>
+			<tr>
+				<td class="label">${message:mdate-label}</td>
+				<td>
+					${assmt.mdatedisplay}
+					<t:if test="assmt.isDiffEditor()">
+						${message:by} 
+						<t:pagelink page="user/view" context="assmt.editor.id">${assmt.editor.displayname}</t:pagelink>
+					</t:if>
+				</td>
+			</tr>
+		</table>
+		
+	</div>
+</div>
+
+</html>

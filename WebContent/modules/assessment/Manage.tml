@@ -1,0 +1,237 @@
+<html t:type="layout" 
+	title="${message:manage} ${message:assessment}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/assessment/home?${project.id}
+		,${message:manage} ${message:assessment}=modules/assessment/manage?${project.id}"
+	totalShowOption="${totalSize}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+<style>
+	.wCell form{
+		display: inline;
+	}
+	.wCell form .wEdit{
+		display: inline;
+	}
+	.wCell .wEditBtn{
+		float: right;
+	}
+</style>
+
+
+
+<p:actionBtns>
+	<t:if test="canCreateAssessment(project)">
+		<a class="button rounded" t:type="pageLink" page="modules/assessment/new" context="project.id" >
+			<span>${message:add-new} ${message:assessment}</span>
+		</a>
+		<t:pagelink page="modules/assessment/Import" context="project.id" class="button rounded">
+				<span>${message:import}</span> 
+			</t:pagelink>
+	</t:if>
+	
+	<a class="button rounded" t:type="pageLink" page="admin/rubric/home"  >
+		<span>${message:manage-my-rubric}</span>
+	</a>
+	
+</p:actionBtns>	
+
+
+<t:grid source="assmts" row="assmt" 
+	model="model"
+	rowIndex="rowIndex"
+	rowsPerPage="rowsPerPage"
+	pagerPosition="bottom" 
+	>
+	<p:empty>
+		<div class="notfoundtext">
+			${message:no-assessment-found}
+		</div>
+	</p:empty>
+   <t:parameter name="orderNumberCell">
+   	${assmt.ordernumber}
+   	<t:if test="isFirst(rowIndex)">
+			<img src="${context:lib/img/arrow_up0.png}" ></img>
+			<p:else>
+				<t:eventlink t:event="swapOrder" context="getParams(getPrevAssmt(rowIndex).id, assmt.id)" >
+					<img src="${context:lib/img/arrow_up.png}" title="${message:move-up}"></img>	
+				</t:eventlink>
+			</p:else>
+		</t:if>
+		<t:if test="isLast(rowIndex, assmts)">
+			<img src="${context:lib/img/arrow_down0.png}" ></img>
+			<p:else>
+				<t:eventlink t:event="swapOrder" context="getParams(getNextAssmt(rowIndex).id, assmt.id)" >
+					<img src="${context:lib/img/arrow_down.png}" title="${message:move-down}"></img>	
+				</t:eventlink>
+			</p:else>
+		</t:if>
+   </t:parameter>
+   
+   <t:parameter name="nameCell">
+   	<t:pagelink page="modules/assessment/view" context="assmt.id">
+   		<t:if test="assmt.shortName">${assmt.shortName} <br/></t:if>
+   		${assmt.name}
+   	</t:pagelink>
+   	
+   	<t:if test="isSetsdateORedate(assmt)">
+	   	<div>
+		   	<span class="date">${assmt.sdatedisplay}</span>
+		   	-
+		   	<span class="date">${assmt.edatedisplay}</span>
+		   </div>
+   	</t:if>
+   	<div>
+   		<span class="subdes">
+   			<t:outputraw value="${truncateString(textarea2html(assmt.des))}"/>
+   		</span>
+   	</div>
+   	
+   </t:parameter>
+   <t:parameter name="creatorCell">
+   	<t:pagelink page="user/view" context="assmt.creator.id">${assmt.creator.displayname}</t:pagelink>
+   </t:parameter>
+   <t:parameter name="mdateCell">
+   	<span class="date">${assmt.mdatedisplay}</span>
+   	<t:if test="assmt.isDiffEditor()">
+			<div style="font-size:0.9em">
+				${message:by} 
+				<t:pagelink page="user/view" context="assmt.editor.id">${assmt.editor.displayname}</t:pagelink>
+			</div>
+		</t:if>
+   </t:parameter>
+   <t:parameter name="groupCell">
+   	<t:if test="assmt.group">
+   		${assmt.group.groupType}
+   	</t:if>
+   </t:parameter>
+   <t:parameter name="rubricCell">
+   	<t:if test="assmt.rubric">
+   		<t:pagelink page="admin/rubric/view" context="assmt.rubric.id">${assmt.rubric.name}</t:pagelink>
+   	</t:if>
+   </t:parameter>
+   <t:parameter name="weightageCell">
+   	<div class="wCell" >
+	   	<span id="wDisplay${assmt.id}">${assmt.weightage}%</span>
+	   	<t:if test="canEditAssessment(assmt)">
+		  		<form t:type="form" t:id="editWeightageForm" >
+	  				<div class="wEdit" id="wEdit${assmt.id}" >
+		  				<t:select t:id="wSelect" clientId="wSelect${assmt.id}" 
+					  			 class="wSelect"
+					  			 value="assmt.weightage" 
+					  			 validate="required" 
+					  			 onchange="this.form.submit();"
+					  			 model="literal:0.0,5.0,10.0,15.0,20.0,25.0,30.0,35.0,40.0,45.0,50.0,55.0,60.0,65.0,70.0,75.0,80.0,85.0,90.0,95.0,100.0"
+					  	></t:select>
+					  	%
+					  	<input type="hidden" name="assmtId" value="${assmt.id}" />
+				  	</div>
+				  	<div class="wEditBtn" >
+					  	<a href="javascript:void(0);" onclick="editWeightClick(${assmt.id})" class="editBtn" >
+				   		<img src="${context:lib/img/icon_edit.png}" title="${message:edit}" id="imgEd${assmt.id}"/>
+				   	</a>
+			   	</div>
+		   	</form>
+			</t:if>
+		</div>
+   </t:parameter>
+   <t:parameter name="permissionCell">
+   	<span class="small">
+	   	<t:if test="assmt.allowViewGradeCriteria"><span title="${message:allowViewGradeCriteria-tip}">
+	   		- ${message:allowViewGradeCriteria-label}</span><br/></t:if>
+	   	<t:if test="assmt.allowSubmitFile"><span title="${message:allowSubmitFile-tip}">
+	   		- ${message:allowSubmitFile-label}</span><br/></t:if>
+	   	<t:if test="assmt.allowViewCommentRightAway"><span title="${message:allowViewComment-tip}">
+	   		- ${message:allowViewCommentRightAway-label}</span><br/></t:if>
+	   		
+	   </span>
+   </t:parameter>
+   <t:parameter name="releaseCell">
+   	<t:if test="assmt.allowReleaseResult">
+   	   	<div>${assmt.rdatedisplay}</div>
+   
+		  <span class="small">
+			
+		  	<t:if test="assmt.allowViewScoredCriteria"><span title="${message:allowViewScoredCriteria-tip}">
+		  		- ${message:allowViewScoredCriteria-label}</span><br/></t:if>
+		  	<t:if test="assmt.allowViewGrade"><span title="${message:allowViewGrade-tip}">
+		  		- ${message:allowViewGrade-label}</span><br/></t:if>
+		  		<t:if test="assmt.allowViewComment"><span title="${message:allowViewComment-tip}">
+		   		- ${message:allowViewComment-label}</span><br/></t:if>
+		</span>
+		
+		<p:else>
+		-
+		</p:else>
+   	</t:if>
+   	
+   </t:parameter>  
+   <t:parameter name="actionCell">
+		<t:if test="canEditAssessment(assmt)">
+			<t:pagelink page="modules/assessment/edit" context="assmt.id" class="button rounded">
+				<span>${message:edit}</span> 
+			</t:pagelink>
+		</t:if>
+		<t:if test="canDeleteAssessment(assmt)">
+			<t:actionlink t:id="delete" context="assmt.id" class="button rounded"
+				onclick="return confirmDelete('${message:confirm-permanent-delete-assessment}')">
+				<span>${message:delete}</span>
+			</t:actionlink>
+		</t:if>
+			<t:actionlink t:id="Export" context="assmt.id" class="button rounded">	
+				<span>Export Setting</span>
+			</t:actionlink>
+		
+		
+			<t:pagelink page="modules/assessment/score" context="assmt.id" class="button rounded">
+				<span>View Score</span> 
+			</t:pagelink>
+		<br/>	
+			<t:pagelink page="modules/assessment/checkviewtime" context="assmt.id" class="button rounded">
+				<span>Check grade view status</span> 
+			</t:pagelink>
+			<t:pagelink page="modules/assessment/checkauditlog" context="assmt.id" class="button rounded">
+				<span>Change Log</span> 
+			</t:pagelink>
+			
+		
+	</t:parameter>
+</t:grid>
+
+<t:if test="assmts">
+	<t:if test="isTotalWeight100()" negate="true">
+		<div class="attention" style="padding:10px;">
+			${message:warn-total-weight-not-100}
+			,  ${message:current-total-weight} = <strong>${getTotalWeight()}%</strong> 
+		</div>
+	</t:if>
+</t:if>
+
+<script>
+	document.observe("dom:loaded", function() {
+		$$(".wEdit").each(function(item){
+			item.hide();
+		});
+	});
+	
+	function editWeightClick(assmtId){
+		if($('wEdit'+assmtId).visible()){
+			$('wEdit'+assmtId).hide();
+			$('wDisplay'+assmtId).show();
+			$('imgEd'+assmtId).writeAttribute("src", '${context:lib/img/icon_edit.png}');
+		}
+		else{
+			$('wEdit'+assmtId).show();
+			$('wDisplay'+assmtId).hide();
+			$('wSelect'+assmtId).focus();
+			$('imgEd'+assmtId).writeAttribute("src",'${context:lib/img/icon_close.png}' );
+		}
+	}
+</script>
+
+
+
+</html>

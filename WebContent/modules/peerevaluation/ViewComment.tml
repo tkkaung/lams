@@ -1,0 +1,42 @@
+<html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+	xmlns:p="tapestry:parameter">
+
+	<head>
+		<title>${message:view-evaluation-comment}</title>
+		<style>
+			div.t-beaneditor {
+				background: #eee;
+				border : none;
+				padding: 10px ;
+				font-size: 12px;
+				font-family: Helvetica,Arial,Calibri,Verdana,sans-serif; 
+			}
+			h1{
+				font-family: Calibri,Helvetica,Arial,sans-serif;
+				font-size: 12pt;
+			}
+			span.date{
+				font-size: 10px;
+				font-style: italic;
+			}
+		</style>
+	</head>
+	<body>
+		
+	<div class="t-beaneditor">
+		<div>
+			<span>${message:orignal-value} ${message:by} <strong>${evalUser.assessor.displayname}</strong> : </span>
+		</div>
+		<div style="padding:10px;">
+			<t:if test="getComments()">
+				<t:outputraw value="textarea2html(getComments())"/>
+				<p:else>
+					<span style="font-size:11px;font-style:italic;">${message:comment-empty}</span>
+				</p:else>
+			</t:if>
+			
+		</div>
+	</div>
+
+</body>
+</html>

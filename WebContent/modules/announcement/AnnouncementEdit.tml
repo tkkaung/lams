@@ -1,0 +1,107 @@
+<html t:type="layout" 
+	title="${message:edit} ${message:announcement}"
+	currentModule="${moduleName}"
+	currentProj="curProj"
+	breadcrumb="${curProj.encodeddisplayname}=project/home?${curProj.id}
+		,${module.displayName}=modules/announcement?${curProj.id},
+		${message:manage} ${message:announcement}=modules/announcement/manage?${curProj.id},
+		${message:edit} ${message:announcement}=modules/announcement/edit?${curProj.id}:${annmt.id}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+	
+	<p:legendBlk>
+		<span class="required">*</span>  ${message:required-fields}
+	</p:legendBlk>
+
+	<form t:type="form" t:id="form" class="e-formeditor">
+			<t:errors/>	
+			<div class="t-beaneditor">	
+			<table>
+				<tr>
+					<td class="label">
+						<t:label for="subject"><span class="required">*</span> ${message:subject-label}</t:label>
+					</td>
+					<td>
+						<t:textfield t:id="subject" value="annmt.subject" validate="required" class="lwidth"/>
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<t:label for="content"><span class="required">*</span> ${message:content-label}</t:label>
+					</td>
+					<td>
+						<textarea t:type="ck/editor" t:id="content" value="annmt.content"
+   		            customConfiguration="context:lib/js_config/ckeditor.js" toolbarSet="Default"
+               		width="630px" height="400px" validate="required"></textarea>
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<t:label for="startDate"><span class="required">*</span> ${message:sdate-label}</t:label>
+					</td>
+					<td>
+						<span class="datetimeField">
+						<t:ck.datetimefield t:id="startDate" value="annmt.startDate" validate="required"
+	      				timePicker="true" timePickerAdjacent="true" datePattern="${message:datetimefield-format}"/>
+						</span>
+						<span class="formtip">${message:startDate-tip}</span>
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<t:label for="endDate">${message:edate-label}</t:label>
+					</td>
+					<td>
+						<span class="datetimeField">
+						<t:ck.datetimefield t:id="endDate" value="annmt.endDate" 
+	      				timePicker="true" timePickerAdjacent="true" datePattern="${message:datetimefield-format}"/>
+						</span>
+						<span class="formtip">${message:endDate-tip}</span>
+					</td>
+				</tr>
+					<tr>
+					<td class="label">
+						<t:label for="enabled">${message:enabled-label}</t:label>
+					</td>
+					<td>
+						<input t:type="checkbox" t:id="enabled" value="annmt.enabled" />
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<t:label for="urgent">${message:urgent-label}</t:label>
+					</td>
+					<td>
+						<input t:type="checkbox" t:id="urgent" value="annmt.urgent" />
+		      		<span class="formtip">${message:form-urgent-tip}</span>
+		      		<img src="${context:lib/img/icon_urgent.png}" />
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<t:label for="notifyMember"></t:label>
+					</td>
+					<td>
+						<input t:type="checkbox" t:id="notifyMember" value="notifyMember" />
+		      		<span class="formtip">${message:notifyMember-tip}</span>
+					</td>
+				</tr>
+				<t:if test="isCreator()" negate="true">
+					<tr>
+					<td class="label">
+						<label >${message:creator-label}</label>
+					</td>
+					<td>
+						<t:pagelink page="user/view" context="annmt.creator.id">${annmt.creator.displayname}</t:pagelink>
+						<span class="formtip">${message:annmt-creator-tip}</span>
+					</td>
+				</tr>
+				</t:if>
+				
+			</table>
+			<t:submit value="${message:submit-label}" class="submit squared"/>
+			</div>
+		</form>
+
+   
+</html>

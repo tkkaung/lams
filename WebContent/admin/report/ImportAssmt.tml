@@ -1,0 +1,83 @@
+<html t:type="layout" title="Import Assessment to Multiple Project Sites"
+	breadcrumb="${message:control-panel}=admin
+	,import assessment=admin/report/importassmt"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="rubric"/></p:leftMenuBlk>
+	
+	
+	
+			
+	
+	
+		<div class="t-beaneditor">
+			<t:form t:id="form" autofocus="false">
+				<t:errors/>
+				<div>
+					<ul>
+					<li>
+					- This function will import ASSESSMENT from CSV file, then create new ASSESSMENT 
+					in each Project Site that matches selected Schl/Dept, Term, and Course Code.
+					</li>
+					<li>
+					- The CSV file must be exported from eUreka (in Manage Assessment page of a project site). 
+					or the format must match. 
+					</li>
+					<li>
+					- The student grouping of assessment will not be imported, because it is assumed that students 
+					 in each project site are not same. 
+					</li>
+					</ul>
+				</div>
+				<div class="t-beaneditor-row">
+					<label ><span class="required">*</span>
+					${message:school-label}
+					</label>
+				<t:if test="canManageReport()">
+					<t:select value="searchSchool" model="getSchoolModel()" blankLabel="-Please Select-"
+					t:mixins="zoneUpdater"	t:clientEvent="change" t:event1="selectSchool" 
+					t:zone1="courseCodeZone"
+					context="searchSchool"
+					/>
+					<p:else>
+						<t:select value="searchSchool" model="getSchoolModel()" validate="required" 
+						t:mixins="zoneUpdater"	t:clientEvent="change" 
+						t:event1="selectSchool" 
+						t:zone1="courseCodeZone"
+						context="searchSchool"
+					/>
+					</p:else>
+				</t:if>
+				</div>
+				<div class="t-beaneditor-row">
+					<label ><span class="required">*</span>
+					${message:term-label}
+					</label>
+				<t:select value="searchTerm" model="getTermModel()" blankLabel="${message:-all-}"
+					t:mixins="zoneUpdater"
+					t:clientEvent="change" t:event1="selectTerm" t:zone1="courseCodeZone"
+					context="searchTerm"
+					/>
+				<t:zone t:id="courseCodeZone" style="display:inline-block;margin-right:10px;">
+					${message:courseCode-label}:
+					<t:select value="searchCourseCode" model="getCourseCodeModel()" blankLabel="${message:-all-}"
+					 />
+				
+				
+				</t:zone>
+				</div>
+				
+				
+				
+				<br/>
+				
+				<div class="t-beaneditor-row">
+					<t:label for="file"><span class="required">*</span> ${message:file-label}</t:label>
+					<input t:type="upload" t:id="file" validate="required, regexp"/>
+		      </div>
+		      
+		       <div class="t-beaneditor-row" style="margin-top:15px;">
+					<input t:type="submit" value="${message:upload-n-run}" class="squared t-beaneditor-submit"/>
+				</div>
+		    </t:form>
+	   </div>
+</html>

@@ -1,0 +1,172 @@
+<html t:type="layout" 
+	title="${module.displayName}"
+	currentModule="${moduleName}"
+	currentProj="curProj"
+	breadcrumb="${curProj.encodeddisplayname}=project/home?${curProj.id}
+		,${module.displayName}=modules/announcement?${curProj.id}"
+	totalShowOption="${getTotalSizeAll()}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+		
+	<p:actionBtns>
+		
+		
+		
+			<t:if test="canCreateAnnouncement(curProj)">
+				<a class="button rounded" t:type="pageLink" page="modules/announcement/create" context="curProj.id" >
+					<span>${message:add-new} ${message:announcement}</span>
+				</a>
+				<a class="button rounded" t:type="pageLink" page="modules/announcement/manage" context="curProj.id" >
+					<span>${message:manage} ${message:announcement}</span>
+				</a>
+			</t:if>
+		
+	</p:actionBtns>	
+		
+	<table class="actionToolBar">
+		<tr>
+			<td class="right">
+				<t:if test="getTotalSizeAll()">
+					<a t:type="actionLink" t:id="dismissAll" context="curProj.id" >
+					${message:mark-all-as-dismiss}
+					</a>
+					|
+				</t:if>
+				<a t:type="pageLink" page="modules/announcement/viewdismissed" context="curProj.id" >
+					<span>${message:view-dismissed-announcement} (${countDismissedAnnmt()})</span>
+				</a>
+				
+			</td>
+		</tr>
+	</table>	
+		
+		
+	<t:if test="hasSchlTypeAnnouncement()">
+		<div style="border:solid #eee 2px;padding:5px;margin:5px;">
+			<span class="altColor" style="font-size:14px;font-weight:bold;">
+				${message:schltypeannouncement}
+			</span>
+			<table class="e-data-grid">
+				<tbody>
+					<t:loop source="stAnnmtsDisplay" value="stAnnmt" >
+						<tr class="${evenodd.next}">
+							<td >
+								<t:delegate to="block:schlTypeAnnmtBlk"/>
+							</td>
+						</tr>
+					</t:loop>
+				</tbody>
+			</table>
+			<t:if test="isMoreThan(totalSizeST, rowsPerPage)">
+				<t:GridPager currentPage="curPageNo" rowsPerPage="rowsPerPage" source="stAnnmts" />
+			</t:if>
+		</div>
+	</t:if>
+	
+	<t:block id="schlTypeAnnmtBlk">
+			<table class="announcement-block"  >
+				<tr>
+					<td rowspan="3" class="icon"><img src="${context:lib/img/24/m_Announcement.png}" /></td>
+					<td class="title">
+						<t:if test="stAnnmt.urgent">
+							<img src="${context:lib/img/icon_urgent.png}"  alt="${message:annmt-urgent-tip}" title="${message:annmt-urgent-tip}" />
+							-
+						</t:if>
+					 	<span class="date">
+					 		<t:if test="stAnnmt.sdate">
+								${stAnnmt.sdateDisplay}
+								<p:else>
+									${formatDateTime(stAnnmt.mdate)}
+								</p:else>
+							</t:if>
+					 	</span> 
+						- <span class="subject">
+					 		<t:pageLink page="modules/announcement/schltypeannmtview" context="getParams(curProj.id, stAnnmt.id)">${stAnnmt.subject}</t:pageLink>
+					 	</span>
+					 </td>
+					<td class="postedBy" >
+						${message:posted-by}: 
+						${message:admin}
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2"><div class="content" style="min-height: 100px;height:auto!important;_height:100px;">
+						<t:outputraw value="stAnnmt.content"/></div>
+					</td>
+				</tr>
+				<tr>
+				<td colspan="2">
+					<a  t:type="actionLink" t:id="dismissSTAnnmt" context="getParams(curProj.id, stAnnmt.id)" >
+						<span>${message:dismiss-annmt}</span>
+					</a>
+				</td>
+			</tr>
+			</table>
+	</t:block>
+	
+	
+	
+	
+	
+		
+		
+	<table class="e-data-grid">
+		<tbody>
+			<t:loop source="annmtsDisplay" value="annmt" >
+				<p:empty>
+					<tr><td><div class="notfoundtext">${message:no-announcement-found}</div></td></tr>
+				</p:empty>
+				
+				<tr class="${evenodd.next}">
+					<td >
+						<t:delegate to="block:annmtBlk"/>
+					</td>
+				</tr>
+			</t:loop>
+		</tbody>
+	</table>
+	<t:if test="isMoreThan(totalSize, rowsPerPage)">
+		<t:GridPager currentPage="curPageNo" rowsPerPage="rowsPerPage" source="annmts" />
+	</t:if>
+	
+	<t:block id="annmtBlk">
+		<table class="announcement-block"  >
+			<tr>
+				<td rowspan="3" class="icon"><img src="${context:lib/img/24/m_Announcement.png}" /></td>
+				<td class="title">
+					<t:if test="annmt.urgent">
+						<img src="${context:lib/img/icon_urgent.png}"  alt="${message:annmt-urgent-tip}" title="${message:annmt-urgent-tip}" />
+						-
+					</t:if>
+				 	<span class="date">${annmt.startDateDisplay}</span> 
+					- <span class="subject">
+				 		<t:pageLink page="modules/announcement/view" context="annmt.id">${annmt.subject}</t:pageLink>
+				 	</span>
+				 </td>
+				<td class="postedBy" >
+					${message:posted-by}: 
+						<t:pagelink page="user/view" class="userlink" context="annmt.creator.id" >
+							${annmt.creator.displayName}
+						</t:pagelink> 
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2"><div class="content" style="min-height: 100px;height:auto!important;_height:100px;">
+					<t:outputraw value="annmt.content"/></div>
+				</td>
+			</tr>
+			<tr>
+			<td colspan="2">
+				<a  t:type="actionLink" t:id="dismissAnnmt" context="annmt.id" >
+					<span>${message:dismiss-annmt}</span>
+				</a>
+			</td>
+		</tr>
+		</table>
+	</t:block>
+	
+	
+	
+		
+		
+</html>

@@ -1,0 +1,106 @@
+<html t:type="layout"
+	title="${message:admin-manage-user}"
+	breadcrumb="${message:control-panel}=admin
+	,${message:admin-manage-user}=admin/user"
+	totalShowOption="${totalSize}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="user"/></p:leftMenuBlk>
+	
+	<style>
+		table.t-data-grid THEAD TR TH {
+			white-space: normal;
+		}
+	</style>
+	
+	<p:actionBtns >
+		<a href="#" t:type="pageLink" page="admin/user/create" class="button rounded">
+			 	<span>${message:add-new} ${message:user}</span>
+		</a>
+		<a href="#" t:type="pageLink" page="admin/user/batchcreate" class="button rounded">
+			 	<span>${message:add-new-user-from-file}</span>
+		</a>
+	</p:actionBtns>
+	
+	
+	<table class="actionToolBar">
+		<tr>
+			<td class="right">		 	
+				<form t:type="form" t:id="searchForm">
+					${message:filter}: <t:textfield t:id="searchText" value="searchText" />
+					${message:in} <t:select t:id="searchIn" value="searchIn" blankLabel="${message:-all-}"/>
+					${message:status-label} <t:select model="statusModel" value="searchEnabled" blankLabel="${message:-all-}"/>
+					${message:school-label} <t:select model="schoolCompactModel" value="searchSchool" blankLabel="${message:-all-}"/>
+					${message:role-label} <t:select model="allSysRoleModel" value="searchSysRole" blankLabel="${message:-all-}"/>
+					<input t:type="submit" value="${message:go}" class="squared" />
+				</form>
+			</td>
+		</tr>
+	</table>
+	
+	
+	<t:if test="users">
+		<p:else>
+			<div class="notfoundtext">${message:no-user-to-manage}</div>
+		</p:else>
+	
+	<form t:type="form" t:id="userForm">
+		<t:errors/>
+		<table class="actionToolBar2">
+			<tr>
+			<td align="left">
+				<t:submit class="squared"  t:type="submit" t:id="deleteBtn" value="${message:delete}" 
+					onclick="return checkChBoxAndConfirmDelete('userGrid','${message:select-at-least-one-item}','${message:confirm-permanent-delete-items}');"
+					/>
+			</td>
+			</tr>
+		</table>
+			<t:grid source="users" row="user" class="stickyHeader t-data-grid" 
+				model="model" 
+				rowsPerPage="rowsPerPage"
+				pagerPosition="both" 
+				id="userGrid"
+				>
+				
+				<p:chkBoxHeader>
+					<input type="checkBox" id="chkBoxAll" value="1" onclick="chkboxAll('userGrid','chkBoxAll')" />
+	       	</p:chkBoxHeader>
+				<p:chkBoxCell>
+					<input type="checkBox" name="gridChkBox" value="${user.id}" onclick="chkbox('userGrid','chkBoxAll')" />
+				</p:chkBoxCell>
+				<p:usernameCell>
+					<t:pagelink page="admin/user/view" context="user.id" title="${message:view-detail}">${user.username}</t:pagelink>
+				</p:usernameCell>
+				<p:emailCell>
+					<t:ck.TrimmedString value="user.email" maxLength="20"/>
+				</p:emailCell>
+				<p:schoolCell>
+					<t:if test="user.school">
+						<span title="${user.school.des}">${user.school.displayName}</span>
+					</t:if>
+				</p:schoolCell>
+				<p:sysroleCell>
+					<div>${user.sysRole.displayname}</div>
+					<t:loop source="user.extraRoles" value="sRoleUser">
+					   <div style="margin-top:5px;">+ ${sRoleUser.sysRole.displayName} 
+					      ${getExtraRoleParamDisplay(sRoleUser)}
+			      	</div>
+			      </t:loop>
+				</p:sysroleCell>
+				<p:enabledCell>
+					<t:actionLink t:id="toggleEnabled" context="user.id"  title="${message:click-to-toggle-enabled}">${user.enabled}</t:actionLink>
+				</p:enabledCell>
+				<p:projectCountCell>
+					${user.projects.size()}
+				</p:projectCountCell>
+				<p:actionCell>
+					<t:pagelink context="user.id" page="admin/user/edit" class="button rounded">
+						<span>${message:edit}</span>
+					</t:pagelink>
+				</p:actionCell>
+				<p:modifyDateCell>
+					<span class="date">${user.modifyDateDisplay}</span>
+				</p:modifyDateCell>
+			</t:grid>
+		</form>
+	</t:if>
+</html>

@@ -1,0 +1,153 @@
+<html t:type="layout" 
+	title="${getTitle()}"
+	currentModule="${moduleName}"
+	currentProj="curProj"
+	breadcrumb="${curProj.encodeddisplayname}=project/home?${curProj.id}
+		,${module.displayName}=modules/learninglog?${curProj.id}
+		,${getBreadcrumb()}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+
+<p:legendBlk>
+	<span class="required">*</span>  ${message:required-fields}
+</p:legendBlk>
+		
+		<form t:type="form" t:id="form" class="e-formeditor" autofocus="false">
+			<t:errors />
+			<div class="t-beaneditor">
+			<table>
+				<tr>
+					<td class="label">
+						<t:label for="title" ><span class="required">*</span> ${message:title-label}</t:label>
+					</td>
+					<td>
+						<t:textfield t:id="title" value="lLog.title" validate="required" class="lwidth"></t:textfield>
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<t:label for="content" />
+					</td>
+					<td>
+						<textarea t:type="ck/editor" t:id="content" value="lLog.content"
+	  		            customConfiguration="context:lib/js_config/ckeditor.js" toolbarSet="Default"
+	              		width="630px" height="400px" ></textarea>
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<label >${message:type-label}</label>
+					</td>
+					<td>
+						<t:select t:id="typeSelect" value="typeSelect" onchange="typeSelectChanged();"  model="typeModel" disabled="${shouldDisableInputType}" />
+						<t:textfield t:id="type" value="lLog.type" size="40" maxlength="255" class="mwidth"/>
+						
+						<t:if test="lLog.forumThreadId">
+							<div>
+								<strong>${message:link-back-label}: </strong> 
+								<t:pagelink page="modules/forum/threadview" context="lLog.forumThreadId">${message:forum-thread}</t:pagelink>
+							</div>
+						</t:if>
+						<t:if test="lLog.blogId">
+							<div>
+								<strong>${message:link-back-label}: </strong> 
+								<t:pagelink page="modules/blog/view" context="lLog.blogId">${message:blog}</t:pagelink>
+							</div>
+						</t:if>
+						<t:if test="lLog.elogId">
+							<div>
+								<strong>${message:link-back-label}: </strong> 
+								<t:pagelink page="modules/elog/view" context="lLog.elogId">${message:elog}</t:pagelink>
+							</div>
+						</t:if>
+					</td>
+				</tr>
+				<tr>
+					<td class="label"><label >${message:file}</label></td>
+					<td>
+						<t:zone t:id="attachedFilesZone">
+							<div>
+							<t:loop source="lLog.files" value="tempFile">
+								<div class="existDiv">
+									<div >
+										<t:eventLink event="retrieveFile" context="tempFile.id"  title="${message:click-to-download}">
+											<img src="${context:lib/img/icon-attachment.gif}"/> 
+											${tempFile.displayName}
+										</t:eventLink>
+										(${tempFile.displaySize})
+										[<a href="#" t:type="actionLink" t:id="removeFile" 
+											context="tempFile.id"
+											zone="attachedFilesZone"
+											class="alink"
+										>
+											<span t:type="any" t:mixins="Confirm" t:message="${message:confirm-remove-attachment}">
+												${message:remove}
+											</span>
+										</a>]
+									</div>
+								</div>
+							</t:loop>
+							</div>
+						</t:zone>
+						<div id="file1" class="fileDiv subgroup">
+							<input t:type="upload" t:id="file1" />
+						</div>
+						<div id="file2" class="fileDiv subgroup">
+							<input t:type="upload" t:id="file2" />
+						</div>
+						<div id="file3" class="fileDiv subgroup">
+							<input t:type="upload" t:id="file3" />
+						</div>
+						<div id="file4" class="fileDiv subgroup">
+							<input t:type="upload" t:id="file4" />
+						</div>
+						<div id="file5" class="fileDiv subgroup">
+							<input t:type="upload" t:id="file5" />
+						</div>
+						<div>
+							<a href="#" id="addMoreFileLink" onclick="addMoreFile(); return false;">${message:add-more-file}</a>
+							<span id="addMoreFileMsg" class="formtip">${message:max-5-files-to-add}</span>
+						</div>
+					</td>
+				</tr>
+			</table>
+			<t:submit t:id="bSubmit" value="${message:submit-label}" class="submit squared"/>
+		</div>
+	</form>
+
+<script type="text/javascript">
+	function typeSelectChanged(){
+		if($('typeSelect').selectedIndex==1){
+			$('type').show();
+			$('type').setValue("");
+		}
+		else
+			$('type').hide();
+	}
+	function addMoreFile(){
+		 if($('file4').visible()){
+			showElm('file5');
+			$('addMoreFileLink').hide();
+			$('addMoreFileMsg').show();
+		}
+		else if($('file3').visible())
+			showElm('file4');
+		else if($('file2').visible())
+			showElm('file3');
+		else if($('file1').visible())
+			showElm('file2');
+		else{
+			showElm('file1');
+			$('addMoreFileLink').update('${message:add-more}');
+		}
+		return false;
+	}
+	
+	document.observe("dom:loaded", function() {
+		typeSelectChanged();
+		$$('.fileDiv').invoke('hide');
+		$('addMoreFileMsg').hide();
+	});
+</script>
+</html>

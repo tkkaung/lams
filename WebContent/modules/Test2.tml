@@ -1,0 +1,35 @@
+<html t:type="layout" title="Test2"
+	currentModule="prop:moduleName"
+		currentProj="curProj"
+		xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+      xmlns:p="tapestry:parameter">
+
+
+<h1>For Testing purpose only, to be deleted later</h1>
+		....body here....
+		<br/>
+    	msg= ${msg}
+    	<br/>.....
+    	
+    	<a  t:type="actionLink" t:id="delete">delete</a>
+    	${formatdatetime(curProj.cdate)}
+    	<t:grid source="objList" row="obj" pagerPosition="bottom" >
+			<p:empty><div class="notfoundtext">${message:search-return-no-result}</div></p:empty>
+	</t:grid>
+	 
+	 <form t:type="Form">
+		 <a t:type="ck/linkSubmit" >test linkSubmit</a>
+     <br/>
+	     test rating:  <div t:type="ck/RatingField"  source="list:'normal','nice','hot','incredible hot','exellent'" value="ratingValue"/>
+            
+            <input type="submit"/>
+        </form>
+
+	
+		<t:beandisplay object="curProj"/>
+		projType = ${curProj.type.id}
+		
+		
+		${getDisplayText()}
+		
+</html>

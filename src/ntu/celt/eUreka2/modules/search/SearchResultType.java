@@ -1,0 +1,6 @@
+package ntu.celt.eUreka2.modules.search;
+
+public enum SearchResultType {
+	PROJECT, ANNOUNCEMENT, RESOURCE_FOLDER, RESOURCE_FILE, RESOURCE_LINK
+	, FORUM, FORUM_THREAD, FORUM_THREAD_REPLY, BLOG
+}

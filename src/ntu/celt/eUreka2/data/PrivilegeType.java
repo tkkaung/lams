@@ -1,0 +1,8 @@
+package ntu.celt.eUreka2.data;
+
+public enum PrivilegeType
+{
+	SYSTEM, PROJECT, ANNOUNCEMENT, ASSESSMENT, BLOG
+	, BUDGET, FORUM, MESSAGE, RESOURCES, SCHEDULE, ELOG
+	, USAGE
+}

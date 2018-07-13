@@ -1,0 +1,289 @@
+<html t:type="layout"
+		title="${message:add-edit} ${message:project}"
+      breadcrumb="${message:control-panel}=admin
+      	,${message:admin-manage-project}=admin/project/manageadminprojects
+      	,${message:add-edit} ${message:project}=admin/project/adminedit"
+		xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+      xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="project"/></p:leftMenuBlk>
+   <p:legendBlk>
+		<span class="required">*</span>  ${message:required-fields}
+	</p:legendBlk>
+	
+	
+	<t:form t:id="form" class="e-formeditor">
+		<t:errors/>
+		<div class="t-beaneditor">
+			<table>
+				<tr>
+					<td class="label">
+						<label>${message:id-label}</label>
+	      		</td>
+					<td>
+						<t:if test="isCreateMode()">
+							<span class="formtip">${message:proj-id-tip}</span>
+							<p:else><strong>${proj.id}</strong></p:else>
+						</t:if>
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<t:label for="name" ><span class="required">*</span>  ${message:name-label}</t:label>
+	      		</td>
+					<td>
+						<t:textfield t:id="name" value="proj.name" class="lwidth"/>
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<t:label for="description" />
+					</td>
+					<td>
+						<textarea t:type="textarea" t:id="description" value="proj.description" cols="50" rows="4" class="lwidth"/>
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<t:label for="sdate"  ><span class="required">*</span>  ${message:sdate-label}</t:label>
+					</td>
+					<td>
+						<t:datefield t:id="sdate" value="proj.sdate" class="swidth" format="${message:datefield-format}"/>
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<t:label for="edate"  ><span class="required">*</span>  ${message:edate-label}</t:label>
+					</td>
+					<td>
+						<t:datefield t:id="edate" value="proj.edate" class="swidth" format="${message:datefield-format}"/>
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<t:label for="status" ><span class="required">*</span> ${message:status-label}</t:label>
+					</td>
+					<td>
+						<table style="_display:inline;">
+							<tr>
+								<td>
+								<t:select t:id="status" value="proj.status" model="projStatusModel" />
+								<br/>
+								<t:loop source="allStatus" value="tempStatus">
+									
+									<span class="formtip"><strong>${tempStatus.displayName}</strong> - ${tempStatus.description}</span>
+									<br/>
+								</t:loop>
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+				<t:if test="isCreateMode()" negate="true">
+					<tr>
+						<td class="label">
+							<t:label for="noAutoChangeStatus">${message:noAutoChangeStatus-label}</t:label>
+						</td>
+						<td>
+							<t:checkbox t:id="noAutoChangeStatus" value="proj.noAutoChangeStatus"/>
+	   					<span class="formtip">${message:noAutoChangeStatus-tip}</span>
+						</td>
+					</tr>
+				</t:if>
+				<tr>
+					<td class="label">
+						<t:label for="type" ><span class="required">*</span> ${message:type-label}</t:label>
+					</td>
+					<td>
+						<t:select t:id="type" value="proj.type" model="projTypeModel" onchange="eTypeChanged(this.value)"/>
+						<span class="formtip">${message:edit-type-tip}</span>
+					</td>
+				</tr>
+				<tr class="courseParam">
+					<td class="label">
+						<t:label for="courseId"/>
+					</td>
+					<td>
+					   <t:textfield t:id="courseId" value="proj.courseId" class="swidth" />
+					   <span class="formtip">${message:proj-courseId-tip}</span>
+					</td>
+				</tr>
+				<tr class="courseParam">
+					<td class="label">
+						<t:label for="courseCode"/>
+					</td>
+					<td>
+					   <t:textfield t:id="courseCode" value="proj.courseCode" class="swidth" />
+					</td>
+				</tr>
+				<tr class="courseParam">
+					<td class="label">
+						<t:label for="Term"/>
+					</td>
+					<td>
+					   <t:textfield t:id="Term" value="proj.term" class="swidth" />
+					</td>
+				</tr>
+				
+				<tr class="courseParam">
+					<td class="label">
+						<t:label for="groupId"/>
+					</td>
+					<td>
+						<t:textfield t:id="groupId" value="proj.groupId" class="swidth" />
+		   			<span class="formtip">${message:proj-groupId-tip}</span>
+					</td>
+				</tr>
+				<tr class="courseParam">
+					<td class="label">
+						<t:label for="seqNo"/>
+					</td>
+					<td>
+						<t:textfield t:id="seqNo" value="proj.seqNo" class="swidth" />
+		   			<span class="formtip">${message:proj-seqNo-tip}</span>
+					</td>
+				</tr>
+				<tr class="caoParam">
+					<td class="label">
+						<t:label for="companyInfo" />
+					</td>
+					<td>
+						<textarea t:type="textarea" t:id="companyInfo" value="proj.companyInfo" cols="50" rows="3" class="lwidth"/>
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<t:label for="school" ><span class="required">*</span> ${message:school-label}</t:label>
+					</td>
+					<td>
+						<table style="_display:inline;">
+							<tr><td>
+							<t:select t:id="school" value="proj.school" model="schoolModel" validate="required"/>
+							</td></tr>
+							<tr><td>
+							<span class="formtip">${message:edit-school-tip}</span>
+							</td></tr>
+						</table>
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<label for="attachment">${message:attachment-label}</label>
+	      		</td>
+					<td>
+						<t:zone t:id="attachedFilesZone">
+							<div>
+								<t:loop source="proj.attachedFiles" value="tempAttFile">
+									<div class="existfileDiv">
+										<t:eventLink t:event="retrieveAttachment" context="tempAttFile.id"  title="${message:click-to-download}">
+											<img src="${context:lib/img/icon-attachment.gif}"/> 
+											${tempAttFile.displayName}
+										</t:eventLink>
+										(${tempAttFile.displaySize})
+										[<a href="#" t:type="actionLink" t:id="removeAttachment" 
+											context="tempAttFile.id"
+											zone="attachedFilesZone"
+											class="alink"
+										>
+											<span t:type="any" t:mixins="Confirm" t:message="${message:confirm-remove-attachment}">
+												${message:remove}
+											</span>
+										</a>]
+									</div>
+								</t:loop>
+							</div>
+						</t:zone>
+						<div>
+							<div id="file1" class="fileDiv subgroup">
+								<input t:type="upload" t:id="file1" id="file1" />
+							</div>
+							<t:if test="proj.attachedFiles">
+								<div id="addMoreFileLink" style="padding-top:5px;">
+									[<a href="#"  onclick="showElm('file1'); hideElm('addMoreFileLink'); return false;">
+										${message:add-more}
+									</a>]
+								</div>
+								<script>
+									$('file1').hide();
+								</script>
+								
+							</t:if>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<label for="keywords">${message:keywords-label}</label>
+	      		</td>
+					<td>
+						<t:zone t:id="selectedKeywordsZone">
+							<div>
+								<t:loop source="proj.keywords" value="tempKeyword">
+									<div class="existDiv">
+										${tempKeyword}
+										[<a href="javascript:void(0);" t:type="any"
+												t:mixins="zoneUpdater" t:clientEvent="click" 
+												t:event1="removeKeyword" t:zone1="selectedKeywordsZone"
+												t:context="getParams(proj.id, tempKeyword)"
+												class="alink"
+											>
+										Remove</a>]
+									</div>
+								</t:loop>
+							</div>
+						</t:zone>	
+					
+						<input t:type="TextField" t:id="keywords" value="keywords" class="lwidth" />
+						<br/>
+						<span class="formtip">${message:keywords-tip}</span>
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<t:label for="searchable" />
+					</td>
+					<td>
+						<t:checkbox t:id="searchable" value="proj.shared"/> 
+						<span class="formtip">${message:proj-shared-tip}</span>
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<t:label for="remarks" />
+					</td>
+					<td>
+						<textarea t:type="textarea" t:id="remarks" value="proj.remarks" cols="50" rows="4" class="lwidth"/>
+					</td>
+				</tr>
+			</table>
+	
+			<t:submit t:id="bsubmit" value="${message:submit-label}" class="submit squared" />
+		</div>
+	</t:form>
+		
+		
+<script language="javascript">
+	function eTypeChanged(typeSelect){
+		var pt_course_Id = ${getID_ProjType_Course()};
+		var pt_cao_Id = ${getID_ProjType_CAO()};
+		
+		if(typeSelect==null || typeSelect!=pt_course_Id){
+			$$('.courseParam').invoke('hide');
+		}
+		else{
+			$$('.courseParam').invoke('show');
+		}
+		
+		if(typeSelect==null || typeSelect!=pt_cao_Id){
+			$$('.caoParam').invoke('hide');
+		}
+		else{
+			$$('.caoParam').invoke('show');
+		}
+		
+	}
+
+	document.observe("dom:loaded", function() {
+		eTypeChanged('${proj.type.id}');
+	});
+</script>
+</html>

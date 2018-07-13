@@ -1,0 +1,139 @@
+<html t:type="layout" 
+	title="message:page-title"
+   breadcrumb="${message:control-panel}=admin,${message:page-title}=admin/backuprestore/migrateproject"
+   xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="project"/></p:leftMenuBlk>
+
+<table class="actionToolBar">
+	<tr>
+		<td class="right">
+		</td>
+	</tr>
+</table>	
+    
+		
+		<div class="proc-form" style="padding:10px 0 20px 0;">
+			<form t:type="form" t:id="userForm">
+				<t:errors/>
+				<div>
+					Find projects by Username (in eUreka1) :
+					<t:textfield t:id="usernameToMigrate" value="usernameToMigrate" />
+					<t:submit value="${message:go}" class="squared"/>	
+				</div>
+			</form>
+		</div>
+		
+	<t:if test="mprojs">
+		<p:else>
+			${message:no-proj-to-migrate} 
+		</p:else>
+		
+		<div class="proc-form">
+			<form t:type="form" t:id="selectProjForm" id="selectProjForm">
+				<t:errors/>
+				<div>
+					ProjID (in eUreka2) to Migrate to :
+					<t:textfield t:id="projIdToMigrateTo" value="projIdToMigrateTo" class="mwidth" />
+					
+					<span class="formtip">
+						<br/>
+						This will override the default ID,  components selected below will be added 
+						to the specified project. the project must exist in eUreka2.
+						This can be many-to-one migrating.
+						<br/> 
+						If you want to use default ID (one-to-one migrating), leave BLANK for the ProjID.
+					</span>
+				</div>
+				<div class="instruction">${message:instruction}:</div>
+				<div class="proc-area">
+					<a href="#" onclick="selectAll(); return false;">Select All</a>
+					|
+					<a href="#" onclick="selectNone(); return false;">Select None</a>
+					
+					<t:loop source="mprojs" value="mproj"  index="var:i" >
+						<div class="projDiv" id="div_${var:i}">
+							<div class="proj">
+								${var:i}
+								<input type="checkBox" name="projChkBox" id="pid${var:i}" value="${mproj.id}" onclick="projClicked('${var:i}', this)" /> 
+									<label for="pid${var:i}">
+										${mproj.DisplayName} 
+										-- [Status = ${mproj.status}] 
+									</label>
+								
+								<t:if test="isProjIdExist(mproj.id)">
+									-- <span class="attention">(${message:proj-id-exists})</span>
+								</t:if>
+							</div>
+							<div class="comps">
+								<ul>
+									<li><input type="checkBox" name="${mproj.id}_compChkBox" value="annmt" id="annmt${var:i}" onclick="compClicked('${var:i}')" />
+										<label for="annmt${var:i}">${message:annmt-label}</label></li>
+									<li><input type="checkBox" name="${mproj.id}_compChkBox" value="actsk" id="actsk${var:i}" onclick="compClicked('${var:i}')" />
+										<label for="actsk${var:i}">${message:actsk-label}</label></li>
+									<li><input type="checkBox" name="${mproj.id}_compChkBox" value="pfile" id="pfile${var:i}" onclick="compClicked('${var:i}')" />
+										<label for="pfile${var:i}">${message:pfile-label}</label></li>
+									<li><input type="checkBox" name="${mproj.id}_compChkBox" value="dsbrd" id="dsbrd${var:i}" onclick="compClicked('${var:i}')" />
+										<label for="dsbrd${var:i}">${message:dsbrd-label}</label></li>
+									<li><input type="checkBox" name="${mproj.id}_compChkBox" value="wblog" id="wblog${var:i}" onclick="compClicked('${var:i}')" />
+										<label for="wblog${var:i}">${message:wblog-label}</label></li>
+									<li><input type="checkBox" name="${mproj.id}_compChkBox" value="links" id="links${var:i}" onclick="compClicked('${var:i}')" />
+										<label for="links${var:i}">${message:links-label}</label></li>
+									
+							<!--  		<li><input type="checkBox" name="${mproj.id}_compChkBox" value="budgt" id="budgt${var:i}" onclick="compClicked('${var:i}')" />
+										<label for="budgt${var:i}">${message:budgt-label}</label></li>
+					 ...not yet implement				<li><input type="checkBox" name="${mproj.id}_compChkBox" value="asemt" id="asemt${var:i}" onclick="compClicked('${var:i}')" />
+										<label for="asemt${var:i}">${message:asemt-label}</label></li>
+					 ...not yet implement
+					-->
+								</ul>
+							</div>
+						</div>
+					</t:loop>
+				</div>
+				<div class="footer">
+					<t:submit value="${message:submit-label}" class="squared"/>	
+				</div>
+			</form>
+		</div>
+		
+	</t:if>
+	
+	<div id="msgDiv"></div>
+	
+	<script>
+		function selectAll(){
+			var inputs = $$('#selectProjForm input');
+			inputs.each(function (elem) {
+				if(elem.type=='checkbox'){
+					 if(!elem.disabled){
+						 elem.checked = true;
+					 }
+				}
+			});
+			return false;
+		}
+		function selectNone(){
+			var inputs = $$('#selectProjForm input');
+			inputs.each(function (elem) {
+				if(elem.type=='checkbox'){
+					 if(!elem.disabled){
+						 elem.checked = false;
+					 }
+				}
+			});
+			return false;
+		}
+		
+		document.observe("dom:loaded", function() {
+			var projChkBoxs = [];
+			projChkBoxs = $$('.proj input').each(function(e){ if(e.type=='checkbox') projChkBoxs.push(e)});
+			projChkBoxs.each(function(elem){
+				if(!elem.checked){
+					$(elem).up('.proj').next('.comps').hide();
+				}
+			});
+		});
+	</script>
+	
+</html>

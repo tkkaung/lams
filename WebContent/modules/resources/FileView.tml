@@ -1,0 +1,265 @@
+<html t:type="layout"
+	title="${message:title-view-file}"
+	currentModule="${moduleName}"
+	currentProj="curProj"
+	breadcrumb="${curProj.encodeddisplayname}=project/home?${curProj.id}
+		,${getModuleDisplayName(curProj)}=modules/resources/home?${curProj.id}
+		${getBreadcrumbLink()}
+		,${message:title-view-file}=modules/resources/fileview?${rfile.id}
+		"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+   
+<style>
+	div.t-data-grid .contentType{
+		width: 15px;
+		text-align: center;
+	}
+	.rtitle{
+		font-size: 15px;
+	}
+	.versionCon, .uploadVersionCon{
+		padding: 5px;
+	}
+	
+</style>
+
+<p:legendBlk>
+	<t:if test="canEditResource(rfile)">
+		<div class="legend">
+			<div class="title">${message:note}:</div>
+			<div class="content">
+				<div>
+					<span class="required">*</span>  ${message:required-fields}
+				</div>
+				<div>
+					<img src="${context:lib/img/lock_icon.png}"/>
+					${message:file-locked-tip}
+				</div>
+			</div>
+		</div>
+	</t:if>
+</p:legendBlk>
+
+
+<p:actionBtns>
+	<t:if test="canEditResource(rfile)" >
+		<t:pageLink  page="modules/resources/resourceedit" context="rfile.id" class="button rounded"
+			title="${message:edit-item-tip}"
+			>
+			<span>${message:edit}</span>
+		</t:pageLink>
+	</t:if>
+</p:actionBtns>
+
+<table class="actionToolBar">
+	<tr>
+		<td class="right">
+		</td>
+	</tr>
+</table>	
+
+<table>
+	<tr>
+		<td ><img src="${getTypeIcon(rfile)}" width="35px" /> </td>
+		<td>
+			<div class="rtitle">${rfile.name}</div>
+		</td>
+	</tr>
+</table>
+			
+		<div class="t-beaneditor e-formeditor">
+		<table>
+			<tr>
+				<td class="label">${message:des-label}</td>
+				<td>
+					<t:outputraw value="textarea2html(rfile.des)"/>
+				</td>
+			</tr>
+			<tr>
+				<td class="label">${message:owner-label}</td>
+				<td>
+					<t:if test="rfile.owner">
+						<t:pagelink page="user/view" context="rfile.owner.id">${rfile.owner.displayName}</t:pagelink>
+					</t:if>
+				</td>
+			</tr>
+			<tr>
+				<td class="label">${message:cdate-label}</td>
+				<td>
+					<span class="date">${rfile.cdatedisplay}</span>
+				</td>
+			</tr>
+			<t:if test="rfile.editor">
+				<tr>
+					<td class="label">${message:editor-label}</td>
+					<td>
+						<t:pagelink page="user/view" context="rfile.editor.id">${rfile.editor.displayName}</t:pagelink>
+						, <span class="date">${rfile.mdatedisplay}</span>
+					</td>
+				</tr>
+			</t:if> 
+			<tr>
+				<td class="label">${message:total-numDownload-label}</td>
+				<td>
+					${rfile.getTotalNumDownload()} ${message:times}
+				</td>
+			</tr>
+			<t:if test="canEditResource(rfile)">
+			<tr>
+				<td class="label">${message:lockedby-label}</td>
+				<td>
+					<t:zone t:id="fileLockedZone" id="fileLockedZone" >
+						<t:if test="rfile.isLocked()">
+							<img src="${context:lib/img/lock_icon.png}"/>
+							${message:by}
+							${rfile.lockedBy.displayname}
+							<t:if test="canUnlock(rfile)">
+								-
+								<t:eventlink t:event="UnlockFile" zone="fileLockedZone">${message:unlock}</t:eventlink>
+							</t:if>
+							<p:else>
+								<img src="${context:lib/img/lock_no.png}"/>
+								<t:if test="canLock(rfile)">
+									- <t:eventlink t:event="lockFile" zone="fileLockedZone" >${message:lock}</t:eventlink>
+								</t:if>
+							</p:else>
+						</t:if>
+						<t:if test="errMsg">
+							<script>alert("${errMsg}");</script>
+						</t:if>
+					</t:zone>
+				</td>
+			</tr>
+			</t:if>
+			<tr>
+				<td class="label">${message:latest-version-label}</td>
+				<td>
+					<t:if test="${rfile.getLatestFileVersion()}">
+						${rfile.getLatestFileVersion().versionDisplay}
+						- <a href="#" t:type="eventLink" t:event="retrieveFile" 
+								context="rfile.getLatestFileVersion().id" title="${message:click-to-download}" >
+	  						<span>${message:download}</span>
+	  					</a>
+  					</t:if>
+				</td>
+			</tr>
+		</table>
+	</div>
+	
+	<div class="t-beaneditor">
+	<div class="versionCon ">
+		<div class="rtitle">${message:versions}</div>
+		<t:grid source="rfile.fileVersions" row="rfversion"
+				model="model"
+		 		rowsPerPage="rowsPerPage"
+				pagerPosition="bottom" 
+		 		>
+		 		
+		 		<t:parameter name="versionCell">
+		 			${rfversion.versionDisplay}
+		 		</t:parameter>
+		 		<t:parameter name="contentTypeCell">
+		 			<t:if test="isImage(rfversion)">
+		 				<img src="${getRetrieveFileThumbLink(rfversion.id)}"/>
+		 			
+		 				<p:else>
+		 					<img src="${getRFVTypeIcon(rfversion)}" />
+		 				</p:else>
+		 			</t:if>
+		 		</t:parameter>
+		 		<t:parameter name="nameCell">
+		 			${rfversion.name}
+		 			<br/>
+		 			<span class="subdes">
+			 			${message:by} 
+			 			<t:pagelink page="user/view" context="rfversion.owner.id">${rfversion.owner.displayName}</t:pagelink>
+			 			,
+			 			<span class="date">${rfversion.cdateDisplay}</span>
+		 			</span>
+			
+		 		</t:parameter>
+		 		<t:parameter name="cmmtCell">
+		 			<t:outputraw value="textarea2html(rfversion.cmmt)"/>
+		 		</t:parameter>
+		 		<t:parameter name="sizeCell">
+		 			${rfversion.displaySize}
+		 		</t:parameter>
+		 		<t:parameter name="actionCell">
+		 			<a href="#"  t:type="eventLink" t:event="retrieveFile" context="rfversion.id" class="button rounded">
+  						<span>${message:download}</span>
+  					</a>
+  					
+		 		</t:parameter>
+		 		
+		</t:grid>
+	</div>
+	</div>
+	
+	
+	<t:if test="canEditResource(rfile)">
+	<div class="t-beaneditor">
+	<div class="uploadVersionCon " >
+		<div class="rtitle">${message:upload-new-version}</div>
+		<t:zone t:id="uploadFileZone" id="uploadFileZone" update="show">
+			
+			<form t:type="form" t:id="form" class="e-formeditor" autofocus="false" >
+				<t:errors />
+				
+				<table>
+						<tr>
+							<td class="label"><t:label for="upfile"><span class="required">*</span> ${message:upfile-label}</t:label></td>
+							<td><input t:type="upload" t:id="upfile" validate="required" disabled="shouldDisableInput"/></td>
+						</tr>
+						<tr>
+							<td class="label"><t:label for="upCmmt">${message:cmmt-label}</t:label></td>
+							<td><t:textarea t:id="upCmmt" value="upCmmt" class="lwidth" disabled="shouldDisableInput"/></td>
+						</tr>
+						<tr>
+							<td></td>
+							<td>
+								<t:submit t:id="upload1" value="${message:upload}" 
+									class="squared ${shouldDisableInput}" disabled="shouldDisableInput"
+									onclick="return uploadClicked();"
+									/>
+									<!-- 
+									t:mixins="zoneUpdater" t:clientEvent="click" 
+									t:event1="ajaxLockFile" t:zone1="fileLockedZone" 
+									
+									 -->
+							</td>
+						</tr>
+					</table>
+			</form>
+			
+		</t:zone>
+	</div>
+	</div>
+	</t:if>
+	<div id="log"></div>
+<script >
+	function uploadClicked(){
+		new Ajax.Request('${getAjaxLockFileURL()}', {
+			method: 'get',
+			onSuccess: function(transport){
+				var json = transport.responseText.evalJSON();
+				if(json.content.include('script') ){ //if error occurs (e.g. unable to lock...) 
+					json.content.evalScripts();
+					return false;
+				}
+				else{
+					$('form').submit();
+					return true;
+				}
+			},
+			onFailure: function(transport){
+				alert('A problem occurs while trying to lock the file before upload');
+			}
+		});
+		return false;
+	}
+
+</script>
+
+
+</html>

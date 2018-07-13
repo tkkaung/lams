@@ -1,0 +1,101 @@
+<html t:type="layout" 
+	title="${message:manage} ${message:announcement}"
+	currentModule="${moduleName}"
+	currentProj="curProj"
+	breadcrumb="${curProj.encodeddisplayname}=project/home?${curProj.id}
+		,${module.displayName}=modules/announcement?${curProj.id}
+		,${message:manage} ${message:announcement}=modules/announcement/manage?${curProj.id}"
+	totalShowOption="${totalSize}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+	<p:actionBtns>
+		<t:if test="canCreateAnnouncement(curProj)">
+			<a class="button rounded" t:type="pageLink" page="modules/announcement/create" context="curProj.id" >
+				<span>${message:add-new} ${message:announcement}</span>
+			</a>
+		</t:if>
+	</p:actionBtns>	
+
+	<table class="actionToolBar">
+		<tr>
+			<td class="right">
+				<form t:type="form" t:id="filterForm" autofocus="false">
+					<span class="fTitle">${message:filter}:</span>
+					${message:subject-label} 
+					<t:textfield value="filterSubject" />
+					<t:if test="canManageAnnouncement(curProj)">
+						${message:creator-label}
+						<t:select t:id="filterCreator" value="filterCreator" model="memberModel" />
+					</t:if>
+					<t:submit value="${message:go}" class="squared"/>	
+				</form>
+			</td>
+		</tr>
+	</table>
+	
+	<style>
+		.urgent{ text-align: center;}
+	</style>
+	
+	<t:grid source="annmts" row="annmt" 
+		rowsPerPage="rowsPerPage"
+		pagerPosition="bottom" 
+		rowClass="evenodd.next"
+		model="model"
+		>
+		<p:empty>
+			<div class="notfoundtext">${message:no-announcement-found}</div>
+		</p:empty>
+		<p:urgentCell>
+			<t:if test="annmt.urgent">
+				<img src="${context:lib/img/icon_urgent.png}"  alt="${message:annmt-urgent-tip}" title="${message:annmt-urgent-tip}" />
+			</t:if>
+		</p:urgentCell>
+		<p:subjectCell>
+			<t:if test="canView">
+				<a href="#" t:type="pageLink" page="modules/announcement/view" context="annmt.id">${annmt.subject}</a>
+				<p:else>
+					${annmt.subject}
+				</p:else>
+			</t:if>
+		</p:subjectCell>
+		<p:contentCell>
+			<t:ck.TrimmedString value="stripTags(annmt.content)" maxLength="300"/>
+		</p:contentCell>
+		<p:startDateCell>
+			<span class="date">${annmt.startDateDisplay}</span>
+		</p:startDateCell>
+		<p:endDateCell>
+			<span class="date">${annmt.endDateDisplay}</span>
+		</p:endDateCell>
+		<p:modifyDateCell>
+			<span class="date">${annmt.modifyDateDisplay}</span>
+		</p:modifyDateCell>
+		<p:enabledCell>
+			<t:if test="canEdit">
+				<t:actionLink t:id="toggleEnabled" context="annmt.id" title="${message:click-to-toggle-enabled}">${annmt.enabled}</t:actionLink>
+				<p:else>
+					${annmt.enabled}
+				</p:else>
+			</t:if>
+		</p:enabledCell>
+		<p:creatorCell>
+			<t:pageLink page="user/view" context="annmt.creator.id">${annmt.creator.displayname}</t:pageLink>
+		</p:creatorCell>
+		<p:actionCell>
+			<t:if test="canEdit">
+				<t:pagelink page="modules/announcement/edit" context="annmt.id" class="button rounded">
+	          	<span>${message:edit}</span>
+	         </t:pagelink>
+         </t:if>
+         <t:if test="canDelete">
+	         <t:actionlink t:id="delete" context="annmt.id" class="button rounded"
+	         	onclick="return confirmDelete('${message:confirm-permanent-delete-item}')">
+	          	<span>${message:delete}</span>
+	         </t:actionlink>
+         </t:if>
+		</p:actionCell>
+	</t:grid>
+
+</html>

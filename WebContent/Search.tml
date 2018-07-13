@@ -1,0 +1,97 @@
+<html t:type="layout" 
+	title="${message:search-result}"
+	breadcrumb="${message:search-result}=search"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" 
+	xmlns:p="tapestry:parameter">
+
+	<div style="margin: 5px 10px;">	
+		<table class="nomargin">
+			<tr>
+				<td>
+					${message:search} :
+					<form t:type="form" t:id="srchForm" autofocus="false" style="display:inline;">
+						<input t:type="textField" value="srchTxt" validate="required" class="mwidth"/>
+						${message:in}
+						<t:select value="srchField" model="srchModel" encoder="stringEncoder" blankLabel="${message:-all-}"></t:select>
+						
+						<input class="button squared" t:type="submit" value="${message:go}" />
+					</form>
+				</td>
+				<td style="text-align:right;margin:10px ">
+					<t:pageLink class="button rounded" page="searchAdvanced" context="true" >
+						<span>${message:to-advanced-search}</span>
+					</t:pageLink>
+				</td>
+			</tr>
+		</table>
+	</div>	
+	
+		<div>
+		<hr />
+			<t:if test="srchResults">
+				
+				<table class="actionToolBar3">
+					<tr>
+						<td class="right">		 	
+							<form t:type="form" t:id="rowsPerPageForm" autofocus="false">
+								${totalSize} ${message:results-found}, ${message:show}
+								<select t:type="select" t:id="rowsPerPageSelect" model="literal:5,10,20,50,100"
+									value="rowsPerPage" onchange="this.form.submit()" />
+								${message:results-per-page}
+							</form>
+						</td>
+					</tr>
+				</table>
+				
+				<t:GridPager currentPage="curPageNo" rowsPerPage="rowsperpage" source="srchResults" />
+				
+				<t:loop source="srchResultsDisplay" value="srchResult">
+					<t:if test="updateAndCheckTypeChanged(t2, srchResult.type)">
+						<div class="horzSeparator">----------------------------------------------------------------</div>
+					</t:if>
+					<div class="srchResultBlk ${evenOdd.next}">
+						<div>
+							<table width="100%">
+								<tr>
+									<td width="24px">
+										<img src="${getSearchResultTypeIcon(srchResult.type)}" alt=""/>
+									</td>
+									<td>
+										<span class="label">${srchResult.type}</span>: 
+										<a href="${srchResult.link}"><t:outputraw value="srchResult.title"/></a>
+									</td>
+									<td style="text-align:right;">
+										<t:loop source="srchResult.extraInfo.keySet()" value="tempStr">
+											<div>
+												<span class="label">${tempStr}</span>:
+												<em><t:outputraw value="${srchResult.extraInfo.get(tempStr)}"/></em>
+											</div>
+										</t:loop>
+										
+									</td>
+								</tr>
+							</table>
+							
+						</div>
+						
+						<div><t:outputraw value="srchResult.content"/></div>
+						<t:if test="srchResult.remarks">
+							<div>
+								<strong>${message:remarks-label}: </strong> 
+								<span class="subdes">${srchResult.remarks}</span>
+							</div>
+						</t:if>
+					</div>
+				</t:loop>
+				
+				<t:GridPager currentPage="curPageNo" rowsPerPage="rowsperpage" source="srchResults" />
+				
+				
+				<p:else>
+					<div class="notfoundtext">${message:search-return-no-result}</div>
+				</p:else>
+			</t:if>
+		</div>
+		
+
+</html>

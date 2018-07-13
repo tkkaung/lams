@@ -1,0 +1,51 @@
+<html t:type="layout" 
+	title="${message:manage} ${message:school}"
+	breadcrumb="${message:control-panel}=admin,${message:manage} ${message:school}=admin/school"
+	totalShowOption="${totalSize}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="systemtools"/></p:leftMenuBlk>
+	
+	<p:actionBtns>
+		<a href="#" t:type="pageLink" page="admin/school/edit" class="button rounded">
+		 	<span>${message:add-new} ${message:school}</span>
+		</a>
+	</p:actionBtns>
+
+
+	<table class="actionToolBar">
+		<tr>
+			<td class="right">		 	
+				<form t:type="form" t:id="searchForm">
+					<t:label for="searchText">${message:filter}: </t:label>
+					<t:textfield t:id="searchText" value="searchText" ></t:textfield>
+					<input type="submit" value="${message:go}" class="squared"/>
+				</form>
+			</td>
+		</tr>
+	</table>
+
+	<t:grid t:id="schoolsGrid" source="schools" row="school" class="stickyHeader t-data-grid"
+		exclude="system,displayName,displayNameLong"
+		t:add="userCount,projectCount,action"
+		t:rowsPerPage="rowsPerPage" 
+		t:pagerPosition="bottom" >
+		
+		<p:userCountCell>
+			${getCountUserBySchool(school)}
+		</p:userCountCell>
+		<p:projectCountCell>
+			${getCountProjectBySchool(school)}
+		</p:projectCountCell>
+		<p:actionCell>
+			<t:pagelink t:id="edit" page="admin/school/edit" context="school.id" class="button rounded">
+          	<span>${message:edit}</span>
+         </t:pagelink>
+         <t:actionlink t:id="delete" context="school.id" class="button rounded"
+         	onclick="return confirmDelete('${message:confirm-permanent-delete-item}')">
+          	<span>${message:delete}</span>
+         </t:actionlink>
+		</p:actionCell>
+	
+	</t:grid>
+
+</html>

@@ -1,0 +1,93 @@
+<html t:type="layout" 
+	title="${module.displayName}"
+	currentModule="${moduleName}"
+	currentProj="curProj"
+	breadcrumb="${curProj.encodeddisplayname}=project/home?${curProj.id}
+		,${module.displayName}=modules/learninglog?${curProj.id}"
+	totalShowOption="${totalSize}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+		
+	<p:actionBtns>
+		<a class="button rounded" t:type="pageLink" page="modules/learninglog/edit" context="getParams(curProj.id, 0)" >
+			<span>${message:add-new} ${message:logentry}</span>
+		</a>
+	</p:actionBtns>	
+		
+	<table class="actionToolBar">
+		<tr>
+			<td class="right">
+				<form t:type="form" t:id="filterForm" autofocus="false">
+					<span class="fTitle">${message:filter}:</span> 
+					<t:textfield t:id="filterText" value="filterText"/>
+					${message:type-label} <t:select t:id="filterType" model="typeModel" value="filterType" blanklabel="${message:-all-}"/>
+					<t:checkbox t:id="showFromAllProjects" value="showFromAllProjects"/>
+					<t:label for="showFromAllProjects">${message:showFromAllProjects}</t:label> 
+					<t:submit value="${message:go}" class="squared"/>
+				</form>
+			</td>
+		</tr>
+	</table>	
+
+	<t:grid source="entries" class="stickyHeader t-data-grid"
+		row="entry" 
+		pagerPosition="bottom" 
+		rowClass="prop:evenodd.next"
+		model="model"
+		rowsPerPage="rowsPerPage"
+		>
+		<p:empty>
+			<div class="notfoundtext">${message:no-logentry-found}</div>
+		</p:empty>
+		
+		<p:titleCell>
+			<t:pagelink page="modules/learninglog/view" context="entry.id"><t:ck.TrimmedString value="entry.title" maxLength="70"/></t:pagelink>
+			<span style="margin-left:5px;vertical-align:bottom;">
+				<t:loop source="entry.files" value="tempFile">
+					<t:eventLink event="retrieveFile" context="tempFile.id">
+						<img src="${context:lib/img/icon-attachment.gif}"  alt="" 
+						title="${message:click-to-download} ${tempFile.displayName}"/>
+					</t:eventLink>
+				</t:loop>
+			</span>
+			<t:if test="entry.content">
+				<br/>
+				<span class="subdes"><t:ck.TrimmedString value="stripTags(entry.content)" maxLength="100"/></span>
+			</t:if>
+		</p:titleCell>
+		<p:typeCell>
+			${entry.type}
+			<t:if test="entry.forumThreadId">
+				<div>
+				<t:pagelink page="modules/forum/threadview" context="entry.forumThreadId">${message:view} ${message:forum-thread}</t:pagelink>
+				</div>
+			</t:if>
+			<t:if test="entry.blogId">
+				<div>
+				<t:pagelink page="modules/blog/view" context="entry.blogId">${message:view} ${message:blog}</t:pagelink>
+				</div>
+			</t:if>
+			<t:if test="entry.elogId">
+				<div>
+				<t:pagelink page="modules/elog/view" context="entry.elogId">${message:view} ${message:elog}</t:pagelink>
+				</div>
+			</t:if>
+		</p:typeCell>
+		<p:mdateCell>
+			<span class="date">${entry.mdatedisplay}</span>
+		</p:mdateCell>
+		<p:projectCell>
+			<t:pagelink page="project/home" context="entry.project.id">${entry.project.displayname}</t:pagelink>
+		</p:projectCell>
+		<p:actionCell>
+			<a href="#" t:type="pageLink" page="modules/learninglog/edit" context="entry.id" class="button rounded">
+				<span>${message:edit}</span>
+			</a>
+			<a href="#" t:type="actionLink" t:id="delete" context="entry.id" class="button rounded"
+					onclick="return confirmDelete('${message:confirm-delete-entry}')">
+				<span>${message:delete}</span>
+			</a>
+		</p:actionCell>
+		
+	</t:grid>
+</html>

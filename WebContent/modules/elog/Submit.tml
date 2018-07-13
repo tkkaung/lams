@@ -1,0 +1,94 @@
+<html t:type="layout" 
+	title="${message:preview-elog}"
+	currentModule="${moduleName}"
+   currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+	,${module.displayName}=modules/elog/home?${project.id}
+	,${message:manage-elog}=modules/elog/manage?${project.id}
+	,${message:preview-elog}=modules/elog/submit"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+
+	<form t:type="form" t:id="elogform" enctype="multipart/form-data" class="e-formeditor">
+	<t:errors />
+	<div class="t-beaneditor">
+
+		<table >
+			<tr>
+				<td class="label">${message:preview-elog}</td>
+				<td>
+					<div style="border:1px solid #ccc;margin:5px;">
+					<div class="elogEntry">
+						<div class="head">
+							<table class="nomargin">
+								<tr>
+									<td>
+										<img src="${context:lib/img/16/m_eLog.png}"  class="icon" />
+										<span class="subject">${subject}</span>
+										<br/>
+										<span class="author-date">
+											${message:by} <span class="author"><t:pageLink page="user/view" context="elog.author.id">${elog.author.displayname}</t:pageLink></span>
+											, <span class="date">${elog.cdateDisplay}</span>
+										</span>
+									</td>
+									<td align="right">
+										
+									</td>
+								</tr>
+							</table>
+						</div>
+						<div class="content"><t:outputraw t:value="content" /></div>
+						
+						<t:if test="elog.files">
+							<div class="attFiles">
+								<div >
+									${message:attachment} <img src="${context:lib/img/icon-attachment.gif}" />
+									:
+								</div>
+								<div >
+									<t:loop source="getNonImageAttachedFiles(elog.files)" value="attFile">
+										<div class="attFile">
+											<t:eventLink event="retrieveFile" context="attFile.id"  title="${message:click-to-download}">
+											<img src="${getAttachFileIcon(attFile)}" style="vertical-align:bottom;"/>
+											${attFile.displayName}
+											</t:eventLink>
+											(${attFile.displaySize})
+										</div>
+									</t:loop>
+								</div>
+								<div class="imgBlks">
+									<t:loop source="getImageAttachedFiles(elog.files)" value="attFile">
+										<div class="imgBlk" >
+											<a href="${getRetrieveImageLink(attFile.id)}" target="_blank" >
+												<img src="${getRetrieveImageThumbLink(attFile.id)}" alt="" title="${message:click-to-view-originalsize}"/>
+											</a>
+											<t:eventLink event="retrieveFile" context="attFile.id"  title="${message:click-to-download}">
+											${message:download}</t:eventLink>
+											(${attFile.displaySize})
+										</div>
+									</t:loop>
+								</div>
+							</div>
+						</t:if>
+					</div>
+					</div>
+				</td>
+			</tr>
+		</table>
+		
+		<t:submit t:id="back" value="${message:back-btn}" class="submit squared"  />
+		<t:submit t:id="saveDraft" value="${message:save-as-draft}" class="squared" onclick="submitClicked(); " />
+		<t:submit t:id="SubmitApproval" value="${message:submit-for-approval}" class="squared" onclick="submitClicked(); " />
+	</div>
+	</form>
+
+<script language="javascript">
+	var submitting = false; //may take long time to submit, because send notification emails
+	function submitClicked(){
+		$('saveDraft').addClassName("disabled");
+		$('SubmitApproval').addClassName("disabled");
+		submitting = true;
+	}
+</script>
+</html>

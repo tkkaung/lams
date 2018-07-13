@@ -1,0 +1,153 @@
+<html t:type="layout" 
+	title="${module.displayName}"
+	currentModule="${moduleName}"
+	currentProj="curProj"
+	breadcrumb="${curProj.encodeddisplayname}=project/home?${curProj.id}
+		,${module.displayName}=modules/budget?${curProj.id}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+	
+	<p:actionBtns>
+		<t:if test="canCreateTransaction(curProj)">
+			<a class="button rounded" t:type="pageLink" page="modules/budget/transactionCreate" context="budget.id">
+				<span>${message:add-new} ${message:transaction}</span>
+			</a>
+		</t:if>
+		<a class="button rounded" t:type="actionLink" t:id="ExportXls" context="budget.id">
+			<span>${message:export-xls-file}</span>
+		</a>
+	</p:actionBtns>	
+
+	<table class="actionToolBar">
+		<tr>
+			<td class="right">
+				<form t:type="form" t:id="displayOptionForm" style="display: inline;" autofocus="false">
+					<span class="fTitle">${message:filter}:</span>
+					${message:status-label} <t:select t:id="displayStatus" value="displayStatus" blanklabel="${message:-all-}" />
+					${message:category-label}<t:select t:id="displayCategory" value="displayCategory"  model="displayCategoryModel" blanklabel="${message:-all-}" />
+					${message:creator-label}<t:select t:id="displayCreatedBy" value="displayCreatedBy" model="displayCreatedByModel" blanklabel="${message:-all-}"/>
+					<t:submit value="${message:go}" class="squared"/>
+				</form>
+			</td>
+		</tr>
+	</table>
+	
+	
+	<form t:type="form" t:id="budgetListForm" >
+		<table class="actionToolBar2">
+			<tr>
+				<td align="left">
+					<t:if test="curProj.isReference()" negate="true">
+						<t:submit value="delete" t:id="deleteBtn" class="squared" 
+							onclick="return checkChBoxAndConfirmDelete('bugtTbl','${message:select-at-least-one-item}','${message:delete-selected-items}')"/>
+					</t:if>	
+				</td>
+			</tr>
+		</table>
+		<t:errors/>
+		
+		<div class="budgetContainer">
+			<table class="t-data-grid" id="bugtTbl">
+				<thead>
+					<tr>
+						<th><input type="checkbox" name="chkBoxAll" id="chkBoxAll" onclick="chkboxAll('bugtTbl','chkBoxAll')"/></th>
+						<th>${message:transactDate-label}</th>
+						<th>${message:description-label}</th>
+						<th>${message:category-label}</th>
+						<th>${message:status-label}</th>
+						<th>${message:creator-label}</th>
+						<th>${message:type-inflow-label}</th>
+						<th>${message:type-outflow-label}</th>
+						<th>${message:balance-label}</th>
+					</tr>
+				</thead>
+				<tbody>
+					<t:unless test="transacts">
+						<tr><td colspan="9">
+								${message:transaction-not-found}
+								<t:if test="canCreateTransaction(curProj)">
+									[<a href="#" t:type="pageLink" page="modules/budget/transactionCreate" context="budget.id">
+										${message:add-new} ${message:transaction}
+									</a>]
+								</t:if>
+							</td>
+						</tr>
+					</t:unless>
+					<t:loop source="transacts" value="transact">
+						<t:if test="runAndCheckEndOfMonth(transact)">
+							<tr class="endOfMonthRow">
+								<td colspan="8">${message:balance-end-of-month} ${prevMonthDisplay}</td>
+								<td >${transactBalanceDisplay}</td>
+							</tr>
+						</t:if>
+						<t:if test="runAndFilter(transact)">
+							<tr class="${evenOdd.next}">
+								<td class="chkbox">
+									<t:if test="canDeleteTransaction(transact)">
+										<input type="checkbox" name="bgtChkbox" value="${transact.id}" onclick="chkbox('bugtTbl','chkBoxAll')" />
+										<p:else>
+											<input type="checkbox" name="bgtChkbox" disabled="disabled"  />
+										</p:else>
+									</t:if>
+								</td>
+								<td>${transact.transactDateDisplay}</td>
+								<td>
+									<t:if test="canEditTransaction(transact)">
+										<a href="#" t:type="pageLink" page="modules/budget/transactionEdit" context="transact.id">
+											${transact.description}
+										</a>
+										<p:else><strong>${transact.description}</strong></p:else>
+									</t:if>
+									
+									<span style="margin-left:5px;vertical-align:bottom;">
+										<t:loop source="transact.attachedFiles" value="tempAttFile">
+											<t:eventLink event="retrieveAttachment" context="tempAttFile.id">
+												<img src="${context:lib/img/icon-attachment.gif}"  alt="" 
+												title="${message:click-to-download} ${tempAttFile.displayName}"/>
+											</t:eventLink>
+										</t:loop>
+									</span>
+									
+									
+									<t:if test="transact.remarks">
+										<br/>
+										<span class="small">
+											${message:remarks-label}: 
+											<span class="remarks">
+												<t:outputraw value="${truncateString(transact.remarks)}" />
+											</span>
+										</span>
+									</t:if>
+								</td>
+								<td>${transact.category}</td>
+								<td>${transact.status}</td>
+								<td>
+									<t:pagelink page="user/view" context="transact.creator.id">${transact.creator.displayName}</t:pagelink>
+									<t:if test="transact.isDiffEditor()">
+										<br/>
+										<span class="small">
+											${message:edited-on} <span class="date">${transact.modifyDateDisplay}</span> 
+											, ${message:by} <t:pagelink page="user/view" context="transact.editor.id">${transact.editor.displayName}</t:pagelink>
+										</span>
+									</t:if>
+								</td>
+								<td class="inflow">${transact.inflowAmount}</td>
+								<td class="outflow">${transact.outflowAmount}</td>
+								<td class="balance">${transactBalanceDisplay}</td>
+							</tr>
+						</t:if>
+						
+					</t:loop>
+				</tbody>
+				<tfoot>
+					<tr class="curBalanceRow">
+						<td colspan="8" >${message:current-balance}</td>
+						<td >${transactBalanceDisplay}</td>
+					</tr>
+				</tfoot>
+			</table>
+		</div>
+	</form>
+	
+	
+</html>

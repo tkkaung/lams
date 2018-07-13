@@ -1,0 +1,109 @@
+<html t:type="layout"
+		title="${message:new-adhoc-project}"
+		xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+      xmlns:p="tapestry:parameter">
+	<p:legendBlk>
+		<span class="required">*</span>  ${message:required-fields}
+	</p:legendBlk> 	
+	
+	
+	
+	<t:form t:id="form" class="e-formeditor">
+		<t:errors/>
+		<div class="t-beaneditor">
+			<table>
+				<tr>
+					<td class="label">
+						<label>${message:id-label}</label>
+	      		</td>
+					<td>
+						<span class="formtip">${message:proj-id-tip}</span>
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<t:label for="name" ><span class="required">*</span>  ${message:name-label}</t:label>
+	      		</td>
+					<td>
+						<t:textfield t:id="name" value="proj.name" class="lwidth"/>
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<t:label for="description" />
+					</td>
+					<td>
+						<textarea t:type="textarea" t:id="description" value="proj.description" cols="50" rows="4" class="lwidth"/>
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<t:label for="sdate"  ><span class="required">*</span>  ${message:sdate-label}</t:label>
+					</td>
+					<td>
+						<t:datefield t:id="sdate" value="proj.sdate" class="swidth" format="${message:datefield-format}"/>
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<t:label for="edate"  ><span class="required">*</span>  ${message:edate-label}</t:label>
+					</td>
+					<td>
+						<t:datefield t:id="edate" value="proj.edate" class="swidth" format="${message:datefield-format}"/>
+					</td>
+				</tr>
+				
+				<tr>
+					<td class="label">
+						<t:label for="school" ><span class="required">*</span> ${message:school-label}</t:label>
+					</td>
+					<td>
+						<t:select t:id="school" value="proj.school" model="schoolModel" validate="required"/>
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<label for="type">${message:type-label}</label>
+					</td>
+					<td>
+						${proj.type.displayname}
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<label for="attachment">${message:attachment-label}</label>
+	      		</td>
+					<td>
+						<input t:type="upload" t:id="file1" />
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<label for="keywords">${message:keywords-label}</label>
+	      		</td>
+					<td>
+						<input t:type="TextField" t:id="keywords" value="keywords" class="lwidth" />
+						<br/>
+						<span class="formtip">${message:keywords-tip}</span>
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<t:label for="searchable" />
+					</td>
+					<td>
+						<t:checkbox t:id="searchable" value="proj.shared"/> 
+						<span class="formtip">${message:proj-shared-tip}</span>
+					</td>
+				</tr>
+				
+			</table>
+	
+			<t:submit t:id="bsubmit" value="${message:submit-label}" class="submit squared" />
+		</div>
+	</t:form>
+	
+	
+	
+	
+</html>

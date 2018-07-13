@@ -1,0 +1,42 @@
+<html t:type="layout" 
+	title="${message:manage} ${message:projstatus}"
+	breadcrumb="${message:control-panel}=admin,${message:manage} ${message:projstatus}=admin/projstatus/manage"
+	totalShowOption="${totalSize}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="systemtools"/></p:leftMenuBlk>
+   
+   <p:actionBtns >
+		<a href="#" t:type="pageLink" page="admin/projstatus/edit" class="button rounded">
+					 	<span>${message:add-new} ${message:projstatus}</span></a>
+	</p:actionBtns>
+	
+	<table class="actionToolBar">
+		<tr>
+			<td class="right">		 	
+			</td>
+			</tr>
+		</table>
+		
+   
+    <t:grid source="statuses" row="status" class="stickyHeader t-data-grid"
+    	exclude="system,displayName"
+    	add="projectCount,action"
+    	rowsPerPage="rowsPerPage" 
+		pagerPosition="bottom" >
+		
+		<p:projectCountCell>
+			${getCountProjectByStatus(status)}
+		</p:projectCountCell>
+       <t:parameter name="actionCell">
+          <t:pagelink t:id="edit" page="admin/projstatus/edit" context="status.id" class="button rounded">
+          	<span>${message:edit}</span>
+          </t:pagelink>
+          <t:actionlink t:id="delete" context="status.id" class="button rounded"
+          	onclick="return confirmDelete('${message:confirm-permanent-delete-item}')">
+          		<span>${message:delete}</span>
+          </t:actionlink>
+       </t:parameter>
+    </t:grid>
+
+</html>

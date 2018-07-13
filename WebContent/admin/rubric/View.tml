@@ -1,0 +1,181 @@
+<html t:type="layout" 
+	title="${message:view} ${message:rubric}"
+	breadcrumb="${message:control-panel}=admin
+		,${getBreadcrumbAdmin()}
+		,${message:manage-my-rubric}=admin/rubric/home
+		,${message:view} ${message:rubric}=admin/rubric/view"
+   xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" xmlns:p="tapestry:parameter">
+
+	<p:leftMenuBlk><t:ControlPanMenu initTab="rubric"/></p:leftMenuBlk>
+
+
+<style>
+	.rubricDetailZone{
+		overflow:auto;
+	}
+	
+</style>
+
+	<p:legendBlk>
+		<t:if test="canUseOpenQuestion()">
+			<div>
+				<b>${message:qualitative-feedback-label}</b> and <b>${message:open-question-label}</b> ${message:note-apply-to-pe-only}
+			</div>
+		</t:if>
+		
+	</p:legendBlk>
+
+
+<p:actionBtns>
+	<t:if test="canEditRubric(rubric)">
+		<a class="button rounded" t:type="pageLink" page="admin/rubric/edit" context="getParams(rubric.id,true)" >
+			<span>${message:edit} ${message:rubric}</span>
+		</a>
+	</t:if>
+	<a class="button rounded" t:type="pageLink" page="admin/rubric/grab" context="getParams(rubric.id,true)" >
+		<span>${message:new-using-this-rubric}</span>
+	</a>
+</p:actionBtns>	
+  
+<div class="t-beaneditor e-formeditor" style="padding-top:0; margin:0px;">
+	<table >
+			<tr>
+				<td class="label">${message:name-label}</td>
+				<td>
+					${rubric.name}
+				</td>
+			</tr>
+			<tr>
+				<td class="label">${message:des-label}</td>
+				<td>
+					<t:outputraw value="textarea2html(rubric.des)"/>
+				</td>
+			</tr>
+			<tr>
+				<td class="label">${message:shared-label}</td>
+				<td>
+					${rubric.shared}
+				</td>
+			</tr>
+			<tr>
+				<td class="label">${message:master-label}</td>
+				<td>
+					${rubric.master}
+					<t:if test="rubric.master">
+						,
+						<t:if test="rubric.school">
+			   			<span title="${rubric.school.des}">${rubric.school.displayname}</span>
+			   			<p:else>
+			   				${message:scope-all-school}
+			   			</p:else>
+			   		</t:if>
+			   	</t:if>
+				</td>
+			</tr>
+			<tr>
+				<td class="label">${message:cdate-label}</td>
+				<td>
+					${rubric.cdatedisplay}
+				</td>
+			</tr>
+			<tr>
+				<td class="label">${message:mdate-label}</td>
+				<td>
+					${rubric.mdatedisplay}
+				</td>
+			</tr>
+			<tr>
+				<td class="label">${message:creator-label}</td>
+				<td>
+					<t:pagelink page="user/view" context="rubric.owner.id">${rubric.owner.displayname}</t:pagelink>
+				</td>
+			</tr>
+		</table>
+	
+	
+	
+	
+	<div class="rubricDetailZone view">
+		<table class="stickyHeader ">
+			<thead>
+			<tr>
+				<th rowspan="2" class="criteria">${message:criteria-objective}</th>
+				<th rowspan="2">${message:weightage-label} <span class="formtip">(%)</span></th>
+				<th colspan="${getFirstCriterions().size()}">${message:criterion}</th>
+			</tr>
+			<tr>
+				<t:loop source="getFirstCriterions()" value="tempRCriterion" index="colIndex">
+					<th>
+						<span title="${message:columnScore-label}">${tempRCriterion.score}</span>
+					</th>
+				</t:loop>
+			</tr>
+			</thead>
+			<t:loop source="rubric.getCriterias()" value="tempRCrit" index="rowIndex">
+				<tr>
+					<th class="critName">
+						<span title="${message:critName-label}"><t:outputraw value="${textarea2html(tempRCrit.name)}"/></span>
+						<t:outputraw value="getSpace()"/>
+					</th>
+					<th class="weightage">
+						${tempRCrit.weightage}
+					</th>
+					<t:loop source="tempRCrit.criterions" value="tempRCriterion" index="colIndex">
+						<td class="crionDes">
+							<t:outputraw value="${textarea2html(tempRCriterion.des)}"/>
+						</td>
+					</t:loop>
+				</tr>
+			</t:loop>
+		
+		</table>
+	</div>
+	
+	
+		 
+		<div class="t-beaneditor e-formeditor">
+		<table >
+			<tr>
+				<td class="label" ><label > ${message:qualitative-feedback-label}</label></td>
+				<td>
+				<div>
+					<t:if test="rubric.useCmtStrength">
+						- ${rubric.cmtStrength} 
+						<br/>
+					</t:if>	
+				</div>
+				<div>
+					<t:if test="rubric.useCmtWeakness">
+						- ${rubric.cmtWeakness}
+						<br/>
+					</t:if>	
+				</div>
+				<div>
+					<t:if test="rubric.useCmtOther">
+						- ${rubric.cmtOther}
+						<br/>
+					</t:if>	
+				</div>
+				<br/>
+				</td>
+			</tr>
+	<t:if test="canUseOpenQuestion()">
+			<tr>
+				<td class="label" ><label > ${message:open-question-label}</label></td>
+				<td>
+					<t:loop source="rubric.openEndedQuestions" value="oQuestion">
+						+ <t:outputraw value="textarea2html(oQuestion)"/>
+		
+						<br/>
+						<br/>
+					</t:loop>
+				</td>
+			</tr>
+	</t:if>
+				
+			</table>
+		</div>
+	
+	
+</div>
+</html>

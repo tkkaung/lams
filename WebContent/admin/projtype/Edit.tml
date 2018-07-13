@@ -1,0 +1,147 @@
+<html t:type="layout" 
+	title="${message:add-edit} ${message:projtype}"
+	breadcrumb="${message:control-panel}=admin,${message:manage} ${message:projtype}=admin/projtype/manage,${message:add-edit} ${message:projtype}=admin/projtype/edit"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="systemtools"/></p:leftMenuBlk>
+	<p:legendBlk>
+		<span class="required">*</span>  ${message:required-fields}
+	</p:legendBlk>
+	
+	
+		<form t:type="form" t:id="form" class="e-formeditor">
+		<t:errors />
+		<div class="t-beaneditor">
+			<table >
+				<tr>
+					<td class="label"><t:label for="name" ><span class="required">*</span>  ${message:name-label}</t:label></td>
+					<td><t:textfield t:id="name" value="type.name"  class="mwidth"/>
+						<span class="formtip">${message:name-known-to-system-tip}</span>
+					</td>
+				</tr>
+				<tr>
+					<td class="label"><t:label for="alias"/></td>
+					<td><t:textfield t:id="alias" value="type.alias" />
+    					<span class="formtip">${message:alias-tip}</span>
+    				</td>
+				</tr>
+				<tr>
+					<td class="label"><t:label for="description" /></td>
+					<td><textarea t:type="textarea" t:id="description" value="type.des" cols="50" rows="5" class="lwidth"/></td>
+				</tr>
+				<tr>
+					<td class="label"><label >${message:mandatory-modules-label}</label></td>
+					<td style="padding-top:5px;">
+						<div><span class="formtip">${message:mandatory-modules-tip}</span></div>
+						<t:loop source="modules" value="module" index="i">
+							<div id="md${i}" >
+								<input type="checkbox" name="objModule" id="mdCh${i}" value="${module.id}" 
+									checked="${getCheckHasModules(module)}" onclick="mandatoryClicked('${i}')"  />
+								${module.displayName}
+							</div>
+						</t:loop>
+					</td>
+				</tr>
+				<tr >
+					<td class="label" ><label >${message:nonmodules-label}</label></td>
+					<td style="padding-top:5px;">
+						<div><span class="formtip">${message:nonmodules-tip}</span></div>
+						<t:loop source="modules" value="module" index="i">
+							<div id="nmd${i}" >
+								<input type="checkbox" name="noModule" id="nmdCh${i}" value="${module.id}" 
+									checked="${getCheckHasNonModules(module)}" onclick="nonModuleClicked('${i}')" />
+								${module.displayName}
+							</div>
+						</t:loop>
+					</td>
+				</tr>
+				<tr>
+					<td class="label"><label >${message:default-modules-label}</label></td>
+					<td style="padding-top:5px;">
+						<div><span class="formtip">${message:default-modules-tip}</span></div>
+						<t:loop source="modules" value="module" index="i">
+							<div id="dmd${i}" >
+								<input type="checkbox" name="defaultModule" id="dmdCh${i}" value="${module.id}" 
+									checked="${getCheckHasDefaultModules(module)}" />
+								${module.displayName}
+							</div>
+						</t:loop>
+					</td>
+				</tr>
+				<tr >
+					<td class="label" ><label >${message:roles-label}</label></td>
+					<td style="padding-top:5px;">
+						<div><span class="formtip">${message:roles-tip}</span></div>
+						<t:loop source="pRoles" value="pRole" index="i">
+							<div id="npr${i}" >
+								<input type="checkbox" name="pRole" id="nprCh${i}" value="${pRole.id}" checked="${getCheckHasRoles(pRole)}" />
+								${pRole.displayName}
+							</div>
+						</t:loop>
+					</td>
+				</tr>
+				<tr >
+					<td class="label" ><label >${message:settings-label}</label></td>
+					<td style="padding-top:5px;">
+						<div><span class="formtip">${message:settings-tip}</span></div>
+						<t:loop source="getAllSettings()" value="pSetting" index="i">
+							<div id="nps${i}" >
+								<input type="checkbox" name="pSetting" id="npsCh${i}" value="${pSetting.name()}" checked="${getCheckHasSettings(pSetting)}" />
+								${getSettingDisplayName(pSetting)}
+							</div>
+						</t:loop>
+					</td>
+				</tr>
+				
+			</table>
+			<t:submit t:id="bSubmit" value="${message:submit-label}" class="submit squared" style="margin-top:10px;"/>
+		</div>
+		</form>
+
+
+	<script>
+		document.observe("dom:loaded", function(){
+			initHidePair("mdCh","nmd",${modules.size()});
+	  		initHidePair("nmdCh","md",${modules.size()});
+	  		initHidePair("nmdCh","dmd",${modules.size()});
+	  		
+	  	});
+	  	
+	  	function mandatoryClicked(mId){
+	  		var mElm = $('mdCh'+mId);
+	  		var nElmId = 'nmd'+mId;
+	  		var nElmChId = 'nmdCh'+mId;
+	  		var dElmChId = 'dmdCh'+mId;
+			if(mElm.checked){
+				$(nElmChId).checked = false;
+				hideElm(nElmId);
+				$(dElmChId).checked = true;
+			}
+			else{
+				showElm(nElmId);
+			}
+	  	}
+	  	
+	  	function nonModuleClicked(mId){
+	  		var nElm = $('nmdCh'+mId);
+	  		var mElmId = 'md'+mId;
+	  		var mElmChId = 'mdCh'+mId;
+	  		var dElmId = 'dmd'+mId;
+	  		var dElmChId = 'dmdCh'+mId;
+			if(nElm.checked){
+				$(mElmChId).checked = false;
+				hideElm(mElmId);
+				$(dElmChId).checked = false;
+				hideElm(dElmId);
+			}
+			else{
+				showElm(mElmId);
+				showElm(dElmId);
+			}
+	  	}
+	  	
+	  	
+	  	
+	</script>
+
+</html>

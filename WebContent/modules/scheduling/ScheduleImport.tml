@@ -1,0 +1,40 @@
+<html t:type="layout" 
+	title="${message:import-xls-title}"
+	currentModule="${moduleName}"
+	currentProj="curProj"
+	breadcrumb="${curProj.encodeddisplayname}=project/home?${curProj.id}
+		,${module.displayName}=modules/scheduling?${curProj.id}
+		,${message:manage-version-page-title}=modules/scheduling/schedulemanage?${curProj.id}
+		,${message:import-xls-title}=modules/scheduling/scheduleimport?${curProj.id}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+   
+   <p:legendBlk>
+   	<span class="required">*</span>  ${message:required-fields}
+		<div class="legend">
+	   	 	<div class="title">${message:note}:</div>
+	    	- ${message:scheduleImport-note1}
+	    </div>
+	</p:legendBlk>
+   
+   
+  <form t:type="form" t:id="form" class="e-formeditor" autofocus="false">
+	<div class="t-beaneditor">
+	<t:errors />
+		<table >
+			<tr>
+				<td class="label"><span class="required">*</span> ${message:xlsfile-label}</td>
+				<td>
+					<input t:type="upload" t:id="xlsfile" value="xlsfile" validate="required, regexp"/>
+					<br/>
+					<span class="formtip">${message:xlsfile-tip}</span>
+				</td>
+			</tr>
+		</table>
+		<t:submit t:id="submit" value="${message:submit-label}" class="submit squared" style="margin-top:10px;"/>
+		
+	</div>
+</form>
+   
+	
+</html>

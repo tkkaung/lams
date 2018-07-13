@@ -1,0 +1,132 @@
+<html t:type="layout"
+	title="${message:view} ${message:user}"
+	breadcrumb="${message:control-panel}=admin
+		,${message:admin-manage-user}=admin/user
+		,${message:view} ${message:user}=admin/user/view"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="user"/></p:leftMenuBlk>
+
+	<p:actionBtns >
+		<a href="#" t:type="pageLink" page="admin/user/edit" context="user.id" class="button rounded">
+		 	<span>${message:edit} ${message:user}</span>
+		</a>
+	</p:actionBtns>
+	
+	
+		<div class="t-beaneditor e-formeditor" >
+			<table >
+				<tr>
+					<td class="label">
+						${message:username-label}
+	      		</td>
+					<td><strong>${user.username}</strong></td>
+				</tr>
+				<tr>
+					<td class="label">
+						${message:password-label}
+	      		</td>
+					<td>
+						<t:pageLink page="admin/user/resetPassword" context="user.id" ><span>[${message:reset-password}]</span></t:pageLink>
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						${message:title-label}
+	      		</td>
+					<td>
+						${user.title}
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						${message:firstname-label}
+	    			</td>
+					<td>${user.firstname}</td>
+				</tr>
+				<tr>
+					<td class="label">
+						${message:lastname-label}
+	      		</td>
+					<td>${user.lastname}</td>
+				</tr>
+				<tr>
+					<td class="label">
+						${message:externalKey-label}
+	      		</td>
+					<td>${user.externalKey}</td>
+				</tr>
+				<tr>
+					<td class="label">
+						${message:school-label}
+		      	</td>
+					<td>
+						<t:if test="user.school">
+							${user.school.displayNameLong}
+						</t:if>
+		      	</td>
+				</tr>
+				<t:if test="user.organization">
+					<tr>
+						<td class="label">${message:organization-label}</td>
+						<td>${user.organization}</td>
+					</tr>
+				</t:if>
+				<tr>
+					<td class="label">${message:jobTitle-label}</td>
+					<td>${user.jobTitle}</td>
+				</tr>
+				<tr>
+					<td class="label">${message:phone-label}</td>
+					<td>${user.phone}</td>
+				</tr>
+				<tr>
+					<td class="label">${message:mphone-label}</td>
+					<td>${user.mphone}</td>
+				</tr>
+				<tr>
+					<td class="label">${message:email-label}</td>
+					<td>${user.email}</td>
+				</tr>
+				<tr>
+					<td class="label">
+						${message:sysRole-label}
+					</td>
+					<td>
+		      		<div>${user.sysRole.displayname}</div>
+						<t:loop source="user.extraRoles" value="sRoleUser">
+							<div>
+								+
+				      		${sRoleUser.sysRole.displayName} 
+				      		${getExtraRoleParamDisplay(sRoleUser)}
+							</div>
+						</t:loop>
+		      	</td>
+				</tr>
+				<tr>
+					<td class="label">${message:enabled-label}</td>
+					<td>
+						${user.enabled}
+					</td>
+				</tr>
+				<tr>
+					<td class="label">${message:remarks-label}</td>
+					<td>
+					 	${user.remarks}
+		      	</td>
+				</tr>
+				<tr>
+					<td class="label">${message:cdate-label}</td>
+					<td>
+					 	${user.createDateDisplay}
+		      	</td>
+				</tr>
+				<tr>
+					<td class="label">${message:mdate-label}</td>
+					<td>
+					 	${user.modifyDateDisplay}
+		      	</td>
+				</tr>
+			</table>
+		</div>
+	
+</html>

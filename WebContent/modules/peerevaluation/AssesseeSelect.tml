@@ -1,0 +1,52 @@
+<html t:type="layout" 
+	title="${message:assessee-select}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/peerevaluation/assesseehome?${project.id}
+		,${message:assessee-select}=modules/peerevaluation/assesseeedit"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+<style>
+ .selectEvaluatee DIV.t-palette select{
+ 	height: 300px;
+ 	width: 250px;
+ }
+</style>
+<p:actionBtns>
+</p:actionBtns>	
+
+<table class="actionToolBar">
+	<tr>
+		<td class="right">
+		</td>
+	</tr>
+</table>
+
+
+<form t:type="form" t:id="Form" clientValidation="false" >
+<div style="text-align:right;padding-right:15px;">
+<t:submit t:id="submit" value=" Next " class="squared" style="padding: 0 15px;"/>
+</div>
+
+	<p>
+	Please select student(s) who you want to evaluate from Available panel on the left, 
+	then move to Selected panel on the right. and click Next
+	</p>
+	<table class="selectEvaluatee">
+		<tr>
+			<td>
+				<div t:type="palette" t:id="toUsers" t:model="availableUsersModel"
+					t:selected="toUsersId" t:encoder="stringEncoder" 
+					deselect="context:lib/img/move_left.jpg"
+					select="context:lib/img/move_right.jpg"
+					/>
+			</td>
+		</tr>
+	</table>
+
+
+</form>
+
+</html>

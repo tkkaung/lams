@@ -1,0 +1,47 @@
+<html t:type="layout" 
+	title="${getPageTitle()}"
+	currentModule="${moduleName}"
+	currentProj="curProj"
+	breadcrumb="${curProj.encodeddisplayname}=project/home?${curProj.id}
+		,${module.displayName}=modules/scheduling?${curProj.id}
+		,${message:milestone}: ${encode(milestone.name)}=modules/scheduling/milestoneview?${milestone.id}
+		,${getBreadcrumbLink()}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+<p:legendBlk>
+	<span class="required">*</span>  ${message:required-fields}
+</p:legendBlk>
+		
+	<div class="t-beaneditor">
+		<form t:type="form" t:id="editForm" autofocus="false">
+			<t:errors />
+			<div class="t-beaneditor-row">
+				<t:label for="name" ><span class="required">*</span> ${message:name-label}</t:label>
+				<t:textfield t:id="name" value="phase.name" class="lwidth" validate="required" maxlength="255" ></t:textfield>
+			</div>
+			<div class="t-beaneditor-row">
+				<t:label for="startDate" ><span class="required">*</span> ${message:sdate-label}</t:label>
+				<t:dateField t:id="startDate" value="phase.startdate" validate="required"  class="swidth" format="${message:datefield-format}" />
+				<span class="formtip">
+					(${message:milestone} ${message:date-label}: ${curProj.sdateDisplay} - ${milestone.deadlineDisplay})
+				</span>
+			</div>
+			<div class="t-beaneditor-row">
+				<t:label for="endDate" ><span class="required">*</span> ${message:edate-label}</t:label>
+				<t:dateField t:id="endDate" value="phase.enddate" validate="required"  class="swidth" format="${message:datefield-format}" />
+			</div>
+			<div class="t-beaneditor-row">
+				<t:label for="comment" />
+				<t:textarea t:id="comment" value="phase.comment" cols="50" rows="5" class="lwidth" ></t:textarea>
+			</div>
+			<div class="t-beaneditor-row">
+				<label for="manager" >${message:manager-label}</label>
+				<t:pageLink page="user/view" context="${phase.manager.id}">${phase.manager.displayname}</t:pageLink>
+			</div>
+			
+			<div class="t-beaneditor-row">
+				<input t:type="submit" value="${message:submit-label}" class="t-beaneditor-submit " />
+			</div>
+		</form>
+	</div>
+</html>

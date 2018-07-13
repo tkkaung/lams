@@ -1,0 +1,53 @@
+NO,ITEMS,LEADERSHIP,MANAGEMENT,COMMAND
+1,Work with people to accomplish task,Y,Y,N
+2,Plan and manage resources,Y,Y,Y
+3,Execute assigned task,Y,Y,Y
+4,Focus on goal accomplishment,Y,Y,Y
+5,Challenge status quo,Y,N,N
+6,Clarify big picture,Y,N,Y
+7,Develop strategies to achieve vision,Y,N,N
+8,Look beyond the current reality,Y,N,N
+9,Focus on running daily operations effectively and efficiently,Y,Y,Y
+10,Follow a set model,Y,Y,N
+11,Set deadlines,Y,Y,Y
+12,Communicate new directions,Y,N,N
+13,Communicate to influence,Y,N,N
+14,Inspire commitment,Y,N,N
+15,Build team,Y,N,N
+16,Develop processes,N,Y,N
+17,Provide structure,N,Y,N
+18,Ask WHY the problems arose,Y,Y,N
+19,Ask HOW to resolve problems,N,Y,N
+20,Assign tasks,N,Y,Y
+21,Examine WHAT to do next,Y,Y,N
+22,Establish rules,N,Y,Y
+23,Complete assigned task,N,Y,Y
+24,Develop procedures,N,Y,N
+25,Develop solution for current problems,N,Y,N
+26,Use chain of command to influence,N,Y,Y
+27,Generate solutions to solve problems,Y,Y,N
+28,Take corrective actions,N,Y,Y
+29,Monitor progress,N,Y,Y
+30,Ensure adherence to processes and procedures,N,Y,Y
+31,Create a pattern for people to follow,N,Y,N
+32,Follow directions,N,Y,N
+33,Engage people,Y,Y,N
+34,Create vision,Y,Y,N
+35,Align vision,Y,N,Y
+36,Establish coalition,Y,N,Y
+37,Energize people ,Y,N,Y
+38,Influence through carrot and stick,N,N,Y
+39,Express clear intent,N,N,Y
+40,Generate creative solutions,Y,N,Y
+41,Exercise control over people,N,N,Y
+42,Assign responsibility,N,Y,Y
+43,Have clear vision ,Y,N,Y
+44,Develop control mechanism,N,Y,Y
+45,Coach people,Y,N,Y
+46,Use given authority to direct others,N,N,Y
+47,Give order,N,N,Y
+48,Optimise resources,N,Y,Y
+49,Achieve assigned mission/task,N,N,Y
+50,Control assigned people,N,N,Y
+51,Empower subordinates,Y,N,Y
+52,Motivate people,Y,N,Y

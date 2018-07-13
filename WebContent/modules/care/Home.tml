@@ -1,0 +1,110 @@
+<html t:type="layout" 
+	title="${module.displayName}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/care/home?${project.id}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+<style>
+	
+	table.t-data-grid thead tr th, table.t-data-grid tbody tr td {
+	    text-align: center;
+	    vertical-align: middle;
+	}
+	table.t-data-grid tbody tr td.assessee {
+	    text-align: left;
+	}
+	
+	
+</style>
+
+<p:actionBtns>
+	
+	<a class="button rounded" t:type="eventlink" t:event="ExportXls" context="project.id" 
+		title="${message:export-tip}">
+		<span>${message:export-xls}</span>
+	</a>
+	|
+	<a class="button rounded" t:type="pageLink" page="modules/care/managequestionset" context="project.id" >
+		<span>${message:manage-questionset}</span>
+	</a>
+	<a class="button rounded" t:type="pageLink" page="modules/care/manage" context="project.id" >
+		<span>${message:manage-care}</span>
+	</a>
+	
+			
+</p:actionBtns>	
+
+
+
+
+<table class="actionToolBar">
+	<tr>
+		<td class="right">
+		</td>
+	</tr>
+</table>
+
+<div class="assmtContainer">
+	<table class="t-data-grid assmttbl stickyHeader"   >
+		<thead>
+			<tr>
+				<th rowspan="2" class="no">No.</th>
+				<th rowspan="2" class="assessee">Student</th>
+				<t:loop source="cares" value="care">
+					<th rowspan="2"> ${care.name} 
+					<t:if test="care.questionSet" negate="true">
+						<div >
+						<t:pagelink page="modules/care/edit" context="care.id" class="attention">
+							${message:no-questionset-yet}
+						</t:pagelink>
+						</div>
+					</t:if>
+					<div>${care.getSdateDisplay()} - ${care.getEdateDisplay()} </div>
+					
+					</th>
+				</t:loop>
+				<th rowspan="2"> Result</th>
+				
+				
+			</tr>
+			</thead>
+		<tbody>
+			<t:loop source="assessees" value="user" index="rowIndex">
+				
+				<tr>
+					<td>${getRowNum()}</td>
+					<td class="assessee" id="${user.username}">
+						${user.displayName}
+					</td>
+					<t:loop source="cares" value="care">
+						<td>
+							${loadCARESurveyUser(care, user, user)}
+							<t:if test="hasGraded()">
+								<t:pageLink page="modules/care/viewscore" context="careUser.id" >
+									${getStatus(careUser)}
+								</t:pageLink>
+							</t:if>
+						</td>
+					</t:loop>
+					
+					<td>
+						<t:pageLink page="modules/care/result" context="getParams(project.id, user.id)" >
+							Result
+						</t:pageLink>
+						
+					</td>
+					
+				</tr>
+			</t:loop>
+			
+		</tbody>
+		
+	</table>
+	
+</div>
+<script language="javascript">
+	
+</script>
+</html>

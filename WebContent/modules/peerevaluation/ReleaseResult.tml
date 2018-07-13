@@ -1,0 +1,158 @@
+<html t:type="layout" title="${message:release-result}"
+	currentModule="${moduleName}" 
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/peerevaluation/home?${project.id}
+		,${message:manage-evaluation}=modules/peerevaluation/manage?${project.id}
+		,${message:view-evaluation-average}=modules/peerevaluation/viewaverage?${eval.id}
+		,${message:release-result}=modules/peerevaluation/releaseresult"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" xmlns:p="tapestry:parameter">
+<style>
+span.ltip {
+	margin-left: 3px;
+	font-size: 10px;
+	color: #F09;	
+}
+.errMsg {
+	display:block;
+	margin:20px;
+}
+</style>  
+
+<table class="actionToolBar">
+	<tr>
+		<td class="right">
+		</td>
+	</tr>
+</table>
+
+<t:if test="canModerate(eval)">
+	<p:else>
+		<div>
+			<span class="important errMsg" >
+			${message:cannot-release-edate-not-over} 
+			</span>
+			<div class="botpage">
+				<a href="javascript:history.go(-1);" class="button welBtn"><span>${message:back}</span></a>
+			</div>
+		</div>
+	</p:else>
+		
+	<form t:type="form" t:id="form" class="e-formeditor">
+		<div class="t-beaneditor">
+			<t:errors />
+			<table>
+				<tr>
+					<td class="label">
+						${message:important}
+					</td>
+					<td>
+						<span class="important">${message:release-important-message}</span>
+					</td>
+				</tr>
+				<tr>
+					<td >
+						<t:outputraw value="getSpace()"/>
+					</td>
+					<td>
+						<t:outputraw value="getSpace()"/>
+						<t:if test="hasNotAttempt()" >
+							<div style="margin-bottom:10px;">
+								<span class=" " >
+									Students who have not submitted evaluation: 
+									<t:grid source="getNotAttemptAssessees()" 
+										row="user" 
+										model="model"
+										rowIndex="rowIndex">
+										<t:parameter name="groupCell">
+										${getGroupTypeName(eval.group, user)}
+										</t:parameter>
+										<t:parameter name="noCell">  	${getRowNum()}  </t:parameter>
+									</t:grid> 
+								</span>
+								Click <t:pageLink page="modules/peerevaluation/checkstatus" context="eval">
+								Here </t:pageLink> to check detailed status
+							</div>
+						</t:if>
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<span class="required">*</span>
+						${message:released-label}
+					</td>
+					<td>
+						<t:checkbox t:id="releaseResult"  value="eval.released" />
+						<t:label for="releaseResult">${message:release-result-text}</t:label>
+						
+					</td>
+				</tr>
+				
+				<tr>
+				<td class="label">Allow students to</td>
+				<td>
+					<t:if test="eval.useFixedPoint" negate="true">
+						<t:checkbox t:id="allowViewScoredCriteria" value="eval.allowViewScoredCriteria" />
+						<t:label for="allowViewScoredCriteria">${message:allowViewScoredCriteria-label}</t:label>
+						<span class="ltip">Click <a t:type="any" href="context:lib/ss/ViewPeerEvaluationScoredRubric.png" target="_new">here</a> to preview what the student will see.</span>
+						<br/>
+					</t:if>
+					<t:checkbox t:id="allowViewGrade" value="eval.allowViewGrade" />
+					<t:label for="allowViewGrade">${message:allowViewGrade-label}</t:label>
+					<span class="ltip">Click <a t:type="any" href="context:lib/ss/ViewPeerEvaluationGrade.png" target="_new">here</a> to preview what the student will see.</span>
+					<br/>
+					<span class="ltip">Click <a t:type="any" href="context:lib/ss/ViewPeerEvaluationGradeNScoredRubrics.png.png" target="_new">here</a> to preview what the student will see when both "${message:allowViewScoredCriteria-label}" and "${message:allowViewGrade-label}" are checked.</span>
+					<br/>
+					
+					<t:if test="canUseAllowStudentViewGradeDetail()">
+						<t:checkbox t:id="allowViewGradeDetail" value="eval.allowViewGradeDetail" onchange="onAllowViewGradeDetailChanged()"/>
+						<t:label for="allowViewGradeDetail">${message:allowViewGradeDetail-label}</t:label>
+						<span class="ltip">Click <a t:type="any" href="context:lib/ss/ViewPeerEvaluationGradeDetail.jpg" target="_new">here</a> to preview what the student will see when both "${message:allowViewGrade-label}" and "${message:allowViewGradeDetail-label}" are checked.</span>
+						
+						<br/>
+						<t:checkbox t:id="allowViewGradeDetailPeer" value="eval.allowViewGradeDetailPeer"  onchange="onAllowViewGradeDetailPeerChanged()"/>
+						<t:label for="allowViewGradeDetailPeer">${message:allowViewGradeDetailPeer-label}</t:label>
+						<span class="ltip">Click <a t:type="any" href="context:lib/ss/ViewPeerEvaluationGradeDetailNoEvaluator.jpg" target="_new">here</a> to preview what the student will see when all "${message:allowViewGrade-label}" and "${message:allowViewGradeDetailPeer-label}" are checked.</span>
+						
+					</t:if>
+					</td>
+				</tr>
+					
+		</table>
+		<t:submit t:id="bsubmit" value="${message:confirm-release}" class="submit squared"
+		 style="margin-top:20px;margin-right:10px;"
+		 onclick="return onSubmitClicked()"/>
+		 
+		<t:pagelink page="modules/peerevaluation/viewaveragemoderate" context="eval.id" class="button squared">
+			${message:back-to-moderate}</t:pagelink>
+	
+	</div>
+</form>
+		
+		
+	
+</t:if>
+
+<script>
+	function onAllowViewGradeDetailPeerChanged(){
+		if($('allowViewGradeDetailPeer').checked){
+			$('allowViewGradeDetail').checked = false;
+		}
+	}
+	function onAllowViewGradeDetailChanged(){
+		if($('allowViewGradeDetail').checked){
+			$('allowViewGradeDetailPeer').checked = false;
+		}
+	}
+	
+	function onSubmitClicked(){
+		if($('releaseResult').checked){
+			return true;
+		}
+		else{
+			alert("Please tick on the released checkbox to confirm releasing the data to students. It is compulsory for instructors to go through the students’ comments, moderate if necessary before releasing peer evaluation result to students.");
+			return false;
+		}
+	}
+</script>
+</html>

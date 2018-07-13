@@ -1,0 +1,230 @@
+<html t:type="layout" title="${message:control-panel}"
+	breadcrumb="${message:control-panel}=admin"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" xmlns:p="tapestry:parameter">
+	
+	
+	
+	
+	<table class="dashboard-container admin">
+	<tr>
+		<td class="left">
+			<div class="container-box">
+				<div class="title"><div class="box">
+					<img src="${context:lib/img/2-project.png}" alt=""/>
+					${message:project}
+					</div></div>
+				<div class="content">
+					<table border="0" cellSpacing="0" cellPadding="0" width="100%">
+						<tr>
+							<td  valign="top">
+								<ul>
+									<t:if test="privHelper.hasPrivU(curUser, privSys.getCreateProject())">
+										<li><t:pagelink page="admin/project/projectedit">${message:new-adhoc-project}</t:pagelink></li>
+									</t:if>
+									<li><t:pagelink page="admin/project/manageprojects">${message:manage-my-project}</t:pagelink></li>
+									<t:if test="privHelper.hasPrivU(curUser, privSys.getManageProject())">
+										<li><t:pagelink page="admin/project/manageadminprojects">${message:admin-manage-project}</t:pagelink></li>
+										---------
+										<li><t:pagelink page="admin/importenrollment">Import Enrollment</t:pagelink></li>
+										<li><t:pagelink page="admin/importgroup">Import Group</t:pagelink></li>
+									</t:if>
+									<t:if test="canBatchCreateProject()">
+										---------
+										<li><t:pagelink page="admin/project/batchcreateproject">${message:batch-create-project}</t:pagelink></li>
+									
+									</t:if>
+									
+								</ul>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+			
+			<t:if test="privHelper.hasPrivU(curUser, privSys.getManageOwnRubric())">
+				<div class="container-box">
+					<div class="title"><div class="box">
+						<img src="${context:lib/img/2-rubric.png}" alt=""/>
+						${message:rubric}</div></div>
+					<div class="content">
+						<ul>
+							<li><t:pagelink page="admin/rubric/home" >${message:manage-my-rubric}</t:pagelink></li>
+							<ul class="sub1">
+								<li><t:pagelink page="admin/rubric/new" context="true" >${message:add-new} ${message:rubric}</t:pagelink></li>
+							</ul>
+							<li><t:pagelink page="admin/rubric/searchshared" >${message:search-shared-rubric}</t:pagelink></li>
+							<t:if test="canManageRubric()">
+								<li><t:pagelink page="admin/rubric/manage">${message:admin-manage-rubric}</t:pagelink></li>
+							</t:if>
+							
+							<t:if test="canViewAssessmentReport()">
+								---------
+								<li><t:pagelink page="admin/report/schoolassessments">${message:assessment-report-by-school}</t:pagelink></li>
+								<li><t:pagelink page="admin/report/schoolassmttabulate">${message:assessment-tabulation-by-school}</t:pagelink></li>
+							
+							</t:if>
+							<t:if test="canViewEvaluationReport()">
+								<li><t:pagelink page="admin/report/schoolevaluations">${message:evaluation-report-by-school}</t:pagelink></li>
+								<li><t:pagelink page="admin/report/schoolevaltabulate">${message:evaluation-tabulation-by-school}</t:pagelink></li>
+							
+							</t:if>
+							
+							<t:if test="canManageRubric()">
+								---------
+								<li><t:pagelink page="admin/report/importassmt">Import Assessment to Multiple Project Sites</t:pagelink></li>
+							
+							</t:if>
+							
+							
+						</ul>
+					</div>
+				</div>
+			</t:if>
+			
+			<t:if test="showAnnouncements()">
+				<div class="container-box">
+					<div class="title"><div class="box">
+						<img src="${context:lib/img/2-announcement.png}" alt=""/>
+						${message:announcement}</div></div>
+					<div class="content">
+						<ul >
+							<t:if test="privHelper.hasPrivU(curUser, privSys.getSystemAnnouncement())">
+								<li><t:pagelink page="admin/systemannouncement/manage">${message:manage} ${message:systemannouncement} </t:pagelink></li>
+								<ul class="sub1">
+									<li><t:pagelink page="admin/systemannouncement/edit" context="literal:0">${message:add-new} ${message:systemannouncement} </t:pagelink></li>
+								</ul>
+							</t:if>
+							<t:if test="privHelper.hasPrivU(curUser, privSys.getProjSchoolAnnouncement())">
+								<li><t:pagelink page="admin/schltypeannouncement/manageschannmt">${message:manage} ${message:schoolannouncement} </t:pagelink></li>
+								<ul class="sub1">
+									<li><t:pagelink page="admin/schltypeannouncement/editschannmt" context="literal:0">${message:add-new} ${message:schoolannouncement} </t:pagelink></li>
+								</ul>
+							</t:if>
+							<t:if test="privHelper.hasPrivU(curUser, privSys.getProjTypeAnnouncement())">
+								<li><t:pagelink page="admin/schltypeannouncement/managetypeannmt">${message:manage} ${message:typeannouncement} </t:pagelink></li>
+								<ul class="sub1">
+									<li><t:pagelink page="admin/schltypeannouncement/edittypeannmt" context="literal:0">${message:add-new} ${message:typeannouncement} </t:pagelink></li>
+								</ul>
+							</t:if>
+						</ul>
+					</div>
+				</div>
+			</t:if>
+			<div class="container-box">
+				<div class="title"><div class="box">
+					<img src="${context:lib/img/2-statistics.png}" alt=""/>
+					Statistics</div></div>
+				<div class="content">
+					<ul>
+					  <t:if test="privHelper.hasPrivU(curUser, privSys.getManageProject())">	
+							<li><t:pagelink page="admin/project/allprojectsstat" context="strYear">Projects Statistics</t:pagelink></li>
+				  		</t:if>
+				  		<t:if test="canViewAssessmentReport()">	
+							<li><t:pagelink page="admin/report/analyticreport" >Page View Analytic</t:pagelink></li>
+						</t:if>
+					
+					</ul>
+				</div>
+			</div>
+		</td>
+		<td class="mid" >
+			<div style="min-height: 290px;height:auto!important;_height:290px; ">
+				<t:outputraw value="getSpace()"/>
+			</div>
+		</td>
+
+		<td class="right">
+			<div class="container-box">
+				<div class="title"><div class="box">
+					<img src="${context:lib/img/2-user.png}" alt=""/>
+					${message:user}</div></div>
+				<div class="content">
+					<ul>
+						<li>
+							<t:pagelink page="user/list">${message:list-user}</t:pagelink>
+						</li>
+						<li>
+							<t:pagelink page="user/viewyourinfo">${message:your-info}</t:pagelink>
+						</li>
+						<t:if test="privHelper.hasPrivU(curUser, privSys.getManageUser())">
+							<li><t:pagelink page="admin/User">${message:admin-manage-user}</t:pagelink></li>
+						</t:if>
+					</ul>
+				</div>
+			</div>
+			
+			
+			<t:if test="showSystemTools()">
+				<div class="container-box" >
+					<div class="title"><div class="box">
+						<img src="${context:lib/img/2-systemTools.png}" alt=""/>
+						${message:system-tools}</div></div>
+					<div class="content">
+						<ul>
+							<t:if test="privHelper.hasPrivU(curUser, privSys.getManageEmailTemplate())">
+								<li><t:pagelink page="admin/emailtemplate">${message:manage} ${message:email-template}</t:pagelink></li>
+							</t:if>
+							
+							<t:if test="privHelper.hasPrivU(curUser, privSys.getManageSystemRole())">
+								<li>
+									<t:pagelink page="admin/sysrole">${message:manage} ${message:sysrole}</t:pagelink>
+									<ul class="sub1">
+										<li><t:pagelink page="admin/sysrole/privilege">${message:sysrole-privilege}</t:pagelink></li>
+									</ul>
+								</li>
+							</t:if>
+							<t:if test="privHelper.hasPrivU(curUser, privSys.getManageProjRole())">
+								<li>
+							 		<t:pagelink page="admin/projrole/manage">${message:manage} ${message:projrole}</t:pagelink>
+							 		<ul class="sub1">
+										<li><t:pagelink page="admin/projrole/privilege">${message:projrole-privilege}</t:pagelink></li>
+									</ul>
+							 	</li>
+							 </t:if>
+							 <t:if test="privHelper.hasPrivU(curUser, privSys.getManageProjType())">
+								<li><t:pagelink page="admin/projtype/manage">${message:manage} ${message:projtype}</t:pagelink></li>
+							</t:if> 	
+							
+							<t:if test="privHelper.hasPrivU(curUser, privSys.getManageSystemData())">
+							 	<li><t:pagelink page="admin/School">${message:manage} ${message:school}</t:pagelink></li>
+							 	<li>
+									<t:pagelink page="admin/privilege">${message:manage} ${message:privilege}</t:pagelink>
+								</li>
+							 	<li><t:pagelink page="admin/projstatus/manage">${message:manage} ${message:projstatus}</t:pagelink></li>
+								<li><t:pagelink page="admin/module/manage">${message:manage} ${message:module}</t:pagelink></li>
+		<!-- 						<li><t:pagelink page="admin/config">${message:configuration}</t:pagelink></li>
+		-->
+							</t:if>
+							
+		<!-- 						<li><t:pagelink page="admin/backuprestore/MigrateBaseData">${message:migrate-base-data}</t:pagelink></li>
+	  					 				<li><t:pagelink page="admin/backuprestore/migrateproject">${message:migrate-project}</t:pagelink></li>
+		
+								<li><t:pagelink page="admin/backuprestore">${message:backup-restore} ${message:project}</t:pagelink></li>
+		-->	
+	 
+	  					</ul>
+					</div>
+				</div>
+			</t:if>
+
+		<div class="container-box">
+				<div class="title"><div class="box">
+					<img src="${context:lib/img/i1_Resource.png}" alt=""/>User Manual</div></div>
+				<div class="content">
+					<ul>
+						<li><a href="http://www.ntu.edu.sg/cits/lsa/eureka/for-faculty/Pages/User-Guides.aspx">User guides for faculty</a></li>
+						<li><a href="http://www.ntu.edu.sg/cits/lsa/eureka/for-students/Pages/User-Guides.aspx">User guides for students</a></li>
+						<t:if test="privHelper.hasPrivU(curUser, privSys.getManageProject())">
+							<li><t:pagelink page="admin/pageinstruction">Instruction to edit grouping, Delete evaluation grades</t:pagelink></li>
+						</t:if>
+									
+					</ul>
+				</div>
+			</div>
+			
+		<t:outputraw value="getSpace()"/>
+		</td>
+	</tr>
+	</table>
+	<div style="text-align:right; padding-right:10px;color:#999;">v ${getBuildNumber()}</div>
+</html>

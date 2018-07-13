@@ -1,0 +1,106 @@
+<html t:type="layout" 
+	title="${message:edit} ${message:questionset}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/lcdp/home?${project.id}
+		,${message:manage-lcdp}=modules/lcdp/manage?${project.id}
+		,${message:manage-questionset}=modules/lcdp/managequestionset?${project.id}
+		,${message:edit} ${message:questionset}=modules/lcdp/questionsetnew?${project.id}
+		"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+<style>
+.rubricDetailZone table tr td{
+	text-align: center;
+}
+</style>
+
+	<p:legendBlk>
+		<span class="required">*</span>  ${message:required-fields}
+	</p:legendBlk>
+
+	<form t:type="form" t:id="form" class="e-formeditor">
+		<t:errors />
+		<div class="t-beaneditor">
+		<table >
+			<tr>
+				<td class="label" ><t:label for="name" ><span class="required">*</span>  ${message:name-label}</t:label></td>
+				<td><t:textfield t:id="name" value="qset.name"  class="lwidth"  validate="required"/></td>
+			</tr>
+			<tr>
+				<td class="label"><t:label for="des" /></td>
+				<td><textarea t:type="textarea" t:id="des" value="qset.des" cols="50" rows="5" class="lwidth"/></td>
+			</tr>
+			
+			
+			<tr>
+				<td class="label"> Questions</td>
+				<td>
+					<div>
+					<t:label for="numQuestion" >Number of Question : </t:label>
+					<t:textfield t:id="numQuestion" style="width:50px;"
+						onChange="numFieldChanged()" onKeyup="numFieldChanged()"
+						validate="required,min=1,max=300" value="numQuestion" />
+						<t:submit value="${message:update}" t:id="updateNumFields"
+										class="squared disabled" />
+					</div>
+					<div class="rubricDetailZone view ">
+							<table class="stickyHeader">
+								<thead>
+								<tr>
+									<th >No</th>
+									<th >Question</th>
+									<th >Leadership?</th>
+									<th >Management?</th>
+									<th >Command?</th>
+								</tr>
+								</thead>
+								<tbody>
+								<t:loop source="qset.questions" value="que" index="rowIndex">
+									<tr>
+										<td>
+											<t:textfield t:id="num" value="que.number"  class="swidth"  />
+										</td>
+										<td>
+											<textarea t:type="textarea" t:id="ques" value="que.des" cols="50" rows="2" />
+										</td>
+										<td>
+											<t:checkbox t:id="dimLeadership" value="que.dimLeadership" />
+										</td>
+										<td>
+											<t:checkbox t:id="dimManagement" value="que.dimManagement" />
+										</td>
+										<td>
+											<t:checkbox t:id="dimCommand" value="que.dimCommand" />
+										</td>
+									</tr>
+									
+									<p:empty>
+										<tr ><td colspan="6">${message:no-question-defined}</td></tr>
+									</p:empty>
+								</t:loop>
+								</tbody>
+							</table>
+						</div>
+				</td>
+			</tr>
+			
+		</table>
+				
+				
+		
+		
+		
+		<t:submit t:id="bsubmit" value="${message:save}" class="submit squared" 
+			style="margin-top:10px;"
+			/>
+		</div>
+	</form>
+
+<script>
+	function numFieldChanged(){
+			$('updateNumFields').removeClassName('disabled');
+		}
+	</script>
+</html>

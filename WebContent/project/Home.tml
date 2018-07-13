@@ -1,0 +1,524 @@
+<html t:type="layout" 
+	title="${message:project-info}" 
+	currentModule="prop:moduleName" 
+	currentProj="project" 
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" 
+	xmlns:p="tapestry:parameter">
+    
+    <p:actionBtns>
+    	<t:if test="canEditProject(project)">
+    		<a class="button rounded" t:type="pageLink" page="project/edit" context="project.id" >
+				<span>${message:edit} ${message:project}</span>
+			</a>
+		</t:if>
+		<t:if test="canEnrollOrgSupervisor(project)">
+			<a class="button rounded" t:type="pageLink" page="project/enrollOrgSupervisor" context="project.id" >
+				<span>${message:enroll-org-supervisor}</span>
+			</a>
+		</t:if>
+		<t:if test="canEnrollMember(project)">
+			<a class="button rounded" t:type="pageLink" page="project/manageMember" context="project.id" >
+				<span>${message:manage-membership}</span>
+			</a>
+		</t:if>
+		<t:if test="canAssignModule(project)">
+			<a class="button rounded" t:type="pageLink" page="project/manageModule" context="project.id" >
+				<span>${message:manage-project-modules}</span>
+			</a>
+		</t:if>
+		<t:if test="canManageGroup(project)">
+			<a class="button rounded" t:type="pageLink" page="modules/group" context="project.id" >
+				<span>${message:manage-group}</span>
+			</a>
+		</t:if>
+		<t:if test="canSelfEnroll(project)">
+			<t:if test="hasSelfEnrollGroups(project)">
+				<a class="button rounded" t:type="pageLink" page="modules/group/selfselectset" context="project.id" >
+					<span>Enroll into group</span>
+				</a>
+			</t:if>
+		</t:if>
+		
+		
+    </p:actionBtns>
+    <table class="dashboard-container">
+			<tr>
+				<td class="left">
+					<div class="container-box">
+						<div class="title"><div class="box">
+			       		<span class="altColor" >
+			       			 ${project.name}
+			       		</span>
+				 		</div></div>
+			       	<div class="content">
+			    			<div>
+			    				<span class="date">${project.sdatedisplay} - ${project.edatedisplay}</span>
+			    				
+			    				<t:if test="project.courseCode"> 
+					       		<div><span >${message:courseCode-label}: <em>${project.courseCode}</em></span></div> 
+					       	</t:if> 
+			    				<t:if test="project.isActive()" negate="true"> 
+			    					<div>${message:status-label} : <span class="attention" >${project.status.displayname}</span></div>
+			    				</t:if>
+			    				<t:if test="project.attachedFiles" > 
+			    					<div>
+			    						${message:attachment-label} : 
+			    						<t:loop source="project.attachedFiles" value="tempAttFile">
+											<span >
+												<t:eventLink t:event="retrieveAttachment" context="tempAttFile.id"  title="${message:click-to-download}">
+													<img src="${context:lib/img/icon-attachment.gif}"/> 
+													${tempAttFile.displayName}
+												</t:eventLink>
+											</span>
+										</t:loop>
+			    					</div>
+			    				</t:if>
+			    				<div class="desc">
+			    					<t:outputraw value="${project.description}" />
+			    				</div>
+			    			</div>
+			    			<t:if test="hasSettingProjScope(project)">
+			    				<div style="margin-top:5px;" class="projScopeRequisiteBLK" onmouseover="$('pscopeActionBtnSpan').show()" onmouseout="$('pscopeActionBtnSpan').hide();">
+				    				<div >
+					    				<div>
+					    					<span class='title'>${message:project-scope}</span>
+					    				</div>
+					    				<div >
+			    							<div class="content">
+			    								<t:outputraw value="getProjExtraInfo().scopeDisplay"/>
+			    							</div>
+					    				</div>
+					    			</div>
+					    			<div>
+					    				<div>
+					    					<span class='title'>${message:project-prerequisite}</span>
+					    				</div>
+					    				<div >
+			    							<div class="content">
+			    								<t:outputraw value="getProjExtraInfo().prerequisiteDisplay"/>
+			    							</div>
+					    				</div>
+					    			</div>
+				    			
+					    			<div style="text-align:right; height:18px;" >
+					    				<t:outputraw value="getSpace()"/>
+					    				<t:if test="getProjExtraInfo().isPending()">
+							    			<span class="small">${message:changes-pending-approval}</span>
+					    					<t:if test="canApprovedScope(project)">
+							    				<span style="padding-left:5px;">
+							    					<t:pagelink page="project/scopeapprove" context="getProjExtraInfo().id" class="button rounded">
+							    						<span>${message:view-approve}</span>
+							    					</t:pagelink>
+							    				</span>
+						    				</t:if>
+						    				
+							    			<p:else>
+								    			<span id="pscopeActionBtnSpan">
+									    			<t:if test="canUpdateScope(project)">
+										    			<t:pagelink page="project/scopeedit" context="project.id" class="button rounded">
+										    				<span>${message:edit-scope-n-prerequisite}</span>
+										    			</t:pagelink>
+										    		</t:if>
+							    					<t:if test="canApprovedScope(project)">
+							    						<t:if test="hasProjExtrInfo(project)">
+										    				<t:pagelink page="project/scopeview" context="getProjExtraInfo().id" >
+										    					<span>${message:view-scope-prerequisite-change-log}</span>
+										    				</t:pagelink>
+									    				</t:if>
+								    				</t:if>
+							    				</span>
+								   		</p:else>
+								   			
+							    		</t:if>
+			    					</div>
+		    					</div>
+			    			</t:if>
+	    				</div>
+	    			</div>
+	    			
+	    			<t:if test="annmtModule">
+		    			<div class="container-box">
+				       	<div class="title"><div class="box">
+				       		<a t:type="pageLink" page="modules/announcement" context="project.id" >
+					 				<div>
+						 				<img src="${getContextPath()}/lib/img/16/m_Announcement.png" />
+						 				${annmtModule.displayName}
+					 				</div>
+					 			</a>
+					 		</div></div>
+				       	<div class="content">
+				       		<t:loop source="getSchlTypeAnnmts()" value="schlTypeAnnmt">
+			       				<div style="margin-bottom:5px;">
+			       					<t:if test="schlTypeAnnmt.urgent"><img src="${context:lib/img/icon_urgent.png}"  alt="urgent" title="${message:annmt-urgent-tip}" /> - </t:if>
+			       					<span class="date">
+			       						<t:if test="schlTypeAnnmt.sdate">
+			       							${schlTypeAnnmt.sdateDisplay}
+			       							<p:else>
+			       								${formatDateTime(schlTypeAnnmt.mdate)}
+			       							</p:else>
+			       						</t:if>
+			       					</span> -
+			       					<t:pageLink page="modules/announcement/schltypeannmtview" context="getParams(project.id, schlTypeAnnmt.id)">
+			       						${schlTypeAnnmt.subject}
+			       					</t:pageLink>
+			       					- 
+			       					<span class="author">
+			       						${message:admin}
+			       					</span>
+			       				</div>
+			       			</t:loop>
+				       	
+				       	
+			       			<t:loop source="getAnnmts()" value="annmt">
+			       				<div >
+			       					<t:if test="annmt.urgent"><img src="${context:lib/img/icon_urgent.png}"  alt="urgent" title="${message:annmt-urgent-tip}" /> - </t:if>
+			       					<span class="date">${annmt.startDateDisplay}</span> -
+			       					<t:pageLink page="modules/announcement/view" context="annmt.id">
+			       						${annmt.subject}
+			       					</t:pageLink> -
+			       					<span class="author">
+			       						<t:pagelink page="user/view" context="annmt.creator.id">${annmt.creator.displayName}</t:pagelink>
+			       					</span>
+			       				</div>
+			       			</t:loop>
+				       		
+				       		<t:if test="hasAnnmts()" negate="true">
+				       			<div class="notfoundtext">${message:no-announcement}</div>
+				       		</t:if>
+				       	</div>
+				      </div>
+			      </t:if>
+	    			
+	    			<t:if test="resourceModule">
+	    				<div class="container-box">
+				       	<div class="title"><div class="box">
+				       		<a t:type="pageLink" page="modules/resources/home" context="project.id" >
+					 				<img src="${getContextPath()}/lib/img/16/m_Resource.png" />
+					 				${getModuleDisplayName(project, resourceModule)}
+					 				</a>
+					 			</div></div>
+				       	<div class="content">
+				       		<t:if test="getResourceTreeNodes()">
+						    		<t:Tree treeid="literal:rsrcTree" source="getResourceTreeNodes()" currentNode="treeNode">
+							        
+								        <t:pagelink page="modules/resources/home" context="getParams(projId, treeNode.identifier)" 
+								        		title="${treeNode.des}">
+								        		${truncateStringShort(treeNode.name)} 
+								        	</t:pagelink>
+								        	<span class="tips"> (${countResourcesByFolder(treeNode.getIdentifier())})</span>
+							        	
+							      </t:Tree>
+							      <p:else>
+							      	<div class="notfoundtext">${message:no-resource}</div>
+							      </p:else>
+						      </t:if>
+				       	</div>
+				      </div>
+	    			</t:if>
+	    			
+	    			<t:if test="blogModule">
+	    				<div class="container-box">
+				       	<div class="title"><div class="box">
+				       		<a t:type="pageLink" page="modules/blog/home" context="project.id" >
+				       			<img src="${getContextPath()}/lib/img/16/m_Blog.png" />
+				       			${blogModule.displayName}
+				       		</a>
+				       	</div></div>
+				       	<div class="content">
+				       		<div style="margin-bottom: 5px;">
+					       		${message:blogs} = ${totalBlog}
+					       		, ${message:comments} = ${totalBlogComment}
+				       		</div>
+				       		
+			       			<t:loop source="getBlogs()" value="blog">
+			       				<div >
+			       					<span class="date">${blog.MDateDisplay}</span> - 
+			       					<t:pageLink page="modules/blog/view" context="blog.id">
+			       						${blog.subject}
+			       					</t:pageLink>
+			       					- 
+			       					<span class="author">
+												<t:pagelink page="user/view" context="blog.author.id">${blog.author.displayname}</t:pagelink>
+										</span>
+			       				</div>
+			       				<p:empty>
+			       					<div class="notfoundtext">${message:no-blog}</div>
+			       				</p:empty>
+			       			</t:loop>
+				       	</div>
+				      </div>
+	    			</t:if>
+	    			
+				</td>
+				<td class="mid" >
+					<div style="min-height: 290px;height:auto!important;_height:290px; ">
+						<t:outputraw value="getSpace()"/>
+					</div>
+				</td>
+				
+				<td class="right">
+				
+					<div class="memberBlk">
+						<div class="container-box">
+							<div class="title"><div class="box">
+				       		<span class="altColor" >
+				       			<img src="${getContextPath()}/lib/img/16/user.png" />
+				       			${message:team-members}
+				       		</span>
+						 	</div></div>
+				       	<div class="content">
+			    				<table class="data-grid2 projMemBlk" width="100%">
+			    					<thead><tr>
+			    						<th>${message:No-label}</th>
+			    						<th>${message:role-label}</th>
+			    						<th>${message:name-label}</th>
+			    						<th>${message:email-label}</th>
+			    						<th>${message:contactNum-label}</th>
+			    					</tr>
+			    					</thead>
+			    					<tbody>
+				    					<t:loop source="projRoles" value="projRole" >
+								       	<t:if test="project.hasMembersByRole(projRole)">
+									       	<t:loop source="project.getProjUsersByRole(projRole)" value="pUser" >
+									       		<tr class="userRow ${getOverListUserClass()}">
+							    						<td>${getNo()}</td>
+							    						<td>${pUser.getDisplayRoleName()}</td>
+							    						<td><t:pagelink page="user/view" class="userlink" context="pUser.user.id">${pUser.user.displayName}</t:pagelink></td>
+							    						<td>${pUser.user.email}</td>
+							    						<td>${pUser.user.displayContactNo}</td>
+							    					</tr>
+									       	</t:loop>
+								       	</t:if>
+							       	</t:loop>
+			    					</tbody>
+			    					
+			    					<tfoot>
+			    						<tr>
+			    							<td colspan="3" style="text-align:left;">
+			    								<t:if test="hasOverListUser()">
+							       				<div class="moreUserBtn">
+							       					...
+							       					(<a href="#" onclick="moreUserClicked(this); return false;">
+							       						${getNumMoreText()}
+							       					</a>)
+							       				</div>
+							       			</t:if>
+			    							</td>
+			    							<td colspan="2" style="text-align:right;">
+				    							<t:if test="project.isReference()" negate="true">
+					    							<t:if test="getMessageModule()" >
+					    								<a class="button rounded" t:type="pageLink" page="modules/message/new" context="project.id" >
+									 						<span>${message:email-members}</span>
+									 					</a>
+									 					<p:else>
+									 						<t:if negate="true" test="hasSettingHideMemberList(project)">
+									 							
+									 						
+										 						<a class="button rounded" href="mailto:${getEmailsAsString()}" >
+										 							<span>${message:email-members}</span>
+										 						</a>
+									 						</t:if>
+									 					</p:else>
+					    							</t:if>
+				    							</t:if>
+			    							</td>
+			    						</tr>
+			    					</tfoot>
+			    				</table>
+				    		</div>
+				    	</div>
+	    			</div>
+	    			
+	    			<t:if test="budgetModule">
+		    			<div class="container-box">
+				       	<div class="title"><div class="box">
+				       		<a t:type="pageLink" page="modules/budget" context="project.id" >
+					 				<img src="${getContextPath()}/lib/img/16/m_Budget.png" />
+					 				${budgetModule.displayName}
+					 			</a>
+					 		</div></div>
+				       	<div class="content">
+			       			<table>
+			       				<tr>
+			       					<td>${message:inflow} (${countInflow})</td>
+			       					<td>= ${totalInflow}</td>
+			       					<td><t:if test="hasInflowPending()">(${totalInflowPending} ${message:pending})</t:if></td>
+			       				</tr>
+			       				<tr>
+			       					<td>${message:outflow} (${countOutflow})</td>
+			       					<td>= ${totalOutflow}</td>
+			       					<td><t:if test="hasOutflowPending()">(${totalOutflowPending} ${message:pending})</t:if></td>
+			       				</tr>
+			       				<tr >
+			       					<td>${message:balance}</td>
+			       					<td>= <strong>${currentBalance}</strong></td>
+			       					<td></td>
+			       				</tr>
+			       			</table>
+				       	</div>
+				      </div>
+			      </t:if>
+	    			
+	    			
+	    			<t:if test="elogModule">
+	    				<div class="container-box">
+				       	<div class="title"><div class="box">
+				       		<a t:type="pageLink" page="modules/elog/home" context="project.id" >
+				       			<img src="${getContextPath()}/lib/img/16/m_eLog.png" />
+				       			${elogModule.displayName}
+				       		</a>
+				       	</div></div>
+				       	<div class="content">
+				       		<div style="margin-bottom: 5px;">
+					       		${message:elogs} = ${totalElog}
+					       		, ${message:comments} = ${totalElogComment}
+					       		, ${message:pending-approval} =  ${getCountPendingElog()}
+				       		</div>
+				       		
+			       			<t:loop source="getElogs()" value="elog">
+			       				<div >
+			       					<span class="date">${elog.mdateDisplay}</span> - 
+			       					<t:pageLink page="modules/elog/view" context="elog.id">
+			       						${elog.subject}
+			       					</t:pageLink>
+			       					<t:if test="isElogPublish(elog)" negate="true">
+											- <span class="status attention">${elog.status}</span>
+										</t:if>
+			       					- 
+			       					<span class="author">
+												<t:pagelink page="user/view" context="elog.author.id">${elog.author.displayname}</t:pagelink>
+										</span>
+			       				</div>
+			       				<p:empty>
+			       					<div class="notfoundtext">${message:no-elog}</div>
+			       				</p:empty>
+			       			</t:loop>
+				       	</div>
+				      </div>
+	    			</t:if>
+	    			
+	    			<t:if test="forumModule">
+	    				<div class="container-box">
+				       	<div class="title"><div class="box">
+				       		<a t:type="pageLink" page="modules/forum" context="project.id" >
+				       			<img src="${getContextPath()}/lib/img/16/m_Forum.png" />
+					 				${getModuleDisplayName(project, forumModule)}
+					 			</a>
+					 		</div></div>
+				       	<div class="content">
+				       		<div style="margin-bottom: 5px;">
+					       		${message:forums} = ${totalForum}
+					       		, ${message:threads} = ${totalRootThread}
+					       		, ${message:replies} = ${totalThreadReply}
+					       		, ${message:reflections} = ${totalThreadReflection}
+				       		</div>
+				       		
+				       		<div class='altColor'>${message:latest-threads}:</div>
+			       			<t:loop source="getThreads()" value="thrd">
+			       				<div >
+			       					<span class="date">${thrd.ModifyDateDisplay}</span> - 
+			       					<t:pageLink page="modules/forum/threadView" context="thrd.id">
+			       						${thrd.name}
+			       					</t:pageLink>
+			       					- 
+			       					<span class="author">
+											<t:if test="thrd.anonymous">
+												${thrd.authordisplayname}
+												<p:else><t:pagelink page="user/view" context="thrd.author.id">${thrd.authordisplayname}</t:pagelink></p:else>
+											</t:if>
+										</span>
+			       				</div>
+			       				<p:empty>
+			       					<div class="notfoundtext">${getNoThreadMessage()}</div>
+			       				</p:empty>
+			       			</t:loop>
+			       			<div class='altColor'>${message:latest-replies}:</div>
+			       			<t:loop source="getThreadRs()" value="thrdR">
+			       				<div >
+			       					<span class="date">${thrdR.ModifyDateDisplay}</span> - 
+			       					<t:pageLink page="modules/forum/threadView" context="thrdR.thread.id" anchor="thR${thrdR.id}">
+			       						${thrdR.name}
+			       					</t:pageLink>
+			       					- 
+			       					<span class="author">
+											<t:if test="thrdR.anonymous">
+												${thrdR.authordisplayname}
+												<p:else><t:pagelink page="user/view" context="thrdR.author.id">${thrdR.authordisplayname}</t:pagelink></p:else>
+											</t:if>
+										</span>
+			       				</div>
+			       				<p:empty>
+			       					<div class="notfoundtext">${getNoThreadReplyMessage()}</div>
+			       				</p:empty>
+			       			</t:loop>
+				       	</div>
+				      </div>
+	    			</t:if>
+	    			
+	    			
+				</td>
+			</tr>
+		</table>
+    
+    	<table class="dashboard-container">
+    	<tr>
+    		<td class="bot">
+    			
+    			<t:if test="schedulingModule">
+    				<div class="container-box">
+			       	<div class="title"><div class="box">
+			       		<a t:type="pageLink" page="modules/scheduling" context="project.id" >
+			       			<img src="${getContextPath()}/lib/img/16/m_Scheduling.png" />
+				 				${schedulingModule.displayName}
+				 			</a>
+				 		</div></div>
+			       	<div class="content">
+			       		
+			       		<t:outputraw value="getSchedulingOutput()"/>
+			       		
+			       		<div class="moreBtn">
+			       			<a class="button rounded" t:type="pageLink" page="modules/scheduling" context="project.id" >
+				 					<span>${message:view-gantt-chart} </span>
+				 				</a>
+			       		</div>
+			       	</div>
+			      </div>
+    			</t:if>
+    		</td>
+    	</tr>
+    
+    
+    </table>
+    
+<script>
+  document.observe("dom:loaded", function(){
+  		if($('pscopeActionBtnSpan'))
+  			$('pscopeActionBtnSpan').hide();
+  		if($$('.oUser')){
+  			$$('.oUser').invoke('hide');
+  		}
+  		initTree('${context:modules/resources/img}/');
+  		
+  });
+	
+	function initTree(imgFolder){
+	   treeObj = new JSDragDropTree();
+	   treeObj.setTreeId("rsrcTree");
+	   treeObj.setImageFolder(imgFolder);
+	   treeObj.setRenameAllowed(false);
+	   treeObj.setDeleteAllowed(false);
+	   treeObj.initTree();
+	   treeObj.expandAll();
+   }
+	function moreUserClicked(elm){
+		var elmId = Element.identify(elm);
+		$$('.oUser').each(function(elmt){
+			showElm(elmt.identify());
+		});
+		$(elmId).up('.moreUserBtn').hide();
+	}
+	
+</script>
+
+</html>

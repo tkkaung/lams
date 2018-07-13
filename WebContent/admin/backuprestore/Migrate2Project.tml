@@ -1,0 +1,120 @@
+<html t:type="layout" 
+	title="message:migrate-project2"
+   breadcrumb="${message:control-panel}=admin
+   ,${message:migrate-project2}=admin/backuprestore/migrate2project"
+   xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="project"/></p:leftMenuBlk>
+<style>
+#projForm div{
+	padding: 5px;
+}
+</style>
+<table class="actionToolBar">
+	<tr>
+		<td class="right">
+		</td>
+	</tr>
+</table>
+
+	
+    <form t:type="form" t:id="projForm">
+   	 <t:errors/>
+		<div>
+			projID in Source database 
+			<span class="required">*</span>
+			: 
+			<t:textfield t:id="projIdToMigrateFrom" value="projIdToMigrateFrom" validate="required"/>
+		</div>
+		<div>
+			projID in Destination database :
+			<t:textfield t:id="projIdToMigrateTo" value="projIdToMigrateTo" />
+			(leave blank to create new project)
+		</div>
+		<div>
+			==&gt; 
+			<t:submit t:id="getInfo" value="Get Project Info" class="squared"/>
+		</div>
+		<div>
+			==&gt; 
+			<t:submit t:id="go" value="Start Migrate" class="squared"/>
+		</div>
+	</form>
+			
+		
+		<table style="width:100%; margin-top:20px;">
+			<tr>
+				<td style="width:49%;vertical-align:top;">
+					<div>
+						<strong>Source Project:</strong>
+						<t:if test="projFrom"> 
+							<div>
+								<t:beandisplay object="projFrom" />
+								<div>members: ${projFrom.members.size()}</div>
+								<div>projmodules: ${projFrom.projmodules.size()}</div>
+								<div>attachedFiles: ${projFrom.attachedFiles.size()}</div>
+								<div>projCAOExtraInfos: ${projFrom.projCAOExtraInfos.size()}</div>
+								<div>projFYPExtraInfos: ${projFrom.projFYPExtraInfos.size()}</div>
+								<div>announcements: ${projFrom.announcements.size()}</div>
+								<div>forums: ${projFrom.forums.size()}</div>
+								<div>schedules: ${projFrom.schedules.size()}</div>
+								<div>budgets: ${projFrom.budgets.size()}</div>
+								<div>messages: ${projFrom.messages.size()}</div>
+								<div>backupEntrys: ${projFrom.backupEntrys.size()}</div>
+								<div>logEntrys: ${projFrom.logEntrys.size()}</div>
+								<div>elogs: ${projFrom.elogs.size()}</div>
+								<div>assessments: ${projFrom.assessments.size()}</div>
+								<div>resources: ${projFrom.resources.size()}</div>
+								<div>blogs: ${projFrom.blogs.size()}</div>
+							</div>
+						</t:if>
+				</div>
+				
+				</td>
+				<td style="width:49%;vertical-align:top;">
+					<div>
+						<strong>Destination Project:</strong>
+						<t:if test="projTo"> 
+							<p:else>
+								<div style="padding:5px;">... Will create a new project ...</div>
+							</p:else>
+							
+							<div>
+								<t:beandisplay object="projTo" />
+								<div>members: ${projTo.members.size()}</div>
+								<div>projmodules: ${projTo.projmodules.size()}</div>
+								<div>attachedFiles: ${projTo.attachedFiles.size()}</div>
+								<div>projCAOExtraInfos: ${projTo.projCAOExtraInfos.size()}</div>
+								<div>projFYPExtraInfos: ${projTo.projFYPExtraInfos.size()}</div>
+								<div>announcements: ${projTo.announcements.size()}</div>
+								<div>forums: ${projTo.forums.size()}</div>
+								<div>schedules: ${projTo.schedules.size()}</div>
+								<div>budgets: ${projTo.budgets.size()}</div>
+								<div>messages: ${projTo.messages.size()}</div>
+								<div>backupEntrys: ${projTo.backupEntrys.size()}</div>
+								<div>logEntrys: ${projTo.logEntrys.size()}</div>
+								<div>elogs: ${projTo.elogs.size()}</div>
+								<div>assessments: ${projTo.assessments.size()}</div>
+								<div>resources: ${projTo.resources.size()}</div>
+								<div>blogs: ${projTo.blogs.size()}</div>
+							</div>
+						</t:if>
+				</div>
+				
+				</td>
+			</tr>
+		</table>
+		
+		
+		
+
+
+<div style="margin-top:30px;">
+NOTE: assume ProjStatus, ProjRole, ProjType, SysRole already exist
+<br/> Assessment 'graded data' (AssessmentUser.java) doesn't get cloned, some ID conflict issue. 
+Develop may want to fix this later
+</div>
+	<div id="msgDiv"></div>
+	
+	
+</html>

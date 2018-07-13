@@ -1,0 +1,132 @@
+<html t:type="layout" 
+		title="${message:manage-membership}"
+		currentModule="prop:moduleName"
+		currentProj="curProj" 
+		breadcrumb="${curProj.encodeddisplayname}=project/home?${curProj.id}
+			,${message:manage-membership}=project/managemember?${curProj.id}"
+		xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" 
+      xmlns:p="tapestry:parameter">
+   
+	<p:legendBlk>
+		<div class="legend">
+    	 	<div class="title">${message:note}:</div>
+	    	- ${message:managemembership-note1}
+	    </div>
+	</p:legendBlk>
+   
+   <p:actionBtns>
+    	<t:if test="canAssignModule(curProj)">
+			<a class="button rounded" t:type="pageLink" page="project/manageModule" context="curProj.id" >
+				<span>${message:manage-project-modules}</span>
+			</a>
+		</t:if>
+    </p:actionBtns>
+   
+	<table class="actionToolBar">
+		<tr>
+			<td class="right">
+			</td>
+		</tr>
+	</table>
+	
+ 	<form t:type="form" t:id="searchForm">
+		${message:search} ${message:user}: 
+		<t:textfield value="searchText" class="swidth"/>
+		${message:in} <t:select t:id="searchIn" value="searchIn" blankLabel="message:-all-"/>
+		<t:submit value="${message:go}" class="squared"/>
+	</form>
+			
+	<form t:type="form" t:id="assignForm">
+		<t:errors />
+		<table class="nomargin">
+		<tr>
+			<td valign="top" class="assign-half">
+			<div >
+				<div class="table-data-grid-header">${message:searchResult}</div>
+				<t:grid source="resultUsers" row="user"
+					add="chkBox"
+					include="username,displayName,email"
+					reorder="chkBox,username,displayName,email"
+					pagerPosition="bottom"
+					id="userGrid"
+					>
+					<p:chkBoxHeader>
+						<input type="checkBox" id="chkBoxAll" value="1" onclick="chkboxAll('userGrid','chkBoxAll')" />
+					</p:chkBoxHeader>
+					<p:chkBoxCell><input type="checkBox" name="chkBox" value="${user.id}" onclick="chkbox('userGrid','chkBoxAll')"/></p:chkBoxCell>
+					<p:displayNameCell>
+						<t:pagelink page="user/view" context="user.id">${user.displayName}</t:pagelink>
+					</p:displayNameCell>
+						
+					<p:empty>
+						<div class="notfoundtext">
+							<t:if test="searchText">
+								${message:search-no-result}
+								<p:else>
+									${message:search-user-to-enroll}
+								</p:else>
+							</t:if>
+						</div>
+					</p:empty>
+				</t:grid>
+			</div>
+			</td>
+			<td style="text-align:center;">
+				<t:select t:id="projRole" value="projRole" model="projRoleModel" validate="required"/>
+				<br/>
+				<t:submit value="${message:enroll} &gt;&gt;" t:id="assign" class="squared asgnbtn" />
+				<br/><br/><t:submit value="&lt;&lt; ${message:unenroll}" t:id="unassign" class="squared asgnbtn"/>
+				<br/><br/>
+				<div>
+					<input t:type="checkbox" t:id="notifyMember" value="notifyMember" />
+					<t:label for="notifyMember">
+				   	<span class="formtip">${message:notify-the-member-tip}</span>
+				   </t:label>
+				</div>
+			</td>
+			<td valign="top" class="assign-half">
+				<div >
+					<div class="table-data-grid-header">${message:assigned-members}</div>
+					<t:grid source="selMembers" row="selMember"
+						model="model"
+						pagerPosition="bottom"
+						id="userGrid2"
+						>
+						<p:chkBoxHeader>
+							<input type="checkBox" id="chkBoxAll2" value="1" onclick="chkboxAll('userGrid2','chkBoxAll2')" />
+						</p:chkBoxHeader>
+						<p:chkBoxCell>
+							<t:if test="shouldnotUnassign(selMember.user)">
+								<input type="checkBox" name="selChkBox" disabled="disabled"/>
+								<p:else>
+									<input type="checkBox" name="selChkBox" value="${selMember.id}" onclick="chkbox('userGrid2','chkBoxAll2')"/>
+								</p:else>
+							</t:if>
+						</p:chkBoxCell>
+						<p:displayNameCell>
+							<t:pagelink page="user/view" context="selMember.user.id">${selMember.user.displayName}</t:pagelink>
+						</p:displayNameCell>
+						<p:roleCell>
+							${selMember.role.displayName}
+							<t:if test="selMember.customRoleName">
+								(<span class="customRoleName">${selMember.customRoleName}</span>)
+							</t:if>
+						</p:roleCell>
+						<p:editCell>
+							<t:pagelink page="project/memberroleedit" context="selMember.id" class="button rounded">
+								<span>${message:edit}</span>
+							</t:pagelink> 
+						</p:editCell>
+					
+						
+						<p:empty><div class="notfoundtext">${message:no-member-assigned}</div></p:empty>
+					</t:grid>
+				</div>
+			</td>
+		</tr>
+		</table>
+		
+	</form>
+	
+	
+</html>

@@ -1,0 +1,143 @@
+<html t:type="layout" 
+	title="View Score"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/lcdp/home?${project.id}
+		,View Score=modules/lcdp/viewscore?${project.id}
+		"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+<style>
+.scaleScore{
+	min-width: 15px;
+}
+.tblResult td{
+	text-align: center;
+}
+.tblResult td.gname{
+	text-align: left;	
+}
+
+</style>
+
+<p:actionBtns>
+	<t:if test="canClearScore(project)">
+		<a class="button rounded" t:type="actionLink" t:id="clearGrade" 
+			context="lcdpUser.id"  onclick="return confirmDelete('WARNING: You are about to clear score of this student in this survey, Are you sure to continue?')">
+			<span>Reset scores</span>
+		</a>
+	</t:if>
+</p:actionBtns>	
+
+<div class="e-formeditor">
+	<div class="t-beaneditor ">
+		<table >
+			<tr>
+				<td class="label">${message:lcdp}</td>
+				<td>${lcdp.name}</td>
+			</tr>
+			<tr>
+				<td class="label">Student</td>
+				<td>${lcdpUser.assessee.getDisplayName()}</td>
+			</tr>
+			<tr>
+				<td class="label">Start Time</td>
+				<td>${lcdpUser.getStartAssessTimeDisplay()}</td>
+			</tr>
+			<tr>
+				<td class="label">Last Time</td>
+				<td>${lcdpUser.getlastAssessTimeDisplay()}</td>
+			</tr>
+			<t:if test="lcdpUser.resetCount">
+				<tr>
+					<td class="label">Reset Answers</td>
+					<td>${lcdpUser.resetCount} times</td>
+				</tr>
+			</t:if>
+			
+			<tr>
+				<td class="label">Answers</td>
+				<td>
+						<div class="rubricDetailZone view tblResult">
+							<table class="stickyHeader">
+							<thead>
+								<tr>
+									<th >No.</th>
+									<th >Question</th>
+									<th >Leadership</th>
+									<th >Management</th>
+									<th >Command</th>
+								</tr>
+								</thead>
+								<tbody>
+								<t:if test="lcdpUser.questionScores">
+									<p:else>
+										<tr ><td colspan="6">${message:no-question-answered}</td></tr>
+									</p:else>
+									
+									
+									<t:loop source="lcdpUser.questionScores" value="que" index="rowIndex">
+										<tr>
+											<td>
+												${que.question.number}
+											</td>
+											<td class="gname">
+												<t:outputraw value="${textarea2html(que.question.des)}"/>
+											</td>
+											<td>
+												<t:if test="que.question.dimLeadership">
+													${que.score}
+												</t:if>
+											</td>
+											<td>
+												<t:if test="que.question.dimManagement">
+													${que.score}
+												</t:if>
+											</td>
+											<td>
+												<t:if test="que.question.dimCommand">
+													${que.score}
+												</t:if>
+											</td>
+										</tr>
+										
+										
+									</t:loop>
+									${loadCalculateScores()}
+									<tr>
+										<th ></th>
+										<th style="text-align:right;padding-right:15px;">Total</th>
+										<th >${getTotalDim(1)}</th>
+										<th >${getTotalDim(2)}</th>
+										<th >${getTotalDim(3)}</th>
+									</tr>
+									<tr>
+										<th ></th>
+										<th style="text-align:right;padding-right:15px;">Average</th>
+										<th >${getAvgDimDisplay(1)}</th>
+										<th >${getAvgDimDisplay(2)}</th>
+										<th >${getAvgDimDisplay(3)}</th>
+									</tr>
+								</t:if>
+							</tbody>
+							</table>
+						</div>
+						
+					</td>
+				</tr>
+				
+			</table>
+
+			
+			
+		
+		
+		
+		
+	</div>
+	
+</div>
+
+</html>

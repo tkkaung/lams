@@ -1,0 +1,72 @@
+<html t:type="layout" 
+   title="${message:view} ${message:criteria}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/assessment/assesseehome?${project.id}
+		,${message:view} ${message:criteria}=modules/assessment/assesseeviewcrit"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+  
+<form class="e-formeditor">
+	<div class="t-beaneditor ">
+		<table >
+			<tr>
+				<td class="label">${message:assessment}</td>
+				<td>
+					${assmt.name}
+				</td>
+			</tr>
+		</table>
+		
+		<t:if test="assmt.criterias">
+			<p:else>
+				<table >
+					<tr>
+						<td class="label"></td>
+						<td>
+							<span >${message:no-criteria-found}</span>
+						</td>
+					</tr>
+				</table>
+				
+			</p:else>
+			
+			<div class="rubricDetailZone view">
+				<style>.rubricDetailZone td{
+					width: ${getCritNameWidthPercentNum(60,getFirstCriterions().size())};
+				}
+				</style>
+				
+				<table >
+					<tr>
+						<th rowspan="2" class="criteria">${message:criteria-objective}</th>
+						<th colspan="${getFirstCriterions().size()}">${message:criterion}</th>
+					</tr>
+					<tr>
+						<t:loop source="getFirstCriterions()" value="tempRCriterion" index="colIndex">
+							<th>
+								<span title="${message:columnScore-label}">${tempRCriterion.score}</span>
+							</th>
+						</t:loop>
+					</tr>
+					<t:loop source="assmt.getCriterias()" value="tempRCrit" index="rowIndex">
+						<tr>
+							<th class="critName">
+								<span title="${message:critName-label}"><t:outputraw value="${textarea2html(tempRCrit.name)}"/></span>
+								<t:outputraw value="getSpace()"/>
+							</th>
+							<t:loop source="tempRCrit.criterions" value="tempRCriterion" index="colIndex">
+								<td class="crionDes">
+									<t:outputraw value="${textarea2html(tempRCriterion.des)}"/>
+								</td>
+							</t:loop>
+						</tr>
+					</t:loop>
+				</table>
+			</div>
+		</t:if>
+	</div>
+</form>
+
+</html>

@@ -1,0 +1,59 @@
+<html t:type="layout" 
+	title="message:page-title"
+   breadcrumb="${message:control-panel}=admin,${callBackPageName}=${callBackPageLink},${message:page-title}=admin/backuprestore/resultpage"
+   xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="project"/></p:leftMenuBlk>
+
+  <t:loop source="results" value="result">
+		<div class="page-result-block">
+			<div class="title2">${result.message}</div>
+			<div class="content">
+				<t:if test="result.hasError()">${result.errorMessage}</t:if>
+				<t:if test="result.hasWarnMessage()">${result.warnMessage}</t:if>
+				
+				<t:if test="result.addedList.size()">
+				<ol>${result.addedList.size()} ${message:added}:
+					<t:loop source="result.addedList" value="var:id">
+						<li>${var:id}</li>
+					</t:loop>
+				</ol>
+				</t:if>
+				<t:if test="result.ignoredList.size()">
+				<ol>${result.ignoredList.size()} ${message:ignored}:
+					<t:loop source="result.ignoredList" value="var:id">
+						<li>${var:id}</li>
+					</t:loop>
+				</ol>
+				</t:if>
+				<t:if test="result.replacedList.size()">
+				<ol>${result.replacedList.size()} ${message:replaced}:
+					<t:loop source="result.replacedList" value="var:id">
+						<li>${var:id}</li>
+					</t:loop>
+				</ol>
+				</t:if>
+				<t:if test="result.deletedList.size()">
+				<ol>${result.deletedList.size()} ${message:deleted}:
+					<t:loop source="result.deletedList" value="var:id">
+						<li>${var:id}</li>
+					</t:loop>
+				</ol>
+				</t:if>
+				<t:if test="result.exportedList.size()">
+				<ol>${result.exportedList.size()} ${message:exported}:
+					<t:loop source="result.exportedList" value="var:id">
+						<li>${var:id}</li>
+					</t:loop>
+				</ol>
+				</t:if>
+				
+				<t:if test="getTotalChanged()">
+					<p:else>
+						${message:nothing-changed}
+					</p:else>
+				</t:if>
+			</div>
+		</div>
+	</t:loop>
+</html>

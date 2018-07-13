@@ -1,0 +1,156 @@
+<html t:type="layout" 
+	title="${getPageTitle()}"
+	currentModule="${moduleName}"
+	currentProj="curProj"
+	breadcrumb="${curProj.encodeddisplayname}=project/home?${curProj.id}
+		,${module.displayName}=modules/scheduling?${curProj.id}
+		,${message:milestone}: ${encode(milestone.name)}=modules/scheduling/milestoneview?${milestone.id}
+		,${getBreadcrumbLink()}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+<p:legendBlk>
+	<span class="required">*</span>  ${message:required-fields}
+</p:legendBlk>
+		
+	<div class="t-beaneditor">
+		<form t:type="form" t:id="editForm" autofocus="false">
+			<t:errors />
+			<table>
+				<tr>
+					<td class="label">
+						<t:label for="name" ><span class="required">*</span> ${message:name-label}</t:label>
+					</td>
+					<td>
+						<t:textfield t:id="name" value="task.name" class="lwidth" validate="required" maxlength="255" ></t:textfield>
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<t:label for="startDate"><span class="required">*</span> ${message:sdate-label}</t:label>
+					</td>
+					<td>
+						<t:dateField t:id="startDate" value="task.startdate" validate="required"  class="swidth" format="${message:datefield-format}"/>
+						<t:if test="phase">
+							<span class="formtip">(${message:phase} ${message:date-label}: <span>(${phase.startDateDisplay} - ${phase.endDateDisplay})</span>)</span>
+							<p:else>
+								<span class="formtip">(${message:milestone} ${message:date-label} <span>(${curProj.sdateDisplay} - ${milestone.deadlineDisplay})</span>)</span>
+							</p:else>
+						</t:if>
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<t:label for="endDate"><span class="required">*</span> ${message:edate-label}</t:label>
+					</td>
+					<td>
+						<t:dateField t:id="endDate" value="task.enddate" validate="required"   class="swidth" format="${message:datefield-format}"/>
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<t:label for="urgency"/>
+					</td>
+					<td>
+						<select t:type="Select" t:id="urgency" value="task.urgency"  validate="required" onchange="reupdateUrgencyIcon();"/>
+						<span>
+							<img class="prio_icon" id="prio_high" src="${context:lib/img/prio_high.png}" alt=""/>
+							<img class="prio_icon" id="prio_medium" src="${context:lib/img/prio_medium.png}" alt=""/>
+							<img class="prio_icon" id="prio_low" src="${context:lib/img/prio_low.png}" alt=""/>
+						</span>
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<t:label for="assignedTo" />
+					</td>
+					<td>
+						<t:palette t:id="assignedTo" t:model="AssignedPersonModel"
+							t:selected="assignedPersonIds" t:encoder="stringEncoder"
+							deselect="context:lib/img/move_left.jpg"
+							select="context:lib/img/move_right.jpg"
+							
+							/>
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<t:label for="comment" />
+					</td>
+					<td>
+						<t:textarea t:id="comment" value="task.comment" cols="50" rows="5" class="lwidth" ></t:textarea>
+					</td>
+				</tr>
+				<t:if negate="true" test="isCreateMode()">
+					<tr>
+						<td class="label">
+							<t:label for="percentComplete" />
+						</td>
+						<td>
+							<t:select t:id="percentComplete" value="task.percentageDone" validate="required" 
+								model="literal:0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100"></t:select>
+						</td>
+					</tr>
+				</t:if>
+				<tr>
+					<td class="label">
+						<label for="manager" >${message:manager-label}</label>
+					</td>
+					<td>
+						<t:pageLink page="user/view" context="${task.manager.id}">${task.manager.displayname}</t:pageLink>
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<label for="reminder" >${message:reminder-label}</label>
+					</td>
+					<td>
+						${message:remind}
+						<t:select value="task.reminderType" validate="required" ></t:select>
+						${message:on-the}
+						<t:loop source="availableDaysToRemind" value="tempInt">
+							<t:if test="task.daysToRemind.contains(tempInt)">
+								<input type="checkBox" checked="checked" id="dayChkBox_${tempInt}" name="dayChkBox" value="${tempInt}" />
+								<p:else>
+									<input type="checkBox" id="dayChkBox_${tempInt}" name="dayChkBox" value="${tempInt}" />
+								</p:else>
+							</t:if>
+							<label for="dayChkBox_${tempInt}">${tempInt}</label>
+						</t:loop>
+						${message:num-days-earlier}.
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<label for="notifyMember" >${message:notifyMember-label}</label>
+					</td>
+					<td>
+						<input t:type="checkbox" value="notifyMember" t:id="notifyMember" />
+						<span class="formtip">${message:notifyMember-tip}</span>
+					</td>
+				</tr>
+				<tr>
+					<td></td>
+					<td>
+						<input t:type="submit" value="${message:submit-label}" class="squared"  />
+					</td>
+				</tr>
+			</table>
+		</form>
+	</div>
+	<script>
+		function reupdateUrgencyIcon(){
+			$$('.prio_icon').invoke('hide');
+			
+			var value = $('urgency').value;
+			if(value =='HIGH')
+				$('prio_high').show();
+			if(value =='MEDIUM')
+				$('prio_medium').show();
+			if(value =='LOW')
+				$('prio_low').show();
+		}
+		document.observe("dom:loaded", function(){
+			reupdateUrgencyIcon();
+		});
+	</script>
+</html>

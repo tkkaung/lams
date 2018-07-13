@@ -1,0 +1,46 @@
+<html t:type="layout" 
+		title="${message:manage} ${message:projrole}"
+		breadcrumb="${message:control-panel}=admin,${message:manage} ${message:projrole}=admin/projrole/manage"
+		totalShowOption="${totalSize}"
+		xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+      xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="systemtools"/></p:leftMenuBlk>
+      
+   <p:actionBtns >
+		<a href="#" t:type="pageLink" page="admin/projrole/edit" class="button rounded">
+				 	<span>${message:add-new} ${message:projrole}</span></a>
+		<a href="#" t:type="pageLink" page="admin/projrole/privilege" class="button rounded">
+				 	<span>${message:projrole-privilege}</span></a>
+	</p:actionBtns>
+	
+	<table class="actionToolBar">
+		<tr>
+			<td class="right">		 	
+			</td>
+		</tr>
+	</table>
+	
+   <t:grid source="roles" row="role" class="stickyHeader t-data-grid"
+   	exclude="system,displayName"
+   	add="userCount,projectCount,action"
+    	rowsPerPage="rowsPerPage" 
+		pagerPosition="bottom" >
+		
+		<p:userCountCell>
+			${getCountUserByProjRole(role)}
+		</p:userCountCell>
+		<p:projectCountCell>
+			${getCountProjectByProjRole(role)}
+		</p:projectCountCell>
+		
+       <t:parameter name="actionCell">
+          <t:pagelink t:id="edit" page="admin/projrole/edit" context="role.id" class="button rounded">
+          	<span>${message:edit}</span>
+          </t:pagelink>
+          <t:actionlink t:id="delete" context="role.id" class="button rounded"
+          	onclick="return confirmDelete('${message:confirm-permanent-delete-item}')">
+          	<span>${message:delete}</span>
+          </t:actionlink>
+       </t:parameter>
+    </t:grid>
+</html>

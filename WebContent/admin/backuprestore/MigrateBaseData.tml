@@ -1,0 +1,42 @@
+<html t:type="layout" 
+	title="message:page-title"
+   breadcrumb="${message:control-panel}=admin,${message:page-title}=admin/backuprestore/migratebasedata"
+   xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="project"/></p:leftMenuBlk>
+	
+	<p:legendBlk>
+		<div class="legend">
+	    	<div class="title">${message:legend}</div>
+	    	<div class="content">
+	    		<div>${message:note1-text}</div>
+	    	</div>
+	    </div>
+	</p:legendBlk>
+	
+	<div class="proc-form" >
+		<form t:type="form" t:id="selectProjForm">
+			<t:errors/>
+			<div class="instruction">${message:instruction}:</div>
+			<div class="proc-area">
+					<div><t:checkbox t:id="sysRole"/> <t:label for="sysRole">${message:sysRole}</t:label> -- <span class="tip">(${totalSysRole})</span></div>
+					<div><t:checkbox t:id="projRole"/> <t:label for="projRole">${message:projRole}</t:label> -- <span class="tip">(${totalProjRole})</span></div>
+					<div><t:checkbox t:id="projStatus"/> <t:label for="projStatus">${message:projStatus}</t:label> -- <span class="tip">(${totalProjStatus})</span></div>
+					<div><t:checkbox t:id="projType"/> <t:label for="projType">${message:projType}</t:label> -- <span class="tip">(${totalProjType})</span></div>
+					<div><t:checkbox t:id="school"/> <t:label for="school">${message:school}</t:label> -- <span class="tip">(${totalSchool})</span></div>
+					<div><t:checkbox t:id="user"/> <t:label for="user">${message:user}</t:label> -- <span class="tip">(${totalUser})</span></div>
+			</div>
+			<div class="instruction">${message:instruction2}:</div>
+			<div class="proc-area">
+				<t:RadioGroup t:id="actionIfExist" >
+					<t:Radio t:id="ignore" value="literal:IGNORE" /><t:label for="ignore"/>
+					<t:Radio t:id="replace" value="literal:REPLACE" /><t:label for="replace"/>
+				</t:RadioGroup>
+			</div>
+			<div>
+				<t:submit value="${message:submit-label}" class="squared"/>	
+			</div>
+		</form>
+	</div>
+
+</html>

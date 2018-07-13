@@ -1,0 +1,27 @@
+<html t:type="layout" 
+	title="${pageTitle}"
+   xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+       
+    <div style="margin:5px;">
+    
+    <div style="padding:15px;">
+    	<strong>${exceptionMessage}</strong>
+    </div>
+    
+    
+    <p style="padding:15px;">
+        <div style="padding:5px;">
+        		<t:pagelink page="index" class="button welBtn">
+        			<span>${message:back-to-home}</span>
+        		</t:pagelink>
+        </div>
+        <div style="padding:5px;">
+				<a href="javascript:history.go(-1);" class="button welBtn">
+					<span>${message:back-to-prev}</span>
+				</a>
+			</div>
+    </p>
+	</div>
+
+</html>

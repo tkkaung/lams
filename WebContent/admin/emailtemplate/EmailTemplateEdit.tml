@@ -1,0 +1,67 @@
+<html t:type="layout" title="${message:add-edit} ${message:email-template}"
+	breadcrumb="${message:control-panel}=admin,${message:manage} ${message:email-template}=admin/emailtemplate,${message:add-edit} ${message:email-template}=admin/emailtemplate/edit"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="systemtools"/></p:leftMenuBlk>
+	
+<p:legendBlk>
+	<span class="required">*</span>  ${message:required-fields}
+		<br/><br/>
+		
+	<div class="legend">
+    	<div class="title">${message:note}:</div>
+    	<div class="content">
+	       <t:if test="getUnDefinedEmailTemplateTypes()">
+			    'Type' and 'Language' must be recognizable by the system (source code).
+			    <br/>
+			    The following Type(s) has not been defined yet: 
+					<ul>
+						<li  t:type="loop" source="getUnDefinedEmailTemplateTypes()" value="var:str">
+							${var:str}
+						</li>
+					</ul>
+			</t:if>		
+	   </div>
+	   
+	   <div class="title">${message:available-variables} :</div>
+    	<div class="content">
+    		you can use these variables inside 'Subject' and 'Content'
+	   	<ul>
+				<li  t:type="loop" source="getEmailTemplateVariables()" value="var:str">
+					${var:str}
+				</li>
+			</ul>
+	   </div>
+   </div>
+</p:legendBlk>  
+	
+	<t:beaneditform t:id="emailTemForm" 
+		object="emailTem"
+		exclude="modifyDate"
+		submitLabel="${message:submit-label}"
+		>
+		<p:type>
+			<t:label for="type" ><span class="required">*</span> ${message:type-label}</t:label>
+			<t:textfield t:id="type" value="emailTem.type" class="mwidth" validate="required"/>
+		</p:type>
+		<p:language>
+			<t:label for="language" ><span class="required">*</span> ${message:language-label}</t:label>
+			<t:textfield t:id="language" value="emailTem.language" class="swidth"/>
+		</p:language>
+		<p:description>
+			<t:label for="description" />
+			<t:textarea t:id="description" value="emailTem.description" class="lwidth" ></t:textarea>
+		</p:description>
+		<p:subject>
+			<t:label for="subject" ><span class="required">*</span> ${message:subject-label}</t:label>
+			<t:textfield t:id="subject" value="emailTem.subject" class="lwidth" ></t:textfield>
+		</p:subject>
+		<p:content>
+			<t:label for="content" ><span class="required">*</span> ${message:content-label}</t:label>
+			<textarea t:type="ck/editor" t:id="content" value="emailTem.content"
+					customConfiguration="context:lib/js_config/ckeditor.js" 
+						toolbarSet="Default" 
+    		           width="630px" height="500px" validate="required"></textarea>
+		</p:content>
+	</t:beaneditform>
+	
+</html>

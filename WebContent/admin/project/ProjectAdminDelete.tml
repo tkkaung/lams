@@ -1,0 +1,79 @@
+<html t:type="layout"
+		title="${message:delete-project-page}"
+      breadcrumb="${message:control-panel}=admin
+      	,${message:admin-manage-project}=admin/project/manageadminprojects
+      	,${message:delete-project-page}=admin/project/admindelete"
+		xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+      xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="project"/></p:leftMenuBlk>
+   <p:legendBlk>
+		<span class="required">*</span>  ${message:required-fields}
+	</p:legendBlk>
+	
+	<style>
+		.projBlk{
+			border:1px solid #ccc;
+			margin-bottom: 5px;
+		}
+	</style>
+	
+	<t:if test="projs">
+		<p:else>
+			<span class="notfoundtext">${message:no-project-selected}</span>
+		</p:else>
+	
+	
+	<t:form t:id="form" class="e-formeditor" >
+		<t:errors />
+		<div class="t-beaneditor">
+			<table >
+				<tr>
+					<td class="label"><label>${message:projToDelete-label}</label></td>
+					<td>
+						<t:loop source="projs" value="proj" index="rowIndex">
+							
+						
+							<div class="projBlk defaultBlkBg">
+								<t:pageLink page="project/home" context="proj.id">
+									${proj.displayname}
+									<br/> ${proj.name}
+								</t:pageLink>
+								<div>
+				    				<span class="date">${proj.sdatedisplay} - ${proj.edatedisplay}</span>
+				    			</div>
+				    			<div class="subdes">
+				    				${proj.description}
+				    			</div>
+				    			<div>
+				    				${message:lastAccess-label}: ${proj.getLastAccessDisplay()}
+				    			</div>
+							</div>
+						</t:loop>
+					
+						
+					</td>
+				</tr>
+				
+				<tr>
+					<td class="label"><span class="required">*</span><t:label for="confirmText">${message:confirmText-label}</t:label></td>
+					<td>
+						<div>
+							${message:confirm-delete-permanently-by-enter-following-message}
+							<br/>
+							<div class="capchaTxt">${message:default-confirm-text}</div>  
+						</div>
+						<t:textfield t:id="confirmText" value="confirmText" />
+					</td>
+				</tr>
+				
+				
+			</table>
+			<t:submit t:id="submit" value="${message:submit-label}" class="submit squared" />
+			<t:submit t:id="cancel" value="${message:cancel}" class="squared" />
+			
+						
+
+		</div>
+	</t:form>
+	</t:if>	
+</html>

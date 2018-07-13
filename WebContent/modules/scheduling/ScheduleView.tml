@@ -1,0 +1,239 @@
+<html 
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+      xmlns:p="tapestry:parameter">
+	<head>	
+	<title>${module.displayName}</title>
+	
+	
+	<style>
+		#schdBlk td.dateCol{
+			width: ${columnWidth}px;
+			background-image: none;
+		}
+	</style>
+</head>
+
+		<h1>${module.displayName}</h1> 
+		<h2>${message:project}: <em>${curProj.displayName}</em></h2>
+		${message:project-date-label}: <span class="date">${curProj.sdatedisplay} - ${curProj.edatedisplay}</span>
+		<t:unless test="schedule.active">
+			<br/> ${message:saved-on}: <strong>${schedule.createDateDisplay}</strong>
+			<br/> ${message:createdBy-label}: <t:pagelink page="user/view" context="schedule.user.id">${schedule.user.displayName}</t:pagelink>
+		</t:unless>
+		<table class="actionToolBar">
+			<tr><td>
+				<form t:type="form" t:id="displayOptionForm" style="display: inline;" autofocus="false">
+					${message:display}: <t:select t:id="displayType" value="displayType" validate="required" onchange="this.form.submit()"/>
+					<t:select t:id="displayStatus" value="displayStatus" blankLabel="${message:-all-}"  onchange="this.form.submit()"/>
+					<t:select t:id="displayAssign" value="displayAssign" blankLabel="${message:-all-}"  model="displayAssignModel" onchange="this.form.submit()"/>
+				</form>
+				<span style="margin-left:10px;">
+					<button onclick="window.print();">${message:print}</button>
+				</span>
+			</td>
+			</tr>
+		</table>
+		<br/>
+		<div id="scheduleContainer" >
+			<table id="schdBlk" cellspacing="0" cellpadding="0"  style="width:${totalScheduleWidth}px;">
+				<thead>
+					<tr>
+						<th rowspan="2" class="iconspan"><t:outputraw value="emptyString"/></th>
+						<th rowspan="2" class="description">${message:description-label}</th>
+						<th rowspan="2" class="manager">${message:manager-label}</th>
+						<th rowspan="2" class="assignedPerson">${message:assignedTo-label}</th>
+						<th rowspan="2" class="urgency">${message:urgency-label}</th>
+						<th rowspan="2" class="duration">${message:duration-label}</th>
+						<th rowspan="2" class="percentDone">${message:percentDone-label}</th>
+						<th rowspan="2" class="hiddenCol" ></th>
+				 		<t:loop source="dateTopColumns" value="dateTopColumn">
+							<th class="dateTopColumn" colspan="${dateTopColumnCountDisplay}">${dateTopColumnDisplay}</th>
+						</t:loop>
+				 	</tr>
+					<tr>
+						<t:loop source="dateColumns" value="dateColumn">
+							<th class="dateCol">${dateColumnDisplay}</th>
+						</t:loop>
+					</tr>
+				</thead>
+			
+				<tbody>
+					<t:loop source="milestones" value="milestone">
+						<tr class="milestone-row">
+							<td class="iconspan">
+								<span class="${milestoneIconClass}" id="icon_m_${milestone.id}" onclick="milestoneIconClick(${milestone.id});" />
+							</td>
+							<td class="description">
+								<div class="tooltipTrigger" >${milestone.name}</div>
+								<div class="tooltip">
+								<t:if test="milestone.comment">
+									<table>
+										<tr>
+											<th>${message:comment-label}:</th>
+											<td>${milestone.comment}</td>
+										</tr>
+									</table>
+								</t:if>
+								</div>
+							</td>
+							<td class="manager"><t:pageLink page="user/view" context="${milestone.manager.id}">${milestone.manager.displayname}</t:pageLink></td>
+							<td class="assignedPerson">-</td>
+							<td class="urgency">
+								-
+							</td>
+							<td class="duration"><div class="small"><span class="nowrap">${milestone.deadlineDisplay}</span></div></td>
+						  	<td class="percentDone">${milestone.averagePercentDone}</td>
+						  	<td class="hiddenCol" >
+								<div class="chartBarWrapper">
+									<div class="chartBar" style="left: ${computeWidthAdjustSingle(StartDay, milestone.deadline, false, 12)}px; ">
+									<img src="${milestone_png}" width="10"/></div>
+								</div>	
+							</td>
+						  	<t:loop source="dateColumns" value="dateColumn" >
+								<td class="dateCol"><t:outputraw value="emptyString"/></td>
+							</t:loop>
+						</tr>
+						
+						<t:loop source="milestone.SortedTasksAndPhases" value="activity">
+							<t:if test="isInstanceofTask(activity)">
+								<t:if test="filterCheck(task)">
+									<tr class="task-row icon_m_${milestone.id}">
+										<t:delegate to="block:taskRow"/>
+									</tr>
+								</t:if>
+								
+								<t:block t:id="taskRow">
+									<td class="iconspan">
+										<span class="icontask" />
+									</td>
+									<td class="description">
+										<span class="tooltipTrigger" >${task.name}</span>
+										<div class="tooltip">
+										<t:if test="task.comment">
+											<table>
+												<tr>
+													<th>${message:comment-label}:</th>
+													<td>${task.comment}</td>
+												</tr>
+											</table>
+										</t:if>
+										</div>
+									</td>
+									<td class="manager"><t:pageLink page="user/view" context="${task.manager.id}">${task.manager.displayname}</t:pageLink></td>
+									<td class="assignedPerson">
+										<t:loop source="task.assignedPersons" value="tempUser">
+							       		<span class="uName"><t:pageLink page="user/view" context="${tempUser.id}">${tempUser.displayName}</t:pageLink></span>
+							       	</t:loop>
+									</td>
+									<td class="urgency">
+										<img src="${getUrgencyLevelIcon(task.urgency)}" alt="" class="urgIcon" title="${getUrgencyTip(task.urgency)}"/>
+									</td>
+									<td class="duration" ><div class="small"><span class="nowrap">${task.startDateDisplay}</span> - <span class="nowrap">${task.endDateDisplay}</span></div></td>
+								  	<td class="percentDone"><div class="${getPercentDoneClass(task.percentageDone,task.endDate)}">${task.percentageDone}</div></td>
+									<td class="hiddenCol" >
+										<div class="chartBarWrapper">
+											<div class="chartBar" title="${task.percentageDone}% ${getCompletedOn(task)}"
+												style="left: ${computeWidthAdjust(StartDay, task.startDate, false)}px;"
+											>
+												<img src="${task_ongoing_png}" height="12px" width="${computeWidth(task.startDate, task.endDate, true)}px"/>
+											</div>
+											<div class="chartBar" title="${task.percentageDone}% ${getCompletedOn(task)}"
+												style="left: ${computeWidthAdjust(StartDay, task.startDate, false)}px;"
+												>
+												<img src="${task_complete_png}" height="12px" width="${computeWidthDone(task.startDate, task.endDate, true, task.percentageDone)}px"/>
+											</div>
+										</div>	
+									</td>
+								  	<t:loop source="dateColumns" value="dateColumn" index="var:i">
+										<td class="dateCol"><t:outputraw value="emptyString"/></td>
+									</t:loop>
+								</t:block>
+							</t:if>
+							<t:if test="isInstanceofPhase(activity)">
+								<tr class="phase-row icon_m_${milestone.id}"  id="p_${phase.id}">
+									<td class="iconspan">
+										<span class="${phaseIconClass}" id="icon_p_${phase.id}" onclick="phaseIconClick('p_${phase.id}');" />
+									</td>
+									<td class="description">
+										<span class="tooltipTrigger" >${phase.name}</span>
+										<div class="tooltip">
+										<t:if test="phase.comment">
+											<table>
+												<tr>
+													<th>${message:comment-label}:</th>
+													<td>${phase.comment}</td>
+												</tr>
+											</table>
+										</t:if>
+										</div>
+									</td>
+									<td class="manager"><t:pageLink page="user/view" context="${phase.manager.id}">${phase.manager.displayname}</t:pageLink></td>
+									<td class="assignedPerson">-</td>
+									<td class="urgency">-</td>
+									<td class="duration"><div class="small" ><span class="nowrap">${phase.startDateDisplay}</span> - <span class="nowrap">${phase.endDateDisplay}</span></div></td>
+								  	<td class="percentDone">${phase.averagePercentDone}</td>
+								  	<td class="hiddenCol" >
+										<div class="chartBarWrapper">
+											<div class="chartBar" 
+												style="left: ${computeWidthAdjust(StartDay, phase.startDate, false)}px; "
+											>
+											<img src="${phase_png}" height="12px" width="${computeWidth(phase.startDate, phase.endDate, true)}px"/></div>
+										</div>	
+									</td>							  	
+								  	<t:loop source="dateColumns" value="dateColumn">
+										<td class="dateCol"><t:outputraw value="emptyString"/></td>
+									</t:loop>
+								</tr>
+				
+								<t:loop source="phase.tasks" value="task" >
+									<t:if test="filterCheck(task)">
+										<tr class="task2-row icon_p_${phase.id}">
+											<t:delegate to="block:taskRow"/>
+										</tr>
+									</t:if>
+								</t:loop>
+							</t:if>
+						</t:loop>
+					</t:loop>
+				</tbody>
+			</table>
+			
+		</div>
+		
+		
+<!-- //////End Render Gantt Chart table //////  -->	
+<div class="legend">
+	<div class="title">${message:legend}</div>
+	<div class="content">
+		<table>
+			<tr>
+			<td><img src="${milestone_png}" height="10px" width="10px"/></td>
+			<td class="label">${message:gantt-milestone}</td>
+			<td><img src="${phase_png}" height="12px" width="15px"/></td>
+			<td class="label">${message:gantt-phase}</td>
+			<td><img src="${task_ongoing_png}" height="12px" width="15px"/></td>
+			<td class="label">${message:gantt-task-ongoing}</td>
+			<td><img src="${task_complete_png}" height="12px" width="15px"/></td>
+			<td class="label">${message:gantt-task-complete}</td>
+		</tr>
+		<tr>
+			<td colspan="10">
+				<span class="con1">
+					<img src="${context:lib/img/prio_high.png}" alt=""/>
+					<span class="label">${message:highUrgency-label}</span>
+				</span>
+				<span class="con1">
+					<img src="${context:lib/img/prio_medium.png}" alt=""/>
+					<span class="label">${message:mediumUrgency-label}</span>
+				</span>
+				<span class="con1">
+					<img src="${context:lib/img/prio_low.png}" alt=""/>
+					<span class="label">${message:lowUrgency-label}</span>
+				</span>
+			</td>
+		</tr>
+		</table>
+	</div>
+</div>		
+			
+</html>

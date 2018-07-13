@@ -1,0 +1,245 @@
+<html t:type="layout" 
+   title="${message:view} ${message:gradeNoun}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/assessment/assesseehome?${project.id}
+		,${message:view} ${message:gradeNoun}=modules/assessment/assesseeviewgrade"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+  
+<style>
+	.legend .non-selected{
+		background: #F5F5F5;
+	}
+	.legend .selected{
+		background: #acebff;
+	}
+	
+	.rubricDetailZone .cr_obj{
+		background: #F5F5F5;
+	}
+	.rubricDetailZone .cr_obj.selected{
+		background: #acebff;
+	}
+	.rubricDetailZone .score{
+		text-align: center;
+		font-weight:bold;
+		width: 40px;
+	}
+	.rubricDetailZone .totalScoreR{
+		text-align: center;
+		font-weight:bold;
+		width: 40px;
+	}
+	
+</style>
+
+<p:legendBlk>
+	<t:if test="assmt.criterias">
+		<div class="legend">
+			<div class="title">${message:legend}</div>
+			<div class="content">
+				<table>
+					<tr>
+						<td><div class="legendmark non-selected" /></td>
+						<td class="label">${message:non-selected}</td>
+						<td><div class="legendmark selected" /></td>
+						<td class="label">${message:selected}</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</t:if>
+</p:legendBlk>
+
+
+<form t:type="form" t:id="form" class="e-formeditor">
+	<div class="t-beaneditor">
+	<t:errors />
+		<table >
+			<tr>
+				<td class="label">${message:assessment}</td>
+				<td>
+					${assmt.name}
+				</td>
+			</tr>
+			<tr>
+				<td class="label">${getAssesseeRoleNames(project)}</td>
+				<td>
+						${assmtUser.assessee.displayname}
+					
+				</td>
+			</tr>
+			
+			<t:if test="assmtUser.totalGrade">
+				<tr>
+					<td class="label">${message:totalGrade-label}</td>
+					<td>
+						<strong>${assmtUser.totalGrade}</strong>
+					</td>
+				</tr>
+				<p:else>
+					<t:if test="assmt.criterias" negate="true">
+						<tr>
+							<td class="label">${message:totalScore-label}</td>
+							<td>
+								<strong>${assmtUser.totalScoreDisplay}</strong>
+							</td>
+						</tr>
+					</t:if>
+				</p:else>
+			</t:if>
+			<t:if test="canViewComments(assmtUser)">
+				<t:if test="assmtUser.comments">
+					<tr>
+						<td class="label">${message:comments-label}</td>
+						<td>
+							
+				   				<t:outputraw value="textarea2html(assmtUser.comments)"/>
+				   			
+			   			</td>
+					</tr>
+				</t:if>
+			</t:if>
+		</table>
+		
+		<t:if test="assmt.criterias">
+			<style>
+				.rubricDetailZone td{
+					width: ${getCritNameWidthPercentNum(60,getFirstCriterions().size())};
+				}
+			</style>
+			<div class="rubricDetailZone view">
+				<t:if test="assmt.gmat">
+				<table >
+					<tr>
+						<th rowspan="2" class="criteria">${message:criteria-objective}</th>
+						<th colspan="12">${message:criterion}</th>
+						<t:if test="canViewComments(assmtUser)">
+							
+								<t:if test="assmtUser.hasCritComments()">
+									
+					   				<th rowspan="2" class="cmmt">
+										${message:comment-label}
+									</th> 
+					   			</t:if>
+				   			
+			   			</t:if>
+					</tr>
+					<tr>
+						<t:loop source="getFirstCriterions()" value="tempRCriterion" index="colIndex">
+							<th colspan="2">
+								<span title="${message:columnScore-label}">${tempRCriterion.score}</span>
+							</th>
+						</t:loop>
+					</tr>
+					<t:loop source="assmt.getCriterias()" value="tempRCrit" index="rowIndex">
+						<tr>
+							<th class="critName">
+								<span title="${message:critName-label}"><t:outputraw value="${textarea2html(tempRCrit.name)}"/></span>
+								<t:outputraw value="getSpace()"/>
+							</th>
+							<t:loop source="tempRCrit.criterions" value="tempRCriterion" index="colIndex">
+								<td id="${tempRCriterion.id}" class="cr_obj c_cr_${tempRCrit.id} ${getSelectedClassGMATL(tempRCriterion)}" 
+									>
+									<t:outputraw value="${textarea2html(tempRCriterion.des)}"/>
+								</td>
+								<td id="${tempRCriterion.id}" class="cr_obj c_cr_${tempRCrit.id} ${getSelectedClassGMATH(tempRCriterion)}" 
+									>
+								</td>
+								
+							</t:loop>
+							<t:if test="canViewComments(assmtUser)">
+								
+								<t:if test="assmtUser.hasCritComments()">
+								
+				   					<td class="cmmt">
+										<t:outputraw value="textarea2html(truncateString(getCritComment(tempRCrit, assmtUser), 150))"/>
+							
+										<t:if test="isMoreThan(textarea2html(getCritComment(tempRCrit, assmtUser)).length(), 150)">
+											<a href="javascript:void(0);" onclick="openPopup('${getViewCritCmmtURL(tempRCrit, assmtUser)}', 'assmtCritCmmt', 500, 300)">
+							   					${message:more}
+							   				</a>	
+										</t:if>
+									</td>
+								</t:if>
+								
+							</t:if>
+						</tr>
+					</t:loop>
+				</table>
+				
+				
+				
+				
+				
+				
+				<p:else>
+				<table >
+					<tr>
+						<th rowspan="2" class="criteria">${message:criteria-objective}</th>
+						<th colspan="${getFirstCriterions().size()}">${message:criterion}</th>
+						<t:if test="canViewComments(assmtUser)">
+							
+								<t:if test="assmtUser.hasCritComments()">
+									
+					   				<th rowspan="2" class="cmmt">
+										${message:comment-label}
+									</th> 
+					   			</t:if>
+				   			
+			   			</t:if>
+					</tr>
+					<tr>
+						<t:loop source="getFirstCriterions()" value="tempRCriterion" index="colIndex">
+							
+							<th class="numScoreCol">
+								<span >${tempRCriterion.score}</span>
+							</th>
+						</t:loop>
+					</tr>
+					<t:loop source="assmt.getCriterias()" value="tempRCrit" index="rowIndex">
+						<tr>
+							<th class="critName">
+								<span title="${message:critName-label}"><t:outputraw value="${textarea2html(tempRCrit.name)}"/></span>
+								<t:outputraw value="getSpace()"/>
+							</th>
+							<t:loop source="tempRCrit.criterions" value="tempRCriterion" index="colIndex">
+								<td id="${tempRCriterion.id}" class="cr_obj c_cr_${tempRCrit.id} ${getSelectedClass(assmtUser, rubricOrder, tempRCriterion, tempRCrit, colIndex)} " 
+									>
+								<!--<td id="${tempRCriterion.id}" class="cr_obj c_cr_${tempRCrit.id} ${getSelectedClass( tempRCriterion)} " 
+									>
+									-->
+									<t:outputraw value="${textarea2html(tempRCriterion.des)}"/>
+								</td>
+							</t:loop>
+							<t:if test="canViewComments(assmtUser)">
+								
+								<t:if test="assmtUser.hasCritComments()">
+								
+				   					<td class="cmmt">
+										<t:outputraw value="textarea2html(truncateString(getCritComment(tempRCrit, assmtUser), 150))"/>
+							
+										<t:if test="isMoreThan(textarea2html(getCritComment(tempRCrit, assmtUser)).length(), 150)">
+											<a href="javascript:void(0);" onclick="openPopup('${getViewCritCmmtURL(tempRCrit, assmtUser)}', 'assmtCritCmmt', 500, 300)">
+							   					${message:more}
+							   				</a>	
+										</t:if>
+									</td>
+								</t:if>
+								
+							</t:if>
+						</tr>
+					</t:loop>
+
+				</table>
+				</p:else>
+				</t:if>
+			</div>
+		</t:if>
+	</div>
+</form>
+
+
+</html>

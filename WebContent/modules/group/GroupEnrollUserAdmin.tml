@@ -1,0 +1,121 @@
+<html t:type="layout" 
+	title="${message:enroll-group-user} Admin"
+	currentModule="${moduleName}"
+	currentProj="curProj"
+	breadcrumb="${curProj.encodeddisplayname}=project/home?${curProj.id}
+			,${message:manage-group}=modules/group?${curProj.id}
+			,${message:enroll-group-user}=modules/group/groupEnrollUserAdmin"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+	
+	
+	<table class="actionToolBar">
+		<tr>
+			<td class="right">
+			</td>
+		</tr>
+	</table>
+	
+	<form t:type="form" t:id="enrollForm">
+		<t:errors />
+		<table style="width:99%; margin:5px;">
+			<tr>
+				<td>
+					${message:groupType-label} : <strong> ${group.groupType}</strong>
+				</td>
+				<td style="text-align:right;">
+					<t:submit value="${message:save-groupname}" t:id="savegroupname"
+					 class="squared ${getShouldDisableInput()}" disabled="${getShouldDisableInput()}"
+					  />		
+				</td>
+			</tr>
+		</table>
+		
+		<table class="nomargin">
+		<tr>
+			<td valign="top" class="assign-half" rowspan="100">
+			<div >
+				<div class="table-data-grid-header">${message:available-members}</div>
+				<t:grid source="resultUsers" row="user"
+					model="model"
+					pagerPosition="bottom"
+					id="userGrid"
+					>
+					<p:chkBoxHeader>
+						<input type="checkBox" id="chkBoxAll" value="1" onclick="chkboxAll('userGrid','chkBoxAll')"
+							class="${getShouldDisableInput()}" disabled="${getShouldDisableInput()}" />
+					</p:chkBoxHeader>
+					<p:chkBoxCell><input type="checkBox" name="chkBox" value="${user.id}" onclick="chkbox('userGrid','chkBoxAll')"
+						class="${getShouldDisableInput()}" disabled="${getShouldDisableInput()}" /></p:chkBoxCell>
+					<p:displayNameCell>
+						<t:pagelink page="user/view" context="user.id">${user.displayName}</t:pagelink>
+					</p:displayNameCell>
+						
+					<p:empty>
+						<div class="notfoundtext">
+							${message:no-available-members}
+						</div>
+					</p:empty>
+				</t:grid>
+			</div>
+			</td>
+			<td>
+			</td>
+			<td>
+			</td>
+		</tr>
+		
+		<t:loop source="group.groupUsers" value="groupUser">
+		<tr>
+		<td style="text-align:center;">
+				<t:submit value="${message:enroll-group}" context="groupUser.id" t:id="assign" 
+					class="squared asgnbtn ${getShouldDisableInput()}" disabled="${getShouldDisableInput()}"
+					 t:defer="false"/>
+				<br/><br/><t:submit value="${message:unenroll-group}" context="groupUser.id" t:id="unassign"
+					 class="squared asgnbtn ${getShouldDisableInput()}" disabled="${getShouldDisableInput()}"
+					  t:defer="false"/>
+				
+			</td>
+			<td valign="top" class="assign-half">
+				<div style="margin-bottom:20px;">
+				<div style="color:#00e;font-weight:bold;">${message:groupNum-label}: 
+					<span style="color:#333;">${groupUser.groupNum}</span>
+					
+					<span style="padding: 0 5px 0 15px;">${message:groupNumName-label} :</span>
+					<input type="text"  name="groupName${groupUser.id}" value="${groupUser.groupNumName}" 
+						class="${getShouldDisableInput()}" disabled="${getShouldDisableInput()}" />
+					
+				</div>
+					<div class="table-data-grid-header">${message:enrolled-members}</div>
+					<t:grid source="groupUser.users" row="enrlUser"
+						model="model"
+						pagerPosition="bottom"
+						id="userGrid${groupUser.id}"
+						>
+						<p:chkBoxHeader>
+							<input type="checkBox" id="chkBoxAll${groupUser.id}" value="1" 
+								onclick="chkboxAll('userGrid${groupUser.id}','chkBoxAll${groupUser.id}')" 
+								class="${getShouldDisableInput()}" disabled="${getShouldDisableInput()}"/>
+						</p:chkBoxHeader>
+						<p:chkBoxCell>
+							<input type="checkBox" name="selChkBox${groupUser.id}" value="${enrlUser.id}" 
+								onclick="chkbox('userGrid${groupUser.id}','chkBoxAll${groupUser.id}')"
+								class="${getShouldDisableInput()}" disabled="${getShouldDisableInput()}" />
+						</p:chkBoxCell>
+						<p:displayNameCell>
+							<t:pagelink page="user/view" context="enrlUser.id">${enrlUser.displayName}</t:pagelink>
+						</p:displayNameCell>
+						
+						<p:empty><div class="notfoundtext">${message:no-enrolled-member}</div></p:empty>
+					</t:grid>
+				</div>
+			</td>
+		</tr>
+		</t:loop>
+	</table>
+		
+	</form>
+	
+	
+	
+	</html>

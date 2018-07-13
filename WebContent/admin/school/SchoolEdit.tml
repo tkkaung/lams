@@ -1,0 +1,31 @@
+<html t:type="layout"
+	title="${getTitle()}"
+	breadcrumb="${message:control-panel}=admin,${message:manage} ${message:school}=admin/school
+		,${getTitle()}=admin/school/edit"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="systemtools"/></p:leftMenuBlk>
+	<p:legendBlk>
+		<span class="required">*</span>  ${message:required-fields}
+	</p:legendBlk>
+	
+	<t:beaneditform t:id="form" object="school"
+	 	exclude="system"
+	 	submitLabel="${message:submit-label}">
+		<p:name>
+			<t:label for="name" ><span class="required">*</span>  ${message:name-label}</t:label>
+			<t:textfield t:id="name" value="school.name" validate="required" class="mwidth"/>
+			<span class="formtip">${message:name-known-to-system-tip}</span>
+    	</p:name>
+    	<p:alias>
+    		<t:label for="alias"/>
+    		<t:textfield t:id="alias" value="school.alias" />
+    		<span class="formtip">${message:alias-tip}</span>
+    	</p:alias>
+		<p:des>
+			<t:label for="des" ><span class="required">*</span>  ${message:des-label}</t:label>
+			<t:textfield t:id="des" value="school.des" validate="required" class="lwidth"/>
+		</p:des>
+	</t:beaneditform>
+
+
+</html>

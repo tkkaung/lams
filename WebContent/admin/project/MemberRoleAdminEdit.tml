@@ -1,0 +1,68 @@
+<html t:type="layout" 
+		title="${message:edit-membership}"
+		breadcrumb="${message:control-panel}=admin
+			,${message:admin-manage-project}=admin/project/manageadminprojects
+			,${message:manage-membership}=admin/project/manageadminmember?${curProj.id}
+			,${message:edit-membership}=admin/project/memberroleedit?${curProj.id}:${user.id}
+			"
+		xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" 
+      xmlns:p="tapestry:parameter">
+   <p:leftMenuBlk><t:ControlPanMenu initTab="project"/></p:leftMenuBlk>
+   
+	<p:legendBlk>
+		<span class="required">*</span>  ${message:required-fields}
+	</p:legendBlk>
+	
+	
+ 	<form t:type="form" t:id="form" class="e-formeditor">
+		<t:errors />
+		<div class="t-beaneditor">
+			<table>
+				<tr>
+					<td class="label">${message:project}</td>
+					<td>
+						<t:pagelink page="project/home" context="curProj.id">
+							${curProj.displayName}
+						</t:pagelink>
+					</td>
+				</tr>
+				<tr>
+					<td class="label">${message:user}</td>
+					<td>
+						<t:pagelink page="user/view" context="user.id">
+							${user.displayName}
+						</t:pagelink>
+					</td>
+				</tr>
+				<tr>
+					<td class="label"><span class="required">*</span> <t:label for="role">${message:role-label}</t:label></td>
+					<td>
+						<t:select t:id="role" value="pUser.role" model="projRoleModel" validate="required"/>
+					</td>
+				</tr>
+				<tr>
+					<td class="label"><t:label for="customRoleName">${message:customRoleName-label}</t:label></td>
+					<td>
+						<t:textfield t:id="customRoleName" value="pUser.customRoleName" class="mwidth"/>
+						<br/>
+						<span class="formtip">${message:customRoleName-tip}</span>
+					</td>
+				</tr>
+				<tr>
+					<td class="label"><t:label for="notifyMember">${message:notifyMember-label}</t:label></td>
+					<td>
+						<input t:type="checkbox" t:id="notifyMember" value="notifyMember" />
+						<t:label for="notifyMember">
+					   	<span class="formtip">${message:notifyMember-tip}</span>
+					   </t:label>
+					</td>
+				</tr>
+			</table>
+			<div style="margin-top:10px;">
+				<t:submit t:id="submit" value="${message:submit-label}" class="submit squared"  />
+			</div>
+		</div>
+	</form>
+	
+	
+</html>

@@ -1,0 +1,499 @@
+<html t:type="layout" 
+	title="${message:moderate-evaluation-detail-by-assessee}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/peerevaluation/home?${project.id}
+		,${message:view-moderate-evaluation-average}=modules/peerevaluation/viewaveragemoderate?${eval.id}
+		,${message:moderate-evaluation-detail-by-assessee}=modules/peerevaluation/viewdetailbyassesseeedit
+		"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+<style>
+	
+	#evalContainer {
+		overflow-x: auto;
+	<t:if test="${isMoreThan(eval.criterias.size(), 7)}">	
+		_overflow-x: scroll;  /* IE */
+	</t:if>
+		width: 100%;
+		/*		width: 972px;*/
+	}
+	table.t-data-grid th.no_bot_border{
+		border-bottom-color: #ccc !important; 
+	}
+	table.t-data-grid th.no_top_border{
+		border-top-color: #ccc !important; 
+	}
+	
+	table.t-data-grid tbody tr td{
+		text-align: center;
+		vertical-align: middle;
+	}
+	.evaltbl th{
+		padding:5px
+	}
+	.evaltbl .name{
+		text-align: left;
+	}
+	.evaltbl .crit {
+		vertical-align: top;
+		width: ${getCritNameWidthPercent(60, eval)};
+		text-align: left;
+		font-size: 11px;
+	}
+	.evaltbl .opques{
+		vertical-align: top;
+		text-align: left;
+		font-size: 11px;
+	}
+
+	.evaltbl td.strength, .evaltbl td.weakness, .evaltbl td.other {
+		vertical-align: top;
+		text-align: left;
+		/*width: 180px;*/
+	}
+	.evaltbl input.critScore{
+		width: 50px;
+	}
+	input.edited , textarea.edited{
+		border: 1px solid #ff6633;
+	}
+	.evaltbl tr.self td {
+		background-color: #999;
+		background-image: none;
+	}
+</style>
+
+
+<p:legendBlk>
+	<div class="legend">
+		<div class="title">${message:legend}</div>
+		<div class="content">
+			<table>
+				<tr>
+		<td><div class="legendmark aplus" /></td>
+					<td class="label">${getColorCodeGradeAplus()}</td>
+					<td><div class="legendmark a" /></td>
+					<td class="label">${getColorCodeGradeA()}</td>
+					<td><div class="legendmark aminus" /></td>
+					<td class="label">${getColorCodeGradeAminus()}</td>
+					<td><div class="legendmark bplus" /></td>
+					<td class="label">${getColorCodeGradeBplus()}</td>
+					<td><div class="legendmark b" /></td>
+					<td class="label">${getColorCodeGradeB()}</td>
+					<td><div class="legendmark bminus" /></td>
+					<td class="label">${getColorCodeGradeBminus()}</td>
+					<td><div class="legendmark cplus" /></td>
+					<td class="label">${getColorCodeGradeCplus()}</td>
+					<td><div class="legendmark c" /></td>
+					<td class="label">${getColorCodeGradeC()}</td>
+					<td><div class="legendmark dplus" /></td>
+					<td class="label">${getColorCodeGradeDplus()}</td>
+					<td><div class="legendmark d" /></td>
+					<td class="label">${getColorCodeGradeD()}</td>
+					<td><div class="legendmark f" /></td>
+					<td class="label">${getColorCodeGradeF()}</td>
+				</tr>
+				<tr>
+					<td>*</td>
+					<td class="label" colspan="10">${message:edited-by-leader} </td>
+				</tr>
+				<t:if test="eval.allowSelfEvaluation">
+					<tr>
+						<td>Note:</td>
+						<td class="label" colspan="10">${message:note-self-not-contribute-to-total} </td>
+					</tr>
+				</t:if>	
+			</table>
+		</div>
+	</div>
+</p:legendBlk>
+
+
+<table class="actionToolBar">
+	<tr>
+		<td class="right">
+		</td>
+	</tr>
+</table>
+
+<div class="e-formeditor t-beaneditor">
+	<table >
+		<tr>
+			<td class="label">${message:evaluating-student}</td>
+			<td>
+				${selectedUser.displayName}
+			</td>
+		</tr>
+		
+	</table>
+<br />
+</div>		
+
+<t:form t:id="form">
+<div id="evalContainer">
+<t:if test="eval.criterias">
+	
+	<table class="t-data-grid evaltbl" >
+		<tr>
+			<th rowspan="2" colspan="3"><t:outputraw value="getSpace()"/></th>
+	
+			<th colspan="${eval.criterias.size()}" ><t:if test="eval.rubric">${eval.rubric.name}</t:if></th>
+			<t:if test="hasQualitativeFeedback(eval)">
+				<th  colspan="${getNumQualitativeFeedback(eval)}">${message:comment}</th>
+			</t:if>
+	
+			<t:if test="eval.useFixedPoint" negate="true">
+				<th class="no_bot_border" rowspan="3" >
+					${message:total-average} 
+					<br/> <span class="formtip">(%)</span> 
+				</th>
+			</t:if>
+		</tr>
+			
+		<tr>
+			<t:loop source="eval.criterias" value="tempCrit" index="colIndex" >
+				<th class="crit" title="${tempCrit.name}">
+					<t:outputraw value="${truncateString(textarea2html(tempCrit.name),100)}"/>
+				</th>
+			</t:loop>
+			<t:if test="eval.getUseCmtStrength()">
+				<th class="no_bot_border cmmtnamebox" rowspan="2">
+					  	<span id="csDisplay">${getCmmtStrengthName(eval)}</span>
+				</th>
+		   	</t:if>
+			<t:if test="eval.getUseCmtWeakness()">
+				<th class="no_bot_border cmmtnamebox" rowspan="2">
+					  	<span id="cwDisplay">${getCmmtWeaknessName(eval)}</span>
+				</th>
+			</t:if>
+			<t:if test="eval.getUseCmtOther()">
+				<th class="no_bot_border cmmtnamebox" rowspan="2">
+					   	<span id="coDisplay">${getCmmtOtherName(eval)}</span>
+				</th>
+			</t:if>
+		</tr>
+		<tr>
+			<th >${message:no}</th>
+			<th ><t:if test="eval.group">
+					${message:group}
+				</t:if></th>
+			<th >${message:evaluated-by}</th>
+			<t:loop source="eval.criterias" value="tempCrit" index="colIndex" >
+				<th class="weight">
+					<t:if test="eval.useFixedPoint" negate="true">
+						<span class="formtip">${message:weightage-label}: <span id="w_${tempCrit.id}">${tempCrit.weightage}</span></span>
+						<br/>
+					</t:if>
+					<span class="formtip"><span id="min_${tempCrit.id}">${tempCrit.minScore}</span>-<span id="m_${tempCrit.id}">${tempCrit.maxScore}</span></span>
+				</th>
+			</t:loop>
+		</tr>
+		
+		${loadEvalUserList(eval, selectedUser)}
+		
+		<t:if test="assessors" negate="true">
+			<tr><td colspan="50">-- No one evaluated this student yet --</td></tr>
+		</t:if>				
+		
+		<t:loop source="assessors" value="user" index="rowIndex">
+			<tr class="${getIsSelfClass(user)}">
+				${loadEvalUser(eval,user)}
+				<td>${getRowNum()}</td>
+				<td ><t:if test="groupUser">${groupUser.getGroupNumNameDisplay()}</t:if></td>
+				<td class="name ${getHasNotGradedClass()}" id="u_${user.id}">
+						${user.displayName} ${getIsSelf(user)}
+				</td>
+				
+				<t:loop source="eval.criterias" value="tempCrit" index="colIndex" >
+					<td>
+						<input class="critScore ${getIsSelfClass(user)}" 
+							id="s_${tempCrit.id}_${user.id}" name="s_${tempCrit.id}_${user.id}" 
+							onchange="critScoreChanged('${tempCrit.id}','${user.id}','${getCritScoreDisplay(tempCrit,evalUser)}')"
+							value="${getCritScoreDisplay(tempCrit,evalUser)}"/>
+							<t:if test="hasGraded()">
+								<t:if test="evalUser.hasEditedCritByLeader(tempCrit)">
+									<span title="${message:original-value-is} ${getCritScoreOriginalDisplay(tempCrit, evalUser)}, Last edited by: ${getEditedPerson(evalUser.editedPerson)}">*</span>
+								</t:if>
+							</t:if>
+					</td>
+				</t:loop>
+		
+				<t:if test="eval.getUseCmtStrength()">		
+				<td class="strength" >
+					<textarea id="cstr_${user.id}" name="cstr_${user.id}" 
+						onchange="cmtChanged('cstr_','${user.id}')"><t:if test="hasGraded()">${evalUser.cmtStrengthDisplay}</t:if></textarea>
+						<t:if test="hasGraded()">
+							<t:if test="evalUser.hasEditedStrengthByLeader()">
+								<a href="javascript:void(0);" title="Last edited by: ${getEditedPerson(evalUser.editedPerson)} , ${message:click-to-view-original}"
+								onclick="openPopup('${getViewCmtStrengthURL(evalUser.id)}', 'evalCmmt', 500, 300)">
+				   					*
+				   				</a>
+							</t:if>
+						</t:if>
+				</td>
+				</t:if>
+				<t:if test="eval.getUseCmtWeakness()">
+				<td class="weakness" >
+					<textarea id="cwkn_${user.id}" name="cwkn_${user.id}"
+						onchange="cmtChanged('cwkn_','${user.id}')"><t:if test="hasGraded()">${evalUser.cmtWeaknessDisplay}</t:if></textarea>
+						<t:if test="hasGraded()">
+							<t:if test="evalUser.hasEditedWeaknessByLeader()">
+								<a href="javascript:void(0);" title="${message:click-to-view-original}"
+								onclick="openPopup('${getViewCmtWeaknessURL(evalUser.id)}', 'evalCmmt', 500, 300)">
+				   					*
+				   				</a>
+							</t:if>
+						</t:if>
+				</td>
+				</t:if>
+				<t:if test="eval.getUseCmtOther()">
+				<td class="other" >
+					<textarea id="cothr_${user.id}" name="cothr_${user.id}"
+						onchange="cmtChanged('cothr_','${user.id}')"><t:if test="hasGraded()">${evalUser.cmtOtherDisplay}</t:if></textarea>
+						<t:if test="hasGraded()">
+							<t:if test="evalUser.hasEditedOtherByLeader()">
+								<a href="javascript:void(0);" title="${message:click-to-view-original}"
+								onclick="openPopup('${getViewCmtOtherURL(evalUser.id)}', 'evalCmmt', 500, 300)">
+				   					*
+				   				</a>
+							</t:if>
+						</t:if>
+				</td>
+				</t:if>
+				
+				<t:if test="eval.useFixedPoint" negate="true">
+							
+					<td class="total ${getTotalScoreClass()} ${getIsSelfClass(user)}" id="t_${user.id}">${getTotalScoreDisplay()}</td>
+				</t:if>
+			</tr>
+			
+			
+			<t:if test="eval.openEndedQuestions">
+				<tr>
+					<td></td>
+					<td colspan="100">
+						<table width="100%">
+							<tbody>
+							<t:loop source="eval.openEndedQuestions" value="oQuestion" index="quesIndex" >
+								<tr>
+									<th width="30%" class=" opques" title="${oQuestion}"  >
+										<t:outputraw value="${truncateString(textarea2html(oQuestion),300)}"/>
+									</th>
+									<td class=" opques">
+										<t:outputraw value="${textarea2html(evalUser.getOpenEndedQuestionAnswers(quesIndex))}"/>
+				
+									</td>
+								</tr>
+							</t:loop>
+							</tbody>
+						</table>
+					</td>
+				</tr>
+				</t:if>	
+		</t:loop>
+
+<t:if test="eval.useFixedPoint" negate="true">		
+		<tr>
+			<th colspan="3" style="text-align:right;">${message:average}:</th>
+
+			<t:loop source="eval.criterias" value="tempCrit" index="colIndex" >
+				<t:if test="eval.useFixedPoint">
+					<th class="average " >${getAverageScoreDisplay(tempCrit)}</th>
+					<p:else>
+						<td id="a_${tempCrit.id}" class="average ${getAverageScoreClass(tempCrit)}" >${getAverageScoreDisplay(tempCrit)}</td>
+					</p:else>
+				</t:if>
+			</t:loop>
+			<t:if test="hasQualitativeFeedback(eval)">
+				<td colspan="${getNumQualitativeFeedback(eval)}"><t:outputraw value="getSpace()"/></td>
+			</t:if>
+
+			
+				<td id="ta_" class="average ${getTotalAverageScoreClass()}">${getTotalAverageScoreDisplay()}</td>
+			
+		</tr>
+		</t:if>
+	</table>
+	
+	
+</t:if>	
+	
+	<div align="right" style="padding-right:10px;margin-top:10px;">
+		<t:submit t:id="save" id="btnSave" value="${message:save}" 
+			class="submit squared" style="padding:0px 15px;margin-right:15px;"
+			onclick="return onSubmitClicked()"/>
+		<t:pagelink page="modules/peerevaluation/viewaveragemoderate" context="eval.id" class="button squared">${message:cancel}</t:pagelink>
+	</div>
+	
+</div>
+</t:form>
+
+<script>
+	function critScoreChanged(critID, userID, prevScore){
+		var score = $('s_'+critID + '_'+userID).value;
+		var maxScore = parseInt($('m_'+critID).innerHTML);
+		var minScore = parseInt($('min_'+critID).innerHTML);
+			
+		var hasInvalidInput = false;
+		
+		if(!isInt(score)){
+			alert("Please fill in Integer value. Input: " +score);
+			$('s_'+critID + '_'+userID).value = prevScore;
+			hasInvalidInput = true;
+		}
+		else 
+		if(lessThan(maxScore,score)){
+			alert("Must input integer no larger than : " +maxScore);
+			$('s_'+critID + '_'+userID).value = prevScore;
+			hasInvalidInput = true;
+		}
+		else if(lessThan(score,minScore)){
+			alert("Must input integer no smaller than : " +minScore);
+			$('s_'+critID + '_'+userID).value = prevScore;
+			hasInvalidInput = true;
+		}
+		
+		
+		reComputeTotal(userID);
+		reComputeAverage(critID);
+		reComputeTotalAverage();
+		
+		if($('s_'+critID + '_'+userID).value == prevScore){
+			$('s_'+critID + '_'+userID).removeClassName("edited");
+			
+			//if(prevScore == ''){
+			//	$('u_'+userID).removeClassName("markSubmited");
+			//}
+		}
+		else{
+			$('s_'+critID + '_'+userID).addClassName("edited");
+			//if(prevScore == ''){
+			//	$('u_'+userID).addClassName("markSubmited");
+			//}
+		}
+		
+		if(hasInvalidInput)
+			return false;
+		return true;
+	}
+	function cmtChanged(cmtType, userId){
+		$(''+ cmtType + userId).addClassName("edited");
+	}
+	
+	function reComputeTotal(usrId){
+		var total = 0;
+		for(var i=0; lessThan(i,critIDList.length); i++){
+			var elm = $('s_' + critIDList[i]+ '_' +usrId)
+			if(! elm.hasClassName("self")){
+				total += ($('s_' + critIDList[i]+ '_' +usrId).value * $('w_'+critIDList[i]).innerHTML ) / $('m_'+critIDList[i]).innerHTML;
+			}
+		}
+		total = Math.round(total*100)/100;
+		$('t_' + usrId).update(total);
+		reUpdateTotalClass(total, usrId);
+	}
+	function reUpdateTotalClass(total, usrId){
+		var possibleScore = 100;
+		for(var i=0; lessThan(i,classList.length); i++){
+			$('t_' + usrId).removeClassName(classList[i]);
+		}
+		var colorCodeClassName = convertScoreToGradeClass(total, possibleScore ) ;
+		$('t_' + usrId).addClassName(colorCodeClassName );
+	}
+	
+	function reComputeAverage(critId){
+		var total = 0;
+		var n = 0;
+		for(var i=0; lessThan(i,userIDList.length); i++){
+			var elm = $('s_' + critId+ '_' +userIDList[i])
+			if(! elm.hasClassName("self")){
+				var score = elm.value
+				if(score !=""){
+					total += parseInt(score);
+					n++;
+				}
+			}
+		}
+		if(!(n==0))
+			total = total/n;
+		var average = Math.round(total*100)/100;
+		$('a_' + critId).update(average);
+		var maxScore = $('m_'+critId).innerHTML;
+		reUpdateAverageClass(average, maxScore, critId);
+	}
+	function reUpdateAverageClass(average, maxScore, critId){
+		for(var i=0; lessThan(i,classList.length); i++){
+			$('a_' + critId).removeClassName(classList[i]);
+		}
+		var colorCodeClassName = convertScoreToGradeClass(average, maxScore ) ;
+		$('a_' + critId).addClassName(colorCodeClassName );
+	}
+	function reComputeTotalAverage(){
+		var total = 0;
+		var n = 0;
+		for(var i=0; lessThan(i,userIDList.length); i++){
+			var elm = $('t_' + userIDList[i])
+			if(! elm.hasClassName("self")){
+				total += parseFloat(elm.innerHTML);
+				n++;
+			}
+		}
+		if(!(n==0))
+			total = total/n;
+		var totalAverage = Math.round(total*100)/100;
+		$('ta_').update(totalAverage);
+		reUpdateTotalAverageClass(totalAverage);
+	}
+	function reUpdateTotalAverageClass(totalAverage){
+		var possibleScore = 100;
+		for(var i=0; lessThan(i,classList.length); i++){
+			$('ta_').removeClassName(classList[i]);
+		}
+		var colorCodeClassName = convertScoreToGradeClass(totalAverage, possibleScore ) ;
+		$('ta_').addClassName(colorCodeClassName );
+	}
+	
+	
+	var critIDList = ${getJSArrCritID()};
+	var userIDList = ${getJSArrUserID()}
+	
+	var gradeList = ['A+','A','A-','B+','B','B-','C+','C','D+','D','F'];
+	var classList = ['aplus','a','aminus','bplus','b','bminus','cplus','c','dplus','d','f'];
+	var classScore = [${message:grade-a-plus},${message:grade-a},${message:grade-a-minus}
+					,${message:grade-b-plus},${message:grade-b},${message:grade-b-minus}
+					,${message:grade-c-plus},${message:grade-c}
+					,${message:grade-d-plus},${message:grade-d},${message:grade-f} ];
+	
+	function convertScoreToGradeClass(score, possibleScore){
+		if(possibleScore!=0){
+			var percent = 100 * score / possibleScore;
+			for(var i=0; lessThan(i,classScore.length); i++){
+				if(greaterThanOrEqual(percent, classScore[i]))
+					return classList[i];
+			}
+		}
+		return "na";
+	}
+	
+	function onSubmitClicked(){
+		if($$('.edited').length != 0 ){
+			if(${containNotEditedByInstructor()}){ 
+				var ans = confirm("${message:confirm-mark-submit}");
+				if(ans)
+					return true;
+				else
+					return false;
+			}
+		}	
+		return true;
+	}
+	document.observe("dom:loaded", function(){
+	
+	});
+</script>
+
+
+</html>

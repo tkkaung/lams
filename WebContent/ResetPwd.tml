@@ -1,0 +1,32 @@
+<html t:type="layout" 
+	title="${message:reset-password}" 
+	breadcrumb="${message:reset-password}=resetpwd"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" 
+	xmlns:p="tapestry:parameter">
+<p:legendBlk>
+	<span class="required">*</span>  ${message:required-fields}
+</p:legendBlk>
+
+	<t:beaneditform t:id="form"  object="user"  
+      		clientValidation="false"
+      		add="confirmPassword"
+      		include="username,password"
+        		submitLabel="${message:submit-label}">
+	    <t:parameter name="username">
+	    	<label for="username">${message:username-label}</label>
+	      	${user.username}
+	    </t:parameter>
+	   <t:parameter name="password">
+	      <t:label for="password"><span class="required">*</span> ${message:password-label}</t:label>
+	      <t:passwordfield t:id="password" value="password" validate="required"/>
+	    </t:parameter>
+	   <t:parameter name="confirmPassword">
+	      <t:label for="confirmPassword"><span class="required">*</span> ${message:confirmPassword-label}</t:label>
+	      <t:passwordfield t:id="confirmPassword" value="confirmPassword" validate="required"/>
+	    </t:parameter>
+   </t:beaneditform>
+	
+
+    
+    
+</html>

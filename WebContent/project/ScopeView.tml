@@ -1,0 +1,127 @@
+<html t:type="layout" 
+	title="${message:view-scope-n-prerequisite}"
+	currentModule="${moduleName}"
+   currentProj="curProj"
+	breadcrumb="${curProj.encodeddisplayname}=project/home?${curProj.id}
+		,${message:view-scope-n-prerequisite}=project/scopeview?${peInfo.id}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+
+	<style>
+		.projScopeRequisiteBLK{
+			width: 620px;
+		}
+	</style>
+	
+	<form t:type="form" t:id="form" class="e-formeditor">
+	<t:errors />
+	<div class="t-beaneditor">
+		<table >
+			<tr>
+				<td class="label">${message:status-label}</td>
+				<td>
+					<strong>
+						<t:if test="peInfo.hasStatusChanged()">
+							${peInfo.status}
+							<p:else>
+								${message:no-change}
+							</p:else>
+						</t:if>
+					</strong>
+				</td>
+			</tr>
+			<t:if test="peInfo.logs">
+				<tr>
+					<td class="label">${message:logs-label}</td>
+					<td>
+						<span class="subdes"><t:outputraw value="peInfo.logs"/></span>
+					</td>
+				</tr>
+			</t:if>
+			<tr>
+				<td class="label">${message:original-scope-prerequisite}</td>
+				<td>
+					<div class="projScopeRequisiteBLK defaultBlkBg">
+						<div >
+		    				<div>
+		    					<span class='title'>${message:project-scope}</span>
+		    				</div>
+		    				<div class="content">
+		    					<t:outputraw value="peInfo.originalScope"/>
+		    				</div>
+		    			</div>
+		    			<div>
+		    				<div>
+		    					<span class='title'>${message:project-prerequisite}</span>
+		    				</div>
+		    				<div class="content">
+		    					<t:outputraw value="peInfo.originalPrerequisite"/>
+		    				</div>
+		    			</div>
+	    			</div>
+				</td>
+			</tr>
+			<t:if test="peInfo.approvedScope">
+				<tr>
+					<td class="label">
+						<t:if test="peInfo.isPrevRejected()">
+							${message:previously-approved}
+							<p:else>
+								${message:approved}
+							</p:else>
+						</t:if>
+					</td>
+					<td>
+						<div class="projScopeRequisiteBLK defaultBlkBg">
+							<div >
+			    				<div>
+			    					<span class='title'>${message:project-scope}</span>
+			    				</div>
+			    				<div class="content">
+			    					<t:outputraw value="peInfo.approvedScope"/>
+			    				</div>
+			    			</div>
+			    			<div>
+			    				<div>
+			    					<span class='title'>${message:project-prerequisite}</span>
+			    				</div>
+			    				<div class="content">
+			    					<t:outputraw value="peInfo.approvedPrerequisite"/>
+			    				</div>
+			    			</div>
+		    			</div>
+					</td>
+				</tr>
+			</t:if>
+			<t:if test="peInfo.isPrevRejected()">
+				<tr>
+					<td class="label">${message:rejected}</td>
+					<td>
+					
+						<div class="projScopeRequisiteBLK defaultBlkBg">
+							<div >
+			    				<div>
+			    					<span class='title'>${message:project-scope}</span>
+			    				</div>
+			    				<div class="content">
+			    					<t:outputraw value="peInfo.rejectedScope"/>
+			    				</div>
+			    			</div>
+			    			<div>
+			    				<div>
+			    					<span class='title'>${message:project-prerequisite}</span>
+			    				</div>
+			    				<div class="content">
+			    					<t:outputraw value="peInfo.rejectedPrerequisite"/>
+			    				</div>
+			    			</div>
+		    			</div>
+					</td>
+				</tr>
+			</t:if>
+			
+		</table>
+	</div>
+	</form>
+</html>

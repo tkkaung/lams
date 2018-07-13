@@ -1,0 +1,23 @@
+<t:container
+      xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+      xmlns:p="tapestry:parameter">
+	<t:if test="sysannmts">
+		<div class="sysAnnmts">
+			<div class="header">${message:systemannouncement}:</div>
+			<t:loop source="sysannmts" value="sysannmt">
+				<div class="sysAnnmtBlk ${getUrgentClass()}">
+					<div>
+						<t:if test="sysannmt.urgent">
+							<img src="${context:lib/img/icon_urgent.png}" alt="${message:annmt-urgent-tip}" title="${message:annmt-urgent-tip}" />
+							- 
+						</t:if>
+						<span class="subject">${sysannmt.subject}</span>
+					</div>
+					<div class="content"><t:outputraw value="sysannmt.content"/></div>
+				</div>
+			</t:loop>		
+		</div>
+	</t:if>
+ 
+   
+</t:container>

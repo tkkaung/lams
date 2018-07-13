@@ -1,0 +1,151 @@
+<html t:type="layout" 
+	title="${message:sysrole} ${message:privilege}"
+	breadcrumb="${message:control-panel}=admin,${message:manage} ${message:sysrole}=admin/sysrole,${message:sysrole} ${message:privilege}=admin/sysrole/privilege"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="systemtools"/></p:leftMenuBlk>
+	<style>
+		table.t-data-grid THEAD TR TH {
+			white-space: normal;
+		}
+		.privChanged {
+			border: 1px solid #F7A030 ;
+		}
+	</style>
+	
+	<p:actionBtns>
+		<t:if test="isEditMode()">
+			<a t:type="actionLink" t:id="viewModeBtn" class="button rounded"><span>${message:view-mode}</span></a>
+			<p:else>
+				<a t:type="actionLink" t:id="editModeBtn" class="button rounded"><span>${message:edit-mode}</span></a>
+			</p:else>
+		</t:if>
+	</p:actionBtns>
+	
+	<p:legendBlk>
+	 <div class="legend">
+    	<div class="title">${message:privileges-label} :</div>
+    	<div class="content">
+    		<ul>
+	    		<li t:type="loop" source="privs" value="priv">
+	    		<strong>${priv.name}</strong> - ${priv.description}
+	    		</li>
+	    	</ul>
+    	</div>
+    </div>
+	</p:legendBlk>
+	
+	
+	<table class="actionToolBar">
+		<tr>
+			<td class="right">		 	
+			</td>
+		</tr>
+	</table>
+	
+<div >
+<t:form t:id="form">
+	<div class="t-data-grid">
+	<table class="stickyHeader t-data-grid">
+		<thead><tr><th class="t-first"></th>
+				<t:loop source="privs" value="priv">
+					<th title="${priv.description}" class="small">${priv.name}</th>
+				</t:loop>
+			</tr>
+		</thead>
+		<tbody>
+			<t:loop source="sysRoles" value="sysRole">
+				<p:empty><div class="notfoundtext">${message:no-role-defined}</div></p:empty>
+			<tr >
+				<td class="row_title t-first" title="${sysRole.description}">${sysRole.displayname}</td>
+				<t:loop source="privs" value="priv">
+					<td align="center">
+						<t:if test="isEditMode()">
+							<span>
+								<input type="checkbox" name="roleID:privIDs"
+									id="${sysRole.id}:${priv.id}" 
+									value="${sysRole.id}:${priv.id}" checked="${containsPrivChecked(sysRole,priv)}"
+									onclick="privIdClicked(this.id)"
+									/>
+							</span>
+							
+							<p:else>
+								<t:if test="containsPriv(sysRole,priv)">
+									<img src="${context:lib/img/show_yes.png}" alt="Yes" />
+								</t:if>
+							</p:else>
+						</t:if>
+					</td>
+				</t:loop>
+			</tr>
+			</t:loop>
+		</tbody>
+		</table>
+	</div>
+	<t:if test="isEditMode()">
+		<div style="text-align:right;margin:5px 10px 0 0;">
+			<t:submit t:id="bsubmit" value="${message:save}" title="${message:save-all}" 
+				class="submit squared disabled" />
+		</div>
+	</t:if>
+	<input type="hidden" name="changedToYes" id="changedToYes" value=""/> <!-- format: roleID1:privID1,roleID2:privID2 ... -->
+	<input type="hidden" name="changedToNo" id="changedToNo" value=""/>
+</t:form>
+</div>	
+
+
+
+<script>
+	function privIdClicked(elmID){
+		var elm = $(elmID);
+		if(elm.checked){
+			if(!elm.hasClassName('cToNo')){
+				elm.addClassName('cToYes');
+				elm.up(0).addClassName('privChanged');
+			}
+			else{
+				elm.removeClassName('cToNo');
+				elm.up(0).removeClassName('privChanged');
+			}
+		}
+		else{
+			if(!elm.hasClassName('cToYes')){
+				elm.addClassName('cToNo');
+				elm.up(0).addClassName('privChanged');
+			}
+			else{
+				elm.removeClassName('cToYes');
+				elm.up(0).removeClassName('privChanged');
+			}
+		}
+		
+		reupdateHiddenFields();
+		if(($('changedToNo').value) || ($('changedToYes').value)){
+			$$('.submit').invoke('removeClassName','disabled');
+		}
+		else{
+			$$('.submit').invoke('addClassName','disabled');
+		}		
+	}
+	function reupdateHiddenFields(){
+		var str = "";
+		$$('.cToYes').each(function(elm){
+			str += elm.value + ",";
+		});
+		if(str!=""){
+			str = str.substring(0,str.length -1);
+		}
+		$('changedToYes').value = str;
+		
+		str = "";
+		$$('.cToNo').each(function(elm){
+			str += elm.value + ",";
+		});
+		if(str!=""){
+			str = str.substring(0,str.length -1);
+		}
+		$('changedToNo').value = str;
+		
+	}
+
+</script>
+</html>

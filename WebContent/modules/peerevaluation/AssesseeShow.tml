@@ -1,0 +1,231 @@
+<html t:type="layout" 
+	title="${message:assessee-show}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/peerevaluation/assesseehome?${project.id}
+		,${message:assessee-show}=modules/peerevaluation/assesseeshow"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+<style>
+	.rubricDetailZone .critCol{
+		width: ${getCritNameWidthPercentNum(60,getFirstCriterions().size())};
+	}
+	.legend .non-selected{
+		background: #FFF url('${context:lib/img/e-block-bg.png}') repeat-x 0px top;
+	}
+	.legend .selected{
+		background: #acebff;
+	}
+	.rubricDetailZone .cr_obj{
+		background: #FFF url('${context:lib/img/e-block-bg.png}') repeat-x 0px top;
+		cursor: pointer;
+	}
+	.rubricDetailZone .cr_obj:hover{
+		background: #FFF url('${context:lib/img/e-block-bg-s.png}') repeat-x 0px top;
+	}
+	.rubricDetailZone .cr_obj.selected{
+		background: #acebff;
+	}
+	.rubricDetailZone .score{
+		text-align: center;
+		font-weight:bold;
+		width: 40px;
+	}
+	.rubricDetailZone .totalScoreR{
+		text-align: center;
+		font-weight:bold;
+		width: 40px;
+	}
+	.rubricDetailZone th.critName{
+		text-align:left;
+	}
+	
+	#assmtContainer {
+		overflow-x: auto;
+	<t:if test="${isMoreThan(eval.criterias.size(), 7)}">	
+		_overflow-x: scroll;  /* IE */
+	</t:if>
+		width: 100%;
+		/*		width: 972px;*/
+	}
+	table.t-data-grid th.no_bot_border{
+		border-bottom-color: #ccc !important; 
+	}
+	table.t-data-grid th.no_top_border{
+		border-top-color: #ccc !important; 
+	}
+	
+	table.t-data-grid tbody tr td{
+		text-align: center;
+		vertical-align: middle;
+	}
+	.evaltbl th{
+		padding:5px
+	}
+	.evaltbl .name{
+		text-align: left;
+	}
+	.evaltbl .crit {
+		vertical-align: top;
+		width: ${getCritNameWidthPercent(60, eval)};
+		text-align: left;
+		font-size: 11px;
+	}
+	.evaltbl .opques{
+		vertical-align: top;
+		text-align: left;
+		font-size: 11px;
+	}
+	.evaltbl td.strength, .evaltbl td.weakness, .evaltbl td.other {
+		vertical-align: top;
+		text-align: left;
+		
+	}
+</style>
+
+<p:actionBtns>
+</p:actionBtns>	
+
+
+
+<form t:type="form" t:id="form" class="e-formeditor" autofocus="false">
+<div class="e-formeditor t-beaneditor">
+	<table >
+		<tr>
+			<td class="label">${message:evaluation}</td>
+			<td>
+				${eval.name}
+				<div><t:outputraw value="${textarea2html(eval.des)}"/></div>
+			</td>
+		</tr>
+		<tr>
+			<td class="label">${message:status-label}</td>
+			<td>
+				${getEvalStatusStudentView(eval, getCurUser())}
+			</td>
+		</tr>
+	</table>
+<br />
+	<div class="rubricDetailZone view">
+		
+<div id="assmtContainer">
+<t:if test="eval.criterias">
+	<table class="t-data-grid evaltbl" >
+		<thead>
+		<tr>
+			<th class="no_bot_border " rowspan="2">${message:no}</th>
+			<th class="no_bot_border " rowspan="2">Student</th>
+			<th colspan="${eval.criterias.size()}" >${message:rubric} : <t:if test="eval.rubric">${eval.rubric.name}</t:if></th>
+			<t:if test="hasQualitativeFeedback(eval)">
+				<th  colspan="${getNumQualitativeFeedback(eval)}">${message:comment}</th>
+			</t:if>
+		
+		</tr>
+		<tr>
+			<t:loop source="eval.criterias" value="tempCrit" index="colIndex" >
+				<th class="crit" title="${tempCrit.name}">
+					<t:outputraw value="${truncateString(textarea2html(tempCrit.name),300)}"/>
+				</th>
+			</t:loop>
+			<t:if test="eval.getUseCmtStrength()">
+				<th class="no_bot_border cmmtnamebox" >
+					  	<span id="csDisplay">${getCmmtStrengthName(eval)}</span>
+				</th>
+		   	</t:if>
+			<t:if test="eval.getUseCmtWeakness()">
+				<th class="no_bot_border cmmtnamebox" >
+					  	<span id="cwDisplay">${getCmmtWeaknessName(eval)}</span>
+				</th>
+			</t:if>
+			<t:if test="eval.getUseCmtOther()">
+				<th class="no_bot_border cmmtnamebox" >
+					   	<span id="coDisplay">${getCmmtOtherName(eval)}</span>
+				</th>
+			</t:if>
+	
+			</tr>
+		
+		</thead>
+		<tbody>
+		<t:loop source="assessees" value="user" index="rowIndex">
+			<tr>
+				<td>${getRowNum()}
+				</td>
+				<td class="name" id="${user.id}">
+						${user.displayName} ${getIsSelf(user)}
+				${loadEvalUser(user)}
+				</td>
+				<t:loop source="eval.criterias" value="tempCrit" index="colIndex" >
+					<td class="critCol">
+						<t:if test="hasGradedCrit(tempCrit)">
+							${getGradedCrit(tempCrit).score}
+						</t:if>
+					</td>
+				</t:loop>
+				<t:if test="eval.getUseCmtStrength()">
+				<td class="strength" >
+					<t:if test="hasGraded()">
+						<t:outputraw value="${textarea2html(evalUser.cmtStrength)}"/>
+					</t:if>
+				</td>
+				</t:if>
+				<t:if test="eval.getUseCmtWeakness()">
+				<td class="weakness" >
+					<t:if test="hasGraded()">
+						<t:outputraw value="${textarea2html(evalUser.cmtWeakness)}"/>
+					</t:if>
+				</td>
+				</t:if>
+				<t:if test="eval.getUseCmtOther()">
+				<td class="other" >
+					<t:if test="hasGraded()">
+						<t:outputraw value="${textarea2html(evalUser.cmtOther)}"/>
+					</t:if>
+				</td>
+				</t:if>
+				
+			</tr>
+			
+			
+				<t:if test="eval.openEndedQuestions">
+				<tr>
+					<td></td>
+					<td colspan="100">
+						<table width="100%">
+							<tbody>
+							<t:loop source="eval.openEndedQuestions" value="oQuestion" index="quesIndex" >
+								<tr>
+									<th width="30%" class=" opques" title="${oQuestion}"  >
+										<t:outputraw value="${truncateString(textarea2html(oQuestion),300)}"/>
+									</th>
+									<td class=" opques">
+										<t:outputraw value="${textarea2html(evalUser.getOpenEndedQuestionAnswers(quesIndex))}"/>
+				
+									</td>
+								</tr>
+							</t:loop>
+							</tbody>
+						</table>
+					</td>
+				</tr>
+				</t:if>	
+		</t:loop>
+		</tbody>
+	</table>
+	
+		
+</t:if>	
+</div>
+
+	</div>
+	
+</div>
+</form>
+<script>
+	
+	document.observe("dom:loaded", function(){
+	});
+</script>
+</html>

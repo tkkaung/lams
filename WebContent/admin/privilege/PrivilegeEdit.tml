@@ -1,0 +1,42 @@
+<html t:type="layout"
+	title="${message:add-edit} ${message:privilege}"
+	breadcrumb="${message:control-panel}=admin
+		,${message:manage} ${message:privilege}=admin/privilege
+		,${message:add-edit} ${message:privilege}=admin/privilege/edit"
+   xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="systemtools"/></p:leftMenuBlk>
+	<p:legendBlk>
+		<span class="required">*</span>  ${message:required-fields}
+	</p:legendBlk>
+
+	<t:beaneditform t:id="form" object="priv"
+		exclude="system" 
+		submitLabel="${message:submit-label}" >
+		<p:id>
+			<t:if test="isCreateMode()">
+				<t:label for="id" ><span class="required">*</span>  ${message:id-label}</t:label>
+				<t:textfield t:id="id" value="priv.id" maxlenght="10" class="swidth" />
+				<span class="formtip">${message:name-known-to-system-tip}</span>
+				
+				<p:else>
+					<label>${message:id-label}</label>
+					<strong>${priv.id}</strong>
+				</p:else>	
+			</t:if>
+			
+    	</p:id>
+		<p:name>
+			<t:label for="name" ><span class="required">*</span>  ${message:name-label}</t:label>
+			<t:textfield t:id="name" value="priv.name" maxlenght="100" class="mwidth"   />
+		</p:name>
+    	<p:description>
+			<t:label for="description" />
+			<textarea t:type="textarea" t:id="description" value="priv.description" cols="50" rows="5" class="lwidth" style="height:150px;"/>
+		</p:description>
+		<p:type>
+			<t:label for="type" ><span class="required">*</span>  ${message:type-label}</t:label>
+			<t:select t:id="type" value="priv.type" validate="required"/>
+		</p:type>
+    </t:beaneditform>
+	
+</html>

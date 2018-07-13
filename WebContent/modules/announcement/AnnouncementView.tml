@@ -1,0 +1,66 @@
+<html t:type="layout" 
+	title="${message:view} ${message:announcement}"
+	currentModule="${moduleName}"
+	currentProj="curProj"
+	breadcrumb="${curProj.encodeddisplayname}=project/home?${curProj.id}
+		,${module.displayName}=modules/announcement?${curProj.id}
+		,${getBreadcrumb()}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+	
+	
+	<p:actionBtns>
+		<t:if test="curProj.isReference()" negate="true">
+		<t:if test="canUpdateAnnouncement(annmt)">
+			<a class="button rounded" t:type="pageLink" page="modules/announcement/edit" context="annmt.id" >
+				<span>${message:edit}</span>
+			</a>
+		</t:if>
+		</t:if>
+	</p:actionBtns>	
+	
+	<table class="announcement-block"  >
+		<tr>
+			<td rowspan="3" class="icon"><img src="${context:lib/img/24/m_Announcement.png}" /></td>
+			<td class="title">
+				<t:if test="annmt.urgent">
+					<img src="${context:lib/img/icon_urgent.png}"  alt="${message:annmt-urgent-tip}" title="${message:annmt-urgent-tip}" />
+					-
+				</t:if>
+			 	<span class="date">${annmt.startDateDisplay}</span> 
+				- <span class="subject" style="font-size:1.2em;">
+			 		${annmt.subject}
+			 	</span>
+			 </td>
+			<td class="postedBy" >
+				${message:posted-by}: 
+					<t:pagelink page="user/view" class="userlink" context="annmt.creator.id" >
+						${annmt.creator.displayName}
+					</t:pagelink> 
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2"><div class="content" style="min-height: 150px;height:auto!important;_height:150px;">
+				<t:outputraw value="annmt.content"/></div>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<t:if test="annmt.hasRead(curUser)">
+					<span class="tips">${message:dismissed-annmt-tip}
+					<a t:type="actionLink" t:id="unreadAnnmt" context="annmt.id" >
+						<span>${message:mark-unread}</span>
+					</a>
+					</span>
+					
+					<p:else>
+						<a  t:type="actionLink" t:id="dismissAnnmt" context="annmt.id" >
+							<span>${message:dismiss-annmt}</span>
+						</a>
+					</p:else>
+				</t:if>
+			</td>
+		</tr>
+	</table>
+		
+</html>

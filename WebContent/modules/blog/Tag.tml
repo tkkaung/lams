@@ -1,0 +1,141 @@
+<html t:type="layout" 
+	title="${message:page-blog-tag}: ${encode(tagName)}"
+	currentModule="${moduleName}"
+   currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/blog/home?${project.id}
+		,${message:page-blog-tag}=modules/blog/tag"
+	totalShowOption="${totalSize}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+
+
+	<table class="actionToolBar">
+		<tr>
+			<td class="right">
+			</td>
+		</tr>
+	</table>
+				
+	<t:loop source="blogsDisplay" value="blog" >
+		<p:empty>
+			<div class="notfoundtext">
+				${message:no-blog-tag-found}
+			</div>
+		</p:empty>
+		<div class="blogEntry">
+			<div class="head">
+				<table class="nomargin">
+					<tr>
+						<td>
+							<img src="${context:lib/img/16/m_Blog.png}"  class="icon" />
+							<t:pageLink page="modules/blog/view" context="blog.id">
+								<span class="subject">${blog.subject}</span>
+							</t:pageLink>
+							<t:if test="blog.shared" negate="true">
+								- <span class="attention" title="${message:private-tip}">${message:private}</span>
+							</t:if>
+							<t:if test="isPublished(blog)" negate="true">
+								- <span class="attention"  title="${message:non-published-tip}">${blog.status}</span>
+							</t:if>
+							<br/>
+							<span class="author-date">
+								${message:by} <span class="author"><t:pageLink page="user/view" context="blog.author.id">${blog.author.displayname}</t:pageLink></span>
+								, <span class="date">${blog.cdateDisplay}</span>
+							</span>
+						</td>
+						<td align="right">
+							<t:if test="canEditBlog(blog)">
+							<a t:type="pageLink" page="modules/blog/edit" context="blog.id" >
+								<span>${message:edit}</span>
+							</a>
+						</t:if>
+						<t:if test="canDeleteBlog(blog)">
+							|
+							<t:if test="blog.comments.size()">
+								<a t:type="actionLink" t:id="deleteBlog1" context="blog.id" 
+									onclick="alert('${message:cant-delete-blog-with-comment}'); return false;">
+									<span>${message:delete}</span>
+								</a>
+							
+							<p:else>
+								<a t:type="actionLink" t:id="deleteBlog" context="blog.id" 
+									onclick="return confirmDelete('${message:confirm-delete-blog}')"
+									>
+									<span>${message:delete}</span>
+								</a>
+							</p:else>
+							</t:if>
+						</t:if>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="content">
+				<t:outputraw t:value="blog.content" />
+			</div>
+			<t:if test="blog.attaches">
+				<div class="attFiles">
+					<div class="attLabel">
+						${message:attachment} <img src="${context:lib/img/icon-attachment.gif}" />
+						:
+					</div>
+					<div>
+						<t:loop source="getNonImageAttachedFiles(blog.attaches)" value="attFile">
+							<div class="attFile">
+								<t:eventLink event="retrieveFile" context="attFile.id"  title="${message:click-to-download}">
+								<img src="${getAttachFileIcon(attFile)}" style="vertical-align:bottom;"/>
+								${attFile.displayName}</t:eventLink>
+								(${attFile.displaySize})
+							</div>
+						</t:loop>
+					</div>
+					<div class="imgBlks">
+						<t:loop source="getImageAttachedFiles(blog.attaches)" value="attFile">
+							<div class="imgBlk" >
+								<a href="${getRetrieveImageLink(attFile.id)}" target="_blank" >
+									<img src="${getRetrieveImageThumbLink(attFile.id)}" alt="" title="${message:click-to-view-originalsize}"/>
+								</a>
+								<t:eventLink event="retrieveFile" context="attFile.id"  title="${message:click-to-download}">
+								${message:download}</t:eventLink>
+								(${attFile.displaySize})
+							</div>
+						</t:loop>
+					</div>					
+				</div>
+			</t:if>
+			
+			<t:if test="blog.hasEdited()">
+				<div class="mdate" >
+						${message:edited-on}: ${blog.mDateDisplay}
+				</div>
+			</t:if>
+			
+			<br />
+			<div class="linkBar" >
+				<t:pagelink page="modules/blog/view" context="blog.id" anchor="newcmt">${message:comments} </t:pagelink>
+				(<t:pagelink page="modules/blog/view" context="blog.id" anchor="viewcmt">${blog.cnum}</t:pagelink>)
+				
+				<t:if test="blog.tags.size()">
+					|
+					${message:tags-label}:
+					<t:loop source="blog.tags" value="tempTag" index="tempIndex">
+						<t:if test="isMoreThan(tempIndex, 0)">, </t:if>
+						<t:pagelink page="modules/blog/tag" context="getParams(project.id, tempTag)">
+							${tempTag}
+						</t:pagelink>
+					</t:loop>
+				</t:if>
+			 </div>
+		</div>
+	</t:loop>
+			
+	
+	<t:if test="isMoreThan(totalSize, rowsPerPage)">
+		<t:GridPager currentPage="curPageNo" rowsPerPage="rowsPerPage" source="blogs" />
+	</t:if>
+
+
+
+</html>

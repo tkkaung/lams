@@ -1,0 +1,159 @@
+<html t:type="layout" 
+	title="${getTitle()}"
+	currentModule="${moduleName}"
+	currentProj="curProj"
+	breadcrumb="${curProj.encodeddisplayname}=project/home?${curProj.id}
+		,${getModuleDisplayName(curProj)}=modules/forum?${curProj.id}
+		,${encode(truncateStr(forum.name))}=modules/forum/forumview?${forum.id},${getBreadcrumbLink()}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+	
+	<style>
+		div.existfileDiv {
+			margin-bottom: 5px;
+		}
+		.thType img{
+			margin: 0 5px;
+		}
+		
+	</style>
+	
+<p:legendBlk>
+	<span class="required">*</span>  ${message:required-fields}
+</p:legendBlk>
+	
+	<t:beaneditform t:id="form" object="thread" model="model" submitlabel="${message:submit-label}">
+		
+		<t:parameter name="name">
+			<t:label for="name" ><span class="required">*</span> ${message:name-label}</t:label>
+			<t:textfield t:id="name" value="thread.name" validate="required" class="lwidth"></t:textfield>
+		</t:parameter>
+		<t:parameter name="type">
+			<div>
+				<t:label for="threadType"> <span class="required">*</span> ${message:threadType-label}</t:label>
+				<div  class="fields-wrap thType">
+					<t:RadioGroup t:id="threadType" value="thread.type" >
+						<table>
+						<tr>
+							<td>
+								<t:Radio t:id="thtype0"  /><img src="${context:lib/img/frm_type/DISCUSS_TOPIC.png}"/> <t:label for="thtype0"/>
+								<br/>
+								<t:Radio t:id="thtype3" /><img src="${context:lib/img/frm_type/DEVELOPING_SOLUTIONS.png}"/> <t:label for="thtype3"/>
+							</td>
+							<td>
+								<t:Radio t:id="thtype1"  /><img src="${context:lib/img/frm_type/ASK_A_QUESTION.png}"/> <t:label for="thtype1"/>
+								<br/>
+								<t:Radio t:id="thtype4" /><img src="${context:lib/img/frm_type/IDENTITFY_PROBLEMS.png}"/> <t:label for="thtype4"/>
+							</td>
+							<td>
+								<t:Radio t:id="thtype2"  /><img src="${context:lib/img/frm_type/SUGGEST_IMPROVMENTS.png}"/> <t:label for="thtype2"/>
+								<br/>
+								<t:Radio t:id="thtype5" /><img src="${context:lib/img/frm_type/ADD_OPINION_OR_FEEDBACK.png}"/> <t:label for="thtype5"/>
+							</td>
+						</tr>
+						</table>
+					</t:RadioGroup>
+				</div>
+			</div>
+		</t:parameter>
+		<t:parameter name="message">
+			<t:label for="message" ><span class="required">*</span> ${message:message-label}</t:label>
+			<textarea t:type="ck/editor" t:id="message" value="thread.message"
+  		            customConfiguration="context:lib/js_config/ckeditor.js" toolbarSet="Default"
+              		width="630px" height="400px" validate="required"></textarea>
+		</t:parameter>
+		<t:parameter name="anonymous">
+			<t:label for="anonymous" />
+			<t:checkbox t:id="anonymous" value="thread.anonymous"/>
+			<span class="formtip">${message:anonymous-tip}</span>
+		</t:parameter>
+		<t:parameter name="pinned">
+			<t:label for="pinned" />
+			<t:checkbox t:id="pinned" value="thread.pinned"/>
+			<span class="formtip">${message:pinned-tip}</span>
+			<img src="${context:lib/img/icon_pin_red.png}" height="16"/>
+		</t:parameter>
+		<t:parameter name="attachment">
+			<div>
+				<label for="attachment">${message:attachment-label}</label>
+				<div style="display:inline-block;" class="fields-wrap">
+					<t:zone t:id="attachedFilesZone">
+						<div>
+						<t:loop source="thread.attachedFiles" value="tempAttFile">
+							<div class="existfileDiv">
+								<t:eventLink event="retrieveFile" context="tempAttFile.id"  title="${message:click-to-download}">
+									<img src="${context:lib/img/icon-attachment.gif}"/> 
+									${tempAttFile.displayName}
+								</t:eventLink>
+								(${tempAttFile.displaySize})
+								[<a href="#" t:type="actionLink" t:id="removeFile" 
+										context="tempAttFile.id"
+										zone="attachedFilesZone"
+										class="alink"
+								>
+									<span t:type="any" t:mixins="Confirm" t:message="${message:confirm-remove-attachment}">
+										${message:remove}
+									</span>
+								</a>]
+							</div>
+						</t:loop>
+						</div>
+					</t:zone>
+					
+					<div id="file1" class="fileDiv subgroup">
+						<input t:type="upload" t:id="file1" />
+					</div>
+					<div id="file2" class="fileDiv subgroup">
+						<input t:type="upload" t:id="file2" />
+					</div>
+					<div id="file3" class="fileDiv subgroup">
+						<input t:type="upload" t:id="file3" />
+					</div>
+					<div id="file4" class="fileDiv subgroup">
+						<input t:type="upload" t:id="file4" />
+					</div>
+					<div id="file5" class="fileDiv subgroup">
+						<input t:type="upload" t:id="file5" />
+					</div>
+					<div>
+						<a href="#" id="addMoreFileLink" onclick="addMoreFile(); return false;">${message:add-more-file}</a>
+						<span id="addMoreFileMsg" class="formtip">${message:max-5-files-to-add}</span>
+					</div>
+				</div>
+			</div>
+		</t:parameter>
+		<t:parameter name="notifyMember">
+			<t:label for="notifyMember"/>
+			<input t:type="checkbox" t:id="notifyMember"  />
+			<span class="formtip">${message:notifyMember-tip}</span>
+		</t:parameter>
+	
+	</t:beaneditform>
+	
+<script type="text/javascript">
+	function addMoreFile(){
+		 if($('file4').visible()){
+			showElm('file5');
+			$('addMoreFileLink').hide();
+			$('addMoreFileMsg').show();
+		}
+		else if($('file3').visible())
+			showElm('file4');
+		else if($('file2').visible())
+			showElm('file3');
+		else if($('file1').visible())
+			showElm('file2');
+		else{
+			showElm('file1');
+			$('addMoreFileLink').update('${message:add-more}');
+		}
+	
+		return false;
+	}
+	document.observe("dom:loaded", function() {
+		$$('.fileDiv').invoke('hide');
+		$('addMoreFileMsg').hide();
+	});
+</script>
+	
+</html>

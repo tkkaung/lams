@@ -1,0 +1,148 @@
+<html t:type="layout" 
+	title="${message:edit} ${message:transaction}"
+	currentModule="${moduleName}"
+	currentProj="curProj"
+	breadcrumb="${curProj.encodeddisplayname}=project/home?${curProj.id}
+		,${module.displayName}=modules/budget?${curProj.id}
+		,${message:edit} ${message:transaction}=modules/budget/transactionedit?${transact.id}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+		
+<p:legendBlk>
+	<span class="required">*</span>  ${message:required-fields}
+</p:legendBlk>
+		
+		
+		<form t:type="form" t:id="form" class="e-formeditor">
+		<div class="t-beaneditor">
+			<t:errors />
+			<table >
+				<tr>
+					<td class="label"><t:label for="description" ><span class="required">*</span> ${message:description-label}</t:label></td>
+					<td>
+						<t:textfield t:id="description" value="transact.description" validate="required" maxlength="255" disabled="shouldDisableInput" class="lwidth"></t:textfield>
+					</td>
+				</tr>
+				<tr>
+					<td class="label"><t:label for="category" /></td>
+					<td>
+						<t:select t:id="categorySelect" value="categorySelect" onchange="categorySelectChanged();"  model="CategoryModel" disabled="shouldDisableInput" />
+						<t:textfield t:id="category" value="transact.category" size="40" maxlength="255" disabled="shouldDisableInput" class="mwidth"></t:textfield>
+					</td>
+				</tr>
+				<tr>
+					<td class="label"><t:label for="remarks" /></td>
+					<td>
+						<t:textarea t:id="remarks" value="transact.remarks" cols="50" rows="3" disabled="shouldDisableInput" class="lwidth"></t:textarea>
+					</td>
+				</tr>
+				<tr>
+					<td class="label"><t:label for="amount" ><span class="required">*</span> ${message:amount-label}</t:label></td>
+					<td>
+						<t:textfield t:id="amount" value="transact.amount" size="20" maxlength="30" validate="required,min=0" disabled="shouldDisableInput" class="swidth"></t:textfield>
+					</td>
+				</tr>
+				<tr>
+					<td class="label"><t:label for="transactDate" ><span class="required">*</span> ${message:transactDate-label}</t:label></td>
+					<td>
+						<t:datefield t:id="transactDate" value="transact.transactDate" validate="required" disabled="shouldDisableInput"  class="swidth" format="${message:datefield-format}"/>
+					</td>
+				</tr>
+				<tr>
+					<td class="label"><t:label for="type" /></td>
+					<td>
+						<t:RadioGroup t:id="type" value="transact.type" >
+							<t:Radio t:id="InFlow"  /> <t:label for="InFlow"/><br/>
+							<t:Radio t:id="OutFlow"  /> <t:label for="OutFlow"/><br/>
+						</t:RadioGroup>
+					</td>
+				</tr>
+				<tr>
+					<td class="label"><t:label for="status" /></td>
+					<td>
+						<t:RadioGroup t:id="status" value="transact.status">
+							<t:Radio t:id="Pending"  /> <t:label for="Pending"/><br/>
+							<t:Radio t:id="Confirm"  /> <t:label for="Confirm"/><br/>
+						</t:RadioGroup>
+					</td>
+				</tr>
+				<tr>
+					<td class="label">${message:attachment-label}</td>
+					<td>
+						<t:zone t:id="attachedFilesZone">
+							<div>
+							<t:loop source="transact.attachedFiles" value="tempAttFile">
+								<div class="existfileDiv">
+									<t:eventLink t:event="retrieveAttachment" context="tempAttFile.id"  title="${message:click-to-download}">
+										<img src="${context:lib/img/icon-attachment.gif}"/> 
+										${tempAttFile.displayName}
+									</t:eventLink>
+									(${tempAttFile.displaySize})
+									[<a href="#" t:type="actionLink" t:id="removeAttachment" 
+												context="tempAttFile.id"
+												zone="attachedFilesZone"
+												class="alink"
+											>
+												<span t:type="any" t:mixins="Confirm" t:message="${message:confirm-remove-attachment}">
+													${message:remove}
+												</span>
+											</a>]
+								</div>
+							</t:loop>
+							</div>
+						</t:zone>
+						<div>
+							<div id="file1" class="fileDiv subgroup">
+								<input t:type="upload" t:id="file1" id="file1" />
+							</div>
+							<t:if test="transact.attachedFiles">
+								<div id="addMoreFileLink" >
+									[<a href="#"  onclick="showElm('file1'); hideElm('addMoreFileLink'); return false;">
+										${message:add-more}
+									</a>]
+								</div>
+								<script>
+									$('file1').hide();
+								</script>
+							</t:if>
+						</div>
+					</td>
+				</tr>
+				
+				
+				
+				
+				
+				
+				
+				
+				<tr>
+					<td class="label">
+						<t:label for="notifyMember"></t:label>
+					</td>
+					<td><input t:type="checkbox" t:id="notifyMember" value="notifyMember" />
+			      		<span class="formtip">${message:notifyMember-tip}</span></td>
+				</tr>
+			</table>
+			<input t:type="submit" value="${message:submit-label}" class="submit squared ${shouldDisableInput}" disabled="shouldDisableInput" />
+				<t:if test="shouldDisableInput">(${message:not-allow-to-make-change})</t:if>
+		</div>
+		</form>
+		
+	<script type="text/javascript">
+		function categorySelectChanged(){
+			if($('categorySelect').selectedIndex==1){
+				$('category').show();
+				$('category').setValue("");
+			}
+			else
+				$('category').hide();
+		}
+		
+		document.observe("dom:loaded", function() {
+			categorySelectChanged();
+		});
+	</script>
+	
+	
+</html>

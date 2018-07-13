@@ -1,0 +1,22 @@
+<html t:type="layout" 
+	title="${message:your-info}"
+	breadcrumb="${message:control-panel}=admin,${message:your-info}=user/viewyourinfo"
+   xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="user"/></p:leftMenuBlk>
+   
+   <p:actionBtns>
+   	<a href="#" t:type="pageLink" page="user/changepassword" class="button rounded">
+			 	<span>${message:change-password}</span>
+		</a>
+		<a href="#" t:type="pageLink" page="user/edit" class="button rounded">
+			 	<span>${message:edit}</span>
+		</a>
+   </p:actionBtns>
+   
+	<t:beandisplay  object="user" 
+		include="username,firstName,lastName,
+      			organization,jobTitle,phone,mphone,email">
+	</t:beandisplay>
+	
+</html>

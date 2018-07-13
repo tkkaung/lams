@@ -1,0 +1,168 @@
+<html t:type="layout" 
+	title="${message:assessee-edit-detail}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/peerevaluation/assesseehome?${project.id}
+		,${message:assessee-edit}=modules/peerevaluation/assesseeedit
+		,${message:assessee-edit-detail}=modules/peerevaluation/assesseeeditdetail"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+<style>
+	.legend .non-selected{
+		background: #FFF url('${context:lib/img/e-block-bg.png}') repeat-x 0px top;
+	}
+	.legend .selected{
+		background: #acebff;
+	}
+	.rubricDetailZone .cr_obj{
+		background: #FFF url('${context:lib/img/e-block-bg.png}') repeat-x 0px top;
+		cursor: pointer;
+	}
+	.rubricDetailZone .cr_obj:hover{
+		background: #FFF url('${context:lib/img/e-block-bg-s.png}') repeat-x 0px top;
+	}
+	.rubricDetailZone .cr_obj.selected{
+		background: #acebff;
+	}
+	.rubricDetailZone .score{
+		text-align: center;
+		font-weight:bold;
+		width: 40px;
+	}
+	.rubricDetailZone .totalScoreR{
+		text-align: center;
+		font-weight:bold;
+		width: 40px;
+	}
+	.rubricDetailZone th.critName{
+		text-align:left;
+	}
+</style>
+
+
+<p:legendBlk>
+		<div class="legend">
+			<div class="title">${message:legend}</div>
+			<div class="content">
+				<table>
+					<tr>
+						<td><div class="legendmark non-selected" /></td>
+						<td class="label">${message:non-selected}</td>
+						<td><div class="legendmark selected" /></td>
+						<td class="label">${message:selected}</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+</p:legendBlk>
+
+<form t:type="form" t:id="form" class="e-formeditor" autofocus="false">
+	<div class="t-beaneditor">
+	<t:errors />
+		<table style="padding-bottom:10px;">
+			<tr>
+				<td class="label">${message:evaluation}</td>
+				<td>
+					${eval.name}
+				</td>
+			</tr>
+			<tr>
+				<td class="label">${message:evaluating-student}</td>
+				<td>
+					${user.displayname}
+				</td>
+			</tr>
+		</table>
+		
+		
+			<style>
+			.rubricDetailZone .critCol{
+				width: ${getCritNameWidthPercentNum(60,getFirstCriterions().size())};
+			}
+			</style>
+			<div class="rubricDetailZone view ">
+				<table >
+					<tr>
+						<th rowspan="2" class="criteria">${message:criteria-objective}</th>
+						<th colspan="${getFirstCriterions().size()}">${message:criterion}</th>
+					</tr>
+					<tr>
+						<t:loop source="getFirstCriterions()" value="tempRCriterion" index="colIndex">
+							<th class="critCol">
+								<span title="${message:columnScore-label}">${tempRCriterion.score}</span>
+							</th>
+						</t:loop>
+					</tr>
+					<t:loop source="eval.getCriterias()" value="tempRCrit" index="rowIndex">
+						<tr>
+							<th class="critName">
+								<span title="${message:critName-label}"><t:outputraw value="${textarea2html(tempRCrit.name)}"/></span>
+								<t:outputraw value="getSpace()"/>
+							</th>
+							<t:loop source="tempRCrit.criterions" value="tempRCriterion" index="colIndex">
+								<td id="${tempRCriterion.id}" class="critCol cr_obj c_cr_${tempRCrit.id} ${getSelectedClass(tempRCriterion)}" 
+									onclick="criterionSelected(this.id,${tempRCriterion.score},${tempRCrit.weightage},${tempRCrit.getMaxScore()},'${tempRCrit.id}')">
+									<t:outputraw value="${textarea2html(tempRCriterion.des)}"/>
+								</td>
+							</t:loop>
+						</tr>
+					</t:loop>
+				</table>
+			</div>
+		
+		<table>
+			<tr>
+				<td class="label" >${message:comment}</td>
+			</tr>
+			<tr>
+				<td class="label"><t:label for="cmtStrength">${message:cmtStrength-label}</t:label></td>
+				<td>
+					<t:textarea t:id="cmtStrength" value="evalUser.cmtStrength" cols="50" rows="4" class="lwidth"/>
+					<br/>
+				</td>
+			</tr>
+			<tr>
+				<td class="label"><t:label for="cmtWeakness">${message:cmtWeakness-label}</t:label></td>
+				<td>
+					<t:textarea t:id="cmtWeakness" value="evalUser.cmtWeakness" cols="50" rows="4" class="lwidth"/>
+					<br/>
+				</td>
+			</tr>
+		</table>
+				
+		<input name="selCriterions" id="selCriterions" type="hidden" value=""/>
+		<t:submit t:id="bsubmit" value="${message:save-grade}" class="submit squared" style="margin-top:10px;"/>
+		
+	</div>
+	
+</form>
+<script>
+	function criterionSelected(elmId, score, weight, maxScore, critId){
+		if($(elmId).hasClassName('selected')){
+			$(elmId).removeClassName('selected');
+		}
+		else{
+			$$('.c_cr_'+critId).invoke('removeClassName','selected');
+			$(elmId).addClassName('selected');
+		}
+		reUpdateSelected();
+	}
+	function reUpdateSelected(){
+		var sel = "";
+		$$('.cr_obj.selected').each(function(elm){
+			sel += elm.identify()+',';
+		});
+		if(sel!=""){
+			sel = sel.substring(0,sel.length -1);
+		}
+		$('selCriterions').value = sel; 
+	}
+	
+	document.observe("dom:loaded", function(){
+		reUpdateSelected();
+	});
+</script>
+
+</html>

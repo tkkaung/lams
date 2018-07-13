@@ -1,0 +1,51 @@
+<html t:type="layout" 
+		title="${message:add-edit} ${message:module}"
+		breadcrumb="${message:control-panel}=admin,${message:manage} ${message:module}=admin/module/manage,${message:add-edit} ${message:module}=admin/module/edit"
+      xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+      xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="systemtools"/></p:leftMenuBlk>
+    <p:legendBlk>
+		<span class="required">*</span>  ${message:required-fields}
+	</p:legendBlk>
+	
+    <t:beaneditform t:id="form" object="module" 
+    	exclude="available,version,remarks"
+    	submitLabel="${message:submit-label}">
+    	<p:name>
+    		<t:label for="name"><span class="required">*</span> ${message:name-label}</t:label>
+    		<t:textfield t:id="name" value="module.name" /> 
+    		<span class="formtip">${message:name-known-to-system-tip}</span>
+    	</p:name>
+    	<p:alias>
+    		<t:label for="alias"/>
+    		<t:textfield t:id="alias" value="module.alias" />
+    		<span class="formtip">${message:alias-tip}</span>
+    	</p:alias>
+    	<p:rooturl>
+    		<t:label for="rooturl"><span class="required">*</span> ${message:rooturl-label}</t:label>
+    		<div style="display:inline-block;_float:left;_margin: 2px 1px;">
+	    		<t:textfield t:id="rooturl" value="module.rooturl" class="lwidth"/> 
+	    		<br/>
+	    		<span class="formtip">${message:rooturl-tip}</span>
+    		</div>
+    	</p:rooturl>
+    	<p:iconurl>
+    		<t:label for="iconUrl"/>
+    		<div style="display:inline-block;_float:left;_margin: 2px 1px;">
+	    		<t:textfield t:id="iconUrl" value="module.iconUrl" class="lwidth"/> 
+	    		<br/>
+	    		<span class="formtip">${message:iconUrl-tip}</span>
+    		</div>
+    	</p:iconurl>
+    	<p:description>
+			<t:label for="description" />
+			<textarea t:type="textarea" t:id="description" value="module.description" cols="50" rows="5" class="lwidth"/>
+		</p:description>
+		<p:remarks>
+			<t:label for="remarks" />
+			<textarea t:type="textarea" t:id="remarks" value="module.remarks" cols="50" rows="5" class="lwidth"/>
+		</p:remarks>
+		
+    </t:beaneditform>
+
+</html>

@@ -1,0 +1,45 @@
+<html xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+	xmlns:p="tapestry:parameter">
+
+	<head>
+		<title>${message:comment-label}</title>
+		<style>
+			div.t-beaneditor {
+				background: #eee;
+				border : none;
+				padding: 10px ;
+				font-size: 12px;
+				font-family: Helvetica,Arial,Calibri,Verdana,sans-serif; 
+			}
+			h1{
+				font-family: Calibri,Helvetica,Arial,sans-serif;
+				font-size: 12pt;
+			}
+			span.date{
+				font-size: 10px;
+				font-style: italic;
+			}
+		</style>
+	</head>
+	<body>
+		
+	<div class="t-beaneditor">
+		
+		
+		<h1>${message:comment}:</h1>
+		<!--<div>
+			<span>${message:by} <strong>${assmtUser.assessor.displayname}</strong></span>
+			, <span class="date">${assmtUser.getAssessedDateDisplay()}</span> 
+		</div>
+		<div>
+			<span><strong>${assmtUser.assessee.displayname}</strong></span>
+		</div>
+		
+		
+		--><div style="padding:10px;">
+			<t:outputraw value="${textarea2html(getCritComment(aCrit, assmtUser))}"/>
+		</div>
+	</div>
+
+</body>
+</html>

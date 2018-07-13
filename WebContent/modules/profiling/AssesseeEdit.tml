@@ -1,0 +1,167 @@
+<html t:type="layout" 
+	title="Perform Assessment"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+	,${module.displayName}=modules/profiling/assesseehome?${project.id}
+	,Perform Assessment=modules/profiling/assesseeedit?${prof.id}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+<style>
+	table.tbContainer {
+		width:100%;
+	}
+	table.tbContainer td{
+		border: 1px solid #ddd;;
+	}
+	table.tblLScore{
+	}
+	table.tblLScore thead tr th {
+	    text-align: center;
+	    vertical-align: bottom;
+		<t:if test="que.tenScale">
+	    	width: 10%;
+			<p:else>
+	    		width: 13%;
+	    	</p:else>
+	    </t:if>
+	}
+	table.tblLScore tbody tr td {
+	    text-align: center;
+	    vertical-align: middle;
+	    
+	}
+	
+	
+	
+</style>
+
+
+<table class="actionToolBar">
+	<tr>
+		<td class="right">
+		</td>
+	</tr>
+</table>
+
+<t:if test="finished">
+<div>You already finished this assessment</div>
+<p:else>
+<form t:type="form" t:id="form" class="e-formeditor">
+		<t:errors />
+	
+	<table class="tbContainer">
+		<tr>
+			<td colspan="5" style="font-size:16px;text-align:center;background:#ddd;">
+				<div >${prof.name}</div>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="5" style="font-size:16px;padding:15px;color:#00e;text-align:center;">
+				<div >${que.getNumberDisplay()} <t:outputraw value="${textarea2html(que.des)}"/></div>
+			</td>
+		</tr>
+		<t:loop source="assessees" value="user" index="rowIndex">
+			<tr>
+				<t:if test="group">
+					<td style="padding:5px;width:20%;">${user.getDisplayName()}</td>
+				</t:if>
+				<td>
+					<t:if test="que.tenScale">
+								<table class="tblLScore t-data-grid">
+								<thead>
+								<tr>
+									<t:loop source="1..10" value="tempScore">
+										<th><label for="rdo_${user.id}_${tempScore}">${getTimeTen(tempScore)}%</label></th>
+									</t:loop>
+								</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<t:loop source="1..10" value="tempScore">
+										<td class="tdRdo">
+											<input  id="rdo_${user.id}_${tempScore}" type="radio" name="rdo_${user.id}" value="${tempScore}" />
+										</td>
+										</t:loop>
+									</tr>
+								</tbody>
+							</table>
+						
+						
+						
+						<p:else>
+						
+							<table class="tblLScore t-data-grid">
+								<thead>
+								<tr>
+									<th><label for="rdo_${user.id}_1">Strongly Disagree<br/>1</label></th>
+									<th><label for="rdo_${user.id}_2">Disagree<br/>2</label></th>
+									<th><label for="rdo_${user.id}_3">Somewhat Disagree<br/>3</label></th>
+									<th><label for="rdo_${user.id}_4">Neutral<br/>4</label></th>
+									<th><label for="rdo_${user.id}_5">Somewhat Agree<br/>5</label></th>
+									<th><label for="rdo_${user.id}_6">Agree<br/>6</label></th>
+									<th><label for="rdo_${user.id}_7">Strongly Agree<br/>7</label></th>
+								</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<t:loop source="1..7" value="tempScore">
+										<td class="tdRdo">
+											<input  id="rdo_${user.id}_${tempScore}" type="radio" name="rdo_${user.id}" value="${tempScore}" />
+										</td>
+										</t:loop>
+									</tr>
+								</tbody>
+							</table>
+						</p:else>
+					</t:if>
+				
+				</td>
+			</tr>
+		</t:loop>
+		<tr>
+			<td colspan="5" style="text-align:center; padding-right:20px;">
+				<t:submit t:id="bsubmit" value="&gt;&gt; ${getSubmitText()}" class="submit squared" 
+				style="margin:5px;padding:8px 20px;height:30px;font-weight:bold;"
+				onclick="return onSubmitClicked();"/>
+			</td>
+		</tr>
+	</table>
+	<table class="actionToolBar">
+		<tr>
+			<td >
+			</td>
+		</tr>
+	</table>
+		
+	<div style="text-align:center;padding:5px;">
+		<span style="color:#ff5a11;"><b>${que.number}</b></span> of <b>${getNumQuestionWithoutNumber(prof)}</b>
+	</div>
+
+</form>
+
+<script>
+$$('.tdRdo').invoke('observe', 'click', function(){
+  	this.down('input').checked = true; 
+});
+
+
+function onSubmitClicked(){
+	<t:loop source="assessees" value="user" index="rowIndex">
+		if ($$('input[name=rdo_${user.id}]:checked').length == 0){
+			alert("Some answer not selected yet, please select again");
+			return false;
+		}
+	</t:loop>
+	
+	
+	return true;
+}
+
+
+</script> 
+
+</p:else>
+</t:if>
+</html>

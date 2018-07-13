@@ -1,0 +1,70 @@
+<html t:type="layout" 
+	title="Change Log"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/assessment/home?${project.id}
+		,${message:manage} ${message:assessment}=modules/assessment/manage?${project.id}
+		,Change Log=modules/assessment/checkauditlog"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+
+
+<table class="actionToolBar">
+	<tr>
+		<td class="right">
+		</td>
+	</tr>
+</table>
+
+<div class="e-formeditor t-beaneditor">
+	<table >
+			<tr>
+				<td class="label">${message:assessment}</td>
+				<td>
+					<t:pagelink page="modules/assessment/view" context="assmt.id">
+							${assmt.name}
+					</t:pagelink>
+				</td>
+			</tr>
+		</table>
+</div>
+		
+<div id="assmtContainer">
+	
+	<div id="scroller">
+	<table class="t-data-grid assmttbl stickyHeader" style="width:100%;">
+	<thead>
+		<tr>
+			<th class="no_bot_border no_top_border">${message:no}</th>
+			<th class="no_bot_border no_top_border">Time</th>
+			<th class="no_bot_border no_top_border">Action</th>
+			<th class="no_bot_border no_top_border">User</th>
+			<th class="no_bot_border no_top_border">Previous Value(s) </th>
+			<th class="no_bot_border no_top_border">New Value(s) </th>
+			
+		</tr>
+		</thead>
+		<tbody>
+		<t:loop source="auditTrails" value="auditTrail" index="rowIndex">
+			<tr class="datarow">
+				<td>${getRowNum()}</td>
+				<td >${auditTrail.getActionTimeDisplay()}</td>
+				<td >${auditTrail.getActionName()}</td>
+				<td >${auditTrail.getActionUser().getDisplayName()}</td>
+				<td ><t:outputraw value="${textarea2html(auditTrail.getPrevValue())}"/></td>
+				<td ><t:outputraw value="${textarea2html(auditTrail.getNewValue())}"/></td>
+			</tr>
+		</t:loop>
+		
+		</tbody>
+	</table>
+	</div>
+	
+	
+	<div style="height:20px;"><t:outputraw value="getSpace()"/></div>
+	
+</div>
+
+</html>

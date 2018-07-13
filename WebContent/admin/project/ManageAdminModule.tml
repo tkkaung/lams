@@ -1,0 +1,124 @@
+<html t:type="layout" 
+		title="${message:manage-project-modules}"
+		breadcrumb="${message:control-panel}=admin
+		,${message:admin-manage-project}=admin/project/manageadminprojects
+		,${message:manage-project-modules}=admin/project/manageadminmodule?${curProj.id}"
+		xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+      xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="project"/></p:leftMenuBlk>
+   
+   
+   <p:legendBlk>
+		<div class="legend">
+    	 	<div class="title">${message:note}:</div>
+	    	- ${message:manageProjModule-note1}
+	    	<br/>* ${message:mandatory-modules}
+	    </div>
+	</p:legendBlk>
+	
+	<p:actionBtns>
+		<a class="button rounded" t:type="pageLink" page="admin/project/manageAdminMember" context="curProj.id" >
+					 <span>${message:manage-membership}</span>
+		</a>
+    </p:actionBtns>
+	
+	<table class="actionToolBar">
+		<tr>
+			<td class="right">
+			</td>
+		</tr>
+	</table>
+	
+	<h2>${message:project}: <a href="#" t:type="pageLink" page="project/home" context="curProj.Id">${curProj.displayname}</a></h2>
+ 		
+	<form t:type="form" t:id="assignForm" >
+		<t:errors />
+		<table class="nomargin">
+		<tr>
+			<td valign="top" class="assign-half">
+			<div >
+				<div class="table-data-grid-header">${message:available}</div>
+				<t:grid source="resultMods" row="mod"
+					add="chkBox"
+					include="displayName,description"
+					reorder="chkBox,displayName"
+					pagerPosition="bottom"
+					id="modGrid"
+					>
+					<p:chkBoxHeader>
+						<input type="checkBox" id="chkBoxAll" value="1" onclick="chkboxAll('modGrid','chkBoxAll')" />
+					</p:chkBoxHeader>
+					<p:chkBoxCell><input type="checkBox" name="chkBox" value="${mod.id}" onclick="chkbox('modGrid','chkBoxAll')"/></p:chkBoxCell>
+					<p:displayNameCell>
+						<img src="${getContextPath()}/${mod.iconUrl}" alt="${mod.name}" style="display:block;"/>
+						${mod.displayName} 
+					</p:displayNameCell>
+					<p:empty><div class="notfoundtext">${message:no-module-available}</div></p:empty>
+				</t:grid>
+			</div>
+			</td>
+			<td style="text-align:center;">
+				<t:submit value="${message:assign} &gt;&gt;" t:id="assign" class="squared asgnbtn" />
+				<br/>
+				<br/>
+				<t:submit value="&lt;&lt; ${message:unassign}" t:id="unassign" class="squared asgnbtn"  />
+			</td>
+			<td valign="top" class="assign-half">
+				<div >
+					<div class="table-data-grid-header">${message:assigned-modules}</div>
+					<t:grid source="selMods" row="selMod"
+						add="chkBox,order"
+						include="displayName,description"
+						reorder="chkBox,displayName"
+						id="modGrid2"
+						rowIndex="selModIndex"
+						>
+						<p:chkBoxHeader>
+							<input type="checkBox" id="chkBoxAll2" value="1" onclick="chkboxAll('modGrid2','chkBoxAll2')" />
+						</p:chkBoxHeader>
+						<p:chkBoxCell>
+							<t:if test="shouldnotUnassign(selMod)">
+								<input type="checkBox" name="selChkBox" disabled="disabled"/>
+								<p:else>
+									<input type="checkBox" name="selChkBox" value="${selMod.id}" onclick="chkbox('modGrid2','chkBoxAll2')"/>
+								</p:else>
+							</t:if>
+						</p:chkBoxCell>
+						<p:displayNameCell>
+							<img src="${getContextPath()}/${selMod.iconUrl}" alt="${selMod.name}" style="display:block;"/>
+							${selMod.displayName} 
+							<t:if test="shouldnotUnassign(selMod)">
+								*
+							</t:if>
+						</p:displayNameCell>
+						<p:orderCell>
+							<t:if test="isFirst(selModIndex, selMods)">
+								<img src="${context:lib/img/arrow_up0.png}" ></img>
+								<p:else>
+									<t:actionlink t:id="moveUp" context="getParams(curProj.id, selMod.id)" >
+										<img src="${context:lib/img/arrow_up.png}" title="${message:move-up}"></img>	
+									</t:actionlink>
+								</p:else>
+							</t:if>
+							<t:if test="isLast(selModIndex, selMods)">
+								<img src="${context:lib/img/arrow_down0.png}" ></img>
+								<p:else>
+									<t:actionlink t:id="moveDown" context="getParams(curProj.id, selMod.id)" >
+										<img src="${context:lib/img/arrow_down.png}" title="${message:move-down}"></img>	
+									</t:actionlink>
+								</p:else>
+							</t:if>
+						</p:orderCell>
+						
+						
+						<p:empty><div class="notfoundtext">${message:no-module-selected}</div></p:empty>
+						
+					</t:grid>
+				</div>
+			</td>
+		</tr>
+		</table>
+		
+	</form>
+	
+</html>

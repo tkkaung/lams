@@ -1,0 +1,123 @@
+<html t:type="layout" 
+		title="${message:configuration}"
+		breadcrumb="${message:control-panel}=admin,${message:configuration}=admin/config"
+      xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+      xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="systemtools"/></p:leftMenuBlk>
+     
+  	<p:actionBtns >
+   	<a href="#" t:type="actionLink" t:id="reload" class="button rounded">
+				 	<span>${message:reload-from-file}</span></a>
+   </p:actionBtns>
+   
+   <p:legendBlk>
+		<span class="required">*</span>  ${message:required-fields}
+	</p:legendBlk>
+   
+   
+   <table class="actionToolBar">
+		<tr>
+			<td class="right">		 	
+			</td>
+		</tr>
+	</table> 
+   
+   
+   <form t:type="form" t:id="configForm" class="e-formeditor" autofocus="false">
+    <t:errors/>
+    	<div class="t-beaneditor">
+    	<div >
+    		<fieldset>
+    		<legend>BbIntegrate Service</legend>
+    		<table>
+    			<tr>
+    				<td class="label"><span class="required">*</span> <t:label for="bbKey"></t:label></td>
+    				<td>
+    					<input t:type="textfield" t:id="bbKey" class="mwidth" validate="required"/>
+    					<br/><span class="formtip">The Hash Key used to generate hash value, which validate communication 
+    					 between BbIntegrateServie and the BlackBoard buildingBlock</span>
+    				</td>
+    			</tr>
+    			<tr>
+    				<td class="label"><span class="required">*</span> <t:label for="bbTimeout"></t:label></td>
+    				<td>
+    					<input t:type="textfield" t:id="bbTimeout" class="mwidth" validate="required"/>
+    					<br/><span class="formtip">Time allowed for the request URL to be valid, in milisecond</span>
+    				</td>
+    			</tr>
+    		</table>	
+    		</fieldset>
+    		<fieldset>
+    		<legend>Display format</legend>
+    		<table>
+    			<tr>
+    				<td class="label"><span class="required">*</span> <t:label for="displayDate"></t:label></td>
+    				<td>
+    					<input t:type="textfield" t:id="displayDate" class="mwidth" validate="required"/>
+    					<br/><span class="formtip"></span>
+    				</td>
+    			</tr>
+    			<tr>
+    				<td class="label"><span class="required">*</span> <t:label for="displayDateLong"></t:label></td>
+    				<td>
+    					<input t:type="textfield" t:id="displayDateLong" class="mwidth" validate="required"/>
+    					<br/><span class="formtip"></span>
+    				</td>
+    			</tr>
+    			<tr>
+    				<td class="label"><span class="required">*</span> <t:label for="displayTime"></t:label></td>
+    				<td>
+    					<input t:type="textfield" t:id="displayTime" class="mwidth" validate="required"/>
+    					<br/><span class="formtip"></span>
+    				</td>
+    			</tr>
+    		</table>	
+    		</fieldset>
+    		<fieldset>
+    		<legend>System</legend>
+    		<table>
+    			<tr>
+    				<td class="label"><span class="required">*</span> <t:label for="sysEmail"></t:label></td>
+    				<td>
+    					<input t:type="textfield" t:id="sysEmail" class="mwidth"  validate="required" />
+    					<br/><span class="formtip">This Email address will appear in "From" for emails sent by the system</span>
+    				</td>
+    			</tr>
+    			<tr>
+    				<td class="label"><span class="required">*</span><t:label for="sysVirtualDrive"></t:label></td>
+    				<td>
+    					<input t:type="textfield" t:id="sysVirtualDrive" class="mwidth"  validate="required"/>
+    					<br/><span class="formtip">Location of the virtual drive, used to store uploaded files</span>
+    				</td>
+    			</tr>
+    		</table>	
+    		</fieldset>
+    		<fieldset>
+    		<t:submit t:id="bSubmit" value="${message:submit-label}" class="submit squared"/>
+    		</fieldset>
+    	</div>
+    	</div>
+    </form>
+   
+   
+   <!-- 
+    <form t:type="form" t:id="configForm">
+    <t:errors/>
+    	<div >
+    		<div class="t-beaneditor">
+    			<t:loop source="keySet" value="key" >
+    				<div class="t-beaneditor-row">
+    					<label for="${key}">${key}</label>
+    					<input id="${key}" name="${key}" value="${getValue(key)}"></input>
+    				</div>
+    			</t:loop>
+    			
+    			<t:submit value="Save"/>
+    		</div>
+    	</div>
+    	
+    </form>
+    
+    -->
+    
+</html>

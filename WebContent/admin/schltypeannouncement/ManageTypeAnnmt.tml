@@ -1,0 +1,91 @@
+<html t:type="layout" 
+	title="${getTitle2()} "
+	breadcrumb="${message:control-panel}=admin
+		,${encode(getTitle2())}=admin/schltypeannouncement/managetypeannmt"
+	totalShowOption="${totalSize}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+	<p:leftMenuBlk><t:ControlPanMenu initTab="announcement"/></p:leftMenuBlk>
+	
+	<p:actionBtns >
+		<a href="#" t:type="pageLink" page="admin/schltypeannouncement/edittypeannmt" class="button rounded">
+			<span>${message:add-new} ${message:typeannouncement}</span>
+		</a>
+	</p:actionBtns>
+	
+	<style>
+		.urgent{
+			text-align:center;
+		}
+	</style>
+    
+	<table class="actionToolBar">
+		<tr>
+			<td class="right">		 	
+			</td>
+		</tr>
+	</table>
+			
+	
+	<t:grid source="annmts" row="annmt" class="stickyHeader t-data-grid"
+		model="model"
+		rowsPerPage="rowsPerPage"
+		pagerPosition="bottom" 
+		>
+		<p:empty>
+			<div class="notfoundtext">${message:no-announcement-found}</div>
+		</p:empty>
+		<p:urgentCell>
+			<t:if test="annmt.urgent">
+				<img src="${context:lib/img/icon_urgent.png}"  alt="${message:annmt-urgent-tip}" title="${message:annmt-urgent-tip}" />
+			</t:if>
+		</p:urgentCell>
+		<p:contentCell>
+			<t:ck.TrimmedString value="stripTags(annmt.content)" maxLength="50"/>
+		</p:contentCell>
+		<p:sdateCell>
+			${annmt.sdateDisplay}
+		</p:sdateCell>
+		<p:edateCell>
+			${annmt.edateDisplay}
+		</p:edateCell>
+		<p:mdateCell>
+			${annmt.mdateDisplay}
+		</p:mdateCell>
+		<p:enabledCell>
+			<t:actionLink t:id="toggleEnabled" context="annmt.id" title="${message:click-to-toggle-enabled}">${annmt.enabled}</t:actionLink>
+		</p:enabledCell>
+		<p:creatorCell>
+			<t:pageLink page="user/view" context="annmt.creator.id">${annmt.creator.displayname}</t:pageLink>
+		</p:creatorCell>
+		<p:projTypeCell>
+			<t:if test="annmt.projType">
+				${annmt.projType.displayName}
+				<p:else>
+					${message:-all-}
+				</p:else>
+			</t:if>
+		</p:projTypeCell>
+		<p:schoolCell>
+			<t:if test="annmt.school">
+				${annmt.school.displayName}
+				<p:else>
+					${message:-all-}
+				</p:else>
+			</t:if>
+		</p:schoolCell>
+		
+		
+		<p:actionCell>
+				<t:pagelink page="admin/schltypeannouncement/edittypeannmt" context="annmt.id" class="button rounded">
+	          	<span>${message:edit}</span>
+	         </t:pagelink>
+	         <t:actionlink t:id="delete" context="annmt.id" class="button rounded"
+	         	onclick="return confirmDelete('${message:confirm-permanent-delete-item}')">
+	          	<span>${message:delete}</span>
+	         </t:actionlink>
+		</p:actionCell>
+	</t:grid>
+		
+	 
+</html>

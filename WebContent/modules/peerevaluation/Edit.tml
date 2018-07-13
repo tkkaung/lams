@@ -1,0 +1,332 @@
+<html t:type="layout" title="${message:edit} ${message:evaluation}"
+	currentModule="${moduleName}" 
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/peerevaluation/home?${project.id}
+		,${message:manage-evaluation}=modules/peerevaluation/manage?${project.id}
+		,${message:edit} ${message:evaluation}=modules/peerevaluation/edit"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" xmlns:p="tapestry:parameter">
+<style>
+span.ltip {
+	margin-left: 3px;
+	font-size: 10px;
+	color: #F09;	
+}
+span.remindtip {
+	margin-left: 3px;
+	font-size: 10px;
+	color: #F44;	
+}
+table.evalTable2 td.label{
+	width: 170px;
+}
+.error {
+	color: #f00;
+}
+</style>  
+	<p:legendBlk>
+		<span class="required">*</span>
+		${message:required-fields}
+		<div>+ No numerical scores are seen by students</div>
+	</p:legendBlk>
+
+	<form t:type="form" t:id="form" class="e-formeditor">
+		<div class="t-beaneditor">
+			<t:errors />
+			<table>
+				<tr>
+					<td class="label">
+						<t:label for="name">
+							<span class="required">*</span>
+							${message:name-label}
+						</t:label>
+					</td>
+					<td>
+						<t:textfield t:id="name" value="eval.name" class="lwidth"
+							validate="required" />
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<t:label for="des">${message:des-label}
+						</t:label>
+					</td>
+					<td>
+						<t:textarea t:id="des" value="eval.des" cols="50"
+							rows="3" class="lwidth" />
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<t:label for="selectGroup">
+						<t:if test="canCreateEvalWithoutGroup()" negate="true">
+							<span class="required">*</span>
+						</t:if>
+							${message:select-group}
+						</t:label>
+					</td>
+					<td>
+						
+						<t:select t:id="selectGroup" model="getGroupModel(project)" 
+						value="group" t:mixins="zoneUpdater"
+						t:clientEvent="change" t:event1="selectGroup" t:zone1="groupDetailZone"
+						context="group"  blanklabel="prop:getNoGroupMessage()"/>
+							
+							
+						<t:zone t:id="groupDetailZone">
+								<t:if test="group">
+									<t:if test="isInvalidGroup(group)">
+										<div class="error">${message:invalid-group-set}</div>
+									</t:if>
+									<!--<t:if test="hasGroupChangedAndHaveGradedData(group, eval)">
+										<div class="error">${message:warning-change-group}</div>
+									</t:if>
+								--></t:if>
+							</t:zone>
+							
+							
+						
+					</td>
+				</tr>
+				<tr>
+					<td class="label">${message:rubric}</td>
+					<td>
+						<t:if test="eval.rubric">
+							<t:pagelink page="admin/rubric/view" context="eval.rubric.id">
+								${eval.rubric.name}
+							</t:pagelink>
+						</t:if>
+						<t:pagelink page="modules/peerevaluation/editcriteria" context="getParams(eval.id, true)" class="button rounded">
+							<span>${message:customize}</span>
+						</t:pagelink>
+					</td>
+				</tr>
+			</table>
+
+			
+				<t:if test="eval.rubric">
+
+					<div class="rubricDetailZone view ">
+						<style>.rubricDetailZone .cririon{
+							width: ${getCritNameWidthPercentNum(60, getFirstCriterions().size())};
+							}
+						</style>
+						<table>
+							<tr>
+								<th rowspan="2" class="criteria">${message:criteria-objective}</th>
+								<th rowspan="2" class="weightage">
+									${message:weightage-label}
+									<span class="formtip">(%)</span></th>
+						<th colspan="${getFirstCriterions().size()}">${message:criterion}</th>
+					</tr>
+					<tr>
+						<t:loop source="getFirstCriterions()" value="tempRCriterion" index="colIndex">
+							<th class="cririon">
+								<span title="${message:columnScore-label}">${tempRCriterion.score}</span>
+							</th>
+						</t:loop>
+					</tr>
+					<t:loop source="eval.getCriterias()" value="tempRCrit" index="rowIndex">
+						<tr>
+							<th class="critName">
+								<span title="${message:critName-label}"><t:outputraw value="${textarea2html(tempRCrit.name)}"/></span>
+								<t:outputraw value="getSpace()"/>
+							</th>
+							<th class="weightage">
+								${tempRCrit.weightage}
+							</th>
+							<t:loop source="tempRCrit.criterions" value="tempRCriterion" index="colIndex">
+								<td>
+									<t:outputraw value="${textarea2html(tempRCriterion.des)}"/>
+								</td>
+							</t:loop>
+						</tr>
+					</t:loop>
+				</table>
+			</div>
+			
+			
+		<div class="t-beaneditor e-formeditor">
+		<table >
+		
+			<tr>
+				<td class="label"><label > Use Fixed point distribution</label></td>
+				<td>
+					<t:checkbox t:id="useFixedPoint" value="eval.useFixedPoint" onchange="useFixedPointChanged();" />	
+					
+					<div id="fixedPointDetail">
+							<b>Number of Points to distribute</b> for number of person per group:  
+							<div style="margin: 0 10px;">
+							2 per group : <t:textfield t:id="pointToDistributePerGroup" value="eval.totalFixedPoint"  class="swidth"  />
+							</div>
+							<div style="margin: 0 10px;">
+							3 per group : <t:textfield t:id="pointToDistribute3PerGroup" value="eval.totalFixedPoint3"  class="swidth"  />
+							</div>
+							<div style="margin: 0 10px;">
+							4 per group : <t:textfield t:id="pointToDistribute4PerGroup" value="eval.totalFixedPoint4"  class="swidth"  />
+							</div>
+							<div style="margin: 0 10px;">
+							5 per group : <t:textfield t:id="pointToDistribute5PerGroup" value="eval.totalFixedPoint5"  class="swidth"  />
+							</div>
+							<div style="margin: 0 10px;">
+							6 per group : <t:textfield t:id="pointToDistribute6PerGroup" value="eval.totalFixedPoint6"  class="swidth"  />
+							</div>
+							<div style="margin: 0 10px;">
+							7 per group : <t:textfield t:id="pointToDistribute7PerGroup" value="eval.totalFixedPoint7"  class="swidth"  />
+							</div>
+							<div style="margin: 0 10px;">
+							8 per group : <t:textfield t:id="pointToDistribute8PerGroup" value="eval.totalFixedPoint8"  class="swidth"  />
+							</div>
+							<div style="margin: 0 10px;">
+							9 per group : <t:textfield t:id="pointToDistribute9PerGroup" value="eval.totalFixedPoint9"  class="swidth"  />
+							</div>
+							<div style="margin: 0 10px;">
+							10 per group : <t:textfield t:id="pointToDistribute10PerGroup" value="eval.totalFixedPoint10"  class="swidth"  />
+							</div>					</div>
+				</td>
+			</tr>
+			<tr>
+				<td class="label" ><label > ${message:qualitative-feedback-label}</label></td>
+				<td>
+				<div style="padding-bottom: 3px;">
+					<t:textfield t:id="cmtStrength" value="eval.customNameCmtStrength"  class="mwidth"  />
+					<t:checkbox t:id="useCmtStrength" value="eval.useCmtStrength"  />	
+				</div>
+				<div style="padding-bottom: 3px;">
+					<t:textfield t:id="cmtWeakness" value="eval.customNameCmtWeakness"  class="mwidth"  />
+					<t:checkbox t:id="useCmtWeakness" value="eval.useCmtWeakness"  />	
+				</div>
+				<div style="padding-bottom: 3px;">
+					<t:textfield t:id="cmtOther" value="eval.customNameCmtOther"  class="mwidth"  />
+					<t:checkbox t:id="useCmtOther" value="eval.useCmtOther"  />	
+				</div>
+				<br/>
+			
+				</td>
+			</tr>
+			<t:if test="canUseOpenQuestion()">
+				
+			<tr>
+				<td class="label" ><label > ${message:open-question-label}</label></td>
+				<td>
+					<t:loop source="eval.openEndedQuestions" value="oQuestion">
+						<p:empty><span class="formtip">No Open Questions defined for this rubric</span></p:empty>
+						
+						+ <t:outputraw value="textarea2html(oQuestion)"/>
+						<br/>
+						<br/>
+					</t:loop>
+				</td>
+			</tr>
+				</t:if>
+			</table>
+		</div>
+	
+		
+		
+			</t:if>
+		
+		
+		<table class="evalTable2">		
+			 <tr> <td
+					class="label"><span class="required">*</span><t:label
+					for="sdate">${message:sdate-label}</t:label></td> <td><t:datefield
+					t:id="sdate" value="eval.sdate" class="swidth" validate="required"
+					format="${message:datefield-format}"/>
+					
+					<span style="margin-left:10px;">
+							<t:checkbox t:id="reminderLaunch" value="eval.reminderLaunch" />
+							Email Notices
+						</span>
+					</td>
+				</tr>
+				
+			 <tr> 
+			 	<td class="label"><span class="required">*</span>
+			 		<t:label
+					for="edate">${message:edate-label}</t:label></td> <td><t:datefield
+					t:id="edate" value="eval.edate" class="swidth" validate="required"
+					format="${message:datefield-format}"/>
+					</td> 
+				</tr>
+				<tr>
+					<td class="label">
+						<label  >${message:email-reminder-label} <span class="remindtip">to students</span></label>
+					</td>
+					<td>
+						<t:loop source="availableDaysToRemind" value="tempInt">
+							<t:if test="eval.daysToRemind.contains(tempInt)">
+								<input type="checkBox" checked="checked" id="dayChkBox_${tempInt}" name="dayChkBox" value="${tempInt}" />
+								<p:else>
+									<input type="checkBox" id="dayChkBox_${tempInt}" name="dayChkBox" value="${tempInt}" />
+								</p:else>
+							</t:if>
+							<label for="dayChkBox_${tempInt}">${tempInt}</label>
+						</t:loop>
+						${message:num-days-before-end-evaluation}
+						<span class="formtip">${message:email-reminder-tip}</span>
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<label for="reminder" >${message:email-reminder-label}<span class="remindtip">to instructor</span></label>
+					</td>
+					<td>
+						<t:loop source="availableDaysToRemind" value="tempInt">
+							<t:if test="eval.daysToRemindInstructor.contains(tempInt)">
+								<input type="checkBox" checked="checked" id="dayChkBoxI_${tempInt}" name="dayChkBoxI" value="${tempInt}" />
+								<p:else>
+									<input type="checkBox" id="dayChkBoxI_${tempInt}" name="dayChkBoxI" value="${tempInt}" />
+								</p:else>
+							</t:if>
+							<label for="dayChkBoxI_${tempInt}">${tempInt}</label>
+						</t:loop>
+						${message:num-days-before-end-evaluation}
+						<span class="formtip">${message:email-reminder-instructor-tip}</span>
+					</td>
+				</tr>
+				<tr> <td
+					class="label"><span class="required">*</span><t:label
+					for="weightage">${message:weightage-label}</t:label></td> 
+					<td>
+					<t:textfield t:id="weightage" value="eval.weightage" class="swidth" validate="required"/>
+					%
+					</td> 
+				</tr>
+				<tr >
+				<td class="label"><t:label for="allowSelfEvaluation">${message:allowSelfEvaluation-label}</t:label></td>
+				<td>
+					<t:checkbox t:id="allowSelfEvaluation" value="eval.allowSelfEvaluation" />
+					<span class="formtip">${message:allowSelfEvaluation-tip}</span>
+				</td>
+			</tr>
+				
+			
+				
+				<tr>
+					<td></td>
+					<td>
+					<t:submit t:id="bsubmit" value="${message:submit-label}" class="submit squared" style="margin-top:10px; margin-left:0px;"/>
+		
+					</td>
+				</tr>
+		</table>
+		
+	</div>
+	
+</form>
+
+<script type="text/javascript">
+	function useFixedPointChanged(){
+	 	if( $('useFixedPoint').checked ){
+			showElm('fixedPointDetail');
+		}
+		else{
+			$('fixedPointDetail').hide();
+		}
+	}
+	document.observe("dom:loaded", function(){
+		useFixedPointChanged();
+	});
+</script>
+</html>

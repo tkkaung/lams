@@ -1,0 +1,92 @@
+<html t:type="layout" 
+	title="${message:add-new} ${message:questionset}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/care/home?${project.id}
+		,${message:manage-care}=modules/care/manage?${project.id}
+		,${message:manage-questionset}=modules/care/managequestionset?${project.id}
+		,${message:add-new} ${message:questionset}=modules/care/questionsetnew?${project.id}
+		"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+
+	<p:legendBlk>
+		<span class="required">*</span>  ${message:required-fields}
+	</p:legendBlk>
+
+	<form t:type="form" t:id="form" class="e-formeditor">
+		<t:errors />
+		<div class="t-beaneditor">
+		<table >
+			<tr>
+				<td class="label" ><t:label for="name" ><span class="required">*</span>  ${message:name-label}</t:label></td>
+				<td><t:textfield t:id="name" value="qset.name"  class="lwidth"  validate="required"/></td>
+			</tr>
+			<tr>
+				<td class="label"><t:label for="des" /></td>
+				<td><textarea t:type="textarea" t:id="des" value="qset.des" cols="50" rows="5" class="lwidth"/></td>
+			</tr>
+			
+			<tr>
+				<td class="label"><label for="template" > Questions</label></td>
+				<td>
+					<t:RadioGroup t:id="temCreate" value="temCreate" >
+					<table style="width:auto;">
+						<tr>
+							<td style="vertical-align:top;padding-right:10px;">
+								<t:Radio t:id="temCreate0" value="0" /> 
+								<t:label for="temCreate0">Create from scratch</t:label>
+							</td>
+						</tr>
+						
+						<tr>
+							<td>
+								<t:Radio t:id="temCreate1" value="1" /> 
+								<t:label for="temCreate1">Load from existing</t:label>
+							</td>
+							<td>
+								<t:select value="qsetToLoad" t:id="qsetToLoad" model="getQsetModel(project)"  />
+								
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<t:Radio t:id="temCreate2" value="2" /> 
+								<t:label for="temCreate2">Load from Excel CSV</t:label>
+								( <a href="${context:lib/sample_files/leadership_care_questionset_1.csv}">${message:sample-file}</a> )
+							</td>
+							<td>
+								<input t:type="upload" t:id="csvfile" validate="regexp" />		
+								
+							</td>
+						</tr>
+					</table>
+					</t:RadioGroup>
+				</td>
+			</tr>
+			
+		</table>
+				
+				
+		
+		
+		
+		<t:submit t:id="bsubmit" value="${message:save}" class="submit squared" 
+			style="margin-top:10px;"
+			/>
+		</div>
+	</form>
+	
+<script>
+	Event.observe($('qsetToLoad'),'change', function(){
+		$('temCreate1').checked = true;
+	});
+	Event.observe($('csvfile'),'change', function(){
+		$('temCreate2').checked = true;
+	});
+	
+</script>
+	
+</html>

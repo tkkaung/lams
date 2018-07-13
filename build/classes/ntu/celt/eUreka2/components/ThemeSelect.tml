@@ -1,0 +1,13 @@
+<t:container
+      xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+      xmlns:p="tapestry:parameter">
+ 	<span class="thmTitle">${message:select-theme}</span>
+ 	<t:loop source="themeColors" value="themeColor" index="index">
+ 		<span class="thColorBlk">
+ 			<t:actionlink t:id="selectColor" context="themeColor">
+ 				<span style="background-color:${getColor(index)};" class="box"><t:outputraw value="getSpace()"/></span>
+ 			</t:actionlink>
+ 		</span>
+ 	</t:loop>
+   
+</t:container>

@@ -1,0 +1,135 @@
+<html t:type="layout" 
+	title="${module.displayName}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+	,${module.displayName}=modules/peerevaluation/assesseehome?${project.id}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+<style>
+	.order{
+		text-align: center;
+	}
+	.status{
+		text-align: center;
+		
+	}
+	.rubric{
+		text-align: center;
+		width: 100px;
+	}
+	.myGrade{
+		text-align: center;
+		width: 100px;
+	}
+	
+	
+</style>
+
+
+<table class="actionToolBar">
+	<tr>
+		<td class="right">
+		</td>
+	</tr>
+</table>
+
+<t:grid source="evals" row="eval" 
+	model="model"
+	rowIndex="rowIndex"
+	pagerPosition="bottom" 
+	>
+	<p:empty>
+		<div class="notfoundtext">
+			${message:no-assessee-evaluation-found}
+		</div>
+	</p:empty>
+   
+   <t:parameter name="orderCell">
+   	${getRowNum()}
+   </t:parameter>
+   <t:parameter name="nameCell">
+   	
+   	<t:pagelink page="modules/peerevaluation/assesseeview" context="eval.id">
+	   			<strong>${eval.name}</strong>
+	   		</t:pagelink>
+   	<div>
+   		<span class="subdes"><t:outputraw value="eval.des"/></span>
+   	</div>
+   </t:parameter>
+   <t:parameter name="edateCell">
+   		<span class="date">${eval.edateDisplay}</span>
+   </t:parameter>
+   <t:parameter name="groupCell">
+   		${getGroupTypeName(eval.group, getCurUser())}
+   </t:parameter>
+   <t:parameter name="statusCell">
+   		<t:if test="canSubmit(eval)">
+   			<t:pagelink page="modules/peerevaluation/assesseeEdit" context="eval.id">
+	   			${getEvalStatusStudentView(eval, getCurUser())}
+	   		</t:pagelink>
+	   	<p:else>
+		   	<t:pagelink page="modules/peerevaluation/assesseeShow" context="eval.id">
+	   			${getEvalStatusStudentView(eval, getCurUser())}
+	   		</t:pagelink>
+	   	</p:else>
+   	  </t:if>
+   		
+   </t:parameter>
+   <t:parameter name="rubricCell">
+   		<t:pagelink page="modules/peerevaluation/assesseeviewrubric" context="eval.id">
+   			${message:view-rubric}
+   		</t:pagelink>
+   </t:parameter>
+   <t:parameter name="myGradeCell">
+   
+   	<t:if test="canViewGrade(eval)">
+   	   		${loadEvalUserListByAssessee(eval)}
+	   		
+	   		<t:if test="hasGraded()">
+		   		<t:if test="canViewGradeDetail(eval)">
+		 			<t:pagelink page="modules/peerevaluation/assesseeviewgradedetail" context="eval.id">
+						<span >${getGradeDisplay()}</span>
+		 			</t:pagelink>
+		 			
+		 			<p:else>
+			 			<t:if test="canViewScoredCrit(eval)">
+				 			<t:pagelink page="modules/peerevaluation/assesseeviewgrade" context="eval.id">
+								<span >${getGradeDisplay()}</span>
+				 			</t:pagelink>
+				 				
+				 			<p:else>
+								<span >${getGradeDisplay()}</span>
+				 			</p:else>
+				 		</t:if>
+		 			</p:else>
+			 	</t:if>
+		 		
+	   		</t:if>
+	   		
+	   		<p:else>
+			   	
+	   			<t:if test="canViewGradeDetail(eval)">
+		 			<t:pagelink page="modules/peerevaluation/assesseeviewgradedetail" context="eval.id">
+						<span >${message:view}</span>
+		 			</t:pagelink>
+		 			
+		 			<p:else>
+			 			<t:if test="canViewScoredCrit(eval)">
+							<t:pagelink page="modules/peerevaluation/assesseeviewgrade" context="eval.id">
+								<span >${message:view}</span>
+			   				</t:pagelink>
+		   				</t:if>	
+		 			</p:else>
+			 	</t:if>
+			 	
+	   		</p:else>
+	   	</t:if>
+	   	
+		
+   </t:parameter>
+   
+</t:grid>
+
+</html>

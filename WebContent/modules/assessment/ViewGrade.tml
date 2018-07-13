@@ -1,0 +1,415 @@
+<html t:type="layout" 
+   title="${message:view} ${message:gradeNoun}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/assessment/home?${project.id}
+		,${message:assessment-score}=modules/assessment/score?${assmt.id}
+		,${message:view} ${message:gradeNoun}=modules/assessment/viewgrade"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+  
+<style>
+	
+	
+	.rubricDetailZone .cr_obj{
+		background: #F5F5F5;
+	}
+	
+	.rubricDetailZone .score{
+		text-align: center;
+		font-weight:bold;
+		width: 40px;
+	}
+	.rubricDetailZone .totalScoreR{
+		text-align: center;
+		font-weight:bold;
+		width: 40px;
+	}
+	.existDiv{
+		display: inline-block;
+		padding-right: 10px;
+	}
+	
+</style>
+
+<p:actionBtns>
+	<t:if test="canGradeAssessment(project)">
+		<a class="button rounded" t:type="pageLink" page="modules/assessment/grade" context="getParams(assmt.id,user.id)" >
+			<span>${message:grade-again}</span>
+		</a>
+	</t:if>
+</p:actionBtns>	
+
+
+
+<p:legendBlk>
+	<t:if test="assmt.criterias">
+		<div class="legend">
+			<div class="title">${message:legend}</div>
+			<div class="content">
+				<table>
+					<tr>
+						<td><div class="legendmark non-selected" /></td>
+						<td class="label">${message:non-selected}</td>
+						<td><div class="legendmark selected" /></td>
+						<td class="label">${message:selected}</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</t:if>
+</p:legendBlk>
+
+
+	<div class="t-beaneditor">
+		<table >
+			<tr>
+				<td class="label">${message:assessment}</td>
+				<td>
+					<t:pagelink page="modules/assessment/view" context="assmt.id">
+						${assmt.name}
+					</t:pagelink>
+				</td>
+			</tr>
+			<tr>
+				<td class="label">${getAssesseeRoleNames(project)}</td>
+				<td>
+					<t:pagelink page="user/view" context="user.id">
+						${user.displayname}
+					</t:pagelink>
+				</td>
+			</tr>
+			<t:if test="assmtUser.files">
+				<tr>
+					<td class="label">Student submitted file</td>
+					<td>
+						<t:zone t:id="attachedFilesStudentZone">
+				   		<t:loop source="assmtUser.files" value="tempFile">
+							<div class="existDiv">
+								<t:eventLink event="retrieveFile" context="tempFile.id"  
+									title="${tempFile.displayName}">
+									<img src="${getAttachFileIcon(tempFile)}" style="vertical-align:bottom;"/>
+									${tempFile.displaySize}	
+								</t:eventLink>
+								
+								${tempFile.getUploadTimeDisplay()}
+								
+								[<a href="#" t:type="actionLink" t:id="removeFileStudent" 
+									context="tempFile.id"
+									zone="attachedFilesStudentZone"
+									class="alink"
+								>
+									<span t:type="any" t:mixins="Confirm" t:message="${message:confirm-remove-attachment}">
+										${message:remove}
+									</span>
+								</a>]
+							</div>
+						</t:loop>
+						</t:zone>
+					</td>
+				</tr>
+			</t:if>
+				<tr>
+					<td class="label">Instructor uploaded file</td>
+					<td>
+						<t:zone t:id="attachedFilesInstructorZone">
+						<t:loop source="assmtUser.instructorfiles" value="tempInstructorFile">
+							<div class="existDiv">
+								<t:eventLink event="retrieveInstructorFile" context="tempInstructorFile.id"  
+									title="${tempInstructorFile.displayName}">
+									<img src="${getAttachFileIcon(tempInstructorFile)}" style="vertical-align:bottom;"/>
+									${tempInstructorFile.displaySize}	
+								</t:eventLink>
+								
+								
+								[<a href="#" t:type="actionLink" t:id="removeFileInstructor" 
+									context="tempInstructorFile.id"
+									zone="attachedFilesInstructorZone"
+									class="alink"
+								>
+									<span t:type="any" t:mixins="Confirm" t:message="${message:confirm-remove-attachment}">
+										${message:remove}
+									</span>
+								</a>]
+							</div>
+						</t:loop>
+						</t:zone>
+						<div>
+							<a href="#" id="addMoreFileLink" onclick="addMoreFile(); return false;">Add File</a>
+							<form t:type="form" t:id="form" class="e-formeditor">
+								<t:errors />
+								<div id="uploadFileDivForm">
+									<input t:type="upload" t:id="file" validate="required" />
+									<input t:type="submit" value="Start Upload" class="squared "/>
+								</div>
+							</form>
+				   		</div>
+					</td>
+				</tr>
+			
+			
+
+				<t:if test="assmt.group">
+				<t:if test="getGroupUser(assmt.group, user)">
+					<tr>
+						<td class="label">${message:group}</td>
+						<td>
+							${assmt.group.groupType} : 
+							<t:pagelink page="modules/group/userview" context="${getGroupUser(assmt.group, user).id}">
+								<strong>${message:groupNum-label} ${getGroupTypeName(assmt.group, user)}</strong> 
+							</t:pagelink>
+						</td>
+					</tr>
+				</t:if>
+			</t:if>
+			<tr>
+				<td class="label">${message:assessor-label}</td>
+				<td>
+					<t:if test="assmtUser.assessor">
+						<t:pagelink page="user/view" context="assmtUser.assessor.id">
+							${assmtUser.assessor.displayname}
+						</t:pagelink>
+					</t:if>
+				</td>
+			</tr>
+			<tr>
+				<td class="label">${message:assessedDate-label}</td>
+				<td>
+					<t:if test="assmtUser.assessedDate">
+						<span class="date">${assmtUser.assessedDateDisplay}</span>
+					</t:if>
+				</td>
+			</tr>
+			<t:if test="assmt.criterias" negate="true">
+				<tr>
+					<td class="label">${message:totalScore-label}</td>
+					<td>
+						<span class="${getAssmtUserDisplayGradeClass()}" style="padding:0 5px;">
+							<strong>${assmtUser.totalScoreDisplay}</strong>
+						</span>
+					</td>
+				</tr>
+			</t:if>
+			<t:if test="assmtUser.totalGrade">
+				<tr>
+					<td class="label">${message:totalGrade-label}</td>
+					<td>
+						<strong>${assmtUser.totalGrade}</strong>
+					</td>
+				</tr>
+			</t:if>
+			<t:if test="assmtUser.comments">
+				<tr>
+					<td class="label">${message:comments-label}</td>
+					<td>
+						<t:outputraw value="textarea2html(assmtUser.comments)"/>
+						<t:if test="assmt.getAllowViewComment()">
+							<t:if test="assmtUser.isStudentViewComments()">
+								<div>
+									<span class="formtip">${message:student-can-view-this-comment}</span>
+								</div>
+							</t:if>
+						</t:if>
+					</td>
+				</tr>
+			</t:if>
+			
+		</table>
+		
+		<t:if test="assmt.criterias">
+		<t:if test="assmt.gmat">
+			<style>
+			.rubricDetailZone td.cr_obj{
+					width: ${getCritNameWidthPercentNum(30,getFirstCriterions().size() )};
+				}
+			</style>
+		<p:else>
+			<style>
+			.rubricDetailZone td.cr_obj{
+					width: ${getCritNameWidthPercentNum(60,getFirstCriterions().size())};
+				}
+			</style>
+		</p:else>
+		</t:if>
+				
+			<div class="rubricDetailZone view ">
+				<t:if test="assmt.gmat">
+				<div id="scroller">
+				<table style="width:100%;" class="stickyHeader">
+				<thead>
+					<tr>
+						<th rowspan="2" class="criteria">${message:criteria-objective}</th>
+						<th rowspan="2" class="weightage">${message:weightage-label} <span class="formtip">(%)</span></th>
+						<th colspan="12">${message:criterion}</th>
+						<th rowspan="2" class="cmmt">${message:comment-label}</th>
+						<th rowspan="2" class="weightedScore">${message:weightedScore-label} <span class="formtip">(%)</span></th>
+					</tr>
+					<tr>
+						<t:loop source="getFirstCriterions()" value="tempRCriterion" index="colIndex">
+							<th colspan="2">
+								<span >${tempRCriterion.score}</span>
+							</th>
+						</t:loop>
+					</tr>
+					</thead>
+					<tbody>
+					<t:loop source="assmt.getCriterias()" value="tempRCrit" index="rowIndex">
+						<tr>
+							<th class="critName">
+								<span title="${message:critName-label}"><t:outputraw value="${textarea2html(tempRCrit.name)}"/></span>
+								<t:outputraw value="getSpace()"/>
+								<div style="margin-top:10px;">
+									Score: 
+									<span style="padding-left:5px;">${getCritScoreDisplay(tempRCrit,assmtUser)}</span>
+								</div>
+								    
+							</th>
+							<th class="weightage">
+								${tempRCrit.weightage}
+							</th>
+							<t:loop source="tempRCrit.criterions" value="tempRCriterion" index="colIndex">
+								<td id="${tempRCriterion.id}" class="cr_obj c_cr_${tempRCrit.id} ${getSelectedClassGMATL(tempRCriterion)}" 
+									>
+									<t:outputraw value="${textarea2html(tempRCriterion.des)}"/>
+								</td>
+								<td id="${tempRCriterion.id}" class="cr_obj c_cr_${tempRCrit.id} ${getSelectedClassGMATH(tempRCriterion)}" 
+									>
+								</td>
+								
+							</t:loop>
+							<td class="cmmt">
+								<t:outputraw value="textarea2html(truncateString(getCritComment(tempRCrit, assmtUser), 150))"/>
+								
+								<t:if test="isMoreThan(textarea2html(getCritComment(tempRCrit, assmtUser)).length(), 150)">
+									<a href="javascript:void(0);" onclick="openPopup('${getViewCritCmmtURL(tempRCrit, assmtUser)}', 'assmtCritCmmt', 500, 300)">
+					   					${message:more}
+					   				</a>	
+								</t:if>
+								
+							</td>
+							<td id="s_${tempRCrit.id}" class="score">${getComputedCritScoreDisplayGMAT(tempRCrit,assmtUser)}</td>
+						</tr>
+					</t:loop>
+					<tr>
+						<td colspan="15" 
+							style="text-align:right;margin-right:10px;font-weight:bold;background:transparent;">
+							${message:totalScore-label}:
+						</td>
+						<td class="totalScoreR ${getAssmtUserDisplayGradeClass()}" id="totalScoreR">
+							${assmtUser.getTotalScoreDisplay()}
+						</td>
+					</tr>
+					</tbody>
+				</table>
+				</div>
+				
+				
+				<p:else>
+				<div id="scroller">
+				<table style="width:100%;" class="stickyHeader">
+				<thead>
+					<tr>
+						<th rowspan="2" class="criteria">${message:criteria-objective}</th>
+						<th rowspan="2" class="weightage">${message:weightage-label} <span class="formtip">(%)</span></th>
+						<th colspan="${getFirstCriterions().size()}">${message:criterion}</th>
+						<th rowspan="2" class="cmmt">${message:comment-label}</th>
+						<th rowspan="2" class="weightedScore">${message:weightedScore-label} <span class="formtip">(%)</span></th>
+					</tr>
+					<tr>
+						
+						<t:if test="isASC(getRubricOrderBy(assmt))">
+							<t:loop source="getFirstCriterions()" value="tempRCriterion" index="colIndex">
+								<th class="critCol numScoreCol">
+									<t:if test="isFirst(colIndex)">
+										<span style="float:left;">0</span>
+									</t:if>
+									<span style="float:right;">${tempRCriterion.score}</span>
+								</th>
+							</t:loop>
+							<p:else>
+								<t:loop source="getFirstCriterions()" value="tempRCriterion" index="colIndex">
+									<th class="critCol numScoreCol">
+										<t:if test="isLast(colIndex, getFirstCriterions())">
+											<span style="float:right;">0</span>
+										</t:if>
+										<span style="float:left;">${tempRCriterion.score}</span>
+									</th>
+								</t:loop>
+							</p:else>
+						</t:if>
+					</tr>
+					</thead>
+					<tbody>
+					<t:loop source="assmt.getCriterias()" value="tempRCrit" index="rowIndex">
+						<tr>
+							<th class="critName">
+								<span title="${message:critName-label}"><t:outputraw value="${textarea2html(tempRCrit.name)}"/></span>
+								<t:outputraw value="getSpace()"/>
+								<div style="margin-top:10px;">
+									Score: 
+									<span style="padding-left:5px;">${getCritScoreDisplay(tempRCrit,assmtUser)}</span>
+								</div>
+								    
+							</th>
+							<th class="weightage">
+								${tempRCrit.weightage}
+							</th>
+							<t:loop source="tempRCrit.criterions" value="tempRCriterion" index="colIndex">
+								<td id="${tempRCriterion.id}" class="cr_obj c_cr_${tempRCrit.id} ${getSelectedClass(assmtUser, rubricOrder, tempRCriterion, tempRCrit, colIndex)}" 
+									>
+									<t:outputraw value="${textarea2html(tempRCriterion.des)}"/>
+								</td>
+							</t:loop>
+							<td class="cmmt">
+								<t:outputraw value="textarea2html(truncateString(getCritComment(tempRCrit, assmtUser), 150))"/>
+								
+								<t:if test="isMoreThan(textarea2html(getCritComment(tempRCrit, assmtUser)).length(), 150)">
+									<a href="javascript:void(0);" onclick="openPopup('${getViewCritCmmtURL(tempRCrit, assmtUser)}', 'assmtCritCmmt', 500, 300)">
+					   					${message:more}
+					   				</a>	
+								</t:if>
+								
+							</td>
+							<td id="s_${tempRCrit.id}" class="score">${getComputedCritScoreDisplay(tempRCrit,assmtUser)}</td>
+						</tr>
+					</t:loop>
+					<tr>
+						<td colspan="${addInt(getFirstCriterions().size(), 3)}" 
+							style="text-align:right;margin-right:10px;font-weight:bold;">
+							${message:totalScore-label}:
+						</td>
+						<td class="totalScoreR ${getAssmtUserDisplayGradeClass()}" id="totalScoreR">
+							${assmtUser.getTotalScoreDisplay()}
+						</td>
+					</tr>
+					</tbody>
+				</table>
+				</div>
+				</p:else>
+				
+				</t:if>
+			
+			
+				
+			</div>
+		</t:if>
+	</div>
+	
+
+<script language="javascript">
+	function addMoreFile(){
+		$('uploadFileDivForm').show();
+		$('addMoreFileLink').hide();
+		
+	}
+	document.observe("dom:loaded", function() {
+		$('uploadFileDivForm').hide();
+	});
+	
+	
+     
+     
+</script>
+
+</html>

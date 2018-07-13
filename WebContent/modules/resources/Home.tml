@@ -1,0 +1,491 @@
+<html t:type="layout" 
+	title="${getModuleDisplayName(curProj)}"
+	currentModule="${moduleName}"
+	currentProj="curProj"
+	breadcrumb="${curProj.encodeddisplayname}=project/home?${curProj.id}
+		,${getModuleDisplayName(curProj)}=modules/resources/home?${curProj.id}
+		${getBreadcrumbLink()}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+<style>
+	div.t-data-grid .typeicon, div.t-data-grid .chkbox{
+		width: 15px;
+		text-align: center;
+	}
+	div.resrcEditBlk{
+		padding: 5px 0;
+	}
+	span.ver{
+		font-size: 11px;
+		font-style: italic;
+	}
+</style>
+
+<p:actionBtns>
+	<t:delegate to="block:resrcNewBtnsBlk"/>
+	
+</p:actionBtns>
+
+
+
+
+<table class="actionToolBar">
+	<tr>
+		<td class="right">
+		</td>
+	</tr>
+</table>	
+
+<table width="100%" class="nomargin" >
+  <tr >
+    <td valign="top" width="220px" style="border-right: 1px #ececec solid;	">
+    	<div class="resrcTreeBlk" >	
+    		<t:if test="treeNodes">
+	    		<t:Tree treeid="literal:rsrcTree" source="treeNodes" currentNode="node">
+		        
+			        <t:pagelink page="modules/resources/home" context="getParams(pid, node.identifier)" 
+			        		class="${isCurNodeClass(curNode, node)}" title="${node.des}">
+			        		${truncateStr(node.name)} 
+			        	</t:pagelink>
+			        	<span class="tips"> (${countResourcesByFolder(node.getIdentifier())})</span>
+		        	
+		      </t:Tree>
+		      <p:else>
+		      	<div class="notfoundtext">${message:no-folder-created}</div>
+		      </p:else>
+	      </t:if>
+	   </div>
+    </td>
+    <td valign="top">
+    	<div class="resrcBlk" >
+    		<t:delegate to="block:editModeBlk"/>
+			<t:delegate to="block:viewModeBlk"/>
+    	</div>
+    </td>
+  </tr>
+</table>
+
+
+
+<t:block t:id="editModeBlk">
+	<div id="newFolderBlk">
+ 		<div class="resrcEditBlk">
+ 			<form t:type="form" t:id="newFolderForm" >
+				<div class="t-beaneditor" onmouseover="showCloseBtn(this);" onmouseout="hideCloseBtn(this);">
+					<t:errors/>
+					<table class="nomargin">
+						<tr>
+							<td>
+								<div class="title">${message:add-new} ${message:folder}</div>
+							</td>
+							<td align="right">
+								<a href="#" onclick="return closeFolderBlk();" class="closeBtn" style="display:hidden">
+									<img src="${context:lib/img/icon_close.png}" alt="${message:close}" title="${message:close}" />
+								</a>
+							</td>
+						</tr>
+					</table>
+					<table>
+						<tr>
+							<td><t:label for="fname"><span class="required">*</span> ${message:fName-label}:</t:label></td>
+							<td><t:textfield t:id="fname" value="fName" validate="required,regexp" class="mwidth"/></td>
+						</tr>
+						<tr>
+							<td><t:label for="fdes">${message:fDes-label}:</t:label></td>
+							<td><t:textfield t:id="fdes" value="fDes" size="50" class="lwidth"/></td>
+						</tr>
+						<tr>
+							<td></td>
+							<td><t:submit value="${message:submit-label}" class="squared"/></td>
+						</tr>
+					</table>
+				</div>
+			</form>
+		</div>
+ 	</div>
+  	<div id="newLinkBlk">
+ 		<div class="resrcEditBlk">
+ 			<form t:type="form" t:id="newLinkForm">
+ 				<div class="t-beaneditor" onmouseover="showCloseBtn(this);" onmouseout="hideCloseBtn(this);">
+					<t:errors/>
+					<table class="nomargin">
+						<tr>
+							<td>
+								<div class="title">${message:add-new} ${message:link}</div>
+							</td>
+							<td align="right">
+								<a href="#" onclick="return closeLinkBlk();" class="closeBtn" style="display:hidden">
+									<img src="${context:lib/img/icon_close.png}" alt="${message:close}" title="${message:close}" />
+								</a>
+							</td>
+						</tr>
+					</table>
+					<table>
+						<tr>
+							<td><t:label for="lname"><span class="required">*</span> ${message:lName-label}:</t:label></td>
+							<td><t:textfield t:id="lname" value="lName" validate="required,regexp" class="mwidth"/></td>
+						</tr>
+						<tr>
+							<td><t:label for="lurl"><span class="required">*</span> ${message:lURL-label}:</t:label></td>
+							<td><t:textfield t:id="lurl" value="lURL" validate="required" class="lwidth"/></td>
+						</tr>
+						<tr>
+							<td><t:label for="ldes">${message:lDes-label}:</t:label></td>
+							<td><t:textfield t:id="ldes" value="lDes" size="50" class="lwidth"/></td>
+						</tr>
+						<tr>
+							<td></td>
+							<td><t:submit value="${message:submit-label}" class="squared"/></td>
+						</tr>
+					</table>
+				</div>
+			</form>
+		</div>
+ 	</div>
+ 	
+ 	<div id="newFileBlk">
+ 		<div class="resrcEditBlk">
+ 			<form t:type="form" t:id="newFileForm">
+ 				<div class="t-beaneditor" onmouseover="showCloseBtn(this);" onmouseout="hideCloseBtn(this);">
+					<t:errors/>
+					<table class="nomargin">
+						<tr>
+							<td>
+								<div class="title">${message:upload-a-file}</div>
+							</td>
+							<td align="right">
+								<a href="#" onclick="return closeFileBlk();" class="closeBtn" style="display:hidden">
+									<img src="${context:lib/img/icon_close.png}" alt="${message:close}" title="${message:close}" />
+								</a>
+							</td>
+						</tr>
+					</table>
+					<table>
+						<tr>
+							<td><t:label for="upfile"><span class="required">*</span> ${message:file-label}:</t:label></td>
+							<td><input t:type="upload" t:id="upfile" validate="required" /></td>
+						</tr>
+						<tr>
+							<td><t:label for="upDes">${message:fDes-label}:</t:label></td>
+							<td>
+								<textarea t:type="textarea" t:id="upDes" value="upDes" cols="50" rows="3" class="lwidth"/>
+				
+							</td>
+						</tr>
+						<tr>
+							<td></td>
+							<td><t:submit value="${message:submit-label}" class="squared"/></td>
+						</tr>
+					</table>
+				</div>
+			</form>
+		</div>
+ 	</div>
+ 	<t:zone t:id="appletZone">
+		<t:if test="showApplet">
+		 	<div id="newMultiFileBlk">
+		 		<div class="resrcEditBlk">
+		 		<div class="t-beaneditor" onmouseover="showCloseBtn(this);" onmouseout="hideCloseBtn(this);">
+		 			<table class="nomargin">
+						<tr>
+							<td>
+								<div class="title">${message:upload-multi-files}</div>
+							</td>
+							<td align="right">
+								<a t:type="any"  class="closeBtn" style="display:hidden"
+									t:mixins="zoneUpdater" t:clientEvent="click" t:event1="toggleApplet" t:zone1="appletZone"
+									 >
+									<img src="${context:lib/img/icon_close.png}" alt="${message:close}" title="${message:close}" />
+								</a>
+							</td>
+						</tr>
+					</table>
+					
+		 			<div style="padding-left:4px;">
+					 <applet name="jumpLoaderApplet" archive="${context:lib/jar/jumploader_z.jar}" 
+					 	code="jmaster.jumploader.app.JumpLoaderApplet.class" width="750" height="260" mayscript="true">
+					  <param name="cache_archive" value="${context:lib/jar/jumploader_z.jar}" />
+					  <param name="cache_version" value="2.28.0" />
+					  <param name="ac_messagesZipUrl" value="${context:lib/jar/messages_en.zip}" />
+					  <param name="scriptable" value="true" />
+					  <param name="mayscript" value="true" />
+					  <!-- <param name="ac_mode" value="framed" />-->
+					  <param name="ac_mode" value="embedded" />
+					  <param name="ac_fireAppletInitialized" value="true" />
+					  <param name="ac_fireUploaderFileAdded" value="true" />
+					  <param name="ac_fireUploaderFileStatusChanged" value="true" />
+						<param name="ac_fireUploaderStatusChanged" value="true" />
+					  
+					  <param name="uc_uploadUrl" value="${getHandlerUrl()}" />
+					  <param name="uc_fileParameterName" value="FILE" />
+					  <param name="uc_partitionLength" value="1048576" />
+					<!--  <param name="uc_maxFileLength" value="104857600"/> -->
+					  <param name="uc_urlEncodeParameters" value="true" />
+					  <param name="uc_sendFilePath" value="true" />
+					  <param name="uc_sendFileLastModified" value="true" />
+					  <param name="uc_maxFiles" value="100" />
+					  <param name="uc_maxTransferRate" value="1048576" />
+					  <param name="uc_autoRetryCount" value="5" />
+					  <param name="uc_uploadQueueReorderingAllowed" value="true" />
+					  <param name="uc_directoriesEnabled" value="true" />
+					  <!-- param name="uc_compressionMode" value="zipOnAdd" / -->
+					  <param name="uc_zipDirectoriesOnAdd" value="true" />
+					  <param name="uc_deleteTempFilesOnRemove" value="true" />
+				 	  <param name="vc_lookAndFeel" value="system" /> 
+					  <param name="vc_mainViewLogoEnabled" value="false" />
+					  <param name="vc_mainViewFileListViewVisible" value="false" />
+					  <param name="vc_mainViewFileTreeViewWidthPercent" value="0" />
+					  <param name="vc_mainViewFileTreeViewVisible" value="false" />
+					   <param name="vc_useThumbs" value="true" />
+					  <param name="vc_thumbHeight" value="100" />
+					  <param name="vc_thumbWidth" value="100" />
+				
+					  <param name="vc_uploadViewStartUploadButtonText" value="Start Upload" /> 
+					  <param name="vc_uploadViewStopUploadButtonText" value="Stop Upload" /> 
+					 	<param name="vc_uploadViewFileChooserDetailsView" value="true" />
+					</applet>
+					<div class="foot">
+					</div>
+					</div>
+			 	</div>
+			 	</div>
+		 	</div>
+		 	<p:else>
+				<br/>
+			</p:else>
+ 		</t:if>
+	</t:zone>
+			
+</t:block>
+
+<t:block t:id="viewModeBlk">
+		<div style="min-height:200px;height:auto!important; _height:200px;">
+			<form t:type="form" t:id="gridForm">
+			<t:errors/>	
+				<table class="actionToolBar2">
+					<tr>
+						<td >
+							<t:if test="curFolder">
+								<t:pagelink page="modules/resources/home" context="getParams(pid, getParentId(curFolder))" >
+									<img src="${context:lib/img/to-parent-folder.png}" width="18" alt="${message:to-parent-folder}" title="${message:to-parent-folder}"/>
+								</t:pagelink>
+								|
+							
+								<t:if test="resrcs">
+									<t:submit value="${message:multi-download}" t:id="MultiDownload" class="squared"
+									onclick="return checkHasSelectChBox('resrcGrid','${message:select-at-least-one-item}');"
+									title="${message:multi-download-tip}"
+									/>
+									<t:if test="canCreateFile(curProj)">
+										<t:submit value="${message:delete}" t:id="delete" class="squared" 
+							 			onclick="return checkChBoxAndConfirmDelete('resrcGrid','${message:select-at-least-one-item}','${message:confirm-permanent-delete-items}');"
+							 			title="${message:delete-item-tip}"
+							 			/>
+										<t:submit value="${message:copy}" t:id="copy" class="squared" 
+							 			onclick="return checkHasSelectChBox('resrcGrid','${message:select-at-least-one-item}');"
+							 			title="${message:copy-item-tip}"
+							 			/>
+										<t:submit value="${message:move}" t:id="move" class="squared" 
+							 			onclick="return checkHasSelectChBox('resrcGrid','${message:select-at-least-one-item}');"
+							 			title="${message:move-item-tip}"
+							 			/>
+						 			</t:if>
+								</t:if>
+							</t:if>
+						
+						</td>
+					</tr>
+				</table>	
+				
+				
+				
+				<t:grid source="resrcs" row="resrc" class="stickyHeader t-data-grid"
+			 		model="model"
+			 		id="resrcGrid"
+			 		t:id="resrcGrid"
+					rowsPerPage="rowsPerPage"
+					pagerPosition="bottom" 
+			 		>
+			 		<p:empty>
+		  				<div class="notfoundtext">${message:current-folder-empty}</div>
+			  			
+			  			<t:if test="testLoadDefaultFolders()">
+		  					${message:suggest-action}:
+			      		<br/>
+				      	- <t:actionLink t:id="loadDefaultFolders" context="curFolder.id">
+				      		<span>${message:load-default-folder}</span>
+				      	</t:actionLink>
+				      	<br/>
+				      	- <a href="#" onclick="toggleElm('newFolderBlk'); return false;" >
+								<span>${message:add-new} ${message:folder}</span>
+							</a>
+						</t:if>
+		  			</p:empty>
+			 		
+			 		
+			  		<p:chkboxHeader>
+						<input type="checkbox" name="chkBoxAll" id="chkBoxAll" onclick="chkboxAll('resrcGrid','chkBoxAll')"/>
+					</p:chkboxHeader>
+					<p:chkboxCell>
+						<input type="checkbox" name="chkBox" value="${resrc.id}" onclick="chkbox('resrcGrid','chkBoxAll')"/>
+					</p:chkboxCell>
+		  			<t:parameter name="typeiconCell">
+		  				<img src="${getTypeIcon(resrc)}" />
+		  			</t:parameter>
+		  			<t:parameter name="nameCell">
+		  				<t:if test="resrc.isFolder()">
+		  					<t:pagelink page="modules/resources/home" context="getParams(pid, resrc.id)" title="${message:click-to-view-folder-content}">
+		  						${resrc.name}
+		  					</t:pagelink>
+		  					<p:else>
+			  					<t:if test="resrc.isLink()">
+				  					<a href="${resrc.toLink().getUrl()}" target="_blank" title="${message:click-to-open-new-window}">${resrc.name}</a>
+				  					<p:else>
+					  					<t:if test="resrc.isFile()">
+						  					<t:pagelink page="modules/resources/fileview" context="resrc.id" title="${message:click-to-view-file-detail}">
+						  						${resrc.name}
+						  					</t:pagelink>
+						  					<t:if test="resrc.toFile().hasMultiVersion()">
+						  						<span class="ver"> - ${resrc.toFile().getLatestFileVersion().getVersionDisplay()}</span>
+						  					</t:if>
+						  					<t:if test="resrc.toFile().getLockedBy()">
+						  						<img src="${context:lib/img/lock_icon.png}" title="${message:locked-by} ${resrc.toFile().getLockedBy().getDisplayName()}"/>
+						  					</t:if>
+						  				</t:if>
+				  					</p:else>
+				  				</t:if>
+		  					</p:else>
+		  				</t:if>
+		  				<t:if test="resrc.des">
+		  					<br/>
+		  					<span class="small"><t:outputraw value="textarea2html(resrc.des)"/></span>
+		  				</t:if>
+		  			</t:parameter>
+		  			<t:parameter name="cdateCell">
+		  				<span class="date">${resrc.cdateDisplay}</span>
+		  			</t:parameter>
+		  			<t:parameter name="ownerCell">
+		  				<t:if test="resrc.owner">
+		  					<t:pagelink page="user/view" context="resrc.owner.id">${resrc.owner.displayname}</t:pagelink>
+		  				</t:if>
+		  			</t:parameter>
+		  			
+		  			<t:parameter name="sizeCell">
+		  				<t:if test="resrc.isFile()">
+		  					<t:if test="${resrc.toFile().getLatestFileVersion()}">
+		  						${resrc.toFile().getLatestFileVersion().getDisplaySize()}
+		  					</t:if>
+		  				</t:if>
+		  			</t:parameter>
+		  			<t:parameter name="actionCell">
+		  				<t:if test="canEditResource(resrc)" >
+		  					<t:pageLink  page="modules/resources/resourceedit" context="resrc.id" class="button rounded"
+		  						title="${message:edit-item-tip}"
+		  						>
+		  						<span>${message:edit}</span>
+		  					</t:pageLink>
+		  				</t:if>
+		  				<t:if test="resrc.isFile()">
+			  				<t:if test="${resrc.toFile().getLatestFileVersion()}">
+				  				<a href="#" t:type="eventLink" t:event="retrieveFile" context="resrc.toFile().getLatestFileVersion().id" 
+				  					class="button rounded">
+			  						<span>${message:download}</span>
+			  					</a>
+		  					</t:if>
+	  					</t:if>
+		  			</t:parameter>
+		  			
+		  		</t:grid>
+	 	</form>
+	 	
+	 	 	
+	 	</div>
+	
+	
+	<table class="actionToolBar3">
+		<tr>
+			<td>
+				
+			</td>
+			<td class="right">		 	
+				<form t:type="form" t:id="rowsPerPageForm" autofocus="false">
+					${totalSize} ${message:results-found}, ${message:show}
+					<select t:type="select" t:id="rowsPerPageSelect" model="literal:5,10,20,50,100"
+						value="rowsPerPage" onchange="this.form.submit()" />
+					${message:results-per-page}
+				</form>
+			</td>
+		</tr>
+	</table>
+</t:block>
+
+<t:block t:id="resrcNewBtnsBlk">
+	<span class="resrcNewBtnsBlk">
+		<t:if test="curNode">
+			<t:if test="canCreateFolder(curProj)">
+				<a class="button rounded" href="#" onclick="toggleElm('newFolderBlk'); return false;" >
+					<span>${message:add-new} ${message:folder}</span>
+				</a>
+			</t:if>
+			<t:if test="canCreateLink(curProj)">
+				<a class="button rounded" href="#" onclick="toggleElm('newLinkBlk'); return false;" >
+					<span>${message:add-new} ${message:link}</span>
+				</a>
+			</t:if>
+			<t:if test="canCreateFile(curProj)">
+				<a class="button rounded" href="#" onclick="toggleElm('newFileBlk'); return false;" >
+					<span>${message:upload-a-file}</span>
+				</a>
+			
+				
+				<a t:type="any"  class="button rounded" 
+					t:mixins="zoneUpdater" t:clientEvent="click" t:event1="toggleApplet" t:zone1="appletZone"
+					 >
+					<span>${message:upload-multi-files}</span>
+				</a>
+			</t:if>
+		</t:if>
+	</span>
+</t:block>
+
+<script type="text/javascript">
+	function initTree(imgFolder){
+	   treeObj = new JSDragDropTree();
+	   treeObj.setTreeId("rsrcTree");
+	   treeObj.setImageFolder(imgFolder);
+	   treeObj.setRenameAllowed(false);
+	   treeObj.setDeleteAllowed(false);
+	   treeObj.initTree();
+	   treeObj.expandAll();
+   }
+   function closeFolderBlk(){
+   	$('fname').value = "";
+   	$('fdes').value = "";
+   	hideElm('newFolderBlk'); 
+   	return false;
+   }
+   function closeLinkBlk(){
+   	$('lname').value = "";
+   	$('lurl').value = "";
+   	$('ldes').value = "";
+   	hideElm('newLinkBlk'); 
+   	return false;
+   }
+   function closeFileBlk(){
+   	$('fname').value = "";
+   	$('fdes').value = "";
+   	hideElm('newFileBlk'); 
+   	return false;
+   }
+   document.observe("dom:loaded", function(){
+  		$('newFolderBlk').hide();
+  		$('newLinkBlk').hide();
+  		$('newFileBlk').hide();
+  		initTree('${context:modules/resources/img}/');
+  		
+  	});
+  	
+</script>
+
+</html>
