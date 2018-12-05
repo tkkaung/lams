@@ -182,7 +182,7 @@
 				</td>
 				<td class="total ${getTotalScoreClass()}">
 					<t:if test="hasGraded()">
-						${getTotalScoreDisplay()}
+						44 : ${getTotalScoreDisplay()}
 					</t:if>
 					<t:outputraw value="getSpace()"/>
 				</td>
