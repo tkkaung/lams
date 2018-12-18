@@ -11,6 +11,7 @@ import ntu.celt.eUreka2.entities.User;
 import ntu.celt.eUreka2.modules.group.Group;
 import ntu.celt.eUreka2.modules.group.GroupDAO;
 import ntu.celt.eUreka2.modules.group.GroupUser;
+import ntu.celt.eUreka2.modules.peerevaluation.EvaluationDAO;
 
 import org.apache.tapestry5.EventContext;
 import org.apache.tapestry5.annotations.Cached;
@@ -41,13 +42,10 @@ public class GroupEnrollUserAdmin extends AbstractPageGroup {
 	private enum SubmitType {ASSIGN, UNASSIGN, SAVE_GROUPNAME}; 
 	@Property
 	private List<User> resultUsers ;
-	@SuppressWarnings("unused")
 	@Property
 	private User user;
-	@SuppressWarnings("unused")
 	@Property
 	private User enrlUser;
-	@SuppressWarnings("unused")
 	@Property
 	private GroupUser groupUser ;
 	
@@ -58,6 +56,8 @@ public class GroupEnrollUserAdmin extends AbstractPageGroup {
 	private UserDAO userDAO;
 	@Inject
 	private GroupDAO groupDAO;
+	@Inject
+	private EvaluationDAO evalDAO;
 	@Inject
 	private Messages messages;
 	@Inject
@@ -99,9 +99,12 @@ public class GroupEnrollUserAdmin extends AbstractPageGroup {
 		
 		if(groupDAO.isGroupBeingUsePE(group)){
 			appState.recordWarningMsg("WARNING: This group is being used for Peer Evaluation (some student(s) " +
-					"has started evaluation), it's only safe to make change if student that you want to " +
+					"has started evaluation), "
+					+ " Removing a student from a group will also DELETE scores evaluated for that student and by that student."
+					/*+ "it's only safe to make change if student that you want to " +
 					"change has not started evaluation nor evaluated by others. " +
-					"If not, you should delete the evaluated grades before proceed. Consult Administrator on how to delete.");
+					"If not, you should delete the evaluated grades before proceed. Consult Administrator on how to delete."*/
+					);
 		}
 		if(groupDAO.isGroupBeingUseAS(group)){
 			appState.recordWarningMsg("WARNING: This group is being used in Assessment Module." );
@@ -184,11 +187,17 @@ public class GroupEnrollUserAdmin extends AbstractPageGroup {
 		else if(SubmitType.UNASSIGN.equals(submitType)){
 			String[] selUserId = request.getParameters("selChkBox"+groupUserID);
 			GroupUser gu = groupDAO.getGroupUserById(groupUserID);
+			Group g = gu.getGroup();
 			for(String uId : selUserId){
 				User u = userDAO.getUserById(Integer.parseInt(uId));
 				gu.removeUser(u);
 				
 				groupDAO.saveGroupUser(gu);
+				
+				
+				//delete evaluated scores (assessor and assessee)
+				evalDAO.deleteEvaluationUsersByUserProject(u, curProj, g);
+				
 			}
 			appState.recordInfoMsg(selUserId.length + " student(s) have been removed from group " + gu.getGroupNumNameDisplay());
 

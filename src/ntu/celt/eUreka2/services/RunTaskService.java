@@ -63,8 +63,12 @@ import ntu.celt.eUreka2.entities.SysRole;
 import ntu.celt.eUreka2.entities.User;
 import ntu.celt.eUreka2.internal.Config;
 import ntu.celt.eUreka2.internal.Util;
+import ntu.celt.eUreka2.modules.big5.BIG5DAO;
+import ntu.celt.eUreka2.modules.big5.BIG5Survey;
 import ntu.celt.eUreka2.modules.care.CAREDAO;
 import ntu.celt.eUreka2.modules.care.CARESurvey;
+import ntu.celt.eUreka2.modules.ipsp.IPSPDAO;
+import ntu.celt.eUreka2.modules.ipsp.IPSPSurvey;
 import ntu.celt.eUreka2.modules.lcdp.LCDPDAO;
 import ntu.celt.eUreka2.modules.lcdp.LCDPSurvey;
 import ntu.celt.eUreka2.modules.message.MessageDAO;
@@ -108,7 +112,8 @@ public class RunTaskService {
 	private ProfilingDAO profDAO;
 	private LCDPDAO lcdpDAO;
 	private CAREDAO careDAO;
-	
+	private BIG5DAO big5DAO;
+	private IPSPDAO ipspDAO;
 	
 	
 	/*
@@ -121,7 +126,7 @@ public class RunTaskService {
 			ProjTypeDAO projTypeDAO, ProjStatusDAO projStatusDAO,
 			ProjExtraInfoDAO projExtraInfoDAO, SchedulingDAO schdlDAO,
 			UsageDAO usageDAO, EmailManager emailManager, EvaluationDAO evalDAO, 
-			ProfilingDAO profDAO, LCDPDAO lcdpDAO, CAREDAO careDAO
+			ProfilingDAO profDAO, LCDPDAO lcdpDAO, CAREDAO careDAO, BIG5DAO big5DAO, IPSPDAO ipspDAO
 			) {
 		super();
 		this.userDAO = userDAO;
@@ -141,6 +146,8 @@ public class RunTaskService {
 		this.profDAO = profDAO;
 		this.lcdpDAO = lcdpDAO;
 		this.careDAO = careDAO;
+		this.big5DAO = big5DAO;
+		this.ipspDAO = ipspDAO;
 	}
 	
 	private boolean parseEnabled(String str){
@@ -1091,7 +1098,9 @@ public class RunTaskService {
 		String profilingHomeURL = Config.getString(Config.BASE_URL)+"/modules/profiling/home";
 		String lcdpHomeURL = Config.getString(Config.BASE_URL)+"/modules/lcdp/home";
 		String careHomeURL = Config.getString(Config.BASE_URL)+"/modules/care/home";
-		
+		String big5HomeURL = Config.getString(Config.BASE_URL)+"/modules/big5/home";
+		String ipspHomeURL = Config.getString(Config.BASE_URL)+"/modules/ipsp/home";
+			
 		
 		int count = 0;
 		//send reminder 
@@ -1288,7 +1297,7 @@ public class RunTaskService {
 		
 
 		
-		//LCDP  (Leadership Survey)
+		//CARE  (Leadership Survey)
 		List<CARESurvey> cares = careDAO.getCAREsToSendReminder();
 		for(CARESurvey care : cares){
 		//	Project proj = lcdp.getProject();
@@ -1324,6 +1333,76 @@ public class RunTaskService {
 		returnMsg  += "<br/><b> " + " " + count +" (CARE Survey)-reminders were sent.</b>";
 
 		
+		//BIG5  (Leadership Survey)
+		List<BIG5Survey> big5s = big5DAO.getBIG5sToSendReminder();
+		for(BIG5Survey big5 : big5s){
+			Collection<User> users = new ArrayList<User>();
+			users.addAll(big5DAO.getNotSubmitedUsersByBIG5Survey(big5));
+			
+			for(User u: users){
+				EmailTemplateVariables var = new EmailTemplateVariables(
+						big5.getCdate().toString(), big5.getMdate().toString(),
+						big5.getName(),
+						Util.truncateString(Util.stripTags(big5.getQuestionSetName()), Config.getInt("max_content_lenght_in_email")), 
+						big5.getCreator().getDisplayName(), 
+						big5.getProject().getDisplayName(), 
+						big5HomeURL + "/" + big5.getProject().getId(),
+						big5.getEdateDisplay(),
+						u.getDisplayName() 
+					);
+				try{
+					emailManager.sendHTMLMail(u, EmailTemplateConstants.BIG5_REMINDER, var);
+					count++;
+					returnMsg +=  "<br/><b>" + count +"</b>, big5ID=" + big5.getId() + ", big5Name="+big5.getName() 
+							+ " ,projID=" + big5.getProject().getId() + ", emailType=" + EmailTemplateConstants.BIG5_REMINDER 
+							+ "<br/>,  username=" + u.getUsername()
+							+ " <br/>," +" emails=" + u.getEmail()
+					;
+				}catch(Exception e){
+					logger.error(e.getMessage());
+					returnMsg += "<br/>"+e.getMessage();
+				}
+			}
+			
+		}
+		returnMsg  += "<br/><b> " + " " + count +" (BIG5 Survey)-reminders were sent.</b>";
+		
+		
+		//IPSP  (Infuencial and Persuading Survey)
+				List<IPSPSurvey> ipsps = ipspDAO.getIPSPsToSendReminder();
+				for(IPSPSurvey ipsp : ipsps){
+					Collection<User> users = new ArrayList<User>();
+					users.addAll(ipspDAO.getNotSubmitedUsersByIPSPSurvey(ipsp));
+					
+					for(User u: users){
+						EmailTemplateVariables var = new EmailTemplateVariables(
+								ipsp.getCdate().toString(), ipsp.getMdate().toString(),
+								ipsp.getName(),
+								Util.truncateString(Util.stripTags(ipsp.getQuestionSetName()), Config.getInt("max_content_lenght_in_email")), 
+								ipsp.getCreator().getDisplayName(), 
+								ipsp.getProject().getDisplayName(), 
+								ipspHomeURL + "/" + ipsp.getProject().getId(),
+								ipsp.getEdateDisplay(),
+								u.getDisplayName() 
+							);
+						try{
+							emailManager.sendHTMLMail(u, EmailTemplateConstants.BIG5_REMINDER, var);
+							count++;
+							returnMsg +=  "<br/><b>" + count +"</b>, ipspID=" + ipsp.getId() + ", ipspName="+ipsp.getName() 
+									+ " ,projID=" + ipsp.getProject().getId() + ", emailType=" + EmailTemplateConstants.BIG5_REMINDER 
+									+ "<br/>,  username=" + u.getUsername()
+									+ " <br/>," +" emails=" + u.getEmail()
+							;
+						}catch(Exception e){
+							logger.error(e.getMessage());
+							returnMsg += "<br/>"+e.getMessage();
+						}
+					}
+					
+				}
+				returnMsg  += "<br/><b> " + " " + count +" (IPSP Survey)-reminders were sent.</b>";
+				
+				
 		
 		
 		return returnMsg;

@@ -1,0 +1,110 @@
+<html t:type="layout" 
+	title="${module.displayName}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/ipsp/home?${project.id}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+<style>
+	
+	table.t-data-grid thead tr th, table.t-data-grid tbody tr td {
+	    text-align: center;
+	    vertical-align: middle;
+	}
+	table.t-data-grid tbody tr td.assessee {
+	    text-align: left;
+	}
+	
+	
+</style>
+
+<p:actionBtns>
+	
+	<a class="button rounded" t:type="eventlink" t:event="ExportXls" context="project.id" 
+		title="${message:export-tip}">
+		<span>${message:export-xls}</span>
+	</a>
+	|
+	<a class="button rounded" t:type="pageLink" page="modules/ipsp/managequestionset" context="project.id" >
+		<span>${message:manage-questionset}</span>
+	</a>
+	<a class="button rounded" t:type="pageLink" page="modules/ipsp/manage" context="project.id" >
+		<span>${message:manage-ipsp}</span>
+	</a>
+	
+			
+</p:actionBtns>	
+
+
+
+
+<table class="actionToolBar">
+	<tr>
+		<td class="right">
+		</td>
+	</tr>
+</table>
+
+<div class="assmtContainer">
+	<table class="t-data-grid assmttbl stickyHeader"   >
+		<thead>
+			<tr>
+				<th rowspan="2" class="no">No.</th>
+				<th rowspan="2" class="assessee">Student</th>
+				<t:loop source="ipsps" value="ipsp">
+					<th rowspan="2"> ${ipsp.name} 
+					<t:if test="ipsp.questionSet" negate="true">
+						<div >
+						<t:pagelink page="modules/ipsp/edit" context="ipsp.id" class="attention">
+							${message:no-questionset-yet}
+						</t:pagelink>
+						</div>
+					</t:if>
+					<div>${ipsp.getSdateDisplay()} - ${ipsp.getEdateDisplay()} </div>
+					
+					</th>
+				</t:loop>
+				<th rowspan="2"> Result</th>
+				
+				
+			</tr>
+			</thead>
+		<tbody>
+			<t:loop source="assessees" value="user" index="rowIndex">
+				
+				<tr>
+					<td>${getRowNum()}</td>
+					<td class="assessee" id="${user.username}">
+						${user.displayName}
+					</td>
+					<t:loop source="ipsps" value="ipsp">
+						<td>
+							${loadIPSPSurveyUser(ipsp,  user)}
+							<t:if test="hasGraded()">
+								<t:pageLink page="modules/ipsp/viewscore" context="ipspUser.id" >
+									${getStatus(ipspUser)}
+								</t:pageLink>
+							</t:if>
+						</td>
+					</t:loop>
+					
+					<td>
+						<t:pageLink page="modules/ipsp/result2" context="getParams(project.id, user.id)" >
+							Result
+						</t:pageLink>
+						
+					</td>
+					
+				</tr>
+			</t:loop>
+			
+		</tbody>
+		
+	</table>
+	
+</div>
+<script language="javascript">
+	
+</script>
+</html>

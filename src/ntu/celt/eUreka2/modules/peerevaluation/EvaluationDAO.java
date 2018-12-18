@@ -8,6 +8,7 @@ import org.apache.tapestry5.hibernate.annotations.CommitAfter;
 import ntu.celt.eUreka2.dao.GenericModuleDAO;
 import ntu.celt.eUreka2.entities.Project;
 import ntu.celt.eUreka2.entities.School;
+import ntu.celt.eUreka2.entities.User;
 import ntu.celt.eUreka2.modules.assessment.Rubric;
 import ntu.celt.eUreka2.modules.group.Group;
 
@@ -44,5 +45,8 @@ public interface EvaluationDAO extends GenericModuleDAO{
 	boolean isGroupBeingUse(Group group);
 
 	List<Evaluation> getOldEvaluations(String dateStr, int firtResult, int maxResult) ;
-		
+	
+	void deleteEvaluationUsersByUserProject(User user, Project proj, Group group);
+	
+	
 }

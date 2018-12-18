@@ -397,7 +397,10 @@ public abstract class AbstractPageProfiling {
 		return selModel;
 	}
 	public SelectModel getQsetModel(Project proj){
-		List<LQuestionSet> qsetList =  profDAO.searchLQuestionSets(null, getCurUser(), null, null);
+		List<LQuestionSet> qsetList1 =  profDAO.searchLQuestionSets(null, getCurUser(), null, null);
+		List<LQuestionSet> qsetList2 =  profDAO.searchLQuestionSets(proj);
+		List<LQuestionSet> qsetList =  Util.union(qsetList1, qsetList2);
+
 		List<OptionModel> optModelList = new ArrayList<OptionModel>();
 		for (LQuestionSet qset : qsetList) {
 			OptionModel optModel = new OptionModelImpl(qset.getName(), qset);

@@ -1,0 +1,139 @@
+<html t:type="layout" 
+	title="View Score"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/big5/home?${project.id}
+		,View Score=modules/big5/viewscore?${project.id}
+		"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+<style>
+.scaleScore{
+	min-width: 15px;
+}
+.tblResult td{
+	text-align: center;
+}
+.tblResult td.gname{
+	text-align: left;	
+}
+.e-formeditor table td.label{ /*override*/
+	width:90px;
+}
+</style>
+
+<p:actionBtns>
+	<t:if test="canClearScore(project)">
+		<a class="button rounded" t:type="actionLink" t:id="clearGrade" 
+			context="big5User.id"  onclick="return confirmDelete('WARNING: You are about to clear score of this student in this Survey, Are you sure to continue?')">
+			<span>Reset scores</span>
+		</a>
+	</t:if>
+</p:actionBtns>	
+
+<div class="e-formeditor">
+	<div class="t-beaneditor ">
+		<table >
+			<tr>
+				<td class="label">${message:big5}</td>
+				<td>${big5.name}</td>
+			</tr>
+			<tr>
+				<td class="label">Student</td>
+				<td>${big5User.assessee.getDisplayName()}</td>
+			</tr>
+			<tr>
+				<td class="label">Start Time</td>
+				<td>${big5User.getStartAssessTimeDisplay()}</td>
+			</tr>
+			<tr>
+				<td class="label">Last Time</td>
+				<td>${big5User.getlastAssessTimeDisplay()}</td>
+			</tr>
+			<t:if test="big5User.resetCount">
+				<tr>
+					<td class="label">Reset Answers</td>
+					<td>${big5User.resetCount} times</td>
+				</tr>
+			</t:if>
+			
+			
+			<tr>
+				<td class="label">Answers</td>
+				<td>
+						
+						
+					</td>
+				</tr>
+				
+			</table>
+
+			<div class=" tblResult">
+				<table class="t-data-grid stickyHeader">
+				<thead>
+					<tr>
+						<th >No.</th>
+						<th >Question</th>
+						<t:loop source="cdimensions" value="cdimension" index="rowIndex">
+							<th style="font-size:9px;">${cdimension.name}</th>
+						</t:loop>
+					</tr>
+					</thead>
+					<tbody>
+					<t:if test="big5User.questionScores">
+						<p:else>
+							<tr ><td colspan="6">${message:no-question-answered}</td></tr>
+						</p:else>
+						
+						
+						<t:loop source="big5User.questionScores" value="queScore" index="rowIndex">
+							<tr>
+								<td>
+									${queScore.question.number}
+								</td>
+								<td class="gname">
+									<t:outputraw value="${textarea2html(queScore.question.des)}"/>
+								</td>
+								
+								<t:loop source="cdimensions" value="cdimension" index="rowIndex">
+									<td>
+										${nvl(getDimensionScore(queScore, cdimension))}
+									</td>
+								</t:loop>
+								
+							</tr>
+							
+							
+						</t:loop>
+						${loadCalculateScores()}
+						<tr>
+							<th ></th>
+							<th style="text-align:right;padding-right:15px;">Total</th>
+							<t:loop source="cdimensions" value="cdimension" index="rowIndex">
+								<th>
+									${getTotalDim(cdimension.id)}
+								</th>
+							</t:loop>
+						</tr>
+						<tr>
+							<th ></th>
+							<th style="text-align:right;padding-right:15px;">Average</th>
+							<t:loop source="cdimensions" value="cdimension" index="rowIndex">
+								<th>
+									${getAvgDimDisplay(cdimension.id)}
+								</th>
+							</t:loop>
+						</tr>
+					</t:if>
+					</tbody>						
+				</table>
+			</div>
+
+
+	</div>
+	
+</div>
+
+</html>

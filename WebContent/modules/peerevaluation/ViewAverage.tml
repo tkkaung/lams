@@ -482,6 +482,11 @@
 								<t:outputraw value="getSpace()"/>
 							</td>
 						</t:loop>
+						<t:if test="isMoreThan(getGroupSize() , groupUser.getUsers().size())">
+							<t:loop source="addInt(1, groupUser.getUsers().size())..getGroupSize()" value="var:peerIndex">
+								<td class="selfHighlight"><t:outputraw value="getSpace()"/></td>
+							</t:loop>
+						</t:if>
 						
 						<p:else>
 							<t:loop source="1..getGroupSize()" value="var:peerIndex">

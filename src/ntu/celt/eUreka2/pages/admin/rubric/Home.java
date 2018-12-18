@@ -1,9 +1,12 @@
 package ntu.celt.eUreka2.pages.admin.rubric;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.tapestry5.PersistenceConstants;
+import org.apache.tapestry5.StreamResponse;
+import org.apache.tapestry5.annotations.InjectPage;
 import org.apache.tapestry5.annotations.Persist;
 import org.apache.tapestry5.annotations.Property;
 import org.apache.tapestry5.annotations.SessionState;
@@ -47,13 +50,14 @@ public class Home extends AbstractPageAdminRubric{
 	private AppState appState;
 	
 	@Inject
-	private AssessmentDAO aDAO;
-	
+	private AssessmentDAO aDAO;	
 	@Inject
 	private Messages messages;
 	@Inject
 	private BeanModelSource beanModelSource;
-	
+	@InjectPage
+	private View viewRubricPage;
+
 	void setupRender() {
 		if(!getCurUser().hasPrivilege(PrivilegeSystem.MANAGE_OWN_RUBRIC)) {
 			throw new NotAuthorizedAccessException(messages.get("not-authorized-access"));
@@ -146,5 +150,8 @@ public class Home extends AbstractPageAdminRubric{
 		
 		return model;
 	}
-	
+
+	public StreamResponse onActionFromExportXLS(int rId) throws IOException {
+		return viewRubricPage.onExportXls(rId);
+	}	
 }

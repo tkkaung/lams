@@ -13,6 +13,8 @@ import ntu.celt.eUreka2.modules.group.Group;
 public interface CAREDAO extends GenericModuleDAO{
 	List<CQuestionSet> getCQuestionSetsByOwner(User u);
 	List<CQuestionSet> searchCQuestionSets(String searchText, User owner,  School school); //ignore search field if it is null
+	List<CQuestionSet> searchCQuestionSets(Project proj); 
+	
 	
 	CQuestionSet getCQuestionSetById(long id);
 	void addCQuestionSet(CQuestionSet qset);

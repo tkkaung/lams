@@ -321,7 +321,9 @@ public abstract class AbstractPageCARE {
 		return selModel;
 	}
 	public SelectModel getQsetModel(Project proj){
-		List<CQuestionSet> qsetList =  careDAO.searchCQuestionSets(null, getCurUser(),  null);
+		List<CQuestionSet> qsetList1 =  careDAO.searchCQuestionSets(null, getCurUser(),  null);
+		List<CQuestionSet> qsetList2 =  careDAO.searchCQuestionSets(proj);
+		List<CQuestionSet> qsetList =  Util.union(qsetList1, qsetList2);
 		List<OptionModel> optModelList = new ArrayList<OptionModel>();
 		for (CQuestionSet qset : qsetList) {
 			OptionModel optModel = new OptionModelImpl(qset.getName(), qset);

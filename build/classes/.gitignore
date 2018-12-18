@@ -1,0 +1,12 @@
+/CVS/
+/Config.properties
+/c3p0.properties
+/changeLog.txt
+/entities.hbm.xml
+/entities_modules.hbm.xml
+/hibernate.cfg.xml
+/hibernate.eureka1.cfg.xml
+/hibernate.eureka2.copy.cfg.xml
+/log4j.properties
+/ntu/
+/samlConfig.properties

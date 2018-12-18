@@ -328,5 +328,16 @@ public class EvaluationDAOImpl implements EvaluationDAO {
 		return true;
 	}
 
+	@Override
+	public void deleteEvaluationUsersByUserProject(User user, Project proj, Group group) {
+		Query q = session.createQuery("DELETE FROM EvaluationUser AS eu " +
+				" WHERE eu.evaluation IN (SELECT e FROM Evaluation AS e WHERE e.project = :proj AND e.group = :group) AND (eu.assessor = :user OR eu.assessee = :user ) "  )
+				.setParameter("proj", proj)
+				.setParameter("group", group)
+				.setParameter("user", user)
+				;
+		q.executeUpdate();
+	}
+
 	
 }

@@ -1604,4 +1604,290 @@
 	</class>
 <!-- Somsak 2017-08-03 ...End  -->
 
+
+<!-- Somsak 2018-08-12 ...Start  -->
+<!-- /////////////////////////////////BIG 5 Personality Survey////////////////////////////////// -->	   	
+   	<class name="ntu.celt.eUreka2.modules.big5.BQuestionSet" table="tbl_big5_bquestionset">
+		<id name="id" type="long" >
+			<generator class="assigned" />
+		</id>
+		<property name="name" type="string" />
+		<property name="des" type="text" />
+		<many-to-one name="owner" class="ntu.celt.eUreka2.entities.User"  />
+		<property name="cdate" type="timestamp" />
+		<property name="mdate" type="timestamp" />
+		<many-to-one name="school" class="ntu.celt.eUreka2.entities.School"  />
+		<list name="questions" cascade="all,delete-orphan" >
+	       <key>
+	         <column name="questionset" not-null="true" />
+	       </key>
+	       <list-index column="idx" />
+	       <one-to-many class="ntu.celt.eUreka2.modules.big5.BQuestion" />
+	   </list>
+	</class>
+	
+	<class name="ntu.celt.eUreka2.modules.big5.BQuestion" table="tbl_big5_bquestion" >
+		<id name="id" type="long" >
+			<generator class="assigned" />
+		</id>
+		<property name="des" type="string" />
+		<many-to-one name="questionset" class="ntu.celt.eUreka2.modules.big5.BQuestionSet" />
+		<property name="number" type="integer" />
+		<property name="dimension1" type="string" />
+		<property name="dimension2" type="string" />
+		<property name="dimension3" type="string" />
+		<property name="dimension4" type="string" />
+		<property name="dimension5" type="string" />
+		
+	</class>
+	<class name="ntu.celt.eUreka2.modules.big5.BIG5Question" table="tbl_big5_big5question" >
+		<id name="id" type="long" >
+			<generator class="assigned" />
+		</id>
+		<property name="des" type="string" />
+		<property name="number" type="integer" />
+	
+		<property name="dimension1" type="string" />
+		<property name="dimension2" type="string" />
+		<property name="dimension3" type="string" />
+		<property name="dimension4" type="string" />
+		<property name="dimension5" type="string" />
+		
+	</class>
+	
+	<class name="ntu.celt.eUreka2.modules.big5.BDimension" table="tbl_big5_bdimension" >
+		<id name="id" type="integer" >
+			<generator class="assigned" />
+		</id>
+		<property name="name" type="string"  />
+		<property name="des" type="text" />
+		<property name="colorCode" type="string"  />
+		<property name="orderNum" type="integer"  />
+		<property name="active" type="boolean"  />
+		<property name="styleGroup" type="string"  />
+		<property name="createTime" type="timestamp" />
+		
+	</class>
+	
+	
+   <class name="ntu.celt.eUreka2.modules.big5.BIG5Survey" table="tbl_big5_survey">
+		<id name="id" type="long" >
+			<generator class="assigned" />
+		</id>
+		<property name="name" type="string" />
+		<many-to-one name="project" class="ntu.celt.eUreka2.entities.Project"  not-null="true" />
+		<many-to-one name="creator" class="ntu.celt.eUreka2.entities.User" not-null="true" />
+		<many-to-one name="editor" class="ntu.celt.eUreka2.entities.User" />
+		<property name="cdate" type="timestamp" />
+		<property name="mdate" type="timestamp" />
+		<property name="sdate" type="timestamp" />
+		<property name="edate" type="timestamp" />
+		<property name="orderNumber" type="integer" />
+		<property name="released" type="boolean" />
+		
+		<many-to-one name="questionSet" class="ntu.celt.eUreka2.modules.big5.BQuestionSet" />
+		<property name="questionSetName" type="string" />
+		<list name="questions"  cascade="all,delete-orphan" >
+	       <key>
+	         <column name="big5"  />
+	       </key>
+	       <list-index column="idx" />
+	       <one-to-many class="ntu.celt.eUreka2.modules.big5.BIG5Question" />
+	    </list>
+	    <set name="big5Users" cascade="all,delete-orphan" >
+	       <key><column name="big5Id" not-null="true" /></key>
+	          <one-to-many  class="ntu.celt.eUreka2.modules.big5.BIG5SurveyUser" />
+	    </set>
+   		<set name="daysToRemind" table="tbl_big5_daystoremind">
+	       <key><column name="big5Id" not-null="true" /></key>
+	        <element type="integer" column="daysToRemind"></element>
+	    </set>
+	</class>
+	
+	<class name="ntu.celt.eUreka2.modules.big5.BQuestionScore" table="tbl_big5_questionscore" >
+		<id name="id" type="string" >
+			<generator class="assigned" />
+		</id>
+		<many-to-one name="question" column="questionId" class="ntu.celt.eUreka2.modules.big5.BIG5Question"  />
+		<property name="score" type="integer"  />
+		<property name="score1" type="integer"  />
+		<property name="score2" type="integer"  />
+		<property name="score3" type="integer"  />
+		<property name="score4" type="integer"  />
+		<property name="score5" type="integer"  />
+		<property name="orderNum" type="integer"  />
+		<many-to-one name="big5User" column="big5UserId" class="ntu.celt.eUreka2.modules.big5.BIG5SurveyUser"  />
+	</class>
+	
+	  
+	
+	<class name="ntu.celt.eUreka2.modules.big5.BIG5SurveyUser" table="tbl_big5_big5surveyuser" >
+		<id name="id" type="long" >
+			<generator class="assigned" />
+		</id>
+		<many-to-one name="assessor" class="ntu.celt.eUreka2.entities.User" />
+		<many-to-one name="assessee" class="ntu.celt.eUreka2.entities.User" />
+		<many-to-one name="survey" class="ntu.celt.eUreka2.modules.big5.BIG5Survey" column="big5Id" />
+		<property name="startAssessTime" type="timestamp" />
+		<property name="lastAssessTime" type="timestamp" />
+		<property name="finished" type="boolean"/>
+	    <property name="lastQuestionNum" type="integer"/>
+	    <property name="resetCount" type="integer"/>
+	   	<set name="questionScores" cascade="all,delete-orphan" order-by="orderNum">
+	       <key><column name="big5UserId"  /></key>
+	          <one-to-many  class="ntu.celt.eUreka2.modules.big5.BQuestionScore" />
+	    </set>
+    	<property name="score1" type="double"  />
+		<property name="score2" type="double"  />
+		<property name="score3" type="double"  />
+		<property name="score4" type="double"  />
+		<property name="score5" type="double"  />
+	</class>
+<!-- Somsak 2018-08-12 ...End  -->
+
+
+<!-- Somsak 2018-09-08 ...Start  -->
+<!-- /////////////////////////////////Influencing and Persuading Style Profiler////////////////////////////////// -->	   	
+   	<class name="ntu.celt.eUreka2.modules.ipsp.IQuestionSet" table="tbl_ipsp_iquestionset">
+		<id name="id" type="long" >
+			<generator class="assigned" />
+		</id>
+		<property name="name" type="string" />
+		<property name="des" type="text" />
+		<many-to-one name="owner" class="ntu.celt.eUreka2.entities.User"  />
+		<property name="cdate" type="timestamp" />
+		<property name="mdate" type="timestamp" />
+		<many-to-one name="school" class="ntu.celt.eUreka2.entities.School"  />
+		<list name="questions" cascade="all,delete-orphan" >
+	       <key>
+	         <column name="questionset" not-null="true" />
+	       </key>
+	       <list-index column="idx" />
+	       <one-to-many class="ntu.celt.eUreka2.modules.ipsp.IQuestion" />
+	   </list>
+	</class>
+	
+	<class name="ntu.celt.eUreka2.modules.ipsp.IQuestion" table="tbl_ipsp_iquestion" >
+		<id name="id" type="long" >
+			<generator class="assigned" />
+		</id>
+		<property name="des" type="string" />
+		<many-to-one name="questionset" class="ntu.celt.eUreka2.modules.ipsp.IQuestionSet" />
+		<property name="number" type="integer" />
+		<property name="dimension1" type="string" />
+		<property name="dimension2" type="string" />
+		<property name="dimension3" type="string" />
+		<property name="dimension4" type="string" />
+		
+	</class>
+	<class name="ntu.celt.eUreka2.modules.ipsp.IPSPQuestion" table="tbl_ipsp_ipspquestion" >
+		<id name="id" type="long" >
+			<generator class="assigned" />
+		</id>
+		<property name="des" type="string" />
+		<property name="number" type="integer" />
+	
+		<property name="dimension1" type="string" />
+		<property name="dimension2" type="string" />
+		<property name="dimension3" type="string" />
+		<property name="dimension4" type="string" />
+		
+	</class>
+	
+	<class name="ntu.celt.eUreka2.modules.ipsp.IDimension" table="tbl_ipsp_idimension" >
+		<id name="id" type="integer" >
+			<generator class="assigned" />
+		</id>
+		<property name="name" type="string"  />
+		<property name="des" type="text" />
+		<property name="colorCode" type="string"  />
+		<property name="orderNum" type="integer"  />
+		<property name="active" type="boolean"  />
+		<property name="styleGroup" type="string"  />
+		<property name="createTime" type="timestamp" />
+		
+	</class>
+	
+	
+   <class name="ntu.celt.eUreka2.modules.ipsp.IPSPSurvey" table="tbl_ipsp_survey">
+		<id name="id" type="long" >
+			<generator class="assigned" />
+		</id>
+		<property name="name" type="string" />
+		<many-to-one name="project" class="ntu.celt.eUreka2.entities.Project"  not-null="true" />
+		<many-to-one name="creator" class="ntu.celt.eUreka2.entities.User" not-null="true" />
+		<many-to-one name="editor" class="ntu.celt.eUreka2.entities.User" />
+		<property name="cdate" type="timestamp" />
+		<property name="mdate" type="timestamp" />
+		<property name="sdate" type="timestamp" />
+		<property name="edate" type="timestamp" />
+		<property name="orderNumber" type="integer" />
+		<property name="released" type="boolean" />
+		<property name="questionType" not-null="true">		
+			<type name="org.hibernate.type.EnumType">
+         		<param name="enumClass">ntu.celt.eUreka2.modules.ipsp.IQuestionType</param>
+     	 	</type>
+   		</property>
+   		<many-to-one name="group" column="groupId" class="ntu.celt.eUreka2.modules.group.Group"  />
+	    
+		
+		<many-to-one name="questionSet" class="ntu.celt.eUreka2.modules.ipsp.IQuestionSet" />
+		<property name="questionSetName" type="string" />
+		<list name="questions"  cascade="all,delete-orphan" >
+	       <key>
+	         <column name="ipsp"  />
+	       </key>
+	       <list-index column="idx" />
+	       <one-to-many class="ntu.celt.eUreka2.modules.ipsp.IPSPQuestion" />
+	    </list>
+	    <set name="ipspUsers" cascade="all,delete-orphan" >
+	       <key><column name="ipspId" not-null="true" /></key>
+	          <one-to-many  class="ntu.celt.eUreka2.modules.ipsp.IPSPSurveyUser" />
+	    </set>
+   		<set name="daysToRemind" table="tbl_ipsp_daystoremind">
+	       <key><column name="ipspId" not-null="true" /></key>
+	        <element type="integer" column="daysToRemind"></element>
+	    </set>
+	</class>
+	
+	<class name="ntu.celt.eUreka2.modules.ipsp.IQuestionScore" table="tbl_ipsp_questionscore" >
+		<id name="id" type="string" >
+			<generator class="assigned" />
+		</id>
+		<many-to-one name="question" column="questionId" class="ntu.celt.eUreka2.modules.ipsp.IPSPQuestion"  />
+		<property name="score" type="integer"  />
+		<property name="score1" type="integer"  />
+		<property name="score2" type="integer"  />
+		<property name="score3" type="integer"  />
+		<property name="score4" type="integer"  />
+		<property name="orderNum" type="integer"  />
+		<many-to-one name="ipspUser" column="ipspUserId" class="ntu.celt.eUreka2.modules.ipsp.IPSPSurveyUser"  />
+	</class>
+	
+	  
+	
+	<class name="ntu.celt.eUreka2.modules.ipsp.IPSPSurveyUser" table="tbl_ipsp_ipspsurveyuser" >
+		<id name="id" type="long" >
+			<generator class="assigned" />
+		</id>
+		<many-to-one name="assessor" class="ntu.celt.eUreka2.entities.User" />
+		<many-to-one name="assessee" class="ntu.celt.eUreka2.entities.User" />
+		<many-to-one name="survey" class="ntu.celt.eUreka2.modules.ipsp.IPSPSurvey" column="ipspId" />
+		<property name="startAssessTime" type="timestamp" />
+		<property name="lastAssessTime" type="timestamp" />
+		<property name="finished" type="boolean"/>
+	    <property name="lastQuestionNum" type="integer"/>
+	    <property name="resetCount" type="integer"/>
+	   	<set name="questionScores" cascade="all,delete-orphan" order-by="orderNum">
+	       <key><column name="ipspUserId"  /></key>
+	          <one-to-many  class="ntu.celt.eUreka2.modules.ipsp.IQuestionScore" />
+	    </set>
+    	<property name="score1" type="double"  />
+		<property name="score2" type="double"  />
+		<property name="score3" type="double"  />
+		<property name="score4" type="double"  />
+	</class>
+<!-- Somsak 2018-09-08 ...End  -->
+
+
 </hibernate-mapping>

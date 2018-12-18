@@ -3,7 +3,9 @@ package ntu.celt.eUreka2.modules.care;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.hibernate.Criteria;
@@ -19,7 +21,8 @@ import ntu.celt.eUreka2.entities.School;
 import ntu.celt.eUreka2.entities.User;
 import ntu.celt.eUreka2.internal.Util;
 import ntu.celt.eUreka2.modules.group.Group;
-import ntu.celt.eUreka2.modules.profiling.LDimension;
+import ntu.celt.eUreka2.modules.ipsp.IPSPSurvey;
+import ntu.celt.eUreka2.modules.ipsp.IQuestionSet;
 
 public class CAREDAOImpl implements CAREDAO {
 	
@@ -89,6 +92,25 @@ public class CAREDAOImpl implements CAREDAO {
 		
 		
 		return crit.list();
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<CQuestionSet> searchCQuestionSets(Project proj) {
+		Set<CQuestionSet> rSet = new HashSet<CQuestionSet>();
+		Query q = session.createQuery("SELECT a FROM CARESurvey AS a " 
+				+" WHERE a.project=:rProject "
+				)
+				.setParameter("rProject", proj);
+
+		List<CARESurvey> aList = q.list();
+		for( CARESurvey ipsp : aList){
+			if(ipsp.getQuestionSet()!= null)
+				rSet.add(ipsp.getQuestionSet());
+		}
+		
+		return new ArrayList<CQuestionSet>(rSet);
+		
 	}
 	
 	

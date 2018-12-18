@@ -47,6 +47,8 @@ import ntu.celt.eUreka2.modules.backuprestore.Migrate2DAO;
 import ntu.celt.eUreka2.modules.backuprestore.Migrate2DAOImpl;
 import ntu.celt.eUreka2.modules.backuprestore.MigrateDAO;
 import ntu.celt.eUreka2.modules.backuprestore.MigrateDAOImpl;
+import ntu.celt.eUreka2.modules.big5.BIG5DAO;
+import ntu.celt.eUreka2.modules.big5.BIG5DAOImpl;
 import ntu.celt.eUreka2.modules.blog.BlogDAO;
 import ntu.celt.eUreka2.modules.blog.BlogDAOImpl;
 import ntu.celt.eUreka2.modules.budget.BudgetDAO;
@@ -59,6 +61,8 @@ import ntu.celt.eUreka2.modules.forum.ForumDAO;
 import ntu.celt.eUreka2.modules.forum.ForumDAOImpl;
 import ntu.celt.eUreka2.modules.group.GroupDAO;
 import ntu.celt.eUreka2.modules.group.GroupDAOImpl;
+import ntu.celt.eUreka2.modules.ipsp.IPSPDAO;
+import ntu.celt.eUreka2.modules.ipsp.IPSPDAOImpl;
 import ntu.celt.eUreka2.modules.scheduling.SchedulingDAO;
 import ntu.celt.eUreka2.modules.scheduling.SchedulingDAOImpl;
 import ntu.celt.eUreka2.modules.search.SearchDAO;
@@ -166,7 +170,9 @@ public class AppModule
     	binder.bind(ProfilingDAO.class, ProfilingDAOImpl.class);
     	binder.bind(LCDPDAO.class, LCDPDAOImpl.class);
     	binder.bind(CAREDAO.class, CAREDAOImpl.class);
-    	
+    	binder.bind(BIG5DAO.class, BIG5DAOImpl.class);
+    	binder.bind(IPSPDAO.class, IPSPDAOImpl.class);
+        	
     }
     
     
@@ -190,7 +196,7 @@ public class AppModule
         // assets. Web browsers will cache assets because of the far future expires
         // header. If existing assets are changed, the version number should also
         // change, to force the browser to download new versions.
-        configuration.add(SymbolConstants.APPLICATION_VERSION, "2.1.93");
+        configuration.add(SymbolConstants.APPLICATION_VERSION, "2.1.97");
      
         //configuration.add(SymbolConstants.MIN_GZIP_SIZE, "10000");
         

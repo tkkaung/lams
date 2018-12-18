@@ -13,6 +13,7 @@ import ntu.celt.eUreka2.modules.group.Group;
 public interface LCDPDAO extends GenericModuleDAO{
 	List<PQuestionSet> getPQuestionSetsByOwner(User u);
 	List<PQuestionSet> searchPQuestionSets(String searchText, User owner,  School school); //ignore search field if it is null
+	List<PQuestionSet> searchPQuestionSets(Project proj); 
 	
 	PQuestionSet getPQuestionSetById(long id);
 	void addPQuestionSet(PQuestionSet qset);

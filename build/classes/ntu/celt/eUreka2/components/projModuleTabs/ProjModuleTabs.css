@@ -37,6 +37,8 @@
 #projMods table td a.LeadershipProfiling { background:url(images/btnlea_g.png) top center no-repeat; }
 #projMods table td a.LCDP { background:url(images/btnlcdp_g.png) top center no-repeat; }
 #projMods table td a.CARE { background:url(images/btncare_g.png) top center no-repeat; }
+#projMods table td a.BIG5 { background:url(images/btnbig5_g.png) top center no-repeat; }
+#projMods table td a.IPSP { background:url(images/btnbig5_g.png) top center no-repeat; }
 
 
 
@@ -56,6 +58,9 @@
 #projMods table td a.LeadershipProfiling:hover, #projMods table td.selected a.LeadershipProfiling{ background:url(images/btnlea.png) top center no-repeat; }
 #projMods table td a.LCDP:hover, #projMods table td.selected a.LCDP{ background:url(images/btnlcdp.png) top center no-repeat; }
 #projMods table td a.CARE:hover, #projMods table td.selected a.CARE{ background:url(images/btncare.png) top center no-repeat; }
+#projMods table td a.BIG5:hover, #projMods table td.selected a.BIG5{ background:url(images/btnbig5.png) top center no-repeat; }
+#projMods table td a.IPSP:hover, #projMods table td.selected a.IPSP{ background:url(images/btnbig5.png) top center no-repeat; }
+
 
 #projMods table td  .ntfCon{
 	position: relative;

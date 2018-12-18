@@ -50,6 +50,8 @@ public class PredefinedNames {
 	public static final String MODULE_LEADERSHIP_PROFILING = "LeadershipProfiling";
 	public static final String MODULE_LEADERSHIP_COMPETENCY = "LCDP";
 	public static final String MODULE_CARE_PSYCHOMETRIC_SURVEY = "CARE";
+	public static final String MODULE_BIG5_PERSONALITY_SURVEY = "BIG5";
+	public static final String MODULE_INFLUENCING_PESUADING_SURVEY = "IPSP";
 	public static final String PROJECT_INFO = "ProjectInfo";
 	
 	

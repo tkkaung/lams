@@ -123,7 +123,7 @@ public class Home extends AbstractPageCARE{
 	
 	@CommitAfter
 	private void initCARESurveys(){
-		String[] names  = {"CARE Psychometric Survey"};
+		String[] names  = {getModule().getDisplayName()};
 		for(int i=0; i<names.length; i++){
 			CARESurvey p1 = new CARESurvey(names[i], project, getCurUser(), i+1, new Date() );
 			

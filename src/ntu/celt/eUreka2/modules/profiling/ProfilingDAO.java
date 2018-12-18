@@ -13,6 +13,7 @@ import ntu.celt.eUreka2.modules.group.Group;
 public interface ProfilingDAO extends GenericModuleDAO{
 	List<LQuestionSet> getLQuestionSetsByOwner(User u);
 	List<LQuestionSet> searchLQuestionSets(String searchText, User owner,  School school, LQuestionType qType); //ignore search field if it is null
+	List<LQuestionSet> searchLQuestionSets(Project proj);
 	
 	LQuestionSet getLQuestionSetById(long id);
 	void addLQuestionSet(LQuestionSet qset);

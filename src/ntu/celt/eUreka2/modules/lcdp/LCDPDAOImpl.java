@@ -3,7 +3,9 @@ package ntu.celt.eUreka2.modules.lcdp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.hibernate.Criteria;
@@ -19,6 +21,8 @@ import ntu.celt.eUreka2.entities.School;
 import ntu.celt.eUreka2.entities.User;
 import ntu.celt.eUreka2.internal.Util;
 import ntu.celt.eUreka2.modules.group.Group;
+import ntu.celt.eUreka2.modules.ipsp.IPSPSurvey;
+import ntu.celt.eUreka2.modules.ipsp.IQuestionSet;
 
 public class LCDPDAOImpl implements LCDPDAO {
 	
@@ -90,7 +94,23 @@ public class LCDPDAOImpl implements LCDPDAO {
 		return crit.list();
 	}
 	
-	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<PQuestionSet> searchPQuestionSets(Project proj) {
+		Set<PQuestionSet> rSet = new HashSet<PQuestionSet>();
+		Query q = session.createQuery("SELECT a FROM LCDPSurvey AS a " 
+				+" WHERE a.project=:rProject "
+				)
+				.setParameter("rProject", proj);
+
+		List<LCDPSurvey> aList = q.list();
+		for( LCDPSurvey ipsp : aList){
+			if(ipsp.getQuestionSet()!= null)
+				rSet.add(ipsp.getQuestionSet());
+		}
+		
+		return new ArrayList<PQuestionSet>(rSet);
+	}
 	
 	@Override
 	public void addLCDPSurvey(LCDPSurvey lcdp) {

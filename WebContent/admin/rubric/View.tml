@@ -35,6 +35,10 @@
 	<a class="button rounded" t:type="pageLink" page="admin/rubric/grab" context="getParams(rubric.id,true)" >
 		<span>${message:new-using-this-rubric}</span>
 	</a>
+	<a class="button rounded" t:type="eventlink" t:event="ExportXls" context="rubric.id" 
+			title="Export xls">
+			<span>Export XLS</span>
+		</a>
 </p:actionBtns>	
   
 <div class="t-beaneditor e-formeditor" style="padding-top:0; margin:0px;">

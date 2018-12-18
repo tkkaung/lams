@@ -40,7 +40,7 @@ public class Import extends AbstractPageAssessment{
 	@Property
     private UploadedFile file;
     private final char seperator = ',';
-	private final int numColumn = 15;
+	private final int numColumn = 17;
 	
 	private String pid;
 	@Property
@@ -120,7 +120,7 @@ public class Import extends AbstractPageAssessment{
 	    		case 1 :
 	    			if(nextLine.length != numColumn){
 	    				isValid = false;
-	    				errorMsg = "Incorrect number of column, Row1";
+	    				errorMsg += "Incorrect number of column, Row1. ";
 	    			}
 	    			break;
 	    		case 2 :
@@ -129,20 +129,20 @@ public class Import extends AbstractPageAssessment{
 	    				if(!"".equals(nextLine[CritColIndex].trim())){
 		    				if(!Util.isInteger(nextLine[CritColIndex])){
 		    					isValid = false;
-			    				errorMsg = "CritCol must be integer";
+			    				errorMsg = "CritCol must be integer. ";
 		    				}
 		    				critCol = Integer.parseInt(nextLine[CritColIndex]);
 	    				}
 	    			}
 	    			else {
 	    				isValid = false;
-	    				errorMsg = "Incorrect number of column, Row2";
+	    				errorMsg += "Incorrect number of column, Row2. ";
 	    			}
 	    			break;
 	    		case 3 :
 	    			if(nextLine.length != (critCol+3) && nextLine.length!=numColumn ){
 	    				isValid = false;
-	    				errorMsg = "Incorrect number of column, Row3 " ;
+	    				errorMsg += "Incorrect number of column, Row3 " ;
 	    			}
 	    			break;
 	    		}
@@ -207,10 +207,10 @@ public class Import extends AbstractPageAssessment{
 		    	critCol = Integer.parseInt(nextLine[13]);
 		    }
 		    assmt.setAllowViewComment(Boolean.parseBoolean(nextLine[14]));
-		    if(nextLine.length >= 14){
+		    if(nextLine.length >= 16){
 			    assmt.setAllowReleaseResult(Boolean.parseBoolean(nextLine[15]));
 		    }
-		    if(nextLine.length >= 15){
+		    if(nextLine.length >= 17){
 			    assmt.setAllowViewCommentRightAway(Boolean.parseBoolean(nextLine[16]));
 		    }
 		    

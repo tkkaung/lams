@@ -1,0 +1,92 @@
+<html t:type="layout" 
+	title="View Result"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/big5/assesseehome?${project.id}
+		,View Result=modules/big5/assesseeresult?${project.id}
+		"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+<p:actionBtns>
+</p:actionBtns>	
+
+<p:legendBlk>
+	<div class="legend">
+		<div class="title">${message:legend}</div>
+		<div class="content">
+			<table>
+				<tr>
+					<td><div class="self_pre" /></td>
+					<td class="label">: Self Score</td>
+<!-- 					<td><div class="norms" style="width: 25px;" ><t:outputraw value="emptyString"/></div></td>
+					<td class="label">Norms</td>
+ -->			
+ 				</tr>
+			</table>
+			* Emotional stability is opposite of Neuroticism (high anxiety/emotional instability)
+		</div>
+	</div>
+</p:legendBlk>	
+
+	<table class="actionToolBar">
+		<tr>
+		<td>
+		</td>
+		<td class="right">
+		</td>
+		</tr>
+	</table>
+		
+
+
+<div style="padding:10px;">Student: <span class="studentname">${assessee.getDisplayName()}</span></div>
+
+<div class="resultContainer">
+	<div class="wrapper">
+		<table id="resultBlk" cellspacing="0" cellpadding="0" style="width:${getTotalWidth()}px;">
+			<tr>
+				<th class="dimensionCol" style="width:${getDimColWidth()}px;" ></th>
+				<th  class="hiddenCol" ></th>
+				<th class="scoreCol" style="width:${getColumnWidth()}px;"><div class="leftspan">0</div>1</th>
+				<t:loop source="2..5" value="tempInt">
+					<th class="scoreCol" style="width:${getColumnWidth()}px;">${tempInt}</th>
+				</t:loop>
+			</tr>
+			
+
+			<t:loop source="cdimensions" value="cdimension" index="rowIndex">
+				<tr >
+					<td style="padding:5px;background-color:#${cdimension.colorCode};">${cdimension.name}</td>
+					<td class="hiddenCol" >
+						<div class="chartBarWrapper">
+							<div class="chartBar norms" style="left: ${computeWidth(getNormsStart(cdimension.id))}px; 
+								width: ${computeWidth(getNormsWidth(cdimension.id))}px;"
+							>
+							<t:outputraw value="emptyString"/>
+							</div>
+							<div class="chartBar self_pre" style="left: ${computeWidth(getAvgSelf(cdimension.id))}px;">
+							<t:outputraw value="emptyString"/>
+							<span style='padding-left:15px;'>${getAvgSelf(cdimension.id)}</span>
+							</div>
+							
+						</div>	
+					</td>
+				  	<t:loop source="1..5" value="tempInt">
+						<td class="scoreCol" style="background-color:#${cdimension.colorCode};"><t:outputraw value="emptyString"/></td>
+					</t:loop>
+					
+				</tr>
+			
+			</t:loop>
+		</table>
+
+
+
+	</div>
+</div>
+
+
+
+</html>

@@ -3,7 +3,9 @@ package ntu.celt.eUreka2.modules.profiling;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.hibernate.Criteria;
@@ -19,6 +21,8 @@ import ntu.celt.eUreka2.entities.School;
 import ntu.celt.eUreka2.entities.User;
 import ntu.celt.eUreka2.internal.Util;
 import ntu.celt.eUreka2.modules.group.Group;
+import ntu.celt.eUreka2.modules.ipsp.IPSPSurvey;
+import ntu.celt.eUreka2.modules.ipsp.IQuestionSet;
 
 public class ProfilingDAOImpl implements ProfilingDAO {
 	
@@ -90,6 +94,23 @@ public class ProfilingDAOImpl implements ProfilingDAO {
 		
 		
 		return crit.list();
+	}
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<LQuestionSet> searchLQuestionSets(Project proj) {
+		Set<LQuestionSet> rSet = new HashSet<LQuestionSet>();
+		Query q = session.createQuery("SELECT a FROM Profiling AS a " 
+				+" WHERE a.project=:rProject "
+				)
+				.setParameter("rProject", proj);
+
+		List<Profiling> aList = q.list();
+		for( Profiling ipsp : aList){
+			if(ipsp.getQuestionSet()!= null)
+				rSet.add(ipsp.getQuestionSet());
+		}
+		
+		return new ArrayList<LQuestionSet>(rSet);
 	}
 	
 	

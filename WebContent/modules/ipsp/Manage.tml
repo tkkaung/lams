@@ -1,0 +1,88 @@
+<html t:type="layout" 
+	title="${message:manage-ipsp}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/ipsp/home?${project.id}
+		,${message:manage-ipsp}=modules/ipsp/manage?${project.id}
+		"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+<style>
+	.released, .orderNumber{
+		text-align: center;
+	}
+</style>
+
+<p:actionBtns>
+	
+	<a class="button rounded" t:type="pageLink" page="modules/ipsp/managequestionset" context="project.id" >
+		<span>${message:manage-questionset}</span>
+	</a>
+</p:actionBtns>	
+
+
+<t:grid source="ipsps" row="ipsp" 
+	model="model"
+	rowIndex="rowIndex"
+	pagerPosition="bottom" 
+	>
+	<p:empty>
+		<div class="notfoundtext">
+			${message:no-ipsp-found}
+		</div>
+	</p:empty>
+   <t:parameter name="orderNumberCell">
+   	${ipsp.ordernumber}
+   </t:parameter>
+   
+   <t:parameter name="nameCell">
+   		<span>${ipsp.name}</span> 
+   </t:parameter>
+   <t:parameter name="mdateCell">
+   	<span class="date">${ipsp.mdatedisplay}</span>
+   	<t:if test="ipsp.isDiffEditor()">
+			<div style="font-size:0.9em">
+				${message:by} 
+				<t:pagelink page="user/view" context="ipsp.editor.id">${ipsp.editor.displayname}</t:pagelink>
+			</div>
+		</t:if>
+   </t:parameter>
+   <t:parameter name="questionSetNameCell">
+   		<t:if test="ipsp.questionSet">
+   			<t:pagelink page="modules/ipsp/QuestionsetView" context="getParams(project.id, ipsp.questionSet.id)">${ipsp.questionSetName}</t:pagelink>
+   		</t:if>
+   </t:parameter>
+   <t:parameter name="edateCell">
+   		<t:if test="ipsp.sdate" >
+   			<span class="date">${ipsp.sdatedisplay}</span>
+   		</t:if> -
+   		<span class="date">${ipsp.edatedisplay}</span>
+   	</t:parameter>
+     
+     <t:parameter name="releasedCell">
+   		<t:actionLink t:id="toggleReleased" context="ipsp.id" title="Click to toggle Release">
+   			<t:if test="ipsp.released" >
+	   			<span >Yes</span>
+	   			<p:else>
+	   				No
+	   			</p:else>
+	   		</t:if>
+   		</t:actionLink>
+   	</t:parameter>
+     
+   <t:parameter name="actionCell">
+			<t:pagelink page="modules/ipsp/edit" context="ipsp.id" class="button rounded">
+				<span>${message:edit}</span> 
+			</t:pagelink>
+			<t:pagelink page="modules/ipsp/checkstatus" context="ipsp.id" class="button rounded">
+				<span>${message:check-status}</span> 
+			</t:pagelink>
+			
+			
+	</t:parameter>
+</t:grid>
+
+
+</html>

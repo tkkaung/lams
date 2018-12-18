@@ -98,7 +98,7 @@ public class GroupEnrollUser extends AbstractPageGroup {
 		resultUsers = filterSelected(resultUsers);
 		
 		if(groupDAO.isGroupBeingUsePE(group)){
-			appState.recordWarningMsg("This group cannot be edited as it is currently being used for Peer Evaluation.");
+			appState.recordWarningMsg("This group cannot be edited as it is currently being used for Peer Evaluation. Please contact admin if you really want to edit");
 		}
 		if(groupDAO.isGroupBeingUseAS(group)){
 			appState.recordWarningMsg("WARNING: This group is being used in Assessment Module." );

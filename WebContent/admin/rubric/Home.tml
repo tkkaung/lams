@@ -81,6 +81,9 @@
 				onclick="return confirmDelete('${message:confirm-permanent-delete-item}')">
 				<span>${message:delete}</span>
 			</t:actionlink>
+			<t:actionlink t:id="exportXLS" context="rubric.id" class="button rounded">
+				<span>${message:export}</span>
+			</t:actionlink>
 		</t:parameter>
 	</t:grid>
 

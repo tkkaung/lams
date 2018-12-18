@@ -1,0 +1,85 @@
+<html t:type="layout" 
+	title="${message:manage-questionset}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/ipsp/home?${project.id}
+		,${message:manage-ipsp}=modules/ipsp/manage?${project.id}
+		,${message:manage-questionset}=modules/ipsp/managequestionset?${project.id}
+		"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+	<style>
+		.info{
+			width: 175px;
+		}
+		.name{
+			width: 35%;
+		}
+	</style>
+	
+
+<p:actionBtns>
+	
+	<a class="button rounded" t:type="pageLink" page="modules/ipsp/questionsetnew" context="project.id" >
+				<span>${message:add-new} ${message:questionset}</span>
+	</a>
+</p:actionBtns>	
+
+
+	<table class="actionToolBar">
+		<tr>
+			<td class="right">		 	
+				<form t:type="form" t:id="searchForm">
+					<t:label for="searchText">${message:filter}: </t:label>
+					
+					<t:textfield t:id="searchText" value="searchText" ></t:textfield>
+					<input type="submit" value="${message:go}" class="squared"/>
+				</form>
+			</td>
+		</tr>
+	</table>
+
+	<t:grid source="qsets" row="qset" class="stickyHeader t-data-grid"
+		model="model"
+		rowsPerPage="rowsPerPage"
+		pagerPosition="bottom" 
+		>
+		<p:empty>
+			<div class="notfoundtext">
+				${message:no-questionset-found}
+			</div>
+		</p:empty>
+	   
+	   <t:parameter name="nameCell">
+	   	<t:pagelink page="modules/ipsp/questionsetview" context="getParams(project.id, qset.id)">${qset.name}</t:pagelink>
+	   	<br/>
+	   	<span class="subdes"><t:outputraw value="${textarea2html(qset.des)}"/></span>
+	   </t:parameter>
+	   <t:parameter name="mdateCell">
+	   	<span class="date">${qset.mdateDisplay}</span>
+	   </t:parameter>
+	   <t:parameter name="ownerCell">
+	   	<t:pagelink page="user/view" context="qset.owner.id">${qset.owner.displayName}</t:pagelink>
+	   </t:parameter>
+	   
+	   <t:parameter name="infoCell">
+	   	<span style="font-size:0.9em;">
+		   	<div>${message:ipspCount-label}: <strong>${countIPSPSurveyByQuestionSet(qset)}</strong></div>
+		 	</span>
+	   </t:parameter>
+	   
+	   <t:parameter name="actionCell">
+			<t:pagelink page="modules/ipsp/questionsetedit" context="getParams(project.id, qset.id)" class="button rounded">
+				<span>${message:edit}</span> 
+			</t:pagelink>
+			<t:actionlink t:id="delete" context="qset.id" class="button rounded"
+				onclick="return confirmDelete('${message:confirm-permanent-delete-item}')">
+				<span>${message:delete}</span>
+			</t:actionlink>
+		</t:parameter>
+	</t:grid>
+
+
+</html>

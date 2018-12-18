@@ -1,0 +1,158 @@
+<html t:type="layout" 
+	title="${message:edit} ${message:big5}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/big5/home?${project.id}
+		,${message:manage-big5}=modules/big5/manage?${project.id}
+		,${message:edit} ${message:big5}=modules/big5/edit?${big5.id}
+		"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+<style>
+span.ltip {
+	margin-left: 3px;
+	font-size: 10px;
+	color: #F09;	
+}
+span.remindtip {
+	margin-left: 3px;
+	font-size: 10px;
+	color: #F44;	
+}
+
+
+</style>  
+	<p:legendBlk>
+		<span class="required">*</span>
+		${message:required-fields}
+	</p:legendBlk>
+
+	<form t:type="form" t:id="form" class="e-formeditor">
+		<div class="t-beaneditor">
+			<t:errors />
+			<table>
+				<tr>
+					<td class="label">
+						<t:label for="name">
+							<span class="required">*</span>
+							${message:name-label}
+						</t:label>
+					</td>
+					<td>
+						<t:textfield t:id="name" value="big5.name" class="mwidth"
+							validate="required" />
+					</td>
+				</tr>
+				
+				<tr> <td
+					class="label"><span class="required">*</span><t:label
+					for="sdate">${message:sdate-label}</t:label></td> <td><t:datefield
+					t:id="sdate" value="big5.sdate" class="swidth" validate="required"
+					format="${message:datefield-format}"/>
+					
+					</td>
+				</tr>
+				
+			 <tr> 
+			 	<td class="label"><span class="required">*</span>
+			 		<t:label
+					for="edate">${message:edate-label}</t:label></td> <td><t:datefield
+					t:id="edate" value="big5.edate" class="swidth" validate="required"
+					format="${message:datefield-format}"/>
+					</td> 
+				</tr>
+				<tr>
+				<td class="label">
+			 		<t:label for="chkCheckbox">Release Result</t:label></td> 
+			 		<td>
+			 			<t:checkbox t:id="chkCheckbox" value="big5.released" />
+			 			<span class="formtip">Allow students to view the result graph</span>
+					</td> 
+				</tr>
+				
+				
+					<tr>
+						<td class="label">
+							<label  >${message:email-reminder-label} </label>
+						</td>
+						<td>
+							<t:loop source="availableDaysToRemind" value="tempInt">
+								<t:if test="big5.daysToRemind.contains(tempInt)">
+									<input type="checkBox" checked="checked" id="dayChkBox_${tempInt}" name="dayChkBox" value="${tempInt}" />
+									<p:else>
+										<input type="checkBox" id="dayChkBox_${tempInt}" name="dayChkBox" value="${tempInt}" />
+									</p:else>
+								</t:if>
+								<label for="dayChkBox_${tempInt}">${tempInt}</label>
+							</t:loop>
+							${message:num-days-before-end-big5}
+							<span class="formtip">${message:email-reminder-tip}</span>
+						</td>
+					</tr>
+				
+				<tr>
+					<td class="label">${message:questionset}</td>
+					<td>
+						
+						<t:select t:id="selectQuestionset" model="getQsetModel(project)"
+								value="qset" t:mixins="zoneUpdater"
+								t:clientEvent="change" t:event1="selectQuestionset" t:zone1="questionDetailZone"
+								context="qset" 
+								/>
+						<t:zone t:id="questionDetailZone">
+						<t:if test="qsetChanged">
+							<span class="important">WARNING: Changing QuestionSet will delete all current survey results.</span> 
+						</t:if>		
+						<div class="rubricDetailZone view ">
+							<table class="stickyHeader">
+								<thead>
+								<tr>
+									<th >No</th>
+									<th >Question</th>
+									<th >Dimension Type</th>
+									
+								</tr>
+								</thead>
+								<tbody>
+									<t:loop source="big5QueList" value="big5Que" index="rowIndex">
+										<tr>
+											<td>
+												${big5Que.number}
+											</td>
+											<td>
+												<t:outputraw value="${textarea2html(big5Que.des)}"/>
+											</td>
+											<td>
+												${big5Que.getDimensionsDisplay()}
+											</td>	
+										</tr>
+										
+										<p:empty>
+											<tr ><td colspan="6">${message:no-question-defined}</td></tr>
+										</p:empty>
+									</t:loop>
+								</tbody>
+							</table>
+						</div>
+						</t:zone>
+						
+						<div>
+							<t:submit t:id="bsubmit" value="${message:submit-label}" class="submit squared" style="margin-top:10px; margin-left:0px;"/>
+						</div>
+					</td>
+				</tr>
+				
+			</table>
+
+			
+			
+		
+		
+		
+		
+	</div>
+	
+</form>
+
+</html>

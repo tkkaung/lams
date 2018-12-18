@@ -1,0 +1,187 @@
+<html t:type="layout" 
+	title="${message:edit} ${message:ipsp}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/ipsp/home?${project.id}
+		,${message:manage-ipsp}=modules/ipsp/manage?${project.id}
+		,${message:edit} ${message:ipsp}=modules/ipsp/edit?${ipsp.id}
+		"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+<style>
+span.ltip {
+	margin-left: 3px;
+	font-size: 10px;
+	color: #F09;	
+}
+span.remindtip {
+	margin-left: 3px;
+	font-size: 10px;
+	color: #F44;	
+}
+
+
+</style>  
+	<p:legendBlk>
+		<span class="required">*</span>
+		${message:required-fields}
+	</p:legendBlk>
+
+	<form t:type="form" t:id="form" class="e-formeditor">
+		<div class="t-beaneditor">
+			<t:errors />
+			<table>
+				<tr>
+					<td class="label">
+						<t:label for="name">
+							<span class="required">*</span>
+							${message:name-label}
+						</t:label>
+					</td>
+					<td>
+						<t:textfield t:id="name" value="ipsp.name" class="mwidth"
+							validate="required" />
+					</td>
+				</tr>
+				
+				<tr> <td
+					class="label"><span class="required">*</span><t:label
+					for="sdate">${message:sdate-label}</t:label></td> <td><t:datefield
+					t:id="sdate" value="ipsp.sdate" class="swidth" validate="required"
+					format="${message:datefield-format}"/>
+					
+					</td>
+				</tr>
+				
+			 <tr> 
+			 	<td class="label"><span class="required">*</span>
+			 		<t:label
+					for="edate">${message:edate-label}</t:label></td> <td><t:datefield
+					t:id="edate" value="ipsp.edate" class="swidth" validate="required"
+					format="${message:datefield-format}"/>
+					</td> 
+				</tr>
+				<tr>
+				<td class="label">
+			 		<t:label for="chkCheckbox">Release Result</t:label></td> 
+			 		<td>
+			 			<t:checkbox t:id="chkCheckbox" value="ipsp.released" />
+			 			<span class="formtip">Allow students to view the result graph</span>
+					</td> 
+				</tr>
+				
+				
+					<tr>
+						<td class="label">
+							<label  >${message:email-reminder-label} </label>
+						</td>
+						<td>
+							<t:loop source="availableDaysToRemind" value="tempInt">
+								<t:if test="ipsp.daysToRemind.contains(tempInt)">
+									<input type="checkBox" checked="checked" id="dayChkBox_${tempInt}" name="dayChkBox" value="${tempInt}" />
+									<p:else>
+										<input type="checkBox" id="dayChkBox_${tempInt}" name="dayChkBox" value="${tempInt}" />
+									</p:else>
+								</t:if>
+								<label for="dayChkBox_${tempInt}">${tempInt}</label>
+							</t:loop>
+							${message:num-days-before-end-ipsp}
+							<span class="formtip">${message:email-reminder-tip}</span>
+						</td>
+					</tr>
+			
+			
+			<t:if test="ipsp.isPeer()">
+					<tr>
+						<td class="label">
+							<t:label for="selectGroup">
+								${message:select-group}
+							</t:label>
+						</td>
+						<td>
+							
+							<t:select t:id="selectGroup" model="getGroupModel(project)" 
+							value="group" t:mixins="zoneUpdater"
+							t:clientEvent="change" t:event1="selectGroup" t:zone1="groupDetailZone"
+							context="group"  />
+								
+								
+							<t:zone t:id="groupDetailZone">
+									<t:if test="group">
+										<t:if test="isInvalidGroup(group)">
+											<div class="attention">${message:invalid-group-set}</div>
+										</t:if>
+									</t:if>
+								</t:zone>
+						</td>
+					</tr>
+				</t:if>
+				
+			
+				
+				<tr>
+					<td class="label">${message:questionset}</td>
+					<td>
+						
+						<t:select t:id="selectQuestionset" model="getQsetModel(project)"
+								value="qset" t:mixins="zoneUpdater"
+								t:clientEvent="change" t:event1="selectQuestionset" t:zone1="questionDetailZone"
+								context="qset" 
+								/>
+						<t:zone t:id="questionDetailZone">
+						<t:if test="qsetChanged">
+							<span class="important">WARNING: Changing QuestionSet will delete all current survey results.</span> 
+						</t:if>		
+						<div class="rubricDetailZone view ">
+							<table class="stickyHeader">
+								<thead>
+								<tr>
+									<th >No</th>
+									<th >Question</th>
+									<th >Dimension Type</th>
+									
+								</tr>
+								</thead>
+								<tbody>
+									<t:loop source="ipspQueList" value="ipspQue" index="rowIndex">
+										<tr>
+											<td>
+												${ipspQue.number}
+											</td>
+											<td>
+												<t:outputraw value="${textarea2html(ipspQue.des)}"/>
+											</td>
+											<td>
+												${ipspQue.getDimensionsDisplay()}
+											</td>	
+										</tr>
+										
+										<p:empty>
+											<tr ><td colspan="6">${message:no-question-defined}</td></tr>
+										</p:empty>
+									</t:loop>
+								</tbody>
+							</table>
+						</div>
+						</t:zone>
+						
+						<div>
+							<t:submit t:id="bsubmit" value="${message:submit-label}" class="submit squared" style="margin-top:10px; margin-left:0px;"/>
+						</div>
+					</td>
+				</tr>
+				
+			</table>
+
+			
+			
+		
+		
+		
+		
+	</div>
+	
+</form>
+
+</html>

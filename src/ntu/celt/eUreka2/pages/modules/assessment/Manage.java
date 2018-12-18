@@ -203,8 +203,8 @@ public class Manage extends AbstractPageAssessment{
 			return true;
 		return false;
 	}
-	public int getTotalWeight(){
-		int total = 0;
+	public float getTotalWeight(){
+		float total = 0;
 		for(Assessment asst: assmts){
 			total += asst.getWeightage();
 		}

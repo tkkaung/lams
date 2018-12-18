@@ -44,6 +44,7 @@ import ntu.celt.eUreka2.modules.lcdp.LCDPDAO;
 import ntu.celt.eUreka2.modules.lcdp.LCDPSurvey;
 import ntu.celt.eUreka2.modules.lcdp.LCDPSurveyUser;
 import ntu.celt.eUreka2.modules.lcdp.PQuestionSet;
+import ntu.celt.eUreka2.modules.profiling.LQuestionSet;
 
 @Import(stylesheet="context:lib/css/lcdpGraphColor.css")
 public abstract class AbstractPageLCDP {
@@ -317,7 +318,10 @@ public abstract class AbstractPageLCDP {
 		return selModel;
 	}
 	public SelectModel getQsetModel(Project proj){
-		List<PQuestionSet> qsetList =  lcdpDAO.searchPQuestionSets(null, getCurUser(),  null);
+		List<PQuestionSet> qsetList1 =  lcdpDAO.searchPQuestionSets(null, getCurUser(),  null);
+		List<PQuestionSet> qsetList2 =  lcdpDAO.searchPQuestionSets(proj);
+		List<PQuestionSet> qsetList =  Util.union(qsetList1, qsetList2);
+		
 		List<OptionModel> optModelList = new ArrayList<OptionModel>();
 		for (PQuestionSet qset : qsetList) {
 			OptionModel optModel = new OptionModelImpl(qset.getName(), qset);

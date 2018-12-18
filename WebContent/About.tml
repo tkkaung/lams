@@ -10,12 +10,42 @@
    <br/>
    </p>
 
+
+<p>
+	2018-10-23 2.1.97 -- By: Somsak  
+	<br/>- fixed minor bug, IPSP, edit QuestionSet, same dimension detail
+	<br/>- fixed bug, IPSP, student view question, change display style
+	<br/>- change, Group, EnrollUserAdmin, Removing a student from a group will also DELETE scores evaluated for that student and by that student. 
+	<br/>- fixed bug, Evalution, viewaverage, show empty cell if group size are different.
+	
+	
+</p>
+
+<p>
+	2018-09-11 2.1.96 -- By: Somsak  
+	<br/>- Add Module "IPSP", Influencing and Persuading Style Profiler
+	<br/>- bug fixed, Import Assessement (because we added column in assessment). 
+	<br/>- bug fix, in BIG5, CARE, LSP, CARE, (when other instructors in same project site edit and click submit, because he/she don't have access to questionset, so the questionset is deleted. fixed by allow to have access. 
+	
+</p>
+
+<p>
+	2018-08-14 2.1.95 -- By: Somsak  
+	<br/>- bug fix, TotalWeight in Assessment Manage page, was Integer, it should be Float datatype. 
+	<br/>- Add Module "BIG5", Big 5 Personality Survey
+</p>
+
+<p>
+	2018-07-16 2.1.94 -- By: Somsak
+	<br/>- add export Rubric as excel 
+</p>
+   
    <p>
-	2018-07-04-27 2.1.92 -- By: Somsak
+	2018-07-04 2.1.93 -- By: Somsak
 	<br/>- fix, Profiling tool, ( 'send reminder' link ), 
 	<br/>- minor, bug, fix
-	
 	</p>
+
    <p>
 	2018-06-27 2.1.92 -- By: Somsak
 	<br/>- assessment, add textbox, instructor can put in score directly

@@ -43,6 +43,9 @@ public class EmailTemplateConstants {
 	
 	public static final String LCDP_REMINDER = "lcdp.remind";
 	public static final String CARE_REMINDER = "care.remind";
+	public static final String BIG5_REMINDER = "big5.remind";
+	public static final String IPSP_REMINDER = "ipsp.remind";
+	
 	
 	
 	

@@ -1,0 +1,73 @@
+<html t:type="layout" 
+	title="Send Email Reminder"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/big5/home?${project.id}
+		,${message:manage-big5}=modules/big5/manage?${project.id}
+		,${message:check-status}=modules/big5/checkstatus?${big5.id}
+		,Send Email Reminder=modules/big5/sendemails?${big5.id}
+		"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+
+<form t:type="form" t:id="form" class="e-formeditor">
+		<div class="t-beaneditor">
+			<t:errors />
+			<table>
+				<tr>
+					<td class="label">
+							${message:fromAddr-label}
+					</td>
+					<td>
+						${getCurUser().email} 
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						${message:toAddr-label} 
+					</td>
+					<td>
+						<t:loop source="users" value="user">
+							<span >
+								${user.email} , 
+							</span>
+						</t:loop>
+					</td>
+				</tr>
+				<tr>
+					<td class="label">
+						<t:label for="subject" />
+					</td>
+					<td>
+						<input t:type="textfield" t:id="subject" value="subject" maxlenght="255" class="lwidth"/>
+				
+					</td>
+				</tr>
+				
+				<tr>
+					<td class="label"><t:label for="content" /></td>
+					<td >
+						<textarea t:type="ck/editor" t:id="content" value="msgContent"
+	    		            customConfiguration="context:lib/js_config/ckeditor.js" toolbarSet="simpleToolbar"
+	                		width="660px" height="300px" class="lwidth"></textarea>
+					</td>
+				</tr>
+					<tr>
+					<td ></td>
+					<td><t:submit value="${message:send}" t:id="send1" class="squared"  />
+						<t:submit t:id="cancel" value="${message:cancel}" class="squared" style="margin-left:20px;" />
+					</td>
+				
+			
+				</tr>
+			
+				
+			</table>
+		</div>
+	</form>
+					
+
+
+</html>

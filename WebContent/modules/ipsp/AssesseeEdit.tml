@@ -1,0 +1,327 @@
+<html t:type="layout" 
+	title="Do Survey"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+	,${module.displayName}=modules/ipsp/assesseehome?${project.id}
+	,Do Survey=modules/ipsp/assesseeedit?${ipsp.id}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+<style>
+	table.tbContainer {
+		width:100%;
+	}
+	table.tbContainer td{
+		border: 1px solid #ddd;;
+	}
+	table.tblLScore{
+	}
+	table.tblLScore thead tr th {
+	    text-align: center;
+	    vertical-align: bottom;
+   		width: 13%;
+	}
+	table.tblLScore tbody tr td {
+	    text-align: center;
+	    vertical-align: middle;
+	    
+	}
+	.cbxScore{
+		font-size: 18px;
+	}
+	
+	
+</style>
+
+
+<table class="actionToolBar">
+	<tr>
+		<td class="right">
+		</td>
+	</tr>
+</table>
+
+<t:if test="finished">
+<div>You already finished this survey</div>
+<p:else>
+
+		<t:if test="createMode">
+
+		
+		<form t:type="form" t:id="formParticular" >
+	
+		
+		<table class="tbContainer" id="page2">
+			<!-- <tr>
+				<td colspan="5" style="font-size:16px;text-align:center;background:#ddd;">
+					<div >${ipsp.name}</div>
+				</td>
+			</tr> -->
+			<t:if test="ipsp.isSELF()">
+				<tr>
+					<td colspan="5" style="font-size:14px;padding:5px;">
+						<h2 style="font-size:20px;font-weight:bold;">Instructions:</h2>
+						
+						<p style="padding: 10px 30px;">The profiler is administered for your personal development and awareness.</p>
+						 <p style="padding: 10px 30px;">
+	On the following pages are phrases describing your preferences. Please use the rating scale below to describe how accurately each statement describes you.
+						<br/>- Describe yourself as you generally are now, <u>not as you wish to be in the future</u>. 
+						<br/>- Describe yourself as you honestly see yourself. 
+						<br/>- So that you can describe yourself in an honest manner, 
+						<br/>- Please read each statement carefully, and then choose that number best corresponds to your answer from this response scale: 
+	 
+						</p>
+						
+					</td>
+				</tr>
+			<p:else>
+				<tr>
+					<td colspan="5" style="font-size:14px;padding:5px;">
+						<h2 style="font-size:20px;font-weight:bold;">Instructions:</h2>
+						
+						<p style="padding: 10px 30px;">You can use this profiler to determine a person’s preferences using the chart below. 
+Please use the rating scale below to describe how accurately each statement describes this person.</p>
+						 <p style="padding: 10px 30px;">  
+
+For each characteristic, place maximum 2 marks if that is closest match to that person whose behavior you are assessing. 
+Allocate 1 mark where you see the behavior or characteristic occasionally. 
+Allocate ‘0’ if you have observed little or none of this behavior or characteristic. 
+
+						</p>
+						
+					</td>
+				</tr>
+			
+			
+			</p:else>
+			
+			</t:if>
+			
+				<tr>
+					<td>
+						
+						<!-- <table class="tblLScore t-data-grid">
+							<thead>
+							<tr>
+								<th>2</th>
+								<th>1</th>
+								<th>0</th>
+							</tr>
+							<tr>
+								<th>Closest match <br/>(Most of the time)</th>
+								<th>Occasionally </th>
+								<th>Little or none of this behavior</th>
+							</tr>
+							</thead>
+						</table> -->
+						
+						<table  style=" margin:10px 30px 30px 40px;">
+							<tbody>
+							<tr>
+								<td width="40px" style="font-weight:bold;">2 :</td>
+								<td>Closest match (Most of the time)</td>
+							</tr>
+							<tr>
+								<td style="font-weight:bold;">1 :</td>
+								<td>Occasionally</td>
+							</tr>
+							<tr>
+								<td style="font-weight:bold;">0 :</td>
+								<td>Little or none of this behavior</td>
+							</tr>
+							
+							</tbody>
+						</table>
+			
+					</td>
+				</tr>
+				
+				<tr>
+				<td colspan="5" style="text-align:center;font-size:16px;">
+					<p style="margin:20px;">
+					
+						<t:submit t:id="partiSubmit" value="NEXT &gt;&gt;" class="submit squared" 
+							style="margin:5px;padding:8px 20px;height:30px;font-weight:bold;"
+					/>
+					
+					</p>
+				</td>
+					
+				</tr>
+			</table>
+		</form>
+		
+		<p:else>	
+
+<form t:type="form" t:id="form" class="e-formeditor">
+		<t:errors />
+	<h2 >${ipsp.name}</h2>
+			<p style="width margin: 5px;">Please allocate exactly as 1 time of 2, 1 time of 1, and 2 times of 0.</p>
+	<!-- <table class=" t-data-grid" style="width:60%; margin:10px 30px 30px 40px;">
+		<thead>
+		<tr>
+			<th>2</th>
+			<th>1</th>
+			<th>0</th>
+		</tr>
+		<tr>
+			<th>Closest match <br/>(Most of the time)</th>
+			<th>Occasionally </th>
+			<th>Little or none of this behavior</th>
+		</tr>
+		</thead>
+	</table> -->
+	
+	<table  style=" margin:10px 30px 30px 40px;">
+		<tbody>
+		<tr>
+			<td width="40px" style="font-weight:bold;">2 :</td>
+			<td>Closest match (Most of the time)</td>
+		</tr>
+		<tr>
+			<td style="font-weight:bold;">1 :</td>
+			<td>Occasionally</td>
+		</tr>
+		<tr>
+			<td style="font-weight:bold;">0 :</td>
+			<td>Little or none of this behavior</td>
+		</tr>
+		
+		</tbody>
+	</table>
+	
+	<div style="font-size: 20px; text-align: center; padding:20px;">
+		Q${que.number}: 
+		<t:outputraw value="${textarea2html(que.des)}"/>
+	</div>
+				
+	<table class="tbContainer tblLScore t-data-grid">
+		
+			<tr>
+				
+				<t:if test="group">
+					<td></td>
+				</t:if>
+				
+				<th >
+					<t:outputraw value="${textarea2html(que.dimension1)}"/>
+				</th>
+				<th >
+					<t:outputraw value="${textarea2html(que.dimension2)}"/>
+				</th>
+				<th >
+					<t:outputraw value="${textarea2html(que.dimension3)}"/>
+				</th>
+				<th >
+					<t:outputraw value="${textarea2html(que.dimension4)}"/>
+				</th>
+			</tr>
+			
+			<t:loop source="assessees" value="user" index="rowIndex">
+				<tr>
+					<t:if test="group">
+						<td style="padding:5px;width:20%;">${user.getDisplayName()}</td>
+					</t:if>
+					
+						<t:loop source="1..4" value="tempScore">
+						<td  style="height:40px;">
+							<select id="cbx_${user.id}_${tempScore}" name="cbx_${user.id}_${tempScore}" class="cbxScore cbx_${user.id}" >
+								<option>0</option>
+								<option>1</option>
+								<option>2</option>
+							</select>
+						</td>
+					</t:loop>
+					
+				</tr>
+			</t:loop>
+			<tr>
+				<td colspan="5" style="text-align:center; padding-right:20px;">
+					<t:submit t:id="bsubmit" value="&gt;&gt; ${getSubmitText()}" class="submit squared" 
+					style="margin:5px;padding:10px 30px;height:40px;font-weight:bold;"
+					onclick="return onSubmitClicked();"/>
+				</td>
+			</tr>
+	</table>
+	<table class="actionToolBar">
+		<tr>
+			<td >
+			</td>
+		</tr>
+	</table>
+		
+	<div style="text-align:center;padding:5px;">
+		<div style="margin:auto;width:${getProgressBarWidth()}px;background:#bbb;border:#ccc 2px solid;">
+			<div style="width:${getProgressWidth()}px;background:#5e5;text-align:right;padding-right:5px;">
+				${getProgressPercent()}%
+			</div>
+		</div>
+		<!--<span style="color:#ff5a11;"><b>${que.number}</b></span> 
+				of <b>${getNumQuestionWithoutNumber(ipsp)}</b>
+		
+		-->
+<!-- 		<t:if test="isOneFourthWay()">
+			<div style="margin-top:5px;">
+				<img style="vertical-align:middle;" src="${context:lib/img/emoji/emoji_goodjob.png}"/>
+				<span style="font-size:16px;font-weight:bold;color:#00e;">Well Done! You are 25% through !</span>
+			</div>
+		</t:if>
+		<t:if test="isHalfWay()">
+			<div style="margin-top:5px;">
+				<img style="vertical-align:middle;" src="${context:lib/img/emoji/emoji_goodjob.png}"/>
+				<span style="font-size:16px;font-weight:bold;color:#00e;">Well Done! You are half-way through !</span>
+			</div>
+		</t:if>
+		<t:if test="isThreeFourthWay()">
+			<div style="margin-top:5px;">
+				<img style="vertical-align:middle;" src="${context:lib/img/emoji/emoji_goodjob.png}"/>
+				<span style="font-size:16px;font-weight:bold;color:#00e;">Well Done! You are 75% through !</span>
+			</div>
+		</t:if> -->
+	</div>
+
+</form>
+		</p:else>
+		</t:if>
+
+
+<script>
+
+
+function onSubmitClicked(){
+	var count1 = 0;
+	var count2 = 0;		
+		
+	<t:loop source="assessees" value="user" index="rowIndex">
+		count1 = 0;
+		count2 = 0;		
+		$$('.cbx_${user.id}').each(function(elm){
+			if( elm.value == 1){
+				count1 += 1;
+			}
+			else {
+				 if (elm.value == 2){
+					count2 += 1;
+				}
+			}
+		});
+		if (count1!=1 || count2!=1){		
+			alert("Please select exactly 1 time of 1, and 1 time of 2, for each person you rate");
+			return false;
+		}
+	</t:loop>
+	
+	
+	return true;
+}
+
+
+document.observe("dom:loaded", function(){
+});
+
+</script> 
+
+</p:else>
+</t:if>
+</html>
