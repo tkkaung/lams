@@ -1,0 +1,87 @@
+<html t:type="layout" 
+	title="${module.displayName}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+	,${module.displayName}=modules/teameffectiveness/assesseehome?${project.id}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+<style>
+	
+	table.t-data-grid tbody tr td {
+	    text-align: center;
+	    vertical-align: middle;
+	}
+	table.t-data-grid tbody tr td.assessee {
+	    text-align: left;
+	}
+	
+	
+</style>
+
+
+<table class="actionToolBar">
+	<tr>
+		<td class="right">
+		</td>
+	</tr>
+</table>
+
+<t:grid source="tes" row="te" 
+	model="model"
+	rowIndex="rowIndex"
+	rowsPerPage="rowsPerPage"
+	pagerPosition="bottom" 
+	>
+	<p:empty>
+		<div class="notfoundtext">
+			${message:no-assessee-te-found}
+		</div>
+	</p:empty>
+   
+   <t:parameter name="orderCell">
+   	${getRowNum()}
+   </t:parameter>
+   <t:parameter name="nameCell">
+   	<strong>${te.name}</strong>
+   	
+   	
+   </t:parameter>
+   
+  
+   <t:parameter name="statusCell">
+  		<t:if test="isShowLink(te)">
+  			<t:pagelink page="modules/teameffectiveness/assesseeedit" context="te.id" >
+  				${getStatusStudent()}</t:pagelink>
+  			<p:else>
+  				${statusStudent}
+  			</p:else>
+  		</t:if>
+   </t:parameter>
+   
+   <t:parameter name="sdateCell">
+	   	<t:if test="isSetsdateORedate(te)">
+		   	<div>
+			   	<span class="date">${te.sdatedisplay}</span>
+			   	-
+			   	<span class="date">${te.edatedisplay}</span>
+			   </div>
+	   	</t:if>
+	   	
+   </t:parameter>
+   <t:parameter name="resultCell">
+	   	<t:if test="te.released">
+		   	<div>
+			   	<t:pagelink page="modules/teameffectiveness/assesseeresult" context="project.id" >
+  				View Result</t:pagelink>
+  			
+		   </div>
+	   	</t:if>
+	   	
+   </t:parameter>
+   
+   
+</t:grid>
+
+</html>

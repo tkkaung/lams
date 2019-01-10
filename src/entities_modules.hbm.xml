@@ -1746,6 +1746,189 @@
 <!-- Somsak 2018-08-12 ...End  -->
 
 
+<!--  Ko Ko -->
+
+<!-- /////////////////////////////////Team Effectiveness Personality Survey////////////////////////////////// -->
+	   	
+   	<class name="ntu.celt.eUreka2.modules.teameffectiveness.TEQuestionSet" table="tbl_te_tquestionset">
+		<id name="id" type="long" >
+			<generator class="assigned" />
+		</id>
+		<property name="name" type="string" />
+		<property name="des" type="text" />
+		<many-to-one name="owner" class="ntu.celt.eUreka2.entities.User"  />
+		<property name="cdate" type="timestamp" />
+		<property name="mdate" type="timestamp" />
+		<many-to-one name="school" class="ntu.celt.eUreka2.entities.School"  />
+		<list name="questions" cascade="all,delete-orphan" >
+	       <key>
+	         <column name="questionset" not-null="true" />
+	       </key>
+	       <list-index column="idx" />
+	       <one-to-many class="ntu.celt.eUreka2.modules.teameffectiveness.TQuestion" />
+	   </list>
+	</class>
+	
+	<class name="ntu.celt.eUreka2.modules.teameffectiveness.TQuestion" table="tbl_te_tquestion" >
+		<id name="id" type="long" >
+			<generator class="assigned" />
+		</id>
+		<property name="des" type="string" />
+		<many-to-one name="questionset" class="ntu.celt.eUreka2.modules.teameffectiveness.TEQuestionSet" />
+		<property name="number" type="integer" />
+		<property name="dimension1" type="string" />
+		<property name="dimension2" type="string" />
+		<property name="dimension3" type="string" />
+		<property name="dimension4" type="string" />
+		<property name="dimension5" type="string" />
+		<property name="dimension6" type="string" />
+		<property name="dimension7" type="string" />
+		<property name="dimension8" type="string" />
+		<property name="dimension9" type="string" />
+		<property name="dimension10" type="string" />
+		<property name="dimension11" type="string" />
+		<property name="dimension12" type="string" />
+		<property name="dimension13" type="string" />
+		<property name="dimension14" type="string" />
+		<property name="dimension15" type="string" />
+		
+	</class>
+
+	<class name="ntu.celt.eUreka2.modules.teameffectiveness.TEQuestion" table="tbl_te_tequestion" >
+		<id name="id" type="long" >
+			<generator class="assigned" />
+		</id>
+		<property name="des" type="string" />
+		<property name="number" type="integer" />
+	
+		<property name="dimension1" type="string" />
+		<property name="dimension2" type="string" />
+		<property name="dimension3" type="string" />
+		<property name="dimension4" type="string" />
+		<property name="dimension5" type="string" />
+		<property name="dimension6" type="string" />
+		<property name="dimension7" type="string" />
+		<property name="dimension8" type="string" />
+		<property name="dimension9" type="string" />
+		<property name="dimension10" type="string" />
+		<property name="dimension11" type="string" />
+		<property name="dimension12" type="string" />
+		<property name="dimension13" type="string" />
+		<property name="dimension14" type="string" />
+		<property name="dimension15" type="string" />
+		
+	</class>
+	
+	<class name="ntu.celt.eUreka2.modules.teameffectiveness.TEDimension" table="tbl_te_dimension" >
+		<id name="id" type="integer" >
+			<generator class="assigned" />
+		</id>
+		<property name="name" type="string"  />
+		<property name="des" type="text" />
+		<property name="colorCode" type="string"  />
+		<property name="orderNum" type="integer"  />
+		<property name="active" type="boolean"  />
+		<property name="styleGroup" type="string"  />
+		<property name="createTime" type="timestamp" />
+		
+	</class>
+	
+	
+   <class name="ntu.celt.eUreka2.modules.teameffectiveness.TESurvey" table="tbl_te_survey">
+		<id name="id" type="long" >
+			<generator class="assigned" />
+		</id>
+		<property name="name" type="string" />
+		<many-to-one name="project" class="ntu.celt.eUreka2.entities.Project"  not-null="true" />
+		<many-to-one name="creator" class="ntu.celt.eUreka2.entities.User" not-null="true" />
+		<many-to-one name="editor" class="ntu.celt.eUreka2.entities.User" />
+		<property name="cdate" type="timestamp" />
+		<property name="mdate" type="timestamp" />
+		<property name="sdate" type="timestamp" />
+		<property name="edate" type="timestamp" />
+		<property name="orderNumber" type="integer" />
+		<property name="released" type="boolean" />
+		
+		<many-to-one name="questionSet" class="ntu.celt.eUreka2.modules.teameffectiveness.TEQuestionSet" />
+		<property name="questionSetName" type="string" />
+		<list name="questions"  cascade="all,delete-orphan" >
+	       <key>
+	         <column name="te"  />
+	       </key>
+	       <list-index column="idx" />
+	       <one-to-many class="ntu.celt.eUreka2.modules.teameffectiveness.TEQuestion" />
+	    </list>
+	    <set name="TEUsers" cascade="all,delete-orphan" >
+	       <key><column name="teId" not-null="true" /></key>
+	          <one-to-many  class="ntu.celt.eUreka2.modules.teameffectiveness.TESurveyUser" />
+	    </set>
+   		<set name="daysToRemind" table="tbl_te_daystoremind">
+	       <key><column name="teId" not-null="true" /></key>
+	        <element type="integer" column="daysToRemind"></element>
+	    </set>
+	</class>
+
+	<class name="ntu.celt.eUreka2.modules.teameffectiveness.TEQuestionScore" table="tbl_te_questionscore" >
+		<id name="id" type="string" >
+			<generator class="assigned" />
+		</id>
+		<many-to-one name="question" column="questionId" class="ntu.celt.eUreka2.modules.teameffectiveness.TEQuestion"  />
+		<property name="score" type="integer"  />
+		<property name="score1" type="integer"  />
+		<property name="score2" type="integer"  />
+		<property name="score3" type="integer"  />
+		<property name="score4" type="integer"  />
+		<property name="score5" type="integer"  />
+		<property name="score6" type="integer"  />
+		<property name="score7" type="integer"  />
+		<property name="score8" type="integer"  />
+		<property name="score9" type="integer"  />
+		<property name="score10" type="integer"  />
+		<property name="score11" type="integer"  />
+		<property name="score12" type="integer"  />
+		<property name="score13" type="integer"  />
+		<property name="score14" type="integer"  />
+		<property name="score15" type="integer"  />
+		<property name="orderNum" type="integer"  />
+		<many-to-one name="TEUser" column="teUserId" class="ntu.celt.eUreka2.modules.teameffectiveness.TESurveyUser"  />
+	</class>
+	
+  
+	
+	<class name="ntu.celt.eUreka2.modules.teameffectiveness.TESurveyUser" table="tbl_te_tesurveyuser" >
+		<id name="id" type="long" >
+			<generator class="assigned" />
+		</id>
+		<many-to-one name="assessor" class="ntu.celt.eUreka2.entities.User" />
+		<many-to-one name="assessee" class="ntu.celt.eUreka2.entities.User" />
+		<many-to-one name="survey" class="ntu.celt.eUreka2.modules.teameffectiveness.TESurvey" column="teId" />
+		<property name="startAssessTime" type="timestamp" />
+		<property name="lastAssessTime" type="timestamp" />
+		<property name="finished" type="boolean"/>
+	    <property name="lastQuestionNum" type="integer"/>
+	    <property name="resetCount" type="integer"/>
+	   	<set name="questionScores" cascade="all,delete-orphan" order-by="orderNum">
+	       <key><column name="teUserId"  /></key>
+	          <one-to-many  class="ntu.celt.eUreka2.modules.teameffectiveness.TEQuestionScore" />
+	    </set>
+    	<property name="score1" type="double"  />
+		<property name="score2" type="double"  />
+		<property name="score3" type="double"  />
+		<property name="score4" type="double"  />
+		<property name="score5" type="double"  />
+		<property name="score6" type="double"  />
+		<property name="score7" type="double"  />
+		<property name="score8" type="double"  />
+		<property name="score9" type="double"  />
+		<property name="score10" type="double"  />
+		<property name="score11" type="double"  />
+		<property name="score12" type="double"  />
+		<property name="score13" type="double"  />
+		<property name="score14" type="double"  />
+		<property name="score15" type="double"  />
+	</class>
+
+<!--  Ko Ko  -->
 <!-- Somsak 2018-09-08 ...Start  -->
 <!-- /////////////////////////////////Influencing and Persuading Style Profiler////////////////////////////////// -->	   	
    	<class name="ntu.celt.eUreka2.modules.ipsp.IQuestionSet" table="tbl_ipsp_iquestionset">

@@ -29,6 +29,9 @@ table.evalTable2 td.label{
 		<span class="required">*</span>
 		${message:required-fields}
 		<div>+ No numerical scores are seen by students</div>
+		<div> <span class="required"> Total Score = {number of criteria * maximum points given * (number of students- self evaluation)} - X </span></div>
+		<div> <span class="required"> Note X is the user-defined value in this equation. </span></div>
+		
 	</p:legendBlk>
 
 	<form t:type="form" t:id="form" class="e-formeditor">
@@ -317,7 +320,8 @@ table.evalTable2 td.label{
 					<t:textfield t:id="weightage" value="eval.weightage" class="swidth" validate="required"/>
 					%
 					</td> 
-				</tr>
+				</tr>				
+				
 			<tr>	
 				<td class="label"><t:label for="allowSelfEvaluation">${message:allowSelfEvaluation-label}</t:label></td>
 				<td>

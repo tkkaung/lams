@@ -65,6 +65,8 @@ import ntu.celt.eUreka2.internal.Config;
 import ntu.celt.eUreka2.internal.Util;
 import ntu.celt.eUreka2.modules.big5.BIG5DAO;
 import ntu.celt.eUreka2.modules.big5.BIG5Survey;
+import ntu.celt.eUreka2.modules.teameffectiveness.TEDAO;
+import ntu.celt.eUreka2.modules.teameffectiveness.TESurvey;
 import ntu.celt.eUreka2.modules.care.CAREDAO;
 import ntu.celt.eUreka2.modules.care.CARESurvey;
 import ntu.celt.eUreka2.modules.ipsp.IPSPDAO;
@@ -113,6 +115,7 @@ public class RunTaskService {
 	private LCDPDAO lcdpDAO;
 	private CAREDAO careDAO;
 	private BIG5DAO big5DAO;
+	private TEDAO teDAO;
 	private IPSPDAO ipspDAO;
 	
 	
@@ -126,7 +129,7 @@ public class RunTaskService {
 			ProjTypeDAO projTypeDAO, ProjStatusDAO projStatusDAO,
 			ProjExtraInfoDAO projExtraInfoDAO, SchedulingDAO schdlDAO,
 			UsageDAO usageDAO, EmailManager emailManager, EvaluationDAO evalDAO, 
-			ProfilingDAO profDAO, LCDPDAO lcdpDAO, CAREDAO careDAO, BIG5DAO big5DAO, IPSPDAO ipspDAO
+			ProfilingDAO profDAO, LCDPDAO lcdpDAO, CAREDAO careDAO, BIG5DAO big5DAO, TEDAO teDAO, IPSPDAO ipspDAO
 			) {
 		super();
 		this.userDAO = userDAO;
@@ -147,6 +150,7 @@ public class RunTaskService {
 		this.lcdpDAO = lcdpDAO;
 		this.careDAO = careDAO;
 		this.big5DAO = big5DAO;
+		this.teDAO = teDAO;
 		this.ipspDAO = ipspDAO;
 	}
 	
@@ -1099,6 +1103,7 @@ public class RunTaskService {
 		String lcdpHomeURL = Config.getString(Config.BASE_URL)+"/modules/lcdp/home";
 		String careHomeURL = Config.getString(Config.BASE_URL)+"/modules/care/home";
 		String big5HomeURL = Config.getString(Config.BASE_URL)+"/modules/big5/home";
+		String teHomeURL = Config.getString(Config.BASE_URL)+"/modules/te/home";
 		String ipspHomeURL = Config.getString(Config.BASE_URL)+"/modules/ipsp/home";
 			
 		
@@ -1367,6 +1372,40 @@ public class RunTaskService {
 		}
 		returnMsg  += "<br/><b> " + " " + count +" (BIG5 Survey)-reminders were sent.</b>";
 		
+		//TeamEffectiveness  (Leadership Survey)
+				List<TESurvey> tes = teDAO.getTEsToSendReminder();
+				for(TESurvey te : tes){
+					Collection<User> users = new ArrayList<User>();
+					users.addAll(teDAO.getNotSubmitedUsersByTESurvey(te));
+					
+					for(User u: users){
+						EmailTemplateVariables var = new EmailTemplateVariables(
+								te.getCdate().toString(), te.getMdate().toString(),
+								te.getName(),
+								Util.truncateString(Util.stripTags(te.getQuestionSetName()), Config.getInt("max_content_lenght_in_email")), 
+								te.getCreator().getDisplayName(), 
+								te.getProject().getDisplayName(), 
+								teHomeURL + "/" + te.getProject().getId(),
+								te.getEdateDisplay(),
+								u.getDisplayName() 
+							);
+						try{
+							emailManager.sendHTMLMail(u, EmailTemplateConstants.TE_REMINDER, var);
+							count++;
+							returnMsg +=  "<br/><b>" + count +"</b>, teID=" + te.getId() + ", teName="+te.getName() 
+									+ " ,projID=" + te.getProject().getId() + ", emailType=" + EmailTemplateConstants.TE_REMINDER 
+									+ "<br/>,  username=" + u.getUsername()
+									+ " <br/>," +" emails=" + u.getEmail()
+							;
+						}catch(Exception e){
+							logger.error(e.getMessage());
+							returnMsg += "<br/>"+e.getMessage();
+						}
+					}
+					
+				}
+				returnMsg  += "<br/><b> " + " " + count +" (Team Effectiveness Survey)-reminders were sent.</b>";
+				
 		
 		//IPSP  (Infuencial and Persuading Survey)
 				List<IPSPSurvey> ipsps = ipspDAO.getIPSPsToSendReminder();

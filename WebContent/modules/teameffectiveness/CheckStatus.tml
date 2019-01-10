@@ -1,0 +1,68 @@
+<html t:type="layout" 
+	title="${message:check-status}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/teameffectiveness/home?${project.id}
+		,${message:manage-te}=modules/teameffectiveness/manage?${project.id}
+		,${message:check-status}=modules/teameffectiveness/checkstatus
+		"
+	totalShowOption="${totalSize}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+
+
+<form t:type="form" t:id="projForm">
+	    <t:errors/>
+	    
+	    <table class="actionToolBar2">
+				<tr>
+				 <td align="left">
+				 	<span style="margin-right: 5px;">
+					 	<input class="squared"  t:type="submit"  t:id="email" value="Email" 
+					 		onclick="return checkHasSelectChBox('userGrid','Please select at least one student to send email');"/>
+					</span>
+						
+				 </td>
+				</tr>
+			</table>
+
+
+<t:grid source="assessors" row="user" class="stickyHeader t-data-grid" 
+	model="model"
+	rowsPerPage="rowsPerpage" 
+	rowIndex="rowIndex"
+	pagerPosition="bottom" 
+	id="userGrid"
+	>
+	<p:empty>
+		<div class="notfoundtext">
+			${message:no-assessee-found}
+		</div>
+	</p:empty>
+   
+   
+	<t:parameter name="chkBoxHeader">
+       	<input type="checkBox" id="chkBoxAll" value="1" onclick="chkboxAll('userGrid','chkBoxAll')" />
+       </t:parameter>
+       <t:parameter name="chkBoxCell">
+				<input type="checkBox" name="gridChkBox" value="${user.id}" onclick="chkbox('userGrid','chkBoxAll')" />
+       </t:parameter>
+
+   <t:parameter name="noCell">
+   	${getRowNum()}
+   </t:parameter>
+   <t:parameter name="nameCell">
+   		${user.displayname}
+   </t:parameter>
+   <t:parameter name="statusCell">
+		${getStatusForCheck(te, user)}
+   </t:parameter>
+   <t:parameter name="endDateCell">
+   		${te.edateDisplay}
+   </t:parameter></t:grid>
+
+</form>
+
+</html>

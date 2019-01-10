@@ -1,0 +1,260 @@
+<html t:type="layout" 
+	title="Do Survey"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+	,${module.displayName}=modules/teameffectiveness/assesseehome?${project.id}
+	,Do Survey=modules/teameffectiveness/assesseeedit?${te.id}"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+<style>
+	table.tbContainer {
+		width:100%;
+	}
+	table.tbContainer td{
+		border: 1px solid #ddd;;
+	}
+	table.tblLScore{
+	}
+	table.tblLScore thead tr th {
+	    text-align: center;
+	    vertical-align: bottom;
+   		width: 13%;
+	}
+	table.tblLScore tbody tr td {
+	    text-align: center;
+	    vertical-align: middle;
+	    
+	}
+	
+	
+	
+</style>
+
+
+<table class="actionToolBar">
+	<tr>
+		<td class="right">
+		</td>
+	</tr>
+</table>
+
+<t:if test="finished">
+<div>You already finished this survey</div>
+<p:else>
+
+		<t:if test="createMode">
+
+		<table class="tbContainer" id="page1">
+			<tr>
+				<td colspan="5" style="font-size:14px;padding:5px;">
+					<h2 style="font-size:20px;font-weight:bold;">Procedure:</h2>
+					
+					<ol>
+						<li>Participation in this research is entirely voluntary, and if you agree to participate, you may also withdraw your consent at any time during the experiment. </li>
+						<li>You may also decline to participate and your name will not be disclosed to anyone including your tutors.</li>
+						<li>If you refuse to participate in this study, you will not have the personalized report on your personality, leadership qualities which are important for your ledership and personal development as part of this Student Leadership Development Programme. </li>
+						<li>If you continue with this survey, you have given the consent to participate in this study.  </li>
+						<li>An individualized report will be generated and you can read it immediately on the eUreka system.</li> 
+					</ol>
+					
+				</td>
+			</tr>
+			<tr>
+				<td colspan="5" style="text-align:center;font-size:16px;">
+						<button  class="submit squared" onclick="page1NextClicked()"
+							style="margin:5px;padding:8px 20px;height:30px;font-weight:bold;">NEXT &gt;&gt;</button>
+				</td>
+			</tr>
+			
+		</table>
+		
+		<form t:type="form" t:id="formParticular" >
+	
+		
+		<table class="tbContainer" id="page2">
+			<!-- <tr>
+				<td colspan="5" style="font-size:16px;text-align:center;background:#ddd;">
+					<div >${te.name}</div>
+				</td>
+			</tr> -->
+			<tr>
+				<td colspan="5" style="font-size:14px;padding:5px;">
+					<h2 style="font-size:20px;font-weight:bold;">Instructions:</h2>
+					
+					<p style="padding: 10px 30px;">On the following pages are phrases describing people's behaviors. 
+					<br/>Please use the rating scale below to describe how accurately each statement describes you.  
+					<br/>Describe yourself as you generally are now, <u>not as you wish to be in the future</u>. 
+					<br/>Describe yourself as you honestly see yourself, in relation to other people you know of the same sex as you are, and roughly your same age. 
+					<br/>So that you can describe yourself in an honest manner, your responses will be kept in absolute confidence and will only be used for your leadership and personal development. 
+					<br/>Please read each statement carefully, and then choose that number best corresponds to your answer.
+					</p>
+					
+				</td>
+			</tr>
+			<tr>
+					<td>
+					</td>
+				</tr>
+				
+				<tr>
+				<td colspan="5" style="text-align:center;font-size:16px;">
+					<p style="margin:20px;">
+					If you are ready to proceed, then click NEXT.
+						
+						<t:submit t:id="partiSubmit" value="NEXT &gt;&gt;" class="submit squared" 
+							style="margin:5px;padding:8px 20px;height:30px;font-weight:bold;"
+					/>
+					
+					</p>
+				</td>
+					
+				</tr>
+			</table>
+		</form>
+		
+		<p:else>	
+
+<form t:type="form" t:id="form" class="e-formeditor">
+		<t:errors />
+	
+	<table class="tbContainer">
+		<tr>
+			<td colspan="5" style="font-size:16px;text-align:center;background:#ddd;">
+				<div >${te.name}</div>
+			</td>
+		</tr>
+			<tr>
+				<td colspan="5" style="text-align:center;font-size:16px;padding:15px;color:#00e;">
+					<div >${que.getNumberDisplay()} <t:outputraw value="${textarea2html(que.des)}"/></div>
+				</td>
+			</tr>
+			<t:loop source="assessees" value="user" index="rowIndex">
+				<tr>
+					<td>
+							
+						<table class="tblLScore t-data-grid">
+							<thead>
+							<tr>
+								<th>1</th>
+								<th>2</th>
+								<th>3</th>
+								<th>4</th>
+								<th>5</th>
+							</tr>
+							<t:if test="isFirstQuestionType()">
+							<tr>
+								<th><label for="rdo_${user.id}_1">Strongly Disagree</label></th>
+								<th><label for="rdo_${user.id}_2">Disagree</label></th>
+								<th><label for="rdo_${user.id}_3">Neutral</label></th>
+								<th><label for="rdo_${user.id}_4">Agree</label></th>
+								<th><label for="rdo_${user.id}_5">Strongly Agree</label></th>
+							</tr>
+							</t:if>
+							<t:if test="isSecondQuestionType()">
+							<tr>
+								<th><label for="rdo_${user.id}_1">Not at All</label></th>
+								<th><label for="rdo_${user.id}_2">Slightly Less</label></th>
+								<th><label for="rdo_${user.id}_3">Natural</label></th>
+								<th><label for="rdo_${user.id}_4">Slightly More</label></th>
+								<th><label for="rdo_${user.id}_5">A Lot</label></th>
+							</tr>
+							</t:if>
+							</thead>
+							<tbody>
+								<tr>
+									<t:loop source="1..5" value="tempScore">
+									<td class="tdRdo" style="height:40px;">
+										<input  id="rdo_${user.id}_${tempScore}" type="radio" name="rdo_${user.id}" value="${tempScore}" />
+									</td>
+									</t:loop>
+								</tr>
+							</tbody>
+						</table>
+			
+					</td>
+				</tr>
+			</t:loop>
+			<tr>
+				<td colspan="5" style="text-align:center; padding-right:20px;">
+					<t:submit t:id="bsubmit" value="&gt;&gt; ${getSubmitText()}" class="submit squared" 
+					style="margin:5px;padding:10px 30px;height:40px;font-weight:bold;"
+					onclick="return onSubmitClicked();"/>
+				</td>
+			</tr>
+	</table>
+	<table class="actionToolBar">
+		<tr>
+			<td >
+			</td>
+		</tr>
+	</table>
+		
+	<div style="text-align:center;padding:5px;">
+		<div style="margin:auto;width:${getProgressBarWidth()}px;background:#bbb;border:#ccc 2px solid;">
+			<div style="width:${getProgressWidth()}px;background:#5e5;text-align:right;padding-right:5px;">
+				${getProgressPercent()}%
+			</div>
+		</div>
+		<!--<span style="color:#ff5a11;"><b>${que.number}</b></span> 
+				of <b>${getNumQuestionWithoutNumber(te)}</b>
+		
+		-->
+		<t:if test="isOneFourthWay()">
+			<div style="margin-top:5px;">
+				<img style="vertical-align:middle;" src="${context:lib/img/emoji/emoji_goodjob.png}"/>
+				<span style="font-size:16px;font-weight:bold;color:#00e;">Well Done! You are 25% through !</span>
+			</div>
+		</t:if>
+		<t:if test="isHalfWay()">
+			<div style="margin-top:5px;">
+				<img style="vertical-align:middle;" src="${context:lib/img/emoji/emoji_goodjob.png}"/>
+				<span style="font-size:16px;font-weight:bold;color:#00e;">Well Done! You are half-way through !</span>
+			</div>
+		</t:if>
+		<t:if test="isThreeFourthWay()">
+			<div style="margin-top:5px;">
+				<img style="vertical-align:middle;" src="${context:lib/img/emoji/emoji_goodjob.png}"/>
+				<span style="font-size:16px;font-weight:bold;color:#00e;">Well Done! You are 75% through !</span>
+			</div>
+		</t:if>
+	</div>
+
+</form>
+		</p:else>
+		</t:if>
+
+
+<script>
+$$('.tdRdo').invoke('observe', 'click', function(){
+  	this.down('input').checked = true; 
+});
+
+
+function onSubmitClicked(){
+	<t:loop source="assessees" value="user" index="rowIndex">
+		if ($$('input[name=rdo_${user.id}]:checked').length == 0){
+			alert("Some answer not selected yet, please select again");
+			return false;
+		}
+	</t:loop>
+	
+	
+	return true;
+}
+
+function page1NextClicked(){
+	$('page2').show();	
+	$('page1').hide();	
+}
+
+document.observe("dom:loaded", function(){
+	$('page2').hide();		
+});
+
+</script> 
+
+</p:else>
+</t:if>
+</html>

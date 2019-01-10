@@ -38,6 +38,7 @@
 #projMods table td a.LCDP { background:url(images/btnlcdp_g.png) top center no-repeat; }
 #projMods table td a.CARE { background:url(images/btncare_g.png) top center no-repeat; }
 #projMods table td a.BIG5 { background:url(images/btnbig5_g.png) top center no-repeat; }
+#projMods table td a.TEAMEFFECTIVENESS { background:url(images/btnbig5_g.png) top center no-repeat; }
 #projMods table td a.IPSP { background:url(images/btnbig5_g.png) top center no-repeat; }
 
 
@@ -59,6 +60,7 @@
 #projMods table td a.LCDP:hover, #projMods table td.selected a.LCDP{ background:url(images/btnlcdp.png) top center no-repeat; }
 #projMods table td a.CARE:hover, #projMods table td.selected a.CARE{ background:url(images/btncare.png) top center no-repeat; }
 #projMods table td a.BIG5:hover, #projMods table td.selected a.BIG5{ background:url(images/btnbig5.png) top center no-repeat; }
+#projMods table td a.TEAMEFFECTIVENESS:hover, #projMods table td.selected a.TEAMEFFECTIVENESS{ background:url(images/btnte.png) top center no-repeat; }
 #projMods table td a.IPSP:hover, #projMods table td.selected a.IPSP{ background:url(images/btnbig5.png) top center no-repeat; }
 
 

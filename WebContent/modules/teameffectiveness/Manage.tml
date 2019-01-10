@@ -1,0 +1,88 @@
+<html t:type="layout" 
+	title="${message:manage-te}"
+	currentModule="${moduleName}"
+	currentProj="project"
+	breadcrumb="${project.encodeddisplayname}=project/home?${project.id}
+		,${module.displayName}=modules/teameffectiveness/home?${project.id}
+		,${message:manage-te}=modules/teameffectiveness/manage?${project.id}
+		"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+   xmlns:p="tapestry:parameter">
+
+<style>
+	.released, .orderNumber{
+		text-align: center;
+	}
+</style>
+
+<p:actionBtns>
+	
+	<a class="button rounded" t:type="pageLink" page="modules/teameffectiveness/managequestionset" context="project.id" >
+		<span>${message:manage-questionset}</span>
+	</a>
+</p:actionBtns>	
+
+
+<t:grid source="tes" row="te" 
+	model="model"
+	rowIndex="rowIndex"
+	pagerPosition="bottom" 
+	>
+	<p:empty>
+		<div class="notfoundtext">
+			${message:no-te-found}
+		</div>
+	</p:empty>
+   <t:parameter name="orderNumberCell">
+   	${te.ordernumber}
+   </t:parameter>
+   
+   <t:parameter name="nameCell">
+   		<span>${te.name}</span> 
+   </t:parameter>
+   <t:parameter name="mdateCell">
+   	<span class="date">${te.mdatedisplay}</span>
+   	<t:if test="te.isDiffEditor()">
+			<div style="font-size:0.9em">
+				${message:by} 
+				<t:pagelink page="user/view" context="te.editor.id">${te.editor.displayname}</t:pagelink>
+			</div>
+		</t:if>
+   </t:parameter>
+   <t:parameter name="questionSetNameCell">
+   		<t:if test="te.questionSet">
+   			<t:pagelink page="modules/teameffectiveness/QuestionsetView" context="getParams(project.id, te.questionSet.id)">${te.questionSetName}</t:pagelink>
+   		</t:if>
+   </t:parameter>
+   <t:parameter name="edateCell">
+   		<t:if test="te.sdate" >
+   			<span class="date">${te.sdatedisplay}</span>
+   		</t:if> -
+   		<span class="date">${te.edatedisplay}</span>
+   	</t:parameter>
+     
+     <t:parameter name="releasedCell">
+   		<t:actionLink t:id="toggleReleased" context="te.id" title="Click to toggle Release">
+   			<t:if test="te.released" >
+	   			<span >Yes</span>
+	   			<p:else>
+	   				No
+	   			</p:else>
+	   		</t:if>
+   		</t:actionLink>
+   	</t:parameter>
+     
+   <t:parameter name="actionCell">
+			<t:pagelink page="modules/teameffectiveness/edit" context="te.id" class="button rounded">
+				<span>${message:edit}</span> 
+			</t:pagelink>
+			<t:pagelink page="modules/teameffectiveness/checkstatus" context="te.id" class="button rounded">
+				<span>${message:check-status}</span> 
+			</t:pagelink>
+			
+			
+	</t:parameter>
+</t:grid>
+
+
+</html>

@@ -49,6 +49,8 @@ import ntu.celt.eUreka2.modules.backuprestore.MigrateDAO;
 import ntu.celt.eUreka2.modules.backuprestore.MigrateDAOImpl;
 import ntu.celt.eUreka2.modules.big5.BIG5DAO;
 import ntu.celt.eUreka2.modules.big5.BIG5DAOImpl;
+import ntu.celt.eUreka2.modules.teameffectiveness.TEDAO;
+import ntu.celt.eUreka2.modules.teameffectiveness.TEDAOImpl;
 import ntu.celt.eUreka2.modules.blog.BlogDAO;
 import ntu.celt.eUreka2.modules.blog.BlogDAOImpl;
 import ntu.celt.eUreka2.modules.budget.BudgetDAO;
@@ -171,6 +173,7 @@ public class AppModule
     	binder.bind(LCDPDAO.class, LCDPDAOImpl.class);
     	binder.bind(CAREDAO.class, CAREDAOImpl.class);
     	binder.bind(BIG5DAO.class, BIG5DAOImpl.class);
+    	binder.bind(TEDAO.class, TEDAOImpl.class);
     	binder.bind(IPSPDAO.class, IPSPDAOImpl.class);
         	
     }
