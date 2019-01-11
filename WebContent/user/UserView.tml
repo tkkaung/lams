@@ -5,7 +5,7 @@
    xmlns:p="tapestry:parameter">
    
 	<t:beandisplay  object="user" 
-		include="username,firstName,lastName,displayname,email">
+		include="username,lastName,displayname,email">
 	</t:beandisplay>
 	
 	<div class="botpage">

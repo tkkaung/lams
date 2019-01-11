@@ -87,7 +87,7 @@ public class SearchDAOImp implements SearchDAO{
 		List<SearchResult> results = new ArrayList<SearchResult>();
 		List<String> words = new ArrayList<String>();
 		List<Object> params = new ArrayList<Object>();
-		
+		System.out.println("search Kanesh here");
 		String filterSql = "";
 		if(allWord!=null){
 			String[] allWords = allWord.split(" ");
@@ -96,7 +96,7 @@ public class SearchDAOImp implements SearchDAO{
 							+ " OR p.id LIKE :word"+i+" "
 							+ " OR p.description LIKE :word"+i
 							+ " OR pu.user.username LIKE :word"+i 
-							+ " OR pu.user.firstName LIKE :word"+i
+							//+ " OR pu.user.firstName LIKE :word"+i
 							+ " OR pu.user.lastName LIKE :word"+i
 							+ " OR p.companyInfo LIKE :word"+i
 							+ " OR :wordExact"+i+ " IN elements(p.keywords) "
@@ -110,7 +110,7 @@ public class SearchDAOImp implements SearchDAO{
 						+ " OR p.id LIKE :word"+words.size()
 						+ " OR p.description LIKE :word"+words.size()
 						+ " OR pu.user.username LIKE :word"+words.size()
-						+ " OR pu.user.firstName LIKE :word"+words.size()
+						//+ " OR pu.user.firstName LIKE :word"+words.size()
 						+ " OR pu.user.lastName LIKE :word"+words.size()
 						+ " OR p.companyInfo LIKE :word"+words.size()
 						+ " OR :wordExact"+words.size()+ " IN elements(p.keywords) "
@@ -128,7 +128,7 @@ public class SearchDAOImp implements SearchDAO{
 							+ " OR p.id LIKE :word"+words.size()
 							+ " OR p.description LIKE :word"+words.size()
 							+ " OR pu.user.username LIKE :word"+words.size()
-							+ " OR pu.user.firstName LIKE :word"+words.size()
+							//+ " OR pu.user.firstName LIKE :word"+words.size()
 							+ " OR pu.user.lastName LIKE :word"+words.size()
 							+ " OR p.companyInfo LIKE :word"+words.size()
 							+ " OR :wordExact"+words.size()+ " IN elements(p.keywords) "
@@ -147,7 +147,7 @@ public class SearchDAOImp implements SearchDAO{
 							+ " OR p.id LIKE :word"+words.size()
 							+ " OR p.description LIKE :word"+words.size()
 							+ " OR pu.user.username LIKE :word"+words.size()
-							+ " OR pu.user.firstName LIKE :word"+words.size()
+							//+ " OR pu.user.firstName LIKE :word"+words.size()
 							+ " OR pu.user.lastName LIKE :word"+words.size()
 							+ " OR p.companyInfo LIKE :word"+words.size()
 							+ " OR :wordExact"+words.size()+ " IN elements(p.keywords) "

@@ -15,6 +15,7 @@
 		<property name="password" type="string" />
 		<property name="title" type="string" />
 		<property name="firstName" type="string" column="firstname" index="index_fname" />
+		
 		<property name="lastName" type="string" column="lastname" index="index_lname" />
 		<property name="jobTitle" type="string" column="jobtitle" />
 		<property name="organization" type="string" />

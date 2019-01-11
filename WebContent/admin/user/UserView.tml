@@ -37,12 +37,14 @@
 						${user.title}
 					</td>
 				</tr>
+				<!-- Manage Users (Admin) Kanesh
 				<tr>
 					<td class="label">
 						${message:firstname-label}
 	    			</td>
 					<td>${user.firstname}</td>
 				</tr>
+				-->
 				<tr>
 					<td class="label">
 						${message:lastname-label}

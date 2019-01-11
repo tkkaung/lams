@@ -42,7 +42,7 @@
 	</table>
 	
 	<t:grid source="users" row="user" class="stickyHeader t-data-grid"
-		include="username,firstName,lastName,email" 
+		include="username,lastName,email" 
 		rowsPerPage="rowsPerPage"
 		pagerPosition="bottom"
 		rowClass="prop:evenodd.next">

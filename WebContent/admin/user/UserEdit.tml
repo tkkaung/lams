@@ -27,12 +27,14 @@
 	      		</td>
 					<td><t:textfield t:id="username" value="user.username"/></td>
 				</tr>
+				<!--
 				<tr>
 					<td class="label">
 						<t:label for="firstname"><span class="required">*</span>  ${message:firstname-label}</t:label>
 	    			</td>
 					<td><t:textfield t:id="firstname" value="user.firstname" class="mwidth"/></td>
 				</tr>
+				-->
 				<tr>
 					<td class="label">
 						<t:label for="lastname"><span class="required">*</span>  ${message:lastname-label}</t:label>

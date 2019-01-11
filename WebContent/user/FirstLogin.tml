@@ -21,10 +21,12 @@
 				  <label for="username">${message:username-label}</label>
 			      <strong>${user.username}</strong>
 			    </div>
+			    <!--
 			    <div class="t-beaneditor-row">
 				  <label for="firstname">${message:firstname-label}</label>
 			      <strong>${user.firstname}</strong>
 			    </div>
+			    -->
 			    <div class="t-beaneditor-row">
 				  <label for="lastname">${message:lastname-label}</label>
 			      <strong>${user.lastname}</strong>

@@ -29,10 +29,12 @@
 	      <t:label for="confirmPassword"><span class="required">*</span>  ${message:confirmpassword-label}</t:label>
 	      <t:passwordfield t:id="confirmPassword" value="confirmPassword" validate="required" />
 	    </t:parameter>
+	    <!--
 	    <t:parameter name="firstname">
 	    	<t:label for="firstname"><span class="required">*</span>  ${message:firstname-label}</t:label>
 	      <t:textfield t:id="firstname" value="user.firstname" class="mwidth" validate="required"/>
 	    </t:parameter>
+	    -->
 	     <t:parameter name="lastname">
 	    	<t:label for="lastname"><span class="required">*</span>  ${message:lastname-label}</t:label>
 	      <t:textfield t:id="lastname" value="user.lastname" class="mwidth" validate="required"/>

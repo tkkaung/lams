@@ -165,8 +165,9 @@ public class UserIndex extends AbstractPageAdminUser {
 	@SuppressWarnings("unchecked")
 	public BeanModel getModel() {
 		BeanModel model = beanModelSource.createEditModel(User.class, messages);
-		model.include("username","firstname","lastname","email","enabled","modifyDate");
-		 model.add("chkBox",null);
+		//model.include("username","firstname","lastname","email","enabled","modifyDate");
+		model.include("username","lastname","email","enabled","modifyDate");
+		model.add("chkBox",null);
         model.add("id", propertyConduitSource.create(User.class, "id")); 
         model.add("school", propertyConduitSource.create(User.class, "school.displayname")); 
         model.add("sysRole", propertyConduitSource.create(User.class, "sysRole.displayName")); 

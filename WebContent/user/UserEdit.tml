@@ -14,11 +14,13 @@
 			<t:parameter name="username">
 		    	<label >${message:username-label}</label>
 		      	${user.username}
-	    	</t:parameter>		
+	    	</t:parameter>
+	    	<!--		
 			<t:parameter name="firstname">
 	    		<label >${message:firstname-label}</label>
 		      ${user.firstname}
 		    </t:parameter>
+		    -->
 		     <t:parameter name="lastname">
 		    	<label >${message:lastname-label}</label>
 		      ${user.lastname}

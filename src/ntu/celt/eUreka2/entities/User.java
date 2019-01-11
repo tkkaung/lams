@@ -112,7 +112,7 @@ public class User implements Serializable{
 		return firstName;
 	}
 	public void setFirstName(String firstName) {
-		this.firstName = firstName;
+		this.firstName = null; //firstName;
 	}
 	public String getLastName() {
 		return lastName;
@@ -278,10 +278,11 @@ public class User implements Serializable{
      * @return	customized display name
      */
     public String getDisplayName(){
-    	if(".".equals(firstName))
-    		return Util.capitalize(lastName);
-    	String str = Util.capitalize(lastName) + " " + Util.capitalize(firstName);
-    	return str;
+    	//if(".".equals(0))
+    	//	return Util.capitalize(lastName);
+    	//String str = Util.capitalize(lastName) + " " + Util.capitalize(firstName);
+    	//return str;
+    	return Util.capitalize(lastName);
     }
     
     public String getDisplayContactNo(){

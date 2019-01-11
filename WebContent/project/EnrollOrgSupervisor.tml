@@ -134,7 +134,7 @@
 								</td>
 							</tr>
 							<tr>
-								<td class="label">${message:firstName-label}<span class="required">*</span></td>
+								<td class="label"><!-- ${message:firstName-label}<span class="required">*</span> --></td>
 								<td><t:textfield value="newUser.firstname" class="mwidth"/></td>
 							</tr>
 							<tr>
