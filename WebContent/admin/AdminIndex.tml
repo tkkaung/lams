@@ -1,10 +1,10 @@
 <html t:type="layout" title="${message:control-panel}"
 	breadcrumb="${message:control-panel}=admin"
 	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" xmlns:p="tapestry:parameter">
-	
-	
-	
-	
+
+
+
+
 	<table class="dashboard-container admin">
 	<tr>
 		<td class="left">
@@ -31,16 +31,16 @@
 									<t:if test="canBatchCreateProject()">
 										---------
 										<li><t:pagelink page="admin/project/batchcreateproject">${message:batch-create-project}</t:pagelink></li>
-									
+
 									</t:if>
-									
+
 								</ul>
 							</td>
 						</tr>
 					</table>
 				</div>
 			</div>
-			
+
 			<t:if test="privHelper.hasPrivU(curUser, privSys.getManageOwnRubric())">
 				<div class="container-box">
 					<div class="title"><div class="box">
@@ -56,31 +56,31 @@
 							<t:if test="canManageRubric()">
 								<li><t:pagelink page="admin/rubric/manage">${message:admin-manage-rubric}</t:pagelink></li>
 							</t:if>
-							
+
 							<t:if test="canViewAssessmentReport()">
 								---------
 								<li><t:pagelink page="admin/report/schoolassessments">${message:assessment-report-by-school}</t:pagelink></li>
 								<li><t:pagelink page="admin/report/schoolassmttabulate">${message:assessment-tabulation-by-school}</t:pagelink></li>
-							
+
 							</t:if>
 							<t:if test="canViewEvaluationReport()">
 								<li><t:pagelink page="admin/report/schoolevaluations">${message:evaluation-report-by-school}</t:pagelink></li>
 								<li><t:pagelink page="admin/report/schoolevaltabulate">${message:evaluation-tabulation-by-school}</t:pagelink></li>
-							
+
 							</t:if>
-							
+
 							<t:if test="canManageRubric()">
 								---------
 								<li><t:pagelink page="admin/report/importassmt">Import Assessment to Multiple Project Sites</t:pagelink></li>
-							
+
 							</t:if>
-							
-							
+
+
 						</ul>
 					</div>
 				</div>
 			</t:if>
-			
+
 			<t:if test="showAnnouncements()">
 				<div class="container-box">
 					<div class="title"><div class="box">
@@ -110,19 +110,32 @@
 					</div>
 				</div>
 			</t:if>
+
+			<!-- Kanesh 2019-06-10 hide Statistics link
 			<div class="container-box">
 				<div class="title"><div class="box">
 					<img src="${context:lib/img/2-statistics.png}" alt=""/>
 					Statistics</div></div>
 				<div class="content">
 					<ul>
-					  <t:if test="privHelper.hasPrivU(curUser, privSys.getManageProject())">	
+					  <t:if test="privHelper.hasPrivU(curUser, privSys.getManageProject())">
 							<li><t:pagelink page="admin/project/allprojectsstat" context="strYear">Projects Statistics</t:pagelink></li>
 				  		</t:if>
-				  		<t:if test="canViewAssessmentReport()">	
+				  		<t:if test="canViewAssessmentReport()">
 							<li><t:pagelink page="admin/report/analyticreport" >Page View Analytic</t:pagelink></li>
 						</t:if>
-					
+
+					</ul>
+				</div>
+			</div>
+			-->
+			<!-- Kanesh 2019-06-10 Added links for  -->
+			<div class="container-box">
+				<div class="title"><div class="box">
+					Enrolment Data Sync</div></div>
+				<div class="content">
+					<ul>
+						<li><a href="runtasksvc/runimportuser" context="strYear">Click Sync Enrolment </a></li>
 					</ul>
 				</div>
 			</div>
@@ -152,8 +165,8 @@
 					</ul>
 				</div>
 			</div>
-			
-			
+
+
 			<t:if test="showSystemTools()">
 				<div class="container-box" >
 					<div class="title"><div class="box">
@@ -164,7 +177,7 @@
 							<t:if test="privHelper.hasPrivU(curUser, privSys.getManageEmailTemplate())">
 								<li><t:pagelink page="admin/emailtemplate">${message:manage} ${message:email-template}</t:pagelink></li>
 							</t:if>
-							
+
 							<t:if test="privHelper.hasPrivU(curUser, privSys.getManageSystemRole())">
 								<li>
 									<t:pagelink page="admin/sysrole">${message:manage} ${message:sysrole}</t:pagelink>
@@ -183,8 +196,8 @@
 							 </t:if>
 							 <t:if test="privHelper.hasPrivU(curUser, privSys.getManageProjType())">
 								<li><t:pagelink page="admin/projtype/manage">${message:manage} ${message:projtype}</t:pagelink></li>
-							</t:if> 	
-							
+							</t:if>
+
 							<t:if test="privHelper.hasPrivU(curUser, privSys.getManageSystemData())">
 							 	<li><t:pagelink page="admin/School">${message:manage} ${message:school}</t:pagelink></li>
 							 	<li>
@@ -195,13 +208,13 @@
 		<!-- 						<li><t:pagelink page="admin/config">${message:configuration}</t:pagelink></li>
 		-->
 							</t:if>
-							
+
 		<!-- 						<li><t:pagelink page="admin/backuprestore/MigrateBaseData">${message:migrate-base-data}</t:pagelink></li>
 	  					 				<li><t:pagelink page="admin/backuprestore/migrateproject">${message:migrate-project}</t:pagelink></li>
-		
+
 								<li><t:pagelink page="admin/backuprestore">${message:backup-restore} ${message:project}</t:pagelink></li>
-		-->	
-	 
+		-->
+
 	  					</ul>
 					</div>
 				</div>
@@ -217,11 +230,11 @@
 						<t:if test="privHelper.hasPrivU(curUser, privSys.getManageProject())">
 							<li><t:pagelink page="admin/pageinstruction">Instruction to edit grouping, Delete evaluation grades</t:pagelink></li>
 						</t:if>
-									
+
 					</ul>
 				</div>
 			</div>
-			
+
 		<t:outputraw value="getSpace()"/>
 		</td>
 	</tr>

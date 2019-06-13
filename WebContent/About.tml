@@ -9,7 +9,12 @@
    Version: ${getBuildNumber()}
    <br/>
    </p>
+<p>
+	2018-10-23 2.1.100 -- By: Kanesh
+	<br/>- Data Sync with enrollment Snapshot file
 
+
+</p>
 
 <p>
 	2018-10-23 2.1.99 -- By: Somsak  
@@ -30,19 +35,19 @@
 </p>
 
 <p>
-	2018-08-14 2.1.95 -- By: Somsak  
-	<br/>- bug fix, TotalWeight in Assessment Manage page, was Integer, it should be Float datatype. 
+	2018-08-14 2.1.95 -- By: Somsak
+	<br/>- bug fix, TotalWeight in Assessment Manage page, was Integer, it should be Float datatype.
 	<br/>- Add Module "BIG5", Big 5 Personality Survey
 </p>
 
 <p>
 	2018-07-16 2.1.94 -- By: Somsak
-	<br/>- add export Rubric as excel 
+	<br/>- add export Rubric as excel
 </p>
-   
+
    <p>
 	2018-07-04 2.1.93 -- By: Somsak
-	<br/>- fix, Profiling tool, ( 'send reminder' link ), 
+	<br/>- fix, Profiling tool, ( 'send reminder' link ),
 	<br/>- minor, bug, fix
 	</p>
 
@@ -54,8 +59,8 @@
 	<br/>- CARE, LCDP, Profiling. add check status page before email
 	<br/>- Evaluation, Home page. add export excel by students
 	<br/>- Evaluation, fixed point distribution, allow to student submit of max or less point.
-	
-	
+
+
 </p>
 
    <p>
@@ -66,11 +71,11 @@
 
    <p>
 	2018-03-17 2.1.90 -- By: Somsak
-	<br/>- bug fixed, Assessment/AssesseeView , NullPointerException if upload file without file or AssmtUser not created yet 
+	<br/>- bug fixed, Assessment/AssesseeView , NullPointerException if upload file without file or AssmtUser not created yet
 	<br/>- CARE and LSP, Edit page, allow to change QuestionSet, and add "WARNING: Changing QuestionSet will delete all current survey results"
 	<br/>- some minor bug fixes
 </p>
-   
+
    <p>
 	2018-01-18 2.1.89 -- By: Somsak
 	<br/>- bug fixed Group being used => can't Delete. used in Assessment only => can Edit, only warning message.
@@ -92,15 +97,15 @@
 <p>
 	2018-01-10 2.1.85 -- By: Somsak
 	<br/>- add "group" in export excel of PeerEvaluation home
-	<br/>- add/update "Use Fixed Point Distribution" in PeerEvaluation, 
+	<br/>- add/update "Use Fixed Point Distribution" in PeerEvaluation,
 </p>
 
 <p>
 	2017-12-29 2.1.84 -- By: Somsak
 	<br/>- show "group" and "matric" in export excel of Assessment and PeerEvaluation
-	<br/>- show "ExternalKey (matric)" in "Manage User (admin)" page, 
-	<br/>- import Replace fields in "Batch import Users" page, 
-	<br/>- add "Import Enrollment" page, 
+	<br/>- show "ExternalKey (matric)" in "Manage User (admin)" page,
+	<br/>- import Replace fields in "Batch import Users" page,
+	<br/>- add "Import Enrollment" page,
 	<br/>- enable "enroll Tutor" for all groups
 	<br/>- minor bug fixed.
 </p>
@@ -132,7 +137,7 @@
 </p>
 <p>
 	2017-09-11 2.1.79 -- By: Somsak
-	<br/>- add API "syncGroups" 
+	<br/>- add API "syncGroups"
 	<br/>- minor bugs fixed
 </p>
 <p>
@@ -145,14 +150,14 @@
 	<br/>- minor UI change in CARE module, show Avg score on Result page.
 	<br/>-  show particular in ViewScore page, and in ExportExcel
 	<br/>- add Score1, Score2 ... into CARESurveyUser (for faster Result page)
-	<br/>- fix bug in Peer Evaluation, (error in JS if not used FixedPointDistribution 
+	<br/>- fix bug in Peer Evaluation, (error in JS if not used FixedPointDistribution
 	</p>
 
 <p>
 	2017-08-10 2.1.76 -- By: Somsak
 	<br/>- Fix bug, doc title for StickyHeader
 	<br/>- Fix/change wording in care/Result
-	
+
 	</p>
 
 <p>
@@ -166,23 +171,23 @@
 	2017-07-19 2.1.74 -- By: Somsak
 	<br/>- Fix bug HideHeader (that always is 0)
 	<br/>- Add params CallBackURL in SAML call. (eureka will call this URL when click "Save" in "NEW" and "EDIT" pages of "Rubric", "Assessment", and "PeerEvaluation"
-	 (add HttpClient library)	
+	 (add HttpClient library)
 	</p>
 
 <p>
 	2017-06-07 2.1.73 -- By: Somsak
 	<br/>- Fix bug on bbsvc , Close printwriter of write JSON output, so can open the bbsvc URL from browser directly.
 	<br/>- Fix bug on "Fixed point distribution" on IE (can submit even total point not correct).
-	
+
 	</p>
-	
+
 
 <p>
 	2017-06-03 2.1.72 -- By: Somsak
 	<br/>- Enable back "Fixed point distribution" and change the calculation to new spec
-	
+
 	</p>
-	
+
 <p>
 	2017-05-11 2.1.71 -- By: Somsak
 	<br/>- Add search by ProjectName in  "Control Panel > School Evaluations Tabulation" , "Control Panel > School Assessments Tabulation"
@@ -194,17 +199,17 @@
 	<br/>- Add API for iNTUlearn
 	<br/>- Add HideHeader (footer) option, to show in iframe
 	</p>
-	
+
 <p>
 	2017-03-02 2.1.69 -- By: Somsak
-	<br/>- hide "Fixed point distribution" function 
+	<br/>- hide "Fixed point distribution" function
 	</p>
 
 <p>
 	2017-02-06 2.1.68 -- By: Somsak
-	<br/>- fix "Leadership Survey" Module, add code to Send email Reminder 
+	<br/>- fix "Leadership Survey" Module, add code to Send email Reminder
 	</p>
-	
+
 <p>
 	2017-01-03 2.1.67 -- By: Somsak
 	<br/>- add "Leadership Survey" Module (Leadership Competency Development Platform (LCDP))
@@ -213,7 +218,7 @@
 	<br/>- "Leadership Profiling" fix to allow students to see result graph (to same as Instructor's)
 	<br/>- minor bugs fixed
 	</p>
-	
+
 <p>
 	2016-11-28 2.1.66 -- By: Somsak
 	<br/>- fix bug in Login.java , in Tomcat8, response.sendRedirect("")  (cannot be empty string, so need to specify "index");
@@ -222,14 +227,14 @@
 	<br/>- add X-Frame-Options:SAMEORIGIN to protect from http-generic-click-jacking vulnerability
 	<br/>- add autocomplete="off" in password textbox
 	</p>
-	
+
 	<p>
 	2016-10-31 2.1.65 -- By: Somsak
 	<br/>- fix bug in RunTaskService.java , runsendevaluationreminderemail , (which resulted in Error just before send LSP reminder emails)
 	<br/>- in BbIntegrateService.java API, change to return Empty JSONArray, instead of text "false" when result is empty
-	
+
 	</p>
-	
+
 	<p>
 	2016-10-01 2.1.64 -- By: Somsak
 	<br/>- LSP module, add export raw result to excel
@@ -238,24 +243,24 @@
 	<br/>- Assessment module, remove checking for assmtUser.allowStudentViewComment completely. (only keep allowStudentViewComment at Assessment setting level)
 	<br/>- show version on Footer
 	<br/>- fix bug, redirect location confuse IDP of UAT and production in PageProtectionFilter.java
-	
+
 	</p>
-	
-	
+
+
 	<p>
 	2016-09-21 2.1.63 -- By: Somsak
 	<br/>- fix ImportGroup bug
 	</p>
-	
+
 	<p>
 	2016-09-20 2.1.62 -- By: Somsak
 	<br/>- Assessment module, change Score Slider to 1 decimal place. (while Weighted scores 2 decimal, total score 1 decimal)
 	</p>
-	
+
 	<p>
 	2016-09-01 2.1.61 -- By: Somsak
 		<br/>- Add NULL and Empty Check in APIs
-		<br/>- update SSO display, allow HideHeader when open with iframe 
+		<br/>- update SSO display, allow HideHeader when open with iframe
 		<br/> now to access from iNTULearn as https://eurekauat.ntu.edu.sg/webapp/saml/access?idp=uat&amp;HideHeader=1&amp;TARGET=
 		<br/>- fix SSO to allow change of username
 		<br/> note: remember when deploy, to copy lams.keystore.pilot to C:\\ and config samlConfig.properties (keystore location) and config.properties (base url) file.
@@ -270,7 +275,7 @@
 	<br/>
 	<br/>- remove check numOfColum in ImportGroup.java
 	<br/>- remove check for InvalidGroupSet in create/Edit PE 
-	
+
 	</p>
 	
 	<p>
