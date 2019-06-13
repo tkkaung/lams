@@ -32,12 +32,19 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
-
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import ntu.celt.eUreka2.dao.ProjExtraInfoDAO;
 import ntu.celt.eUreka2.dao.ProjRoleDAO;
@@ -47,6 +54,8 @@ import ntu.celt.eUreka2.dao.ProjectDAO;
 import ntu.celt.eUreka2.dao.SchoolDAO;
 import ntu.celt.eUreka2.dao.SysRoleDAO;
 import ntu.celt.eUreka2.dao.UserDAO;
+import ntu.celt.eUreka2.dao.WebSessionDAO;
+import ntu.celt.eUreka2.data.AppState;
 import ntu.celt.eUreka2.data.PredefinedNames;
 import ntu.celt.eUreka2.data.PrivilegeProject;
 import ntu.celt.eUreka2.entities.Module;
@@ -61,6 +70,7 @@ import ntu.celt.eUreka2.entities.Project;
 import ntu.celt.eUreka2.entities.School;
 import ntu.celt.eUreka2.entities.SysRole;
 import ntu.celt.eUreka2.entities.User;
+import ntu.celt.eUreka2.entities.WebSessionData;
 import ntu.celt.eUreka2.internal.Config;
 import ntu.celt.eUreka2.internal.Util;
 import ntu.celt.eUreka2.modules.big5.BIG5DAO;
@@ -69,6 +79,9 @@ import ntu.celt.eUreka2.modules.teameffectiveness.TEDAO;
 import ntu.celt.eUreka2.modules.teameffectiveness.TESurvey;
 import ntu.celt.eUreka2.modules.care.CAREDAO;
 import ntu.celt.eUreka2.modules.care.CARESurvey;
+import ntu.celt.eUreka2.modules.group.Group;
+import ntu.celt.eUreka2.modules.group.GroupDAO;
+import ntu.celt.eUreka2.modules.group.GroupUser;
 import ntu.celt.eUreka2.modules.ipsp.IPSPDAO;
 import ntu.celt.eUreka2.modules.ipsp.IPSPSurvey;
 import ntu.celt.eUreka2.modules.lcdp.LCDPDAO;
@@ -90,8 +103,14 @@ import ntu.celt.eUreka2.services.email.EmailManager;
 import ntu.celt.eUreka2.services.email.EmailTemplateConstants;
 import ntu.celt.eUreka2.services.email.EmailTemplateVariables;
 
+import org.apache.tapestry5.annotations.Cached;
+import org.apache.tapestry5.annotations.SessionAttribute;
+import org.apache.tapestry5.annotations.SessionState;
+import org.apache.tapestry5.hibernate.annotations.CommitAfter;
+import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.services.Request;
 import org.apache.tapestry5.services.Response;
+import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 
 import us.antera.t5restfulws.RestfulWebMethod;
@@ -118,6 +137,25 @@ public class RunTaskService {
 	private TEDAO teDAO;
 	private IPSPDAO ipspDAO;
 	
+	private User user;
+	private ProjRole role;
+
+	@SessionState
+	private AppState appState;
+	
+	@SessionAttribute(WebSessionData.EUREKA2_SESSION_ID_NAME)
+	private String ssid;
+
+	@Inject
+	private WebSessionDAO webSessionDAO;
+	@Inject
+	private GroupDAO groupDAO;
+	
+
+	@Cached
+	public User getCurUser() {
+		return webSessionDAO.getCurrentUser(ssid);
+	}
 	
 	/*
 	 * Receive all the services needed as constructor arguments. 
@@ -340,6 +378,7 @@ public class RunTaskService {
 			        logger.info("Finished "+ fName +" , "+numIgnore+" ignored, "+numAdd+" added, "+ numReplace+" replaced.");
 			        writer.println("Finished "+ fName +" , "+numIgnore+" ignored, "+numAdd+" added, "+ numReplace+" replaced.");
 					writer.flush();
+					
 				}
 				catch (FileNotFoundException ex){
 					logger.error("Cannot find Users file to import. "+fName);
@@ -354,7 +393,16 @@ public class RunTaskService {
 			writer.println(ex.getMessage());
 			writer.flush();
 		}
+		/*
+		try{
+			
+		DataSync();
+		}catch(IOException ex){
+		
+		}
+		*/
 		finally{
+			DataSync();
 			if(br !=null){
 				br.close();
 				br = null;
@@ -372,8 +420,387 @@ public class RunTaskService {
 				fis = null;
 			}
 		}
+		
 	}
 	
+	
+	@SuppressWarnings("null")
+	public static final List<String> findInFile(final Path file, final String pattern, 
+			final int flags)
+					throws IOException
+	{
+
+		final List<String> userlist = new ArrayList<String>();
+		final Pattern p = Pattern.compile(pattern, flags);
+		final Logger logger = null;
+		String line;
+		Matcher m;
+		//final BufferedReader br = Files.newBufferedReader(path);
+		try {
+
+			BufferedReader br = Files.newBufferedReader(file, StandardCharsets.UTF_8);;
+
+			while ((line = br.readLine()) != null) {
+				m = p.matcher(line);
+				while (m.find()) {
+					//System.out.println("m.group() = "+m.group()+ ", reading file = "+line );
+
+					//sb.append(m.group());
+					userlist.add(line);
+					//System.out.println("Fn = "+line);
+				}
+			}
+
+
+		} catch (IOException e) { 
+			logger.error(e.getMessage());
+
+			// do something 
+			e.printStackTrace(); 
+		}
+		return userlist;
+	}
+
+	@CommitAfter
+	public Object DataSync() throws IOException {
+	//public Object onSuccessFromForm() throws IOException 
+	System.out.println("eUreaka DataSync...");
+	try {
+
+		ProjRole studentRole = projRoleDAO.getRoleByName(PredefinedNames.PROJROLE_STUDENT);
+
+		//String fileName = Config.getString("QScheduler.ImportUser.eureka_enrol");
+		String fileName  = "D:\\eureka2WebappData\\enrolment\\eureka_enrol.txt";
+		//String fileName  = "D:\\Eureka\\EUREKA_OASIS_FILES\\eureka.txt";
+		
+		/////
+
+
+		
+//		for (String line : sb) {
+//			System.out.println("line ="+line);
+//
+//		}
+		/////
+		
+		//Create new projects based on if it not existing in eUreka 
+		
+		List<Project> projList = projDAO.getAllProjects(1, 1000000);
+		//List<Project> projList = projDAO.getProjectsByCourseId("18S1-AD2101-SEM-6");
+//		projDAO.saveProject(proj);
+		List<Project> projList_filered = new ArrayList<Project>();
+
+		int year = LocalDate.now().getYear();
+		int month = LocalDate.now().getMonthOfYear();
+		
+		int y =   year % 100;
+		System.out.println("y = "+y);
+		CharSequence term_past2 = null;
+		CharSequence term_past1 =  null;
+		CharSequence term_current = null;
+		if (month >=1 && month <= 7) { //Jan -July
+			 term_past2 = y-1+"S1";
+			 term_past1 =  y-1+"S2";
+			 term_current = y+"S1";
+			
+		} else { //Aug - Dec
+			 term_past2 = y-1+"S2";
+			 term_past1 =  y+"S1";
+			 term_current = y+"S2";
+		}
+		//System.out.println("term_past2 = "+term_past2+",  term_past1 = "+term_past1+", term_current ="+term_current);
+		//System.out.println("No: of Projects="+projList.size());
+				
+		//CharSequence  stringToSearch = null;
+		String  stringToSearch = null;
+
+		String   teststr = null;
+		
+		for(int i=0; i<projList.size(); i++) {
+			
+			try {
+			Project proj = projList.get(i);
+			String proj_id = proj.getId();
+			//System.out.println("i="+i);
+			
+			//CharSequence stringToSearch = "18S2-AD2101-SEM-2";
+
+			teststr = proj.getCourseId();
+			
+			List<Integer> exceptType = new ArrayList<Integer>();
+
+			//exceptType.add(2260993);
+			//exceptType.add(2260992);
+			//exceptType.add(98304);
+			//exceptType.add(1867776);
+			//exceptType.add(5832704);
+			
+			
+			if (exceptType.contains(proj.getType().getId())) {
+				//System.out.println("Adhoc type found proj.getType().getId() = "+proj.getType().getId());
+				continue;
+
+			} else {
+				//System.out.println("Project not going to use");
+
+				//continue;
+				//System.out.println("Project type going to use");
+
+				//System.out.println("project filtered"+projList_filered.size());
+			}
+			
+			if (teststr != null && (teststr.contains(term_current) || teststr.contains(term_past1) || teststr.contains(term_past2))) {
+				//System.out.println("Course ID>>"+proj.getCourseId() +" Display Name>>"+proj.getDisplayName());
+				stringToSearch = proj.getCourseId();
+				//System.out.println("proj.getCourseId() = "+proj.getCourseId());
+				
+				projList_filered.add(proj);
+				//System.out.println("teststr = "+teststr);
+			} else
+				continue;
+
+			} catch(Exception e) {
+				logger.error(e.getMessage());
+			}			
+
+			/*
+			CharSequence  stringToSearch = proj.getCourseId();
+			//CharSequence stringToSearch = "18S2-AD2101-SEM-2";
+			CharSequence term_filer = "18S1";
+			String   teststr = proj.getCourseId();
+			if (teststr != null && teststr.contains(term_filer)) {
+				//System.out.println("Course ID>>"+proj.getCourseId() +" Display Name>>"+proj.getDisplayName());
+				stringToSearch = proj.getCourseId();
+				//stringToSearch= "18S1-AC3102-SEM-6";
+
+			} else
+				continue;
+				*/
+			
+			/*
+			proj = new Project();
+    		projFyp = new ProjFYPExtraInfo();
+    		projFyp.setProject(proj);
+    		
+    		proj.setSchool(school);
+    		projFyp.setFypID(fypID);
+    		projFyp.setFypNo(fypNo);
+    		projFyp.setAcadYear(acadYear);
+    		projFyp.setAcadSem(acadSem);
+    		proj.setName(name);
+    		proj.setDescription(description);
+    		
+    		proj.getMembers().clear(); //delete old members list
+    		for(ProjUser pu :members){
+    			pu.setProject(proj);
+    			proj.addMember(pu);
+    		}
+    		
+    		
+    		getFypStartDateEndDate(projFyp, proj);
+    		projFyp.setExamDateTime(examDateTime);
+    		projFyp.setExamVenue(examVenue);
+    		
+    		proj.setType(fypType);
+    		proj.setId(projDAO.generateId(proj.getType(), proj.getSchool(), (Util.stringToDate(projFyp.getAcadYear(), "yyyy"))));
+    		
+			for(Module m : defaultModules){
+				proj.addModule(new ProjModule(proj, m));
+			}
+			proj.setCdate(new Date());
+			proj.setMdate(new Date());
+			//proj.setCreator(creator);
+			proj.setStatus(activeStatus);
+		
+			//TODO create default milestones of important dates
+			
+			projDAO.immediateSaveProject(proj);
+			projExtraInfoDAO.immediateSaveProjExtraInfo(projFyp)
+			*/
+		}
+		System.out.println("project full = "+projList.size());
+		System.out.println("project filtered = "+projList_filered.size());
+	
+		//////////////////////////////////
+		List<String> lines = Collections.emptyList(); 
+		try { 
+			lines = Files.readAllLines(Paths.get(fileName), StandardCharsets.UTF_8);
+			
+		} catch (FileNotFoundException ex){
+				logger.error("Cannot find Users file to import. "+fileName);
+		} catch (IOException e) { 
+
+			// do something 
+			e.printStackTrace(); 
+		}
+		////////////////////////////
+		//List<String>  matchedlines = new ArrayList<String>();
+		
+		for(int i=0; i<projList_filered.size(); i++) {
+
+			Project proj = projList_filered.get(i);
+			//System.out.println("No: of Projects="+projList.size());
+			String proj_id = proj.getId();
+			//System.out.println("ProjID="+proj_id);
+			//System.out.println("ProjID="+proj_id+"  CourseId ="+proj.getCourseId());
+			stringToSearch = proj.getCourseId();
+			//CharSequence stringToSearch = "18S2-AD2101-SEM-2";
+			
+			/*
+			 String   teststr = proj.getCourseId();
+			
+			CharSequence term_filer = "18S1";
+			if (teststr != null && teststr.contains(term_filer)) {
+				//System.out.println("Course ID>>"+proj.getCourseId() +" Display Name>>"+proj.getDisplayName());
+				stringToSearch = proj.getCourseId();
+				//stringToSearch= "18S1-AC3102-SEM-6";
+
+			} else
+				continue;
+			 */
+			
+
+			//System.out.println("lines = "+lines.size());
+			int count = 0;
+			int count1 = 0;
+
+
+			List<Object> userlist = new ArrayList<Object>();
+			List<String>  matchedlines = findInFile(Paths.get(fileName),stringToSearch, 1);
+			Iterator<String> itr = lines.iterator();
+			System.out.println("ProjID="+proj_id+"  CourseId = "+proj.getCourseId() + ",  DsiplayName = "+proj.getDisplayName() + ", enrolment nos = "+matchedlines.size());
+
+			/*
+			//Reading file lines one by one
+			while (itr.hasNext()) {
+				count1++;
+
+				String line = itr.next();
+				if (stringToSearch != null && line.contains(stringToSearch) ) {
+
+					//String[] arrOfStr = line.split("\\|",-2);
+					
+					//System.out.println("matches : "+itr.next());
+					userlist.add(line.split("\\|",-2));
+					count++;
+				} else {
+					//System.out.println("not matches : "+itr.next());
+					continue;
+				}
+				count1++;
+			}
+			*/
+			
+			for (String line : matchedlines) {
+				userlist.add(line.split("\\|",-2));
+			}
+			
+			//System.out.println(" Number of iteration count1: "+count1);		
+            if (count > 0)
+			for(int i1 = 0; i1 < userlist.size(); i1++) {
+				//System.out.println(userlist.get(i1).toString());
+				String[]  arrOfStr = (String[]) userlist.get(i1);
+
+				//USERNAME|CAMPUS|FULLNAME|EMAIL|USER_ROLE|COURSE_NAME|COURSE_CODE|ACAD_YR|SEM|COURSE_ID
+				//	            for(int i11 = 0; i11 < arrOfStr.length; i11++) {
+				//		            System.out.println("USERNAME: "+arrOfStr[i11]);               
+				//		        }
+
+				String USERNAME = arrOfStr[0];
+				/*
+				String school = arrOfStr[1];
+				String FULLNAME = arrOfStr[2];
+				String EMAIL = arrOfStr[3];
+				String USER_ROLE = arrOfStr[4];
+				String COURSE_NAME = arrOfStr[5];
+				String COURSE_CODE = arrOfStr[6];
+				String ACAD_YR = arrOfStr[7];
+				String SEM = arrOfStr[8];
+				*/
+				String COURSE_ID = arrOfStr[9];
+		
+				/*
+				if (COURSE_ID != null && !COURSE_ID.equals(stringToSearch))
+					System.out.println("project is not avalable in eUreka = "+COURSE_ID+" stringToSearch = "+stringToSearch);
+					*/
+				
+
+				if (!proj.hasMember(USERNAME)) { 
+					// User is already in the group. no action required
+					//System.out.println(" User is already in the group. no action required: "+proj.getCourseId());
+					
+				//} else {
+					// create a user
+					User user = userDAO.getUserByUsername(USERNAME);
+										
+					//System.out.println("Debug ":  Adding members to the project "+USERNAME+" displayname = "+user.getDisplayName());
+			
+					// create a project user
+					ProjUser pu = new ProjUser(proj, user, studentRole);
+					//System.out.println("Debug getName()"+pu.getUser().getDisplayName());
+					//System.out.println("Debug getDisplayName()"+pu.getProject().getDisplayName());
+
+					proj.addMember(pu);
+					userDAO.save(user);
+
+				}
+
+		}
+		}
+		
+		System.out.print("All filtered projects enrolment have been synced.");
+	
+	} catch (NumberFormatException ex) {
+		appState.recordErrorMsg("Invalid Data type, " + ex.getMessage());
+
+		logger.error(ex.getMessage());
+/*
+		in.close();
+		savedFile.delete();
+		if(count>0){
+			appState.recordWarningMsg("created Group : " + groupTypeName +", " + count + " users added to the group");
+		}
+		if(countNotFound > 0){
+			appState.recordWarningMsg("Total users not added :" + countNotFound  );
+		}
+		return null;
+		*/
+	} catch (RuntimeException ex) {
+		// Kanesh commented below
+		//appState.recordErrorMsg(ex.getMessage());
+
+		//logger.error(ex.getMessage());
+/*
+		in.close();
+		savedFile.delete();
+		
+		if(count>0){
+			appState.recordWarningMsg("created Group : " + groupTypeName +", " + count + " users added to the group");
+		}
+		if(countNotFound > 0){
+			appState.recordWarningMsg("Total users not added :" + countNotFound  );
+		}
+		return null;
+		*/
+	}catch(Exception e) {
+		appState.recordErrorMsg(e.getMessage());
+
+		logger.error(e.getMessage());
+	}
+	/*
+	appState.recordInfoMsg("Successfully created Group : " + groupTypeName +", " + count + " users added to the group");
+	if(countNotFound > 0){
+		appState.recordWarningMsg("Total users not added :" + countNotFound  );
+	}
+	*/
+	return null;
+
+}
+	private void User() {
+		// TODO Auto-generated method stub
+		
+	}
+
 	@RestfulWebMethod 
 	public void runImportCAOProj(Request request, Response response) throws IOException{
 		PrintWriter writer = response.getPrintWriter("text/plain");
