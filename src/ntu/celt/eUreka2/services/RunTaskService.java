@@ -99,15 +99,21 @@ import ntu.celt.eUreka2.modules.scheduling.SchedulingDAO;
 import ntu.celt.eUreka2.modules.scheduling.Task;
 import ntu.celt.eUreka2.modules.scheduling.UrgencyLevel;
 import ntu.celt.eUreka2.modules.usage.UsageDAO;
+import ntu.celt.eUreka2.pages.admin.project.ManageAdminMember;
+import ntu.celt.eUreka2.pages.admin.project.ManageAdminProjects;
+import ntu.celt.eUreka2.pages.admin.project.ProjectAdminEdit;
 import ntu.celt.eUreka2.services.email.EmailManager;
 import ntu.celt.eUreka2.services.email.EmailTemplateConstants;
 import ntu.celt.eUreka2.services.email.EmailTemplateVariables;
 
+import org.apache.commons.lang.time.DateUtils;
 import org.apache.tapestry5.annotations.Cached;
 import org.apache.tapestry5.annotations.SessionAttribute;
 import org.apache.tapestry5.annotations.SessionState;
 import org.apache.tapestry5.hibernate.annotations.CommitAfter;
+import org.apache.tapestry5.ioc.Messages;
 import org.apache.tapestry5.ioc.annotations.Inject;
+import org.apache.tapestry5.services.PageRenderLinkSource;
 import org.apache.tapestry5.services.Request;
 import org.apache.tapestry5.services.Response;
 import org.joda.time.LocalDate;
@@ -136,6 +142,13 @@ public class RunTaskService {
 	private BIG5DAO big5DAO;
 	private TEDAO teDAO;
 	private IPSPDAO ipspDAO;
+	
+	@SessionState
+	private ProjectAdminEdit projadmedit;
+	@Inject
+	private Messages _messages;
+	@Inject
+	private PageRenderLinkSource linkSource;
 	
 	private User user;
 	private ProjRole role;
@@ -460,41 +473,95 @@ public class RunTaskService {
 		}
 		return userlist;
 	}
+	public boolean isCreateMode(String projId) {
+		if(projId == null)
+			return true;
+		return false;
+	}
+	
+	@CommitAfter
+	public Project  AddProject(String name,String courseId,String courseCode,String desc,
+			String schoolname,Date startdate,Date enddate, String groupId, String term, String keywords,String remarks) {
+		Project myproj = new Project();
 
+		try {
+		String projId = null;
+
+		myproj.setType(projTypeDAO.getTypeByName(PredefinedNames.PROJTYPE_COURSE));
+		myproj.setName(name);
+		myproj.setCdate(new Date());
+		myproj.setCourseId(courseId);
+		myproj.setCourseCode(courseCode);
+		myproj.setDescription(desc);
+		
+		School school = schoolDAO.getSchoolByName(schoolname); //NBS
+		myproj.setSchool(school);
+
+		myproj.setRemarks(remarks);
+		myproj.setTerm(term);
+		
+		myproj.setSdate(startdate);
+		
+		myproj.setEdate(enddate);
+		myproj.setMdate(new Date());
+		
+		
+		myproj.setStatus(projStatusDAO.getStatusByName(PredefinedNames.PROJSTATUS_ACTIVE));
+		myproj.setLastStatusChange(new Date());
+		
+		
+		User curuser = userDAO.getUserById(1);
+		
+		myproj.setGroupId(groupId);
+		
+		if(isCreateMode(projId)){
+			myproj.setCdate(new Date());
+			myproj.setCreator(curuser);
+			
+			List<Module> defaultModules = myproj.getType().getDefaultModules();
+			for(Module m : defaultModules){
+				myproj.addModule(new ProjModule(myproj, m));
+			}
+			
+		}
+		myproj.setEditor(curuser);
+		myproj.setMdate(new Date());
+			
+		if (keywords!=null) {
+			String keywordsStr[] = keywords.split(",");
+			for(String keyword : keywordsStr){
+				keyword = keyword.trim();
+				if(!keyword.isEmpty())
+					myproj.addKeywords(keyword);
+			}
+		}
+		
+		System.out.println("Project creating... (save)");
+		projDAO.immediateSaveProject(myproj);
+		System.out.println("Project created");
+		
+		} catch(Exception e) {
+			logger.error(e.getMessage());
+		}
+		return myproj;
+	}
+	
 	@CommitAfter
 	public Object DataSync() throws IOException {
 	//public Object onSuccessFromForm() throws IOException 
 	System.out.println("eUreaka DataSync...");
+	
 	try {
 
 		ProjRole studentRole = projRoleDAO.getRoleByName(PredefinedNames.PROJROLE_STUDENT);
 
-		//String fileName = Config.getString("QScheduler.ImportUser.eureka_enrol");
-		String fileName  = "D:\\eureka2WebappData\\enrolment\\eureka_enrol.txt";
-		//String fileName  = "D:\\Eureka\\EUREKA_OASIS_FILES\\eureka.txt";
+		String fileName = Config.getString("QScheduler.ImportUser.eureka_enrol");
+			
 		
-		/////
-
-
-		
-//		for (String line : sb) {
-//			System.out.println("line ="+line);
-//
-//		}
-		/////
-		
-		//Create new projects based on if it not existing in eUreka 
-		
-		List<Project> projList = projDAO.getAllProjects(1, 1000000);
-		//List<Project> projList = projDAO.getProjectsByCourseId("18S1-AD2101-SEM-6");
-//		projDAO.saveProject(proj);
-		List<Project> projList_filered = new ArrayList<Project>();
-
 		int year = LocalDate.now().getYear();
 		int month = LocalDate.now().getMonthOfYear();
 		
 		int y =   year % 100;
-		System.out.println("y = "+y);
 		CharSequence term_past2 = null;
 		CharSequence term_past1 =  null;
 		CharSequence term_current = null;
@@ -503,14 +570,89 @@ public class RunTaskService {
 			 term_past1 =  y-1+"S2";
 			 term_current = y+"S1";
 			
-		} else { //Aug - Dec
+		} else { // Aug - Dec
 			 term_past2 = y-1+"S2";
 			 term_past1 =  y+"S1";
 			 term_current = y+"S2";
 		}
-		//System.out.println("term_past2 = "+term_past2+",  term_past1 = "+term_past1+", term_current ="+term_current);
-		//System.out.println("No: of Projects="+projList.size());
+		System.out.println("term_current = "+term_current);
+		//////////////////////////////////
+		/*
+		List<String> lines = Collections.emptyList(); 
+		try { 
+			lines = Files.readAllLines(Paths.get(fileName), StandardCharsets.UTF_8);
+			
+		} catch (FileNotFoundException ex){
+				logger.error("Cannot find Users file to import. "+fileName);
+		} catch (IOException e) { 
+
+			// do something 
+			e.printStackTrace(); 
+		}
+		*/
+		////////////////////////////
+		String  schoolToSearch = "(NBS)";
+		String  past1termToSearch = term_past1.toString();
+		String  currenttermToSearch = term_current.toString();
+
+		//List<Object> enrollist = new ArrayList<Object>();
+		List<String>  enrolmatchedlines = findInFile(Paths.get(fileName),schoolToSearch, 1);
+		//System.out.println("ProjID="+proj_id+"  CourseId = "+proj.getCourseId() + ",  DsiplayName = "+proj.getDisplayName() + ", enrolment nos = "+matchedlines.size());
+		//projadmedit.onSuccessFromForm();
+		///////
+		
+		int count = 0;
+		//////////////////////////////////
+		for (String line : enrolmatchedlines) {
+			if (line.contains(past1termToSearch) || line.contains(currenttermToSearch)) {
+				String[]  arrOfStr = line.split("\\|",-2);
+
+				//USERNAME|CAMPUS|FULLNAME|EMAIL|USER_ROLE|COURSE_NAME|COURSE_CODE|ACAD_YR|SEM|COURSE_ID
+				//SONAM002|NTU|SONAM SAHNI|SONAM002@ntu.edu.sg|STUDENT|B6027 - OPERATIONS (MBA) 2018/2019 Trimester 2 (Group 1)|B6027|2018|2|18S2-B6027-MBA-1|CoB (NBS)
+				//String USERNAME = arrOfStr[0];
 				
+				String desc;
+				String schoolname = "NBS";
+				String groupId = null;
+				String keywords = null;
+				String remarks = "created by datasync";
+				
+				//String campus = arrOfStr[1];
+				//String FULLNAME = arrOfStr[2];
+				//String EMAIL = arrOfStr[3];
+				//String USER_ROLE = arrOfStr[4];
+				String COURSE_NAME =  arrOfStr[5];
+				String COURSE_CODE = arrOfStr[6];
+				String ACAD_YR = arrOfStr[7];
+				String SEM = arrOfStr[8];
+				
+				String COURSE_ID = arrOfStr[9];
+
+				//String school = arrOfStr[10];
+				desc = COURSE_NAME;
+				int ACADYR =   Integer(ACAD_YR) % 100;
+				String term = ACADYR+SEM;
+
+			    //enrollist.add(line.split("\\|",-2));
+			    Date startdate = new Date();
+			    Date enddate  = DateUtils.addMonths(new Date(), 12);
+			    
+			    List<Project> p1 = projDAO.getProjectsByCourseId(COURSE_ID);
+				
+				if (p1.size() <= 0) {
+					count++; 
+					Project p = AddProject(COURSE_ID,COURSE_ID,COURSE_CODE,desc,schoolname,startdate,enddate,groupId,term,keywords, remarks);
+					System.out.println("p.courseId = "+p.getCourseId());
+				}
+			}
+		}
+		System.out.println(count +" projects created");
+		//Create new projects based on if it not existing in eUreka 
+		
+		List<Project> projList = projDAO.getAllProjects(1, 10000);
+
+		List<Project> projList_filered = new ArrayList<Project>();
+		
 		//CharSequence  stringToSearch = null;
 		String  stringToSearch = null;
 
@@ -527,15 +669,22 @@ public class RunTaskService {
 
 			teststr = proj.getCourseId();
 			
-			List<Integer> exceptType = new ArrayList<Integer>();
+			List<Integer> exceptType = new ArrayList<Integer>();	
+			
+			//System.out.println(" status = "+proj.getStatus().getId());
+			
+			//32768 active 32768
+			if (proj.getStatus().getId() != 32768) { // Non-active projects skip (32768 is the active project status)
+				continue;
+			}
 
-			//exceptType.add(2260993);
-			//exceptType.add(2260992);
-			//exceptType.add(98304);
-			//exceptType.add(1867776);
-			//exceptType.add(5832704);
-			
-			
+			//exceptType.add(2260993);  //SEN Senate
+			//exceptType.add(2260992);  //CAO Career Affairs Office
+			//exceptType.add(98304);    //ADH
+			//exceptType.add(1867776);  //FYP
+			//exceptType.add(5832704);  //Course
+			//exceptType.add(22380544); // LAB	eLog Book	Digital Lab Log Book
+
 			if (exceptType.contains(proj.getType().getId())) {
 				//System.out.println("Adhoc type found proj.getType().getId() = "+proj.getType().getId());
 				continue;
@@ -548,7 +697,7 @@ public class RunTaskService {
 
 				//System.out.println("project filtered"+projList_filered.size());
 			}
-			
+
 			if (teststr != null && (teststr.contains(term_current) || teststr.contains(term_past1) || teststr.contains(term_past2))) {
 				//System.out.println("Course ID>>"+proj.getCourseId() +" Display Name>>"+proj.getDisplayName());
 				stringToSearch = proj.getCourseId();
@@ -577,64 +726,9 @@ public class RunTaskService {
 				continue;
 				*/
 			
-			/*
-			proj = new Project();
-    		projFyp = new ProjFYPExtraInfo();
-    		projFyp.setProject(proj);
-    		
-    		proj.setSchool(school);
-    		projFyp.setFypID(fypID);
-    		projFyp.setFypNo(fypNo);
-    		projFyp.setAcadYear(acadYear);
-    		projFyp.setAcadSem(acadSem);
-    		proj.setName(name);
-    		proj.setDescription(description);
-    		
-    		proj.getMembers().clear(); //delete old members list
-    		for(ProjUser pu :members){
-    			pu.setProject(proj);
-    			proj.addMember(pu);
-    		}
-    		
-    		
-    		getFypStartDateEndDate(projFyp, proj);
-    		projFyp.setExamDateTime(examDateTime);
-    		projFyp.setExamVenue(examVenue);
-    		
-    		proj.setType(fypType);
-    		proj.setId(projDAO.generateId(proj.getType(), proj.getSchool(), (Util.stringToDate(projFyp.getAcadYear(), "yyyy"))));
-    		
-			for(Module m : defaultModules){
-				proj.addModule(new ProjModule(proj, m));
-			}
-			proj.setCdate(new Date());
-			proj.setMdate(new Date());
-			//proj.setCreator(creator);
-			proj.setStatus(activeStatus);
-		
-			//TODO create default milestones of important dates
-			
-			projDAO.immediateSaveProject(proj);
-			projExtraInfoDAO.immediateSaveProjExtraInfo(projFyp)
-			*/
 		}
 		System.out.println("project full = "+projList.size());
 		System.out.println("project filtered = "+projList_filered.size());
-	
-		//////////////////////////////////
-		List<String> lines = Collections.emptyList(); 
-		try { 
-			lines = Files.readAllLines(Paths.get(fileName), StandardCharsets.UTF_8);
-			
-		} catch (FileNotFoundException ex){
-				logger.error("Cannot find Users file to import. "+fileName);
-		} catch (IOException e) { 
-
-			// do something 
-			e.printStackTrace(); 
-		}
-		////////////////////////////
-		//List<String>  matchedlines = new ArrayList<String>();
 		
 		for(int i=0; i<projList_filered.size(); i++) {
 
@@ -661,16 +755,14 @@ public class RunTaskService {
 			
 
 			//System.out.println("lines = "+lines.size());
-			int count = 0;
-			int count1 = 0;
-
 
 			List<Object> userlist = new ArrayList<Object>();
 			List<String>  matchedlines = findInFile(Paths.get(fileName),stringToSearch, 1);
-			Iterator<String> itr = lines.iterator();
-			System.out.println("ProjID="+proj_id+"  CourseId = "+proj.getCourseId() + ",  DsiplayName = "+proj.getDisplayName() + ", enrolment nos = "+matchedlines.size());
+			//System.out.println("ProjID="+proj_id+"  CourseId = "+proj.getCourseId() + ",  DsiplayName = "+proj.getDisplayName() + ", enrolment nos = "+matchedlines.size());
 
 			/*
+ 			Iterator<String> itr = lines.iterator();
+
 			//Reading file lines one by one
 			while (itr.hasNext()) {
 				count1++;
@@ -695,8 +787,8 @@ public class RunTaskService {
 				userlist.add(line.split("\\|",-2));
 			}
 			
-			//System.out.println(" Number of iteration count1: "+count1);		
-            if (count > 0)
+			//System.out.println("userlist.size(): "+userlist.size());
+			if (userlist.size() > 0)
 			for(int i1 = 0; i1 < userlist.size(); i1++) {
 				//System.out.println(userlist.get(i1).toString());
 				String[]  arrOfStr = (String[]) userlist.get(i1);
@@ -708,7 +800,7 @@ public class RunTaskService {
 
 				String USERNAME = arrOfStr[0];
 				/*
-				String school = arrOfStr[1];
+				String campus = arrOfStr[1];
 				String FULLNAME = arrOfStr[2];
 				String EMAIL = arrOfStr[3];
 				String USER_ROLE = arrOfStr[4];
@@ -718,12 +810,12 @@ public class RunTaskService {
 				String SEM = arrOfStr[8];
 				*/
 				String COURSE_ID = arrOfStr[9];
+				//String school = arrOfStr[10];
 		
 				/*
 				if (COURSE_ID != null && !COURSE_ID.equals(stringToSearch))
 					System.out.println("project is not avalable in eUreka = "+COURSE_ID+" stringToSearch = "+stringToSearch);
 					*/
-				
 
 				if (!proj.hasMember(USERNAME)) { 
 					// User is already in the group. no action required
@@ -733,7 +825,7 @@ public class RunTaskService {
 					// create a user
 					User user = userDAO.getUserByUsername(USERNAME);
 										
-					//System.out.println("Debug ":  Adding members to the project "+USERNAME+" displayname = "+user.getDisplayName());
+					System.out.println(i1+": Debug :  Adding mbr to proj "+USERNAME+" displayname = "+user.getDisplayName()+", "+proj.getCourseId());
 			
 					// create a project user
 					ProjUser pu = new ProjUser(proj, user, studentRole);
@@ -742,10 +834,8 @@ public class RunTaskService {
 
 					proj.addMember(pu);
 					userDAO.save(user);
-
 				}
-
-		}
+			}
 		}
 		
 		System.out.print("All filtered projects enrolment have been synced.");
@@ -796,6 +886,16 @@ public class RunTaskService {
 	return null;
 
 }
+	private int Integer(String aCAD_YR) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	private void isCreateMode() {
+		// TODO Auto-generated method stub
+		
+	}
+
 	private void User() {
 		// TODO Auto-generated method stub
 		
