@@ -649,7 +649,7 @@ public class RunTaskService {
 		System.out.println(count +" projects created");
 		//Create new projects based on if it not existing in eUreka 
 		
-		List<Project> projList = projDAO.getAllProjects(1, 10000);
+		List<Project> projList = projDAO.getAllProjects(0, 10000);
 
 		List<Project> projList_filered = new ArrayList<Project>();
 		
@@ -818,22 +818,24 @@ public class RunTaskService {
 					*/
 
 				if (!proj.hasMember(USERNAME)) { 
-					// User is already in the group. no action required
-					//System.out.println(" User is already in the group. no action required: "+proj.getCourseId());
+					// if user is not member to this project, add it here
 					
-				//} else {
-					// create a user
-					User user = userDAO.getUserByUsername(USERNAME);
-										
-					System.out.println(i1+": Debug :  Adding mbr to proj "+USERNAME+" displayname = "+user.getDisplayName()+", "+proj.getCourseId());
-			
-					// create a project user
-					ProjUser pu = new ProjUser(proj, user, studentRole);
-					//System.out.println("Debug getName()"+pu.getUser().getDisplayName());
-					//System.out.println("Debug getDisplayName()"+pu.getProject().getDisplayName());
+					try {
+						// create a user
+						User user = userDAO.getUserByUsername(USERNAME);
 
-					proj.addMember(pu);
-					userDAO.save(user);
+						System.out.println(i1+": Debug :  Adding mbr to proj "+USERNAME+" displayname = "+user.getDisplayName()+", "+proj.getCourseId());
+
+						// create a project user
+						ProjUser pu = new ProjUser(proj, user, studentRole);
+						//System.out.println("Debug getName()"+pu.getUser().getDisplayName());
+						//System.out.println("Debug getDisplayName()"+pu.getProject().getDisplayName());
+
+						proj.addMember(pu);
+						userDAO.save(user);
+					} catch (Exception e) {
+						System.out.println(USERNAME+" : addMember exception:"+e);
+					}
 				}
 			}
 		}
@@ -859,7 +861,7 @@ public class RunTaskService {
 		// Kanesh commented below
 		//appState.recordErrorMsg(ex.getMessage());
 
-		//logger.error(ex.getMessage());
+		logger.error(ex.getMessage());
 /*
 		in.close();
 		savedFile.delete();
