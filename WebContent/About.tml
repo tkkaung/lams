@@ -9,8 +9,15 @@
    Version: ${getBuildNumber()}
    <br/>
    </p>
+   <p>
+	2018-07-24 2.1.101 -- By: Ko Ko
+	<br/>- AppScan Fixes
+
+
+</p>
+   
 <p>
-	2018-10-23 2.1.100 -- By: Kanesh
+	2018-07-24 2.1.100 -- By: Kanesh
 	<br/>- Data Sync with enrollment Snapshot file
 
 

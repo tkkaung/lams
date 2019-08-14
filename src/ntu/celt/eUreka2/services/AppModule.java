@@ -199,7 +199,7 @@ public class AppModule
         // assets. Web browsers will cache assets because of the far future expires
         // header. If existing assets are changed, the version number should also
         // change, to force the browser to download new versions.
-        configuration.add(SymbolConstants.APPLICATION_VERSION, "2.1.100");
+        configuration.add(SymbolConstants.APPLICATION_VERSION, "2.1.101");
      
         //configuration.add(SymbolConstants.MIN_GZIP_SIZE, "10000");
         
