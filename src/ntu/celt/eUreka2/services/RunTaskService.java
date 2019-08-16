@@ -737,7 +737,7 @@ public class RunTaskService {
 			String proj_id = proj.getId();
 			//System.out.println("ProjID="+proj_id);
 			//System.out.println("ProjID="+proj_id+"  CourseId ="+proj.getCourseId());
-			stringToSearch = proj.getCourseId();
+			stringToSearch = proj.getCourseId()+"\\|";
 			//CharSequence stringToSearch = "18S2-AD2101-SEM-2";
 			
 			/*
