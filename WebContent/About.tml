@@ -9,18 +9,15 @@
    Version: ${getBuildNumber()}
    <br/>
    </p>
-   <p>
-	2018-07-24 2.1.101 -- By: Ko Ko
-	<br/>- AppScan Fixes
-
+<p>
+	2019-08-28 2.1.101 -- By: Kanesh  
+	<br /> - Hide firstName and removed from UI and The Last name showing the full name based on the latest snapshot files.
+</p>
 
 </p>
-   
 <p>
 	2018-07-24 2.1.100 -- By: Kanesh
 	<br/>- Data Sync with enrollment Snapshot file
-
-
 </p>
 
 <p>
@@ -29,8 +26,6 @@
 	<br/>- fixed bug, IPSP, student view question, change display style
 	<br/>- change, Group, EnrollUserAdmin, Removing a student from a group will also DELETE scores evaluated for that student and by that student. 
 	<br/>- fixed bug, Evalution, viewaverage, show empty cell if group size are different.
-	
-	
 </p>
 
 <p>
