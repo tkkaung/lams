@@ -1713,7 +1713,13 @@ public class RunTaskService {
 		count = 0;
 		returnMsg += "<br/>";
 		evals = evalDAO.getEvalsToSendLaunchReminder();
-		for(Evaluation eval : evals){
+		for(Evaluation eval : evals) {
+
+			if (!eval.getReminderLaunch()) {
+				System.out.println("Email notice flag is turn off and not sending email");
+				continue;
+			}
+			
 			Collection<User> leaders = new ArrayList<User>();
 			Project proj = eval.getProject();
 			leaders.addAll(getLeaderUsers(proj));
