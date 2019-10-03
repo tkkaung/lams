@@ -9,6 +9,9 @@
    Version: ${getBuildNumber()}
    <br/>
    </p>
+   <p>
+	2019-10-02 2.1.102 -- By: Kanesh  
+	<br /> - Peer evaluation, Email launch notice flag is checked
 <p>
 	2019-08-28 2.1.101 -- By: Kanesh  
 	<br /> - Hide firstName and removed from UI and The Last name showing the full name based on the latest snapshot files.
