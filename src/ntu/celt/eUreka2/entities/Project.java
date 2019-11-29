@@ -284,7 +284,7 @@ public class Project implements JSONable, Serializable {
 	*/
 	public ProjModule getProjModule(Module module){
 		for(ProjModule pm : projmodules){
-			if(pm.getModule().equals(module)){
+			if(pm != null && pm.getModule().equals(module)){
 				return pm;
 			}
 		}
@@ -319,7 +319,7 @@ public class Project implements JSONable, Serializable {
 	}
 	public boolean hasMembersByRole(ProjRole pr){
 		for(ProjUser pu : members){
-			if(pu.getRole().equals(pr))
+			if(pu != null && pu.getRole().equals(pr))
 				return true;
 		}
 		return false;
@@ -327,7 +327,7 @@ public class Project implements JSONable, Serializable {
 	public List<User> getMembersByRole(ProjRole pr){
 		List<User> uList = new ArrayList<User>();
 		for(ProjUser pu : members){
-			if(pu.getRole().equals(pr))
+			if(pu != null && pu.getRole().equals(pr))
 				uList.add(pu.getUser());
 		}
 		return uList;
@@ -335,7 +335,7 @@ public class Project implements JSONable, Serializable {
 	public List<ProjUser> getProjUsersByRole(ProjRole pr){
 		List<ProjUser> puList = new ArrayList<ProjUser>();
 		for(ProjUser pu : this.getMembers()){
-			if(pu.getRole().equals(pr))
+			if(pu != null && pu.getRole().equals(pr))
 				puList.add(pu);
 		}
 		return puList;
@@ -355,14 +355,14 @@ public class Project implements JSONable, Serializable {
 	}
 	public boolean hasModule(String moduleName){
 		for(ProjModule pm : projmodules){
-			if(pm.getModule().getName().equals(moduleName))
+			if(pm != null && pm.getModule().getName().equals(moduleName))
 				return true;
 		}
 		return false;
 	}
 	public ProjModule getProjModule(String moduleName){
 		for(ProjModule pm : projmodules){
-			if(pm.getModule().getName().equals(moduleName))
+			if(pm != null && pm.getModule().getName().equals(moduleName))
 				return pm;
 		}
 		return null;
