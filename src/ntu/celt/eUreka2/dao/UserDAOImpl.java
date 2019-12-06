@@ -64,6 +64,39 @@ public class UserDAOImpl implements UserDAO {
 			return (User) uList.get(0);
 		return null;
 	}
+	
+	public List<User>  getUsersByUsernames(String usernames) { // usernames = 'username1','username' by Kanesh
+		
+		 if(usernames==null || usernames.isEmpty() || usernames.equals("."))
+		 
+			return null;
+		/*
+		String sqlNative = "select username from tbl_user where username ='" +username +"' ";
+		Query qNative = session.createQuery(sqlNative);
+		
+		 try {
+	            String url = "jdbc:msql://localhost:3306/eureka2";
+	            Connection conn = (Connection) DriverManager.getConnection(url,"eureka","eureka_20");
+	            Statement stmt = (Statement) conn.createStatement();
+	            ResultSet rs;
+	 
+	            rs = stmt.executeQuery("select username from tbl_user where username ='" +username +"' ");
+	            while ( rs.next() ) {
+	                String lastName = rs.getString("id");
+	                System.out.println(lastName);
+	            }
+	            conn.close();
+	        } catch (Exception e) {
+	            System.err.println("Got an exception! ");
+	            System.err.println(e.getMessage());
+	        }
+*/
+
+		String sqlNative = "SELECT u FROM User AS u  WHERE username IN ("+usernames+")";
+		Query qNative = session.createQuery(sqlNative);
+		return qNative.list();
+	}
+		
 	/*@Override
 	public User getUserByExKey(String externalKey) {
 		if(externalKey==null || externalKey.isEmpty() || externalKey.equals("."))

@@ -56,8 +56,10 @@ import ntu.celt.eUreka2.dao.SysRoleDAO;
 import ntu.celt.eUreka2.dao.UserDAO;
 import ntu.celt.eUreka2.dao.WebSessionDAO;
 import ntu.celt.eUreka2.data.AppState;
+import ntu.celt.eUreka2.data.FilterType;
 import ntu.celt.eUreka2.data.PredefinedNames;
 import ntu.celt.eUreka2.data.PrivilegeProject;
+import ntu.celt.eUreka2.data.UserSearchableField;
 import ntu.celt.eUreka2.entities.Module;
 import ntu.celt.eUreka2.entities.ProjCAOExtraInfo;
 import ntu.celt.eUreka2.entities.ProjFYPExtraInfo;
@@ -117,6 +119,7 @@ import org.apache.tapestry5.services.PageRenderLinkSource;
 import org.apache.tapestry5.services.Request;
 import org.apache.tapestry5.services.Response;
 import org.hibernate.Session;
+import org.hibernate.criterion.Criterion;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
@@ -424,8 +427,11 @@ public class RunTaskService {
 			DataSync();
 			
 			DateTime t2 = DateTime.now();
+			long milliseconds = Math.abs(t2.getMillis()-t1.getMillis());
+			long mins = milliseconds/1000/60;
+			long hrs = mins/60;
 
-			System.out.println("Time taken to run DataSync() = " +Math.abs(t2.getMillis()-t1.getMillis())/1000 + " seconds");
+			System.out.println("Time taken to run DataSync() = " +milliseconds/1000 + " seconds => "+mins+" mins, => "+hrs+" hours");
 			
 			if(br !=null){
 				br.close();
@@ -653,113 +659,107 @@ public class RunTaskService {
 		return true;
 	}
 	
+	public String getUsernamesAsString(Project proj, List<Object> userlist) {
+		
+		List <String> ulist = new ArrayList<String>();
+		List <String> rlist = new ArrayList<String>();
+		String usernames = "";
+		
+		for(int i1 = 0; i1 < userlist.size(); i1++) {
+			String[]  arrOfStr = (String[]) userlist.get(i1); 	//USERNAME|CAMPUS|FULLNAME|EMAIL|USER_ROLE|COURSE_NAME|COURSE_CODE|ACAD_YR|SEM|COURSE_ID
+
+			String USERNAME = arrOfStr[0];
+			String Role = arrOfStr[4];
+
+			if (!proj.hasMember(USERNAME)) {
+				// if user is not member to this project, add it here
+				ulist.add(USERNAME);
+				rlist.add(Role);
+
+				if (usernames.equals("") || usernames.isEmpty()) {
+					usernames = "'"+USERNAME+"'";
+				} else {
+					usernames += ", '"+USERNAME+"'";
+				}	
+			}
+		}
+		return usernames;
+	}
+
 	@CommitAfter
 	public boolean addUserToProj(Project proj, List<Object> userlist,ProjRole studentRole,ProjRole leaderRole, ProjRole TutorRole) {
 		//System.out.println("inside 0 addUserToProj ");
 		
         int saveflag =0;
-		//System.out.println("inside 1 addUserToProj ");
 		ProjRole role = null;
+		
+		List <String> ulist = new ArrayList<String>();
+		List <String> rlist = new ArrayList<String>();
+		String usernames = getUsernamesAsString(proj, userlist);
+		
+//		FilterType filterType = null;
+//		String searchText = null;
+//		UserSearchableField searchIn = UserSearchableField.username;
+//		Boolean enabled =true; School school= null;
+//		Integer firstResult=0; Integer maxResult=1;
+		List <User> ulist_db = new ArrayList<User>();
+		DateTime  t11 = DateTime.now();
 
-		for(int i1 = 0; i1 < userlist.size(); i1++) {
-			//System.out.println(userlist.get(i1).toString());
-			String[]  arrOfStr = (String[]) userlist.get(i1);
-			System.out.println("inside 2 addUserToProj "+i1);
+		if (!usernames.isEmpty()) {
+			ulist_db = userDAO.getUsersByUsernames(usernames);  // usernames = 'username1','username' by Kanesh
+			/*
+			for (int u=0; u < ulist.size(); u++) {
+				String uname= ulist.get(u);
+				List<User> ul = userDAO.searchUsers(FilterType.EXACT_WORD,uname,searchIn,enabled,school,firstResult,maxResult);
+				System.out.println("710 :  searchUsers  "+uname);
+				System.out.println("711 :  searchUsers ul.size() =  "+ul.size());
 
-			//USERNAME|CAMPUS|FULLNAME|EMAIL|USER_ROLE|COURSE_NAME|COURSE_CODE|ACAD_YR|SEM|COURSE_ID
+		 		ulist_db.addAll(ul);
+			}
+			 */
+			// create a user
+			DateTime t21 = DateTime.now();
+			System.out.println("715 ulist_db.size() = "+ulist_db.size()+", userDAO.getUsersByUsernames, time = " +Math.abs(t21.getMillis()-t11.getMillis()));
 
-			String USERNAME = arrOfStr[0];
-			String Role = arrOfStr[4];
-			//System.out.println("Snapshot Role "+Role);
-			
-			//DateTime t1 = DateTime.now();
-
-			Boolean mbr_exists = proj.hasMember(USERNAME);
-			//DateTime t2 = DateTime.now();
-
-			//System.out.println("proj.hasMember(USERNAME), time = " +Math.abs(t2.getMillis()-t1.getMillis()));
-
-			if (!mbr_exists) {
-				// if user is not member to this project, add it here
+			for (int l =0; l<ulist_db.size(); l++) {
+				User user = ulist_db.get(l);
+				String Role = rlist.get(l);
+				String USERNAME = user.getUsername();
+				System.out.println(l+": 721 Debug :  Adding mbr to proj "+USERNAME); //+" displayname = "+user.getDisplayName()+", "+proj.getCourseId()
 
 				try {
-					System.out.println("686");
-					DateTime  t11 = DateTime.now();
-
-					// create a user
-					User user = userDAO.getUserByUsername(USERNAME);
-					DateTime t21 = DateTime.now();
-
-					System.out.println("713 ProjUser, time = " +Math.abs(t21.getMillis()-t11.getMillis()));
-
-					//User user = new User();
-					//System.out.println("689 "+user2.size());
-					//User user2 = userDAO.getUserById(1);
-					//System.out.println("691");
-
-					System.out.println(i1+": Debug :  Adding mbr to proj "+USERNAME); //+" displayname = "+user.getDisplayName()+", "+proj.getCourseId()
-
 					if (Role.equals("STUDENT")) {
 						role = studentRole;
-						//System.out.println("Studeult role "+role.getName());
 					} else if (Role.equals("Instructor")) {
 						role = leaderRole;
-						//System.out.println("Leader role "+role.getName());
 					} else if (Role.equals("Teaching_Assistant")) {
 						role = TutorRole;
-						//System.out.println("Leader role "+role.getName());
 					}	else {
 						role = studentRole; //default student
 					}
-					
 
 					// create a project user
 					ProjUser pu = new ProjUser(proj, user, role);
-					System.out.println("Assigned pu and be addMember");
 					proj.addMember(pu);
-					System.out.println("Assigned pu and be addMember 2");
-
-					
 					saveflag += 1;
 
 					if (Role.equals("Instructor") || Role.equals("Teaching_Assistant") ) {
 						userDAO.save(user);
 						saveflag = 0;
 					}
-					/*
-					if (i1 % 100 == 99) {
-						DateTime t1 = DateTime.now();
-
-						//System.out.println("time taken for proj.addMember(pu) = " +Math.abs(t1.getMillis()-t0.getMillis()));
-						//userDAO.save(user);
-						//projDAO.saveProject(proj);
-						projDAO.immediateSaveProject(proj);
-
-						DateTime t2 = DateTime.now();
-						//System.out.println("afetr  saveProject.save(), time = " +Math.abs(t2.getMillis()-t1.getMillis()));
-					}
-					*/
 				} catch (Exception e) {
 					System.out.println(USERNAME+" : addMember exception:"+e);
 				}
-				
+			}
+			if (saveflag > 0) {
+				DateTime t1 = DateTime.now();
+				projDAO.immediateSaveProject(proj);
+				DateTime t2 = DateTime.now();
+				System.out.println("afetr  projDAO.immediateSaveProject(proj), time = " +Math.abs(t2.getMillis()-t1.getMillis()));
+				return false;
 			}
 		}
-		
-		//System.out.println("====================== proj = "+proj.getCourseId()+", saveflag = "+saveflag);
-		if (saveflag > 0) {
-			DateTime t1 = DateTime.now();
-
-			projDAO.immediateSaveProject(proj);
-			DateTime t2 = DateTime.now();
-
-			//System.out.println("afetr  projDAO.immediateSaveProject(proj), time = " +Math.abs(t2.getMillis()-t1.getMillis()));
-
-			//userDAO.save(user);
-			return false;
-		}
 		return true;
-
 	}
 	
 	@CommitAfter
@@ -768,11 +768,7 @@ public class RunTaskService {
 	System.out.println("eUreaka DataSync...");
 	
 	try {
-
-
 		String fileName = Config.getString("QScheduler.ImportUser.eureka_enrol");
-			
-		
 		int year = LocalDate.now().getYear();
 		int month = LocalDate.now().getMonthOfYear();
 		
@@ -791,20 +787,7 @@ public class RunTaskService {
 			 term_current = y+"S2";
 		}
 		System.out.println("term_past1 = "+term_past1+",  term_current = "+term_current);
-		//////////////////////////////////
-		/*
-		List<String> lines = Collections.emptyList(); 
-		try { 
-			lines = Files.readAllLines(Paths.get(fileName), StandardCharsets.UTF_8);
-			
-		} catch (FileNotFoundException ex){
-				logger.error("Cannot find Users file to import. "+fileName);
-		} catch (IOException e) { 
 
-			// do something 
-			e.printStackTrace(); 
-		}
-		*/
 		////////////////////////////
 		String  schoolToSearch = "(NBS)";
 		String  past1termToSearch = term_past1.toString();
@@ -822,66 +805,36 @@ public class RunTaskService {
 		List<String> ArrCourseids = new ArrayList<String>();	
 
 		for (String line : enrolmatchedlines) {
-			//if (line.contains(past1termToSearch) || line.contains(currenttermToSearch)) {
 			String[]  arrOfStr = line.split("\\|",-2);
 			String COURSE_ID = arrOfStr[9];
-			
-			//if (ArrCourseids.size() == 0)
-			//	ArrCourseids.add(COURSE_ID);
-
-			//for(String str: ArrCourseids) {
-				//System.out.println("str = "+str);
-				/*
-				if(str.trim().contains(COURSE_ID)) { // || (str.trim().contains(COURSE_ID) && ArrCourseids.size() ==1)
-					System.out.println("IF "+", str = "+str+", COURSE_ID =  "+COURSE_ID+ ", str.trim().contains(COURSE_ID) = "+str.trim().contains(COURSE_ID));
-					break;
-				} else {
-					System.out.println("else "+", str = "+str+", COURSE_ID =  "+COURSE_ID+ ", str.trim().contains(COURSE_ID) = "+str.trim().contains(COURSE_ID));
-				 */
 				
-					//if (ArrCourseids.stream().anyMatch(str->str.trim().equals(COURSE_ID ))) {
 			if (!ArrCourseids.contains(COURSE_ID)) {
-
 					ArrCourseids.add(COURSE_ID);
 					//USERNAME|CAMPUS|FULLNAME|EMAIL|USER_ROLE|COURSE_NAME|COURSE_CODE|ACAD_YR|SEM|COURSE_ID
 					//SONAM002|NTU|SONAM SAHNI|SONAM002@ntu.edu.sg|STUDENT|B6027 - OPERATIONS (MBA) 2018/2019 Trimester 2 (Group 1)|B6027|2018|2|18S2-B6027-MBA-1|CoB (NBS)
-					//String USERNAME = arrOfStr[0];
 
 					String desc;
 					String schoolname = "NBS";
 					String groupId = null;
 					String keywords = null;
 					String remarks = "created by datasync";
-
-					//String campus = arrOfStr[1];
-					//String FULLNAME = arrOfStr[2];
-					//String EMAIL = arrOfStr[3];
-					//String USER_ROLE = arrOfStr[4];
 					String COURSE_NAME =  arrOfStr[5];
 					String COURSE_CODE = arrOfStr[6];
 					String ACAD_YR = arrOfStr[7];
 					String SEM = arrOfStr[8];
 
-
-
-					//String school = arrOfStr[10];
 					desc = COURSE_NAME;
 					int ACADYR =   Integer(ACAD_YR) % 100;
 					String term = ACADYR+SEM;
-					//System.out.println("term = "+term);
 
-					//enrollist.add(line.split("\\|",-2));
 					Date startdate = new Date();
 					Date enddate  = DateUtils.addMonths(new Date(), 12);
-					//System.out.println("before getProjectsByCourseId() for "+COURSE_ID);
 					List<Project> p1 = projDAO.getProjectsByCourseId(COURSE_ID);
-					//System.out.println("after getProjectsByCourseId() for "+COURSE_ID+", ArrCourseids.size() = "+ArrCourseids.size());
 
 					if (p1.size() <= 0) {
-						//System.out.println("creating project , p1.size() = "+p1.size());
 
 						count++; 
-						Project p = addMyProject(COURSE_ID,COURSE_ID,COURSE_CODE,desc,schoolname,startdate,enddate,groupId,term,keywords, remarks);
+						addMyProject(COURSE_ID,COURSE_ID,COURSE_CODE,desc,schoolname,startdate,enddate,groupId,term,keywords, remarks);
 						//System.out.println("p.courseId = "+p.getCourseId());
 					} else {
 						//System.out.println("existing project , p1.size() = "+p1.size()+", COURSE_ID="+COURSE_ID);
@@ -895,32 +848,19 @@ public class RunTaskService {
 		System.out.println(count +" projects created");
 		//Create new projects based on if it not existing in eUreka 
 	    
-		System.out.println("before the getAllProjects()");
-
 		List<Project> projList = projDAO.getAllProjects(0, 10000);
-		System.out.println("after the getAllProjects()");
 
 		List<Project> projList_filered = new ArrayList<Project>();
-		
-		//CharSequence  stringToSearch = null;
 		String  stringToSearch = null;
-
 		String   teststr = null;
 		
 		for(int i=0; i < projList.size(); i++) {
 			
 			try {
-			Project proj = projList.get(i);
-			String proj_id = proj.getId();
-			//System.out.println("i="+i);
-			
-			//CharSequence stringToSearch = "18S2-AD2101-SEM-2";
-
+			Project proj = projList.get(i);			
 			teststr = proj.getCourseId();
 			
 			List<Integer> exceptType = new ArrayList<Integer>();	
-			
-			//System.out.println(" status = "+proj.getStatus().getId());
 			
 			//32768 active 32768
 			if (proj.getStatus().getId() != 32768) { // Non-active projects skip (32768 is the active project status)
@@ -939,48 +879,27 @@ public class RunTaskService {
 				continue;
 
 			} else {
-				//System.out.println("Project not going to use");
 
-				//continue;
-				//System.out.println("Project type going to use");
-
-				//System.out.println("project filtered"+projList_filered.size());
 			}
 
 			if (teststr != null && (teststr.contains(term_current) || teststr.contains(term_past1) || teststr.contains(term_past2))) {
-				//System.out.println("Course ID>>"+proj.getCourseId() +" Display Name>>"+proj.getDisplayName());
 				stringToSearch = proj.getCourseId();
-				//System.out.println("proj.getCourseId() = "+proj.getCourseId());
 				
 				projList_filered.add(proj);
-				//System.out.println("teststr = "+teststr);
 			} else
 				continue;
 
 			} catch(Exception e) {
 				logger.error(e.getMessage());
-			}			
-
-			/*
-			CharSequence  stringToSearch = proj.getCourseId();
-			//CharSequence stringToSearch = "18S2-AD2101-SEM-2";
-			CharSequence term_filer = "18S1";
-			String   teststr = proj.getCourseId();
-			if (teststr != null && teststr.contains(term_filer)) {
-				//System.out.println("Course ID>>"+proj.getCourseId() +" Display Name>>"+proj.getDisplayName());
-				stringToSearch = proj.getCourseId();
-				//stringToSearch= "18S1-AC3102-SEM-6";
-
-			} else
-				continue;
-				*/
-			
+			}
 		}
 		System.out.println("project full = "+projList.size());
 		projList.clear(); // free up memory
 		System.out.println("project filtered = "+projList_filered.size());
 		
 		DateTime t11 = DateTime.now();
+		//List <User> ulist_db = userDAO.getUsersByUsernames("'tkanesh','gbgoh'");
+		//System.out.println("1033 ulist_db.size() = "+ulist_db.size());
 
 		ProjRole studentRole = projRoleDAO.getRoleByName(PredefinedNames.PROJROLE_STUDENT);
 		ProjRole leaderRole = projRoleDAO.getRoleByName(PredefinedNames.PROJROLE_LEADER);
@@ -988,62 +907,16 @@ public class RunTaskService {
 
 		DateTime t21 = DateTime.now();
 		
-		System.out.println("addUserToProj:: projRoleDAO.getRoleByName, time = " +Math.abs(t21.getMillis()-t11.getMillis()));
-		for(int i=0; i < projList_filered.size(); i++) {
+		System.out.println("projRoleDAO.getRoleByName, time = " +Math.abs(t21.getMillis()-t11.getMillis()));
+
+		for (int i=0; i < projList_filered.size(); i++) {
 
 			Project proj = projList_filered.get(i);
-			//System.out.println("No: of Projects="+projList.size());
 			String proj_id = proj.getId();
-			//System.out.println("ProjID="+proj_id);
-			//System.out.println("ProjID="+proj_id+"  CourseId ="+proj.getCourseId());
 			stringToSearch = proj.getCourseId()+"\\|";
-			//CharSequence stringToSearch = "18S2-AD2101-SEM-2";
-			
-			/*
-			 String   teststr = proj.getCourseId();
-			
-			CharSequence term_filer = "18S1";
-			if (teststr != null && teststr.contains(term_filer)) {
-				//System.out.println("Course ID>>"+proj.getCourseId() +" Display Name>>"+proj.getDisplayName());
-				stringToSearch = proj.getCourseId();
-				//stringToSearch= "18S1-AC3102-SEM-6";
-
-			} else
-				continue;
-			 */
-			
-
-			//System.out.println("lines = "+lines.size());
 
 			List<Object> userlist = new ArrayList<Object>();
-			//List<String>  matchedlines = enrolmatchedlines; //findInFile(Paths.get(fileName),stringToSearch, 1);
 			List<String>  matchedlines = findInFile(Paths.get(fileName),stringToSearch,"","", 1);
-			//System.out.println("matchedlines.size(): "+matchedlines.size());
-
-			//System.out.println("ProjID="+proj_id+"  CourseId = "+proj.getCourseId() + ",  DsiplayName = "+proj.getDisplayName() + ", enrolment nos = "+matchedlines.size());
-
-			/*
- 			Iterator<String> itr = lines.iterator();
-
-			//Reading file lines one by one
-			while (itr.hasNext()) {
-				count1++;
-
-				String line = itr.next();
-				if (stringToSearch != null && line.contains(stringToSearch) ) {
-
-					//String[] arrOfStr = line.split("\\|",-2);
-					
-					//System.out.println("matches : "+itr.next());
-					userlist.add(line.split("\\|",-2));
-					count++;
-				} else {
-					//System.out.println("not matches : "+itr.next());
-					continue;
-				}
-				count1++;
-			}
-			*/
 			
 			for (String line : matchedlines) {
 				userlist.add(line.split("\\|",-2));
@@ -1052,45 +925,67 @@ public class RunTaskService {
 			System.out.println("userlist.size(): "+userlist.size() +", Calling addUserToProj() ....");
 			if (userlist.size() > 0) {
 				DateTime t1 = DateTime.now();
-				//System.out.println("Before calling addUserToProj");
+				System.out.println("Before calling addUserToProj for "+proj.getCourseId());
 
 				addUserToProj(proj,userlist,studentRole,leaderRole,TutorRole);
 				DateTime t2 = DateTime.now();
 
 				System.out.println("afetr  addUserToProj(proj,userlist) for "+proj.getCourseId() +", time = " +Math.abs(t2.getMillis()-t1.getMillis()));
+				
+				// Uncomment below removeUserFromProj() after performance improved 2019-12-06
 //				t1 = DateTime.now();
 //
 //				removeUserFromProj(proj,userlist);
 //				t2 = DateTime.now();
 //
 //				System.out.println("After removeUserFromProj(proj,userlist) for "+proj.getCourseId() +", time = " +Math.abs(t2.getMillis()-t1.getMillis())+", members after removal = "+proj.getMembers().size());
-
 			}
 			userlist.clear();
 			//System.out.println("addUserToProj & removeUserFromProj completed for "+proj.getCourseId());
-
-			/*
-			DateTime t1 = DateTime.now();			
-			System.out.println("before userDAO.save()");		
-			userDAO.save(user);
-			DateTime t2 = DateTime.now();
-
-			System.out.println("afetr  userDAO.save(), time = " +Math.abs(t2.getMillis()-t1.getMillis()));
-			*/
-			/*
-			 * User u = pu.getUser();
-				curProj.removeMember(pu);
-				userDAO.save(u);
-			 */
 		}
 		
+		for (int i=0; i < projList_filered.size(); i++) {
+
+			Project proj = projList_filered.get(i);
+			String proj_id = proj.getId();
+			stringToSearch = proj.getCourseId()+"\\|";
+
+			List<Object> userlist = new ArrayList<Object>();
+			//List<String>  matchedlines = enrolmatchedlines; //findInFile(Paths.get(fileName),stringToSearch, 1);
+			List<String>  matchedlines = findInFile(Paths.get(fileName),stringToSearch,"","", 1);
+			
+			for (String line : matchedlines) {
+				userlist.add(line.split("\\|",-2));
+			}
+			
+			System.out.println("userlist.size(): "+userlist.size() +", Calling addUserToProj() ....");
+			if (userlist.size() > 0) {
+				DateTime t1 = DateTime.now();
+				System.out.println("Before calling addUserToProj for "+proj.getCourseId());
+
+				addUserToProj(proj,userlist,studentRole,leaderRole,TutorRole);
+				DateTime t2 = DateTime.now();
+
+				System.out.println("afetr  addUserToProj(proj,userlist) for "+proj.getCourseId() +", time = " +Math.abs(t2.getMillis()-t1.getMillis()));
+				
+				// Uncomment below removeUserFromProj() after performance improved 2019-12-06
+//				t1 = DateTime.now();
+//
+//				removeUserFromProj(proj,userlist);
+//				t2 = DateTime.now();
+//
+//				System.out.println("After removeUserFromProj(proj,userlist) for "+proj.getCourseId() +", time = " +Math.abs(t2.getMillis()-t1.getMillis())+", members after removal = "+proj.getMembers().size());
+			}
+			userlist.clear();
+			//System.out.println("addUserToProj & removeUserFromProj completed for "+proj.getCourseId());
+		}
 		System.out.print("All filtered projects enrolment have been synced.");
 
 	} catch (NumberFormatException ex) {
 		appState.recordErrorMsg("Invalid Data type, " + ex.getMessage());
 
 		logger.error(ex.getMessage());
-/*
+		/*
 		in.close();
 		savedFile.delete();
 		if(count>0){
@@ -1106,7 +1001,7 @@ public class RunTaskService {
 		//appState.recordErrorMsg(ex.getMessage());
 
 		logger.error(ex.getMessage());
-/*
+		/*
 		in.close();
 		savedFile.delete();
 		
@@ -1120,7 +1015,6 @@ public class RunTaskService {
 		*/
 	}catch(Exception e) {
 		appState.recordErrorMsg(e.getMessage());
-
 		logger.error(e.getMessage());
 	} finally {
 	    //Session session;
@@ -1133,7 +1027,6 @@ public class RunTaskService {
 	}
 	*/
 	return null;
-
 }
 	private int Integer(String aCAD_YR) {
 		// TODO Auto-generated method stub
@@ -1142,12 +1035,10 @@ public class RunTaskService {
 
 	private void isCreateMode() {
 		// TODO Auto-generated method stub
-		
 	}
 
 	private void User() {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@RestfulWebMethod 

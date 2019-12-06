@@ -24,6 +24,7 @@ public interface UserDAO {
   	
   	void delete(User user) throws ConstraintViolationException ;
   	User getUserByUsername(String username);
+  	List<User> getUsersByUsernames(String username);
   	boolean isUsernameExist(String username);
   	User getUserByExKey(String exKey);
   	List<User> getUserByUsernameOrEmail(String usernameEmail);
