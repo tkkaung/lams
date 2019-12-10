@@ -66,10 +66,13 @@ public class UserDAOImpl implements UserDAO {
 	}
 	
 	public List<User>  getUsersByUsernames(String usernames) { // usernames = 'username1','username' by Kanesh
+		 //System.out.println("inside UserDAOImpl usernames = "+usernames);
 		
 		 if(usernames==null || usernames.isEmpty() || usernames.equals("."))
 		 
 			return null;
+		
+
 		/*
 		String sqlNative = "select username from tbl_user where username ='" +username +"' ";
 		Query qNative = session.createQuery(sqlNative);

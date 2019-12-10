@@ -41,8 +41,10 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -428,10 +430,14 @@ public class RunTaskService {
 			
 			DateTime t2 = DateTime.now();
 			long milliseconds = Math.abs(t2.getMillis()-t1.getMillis());
-			long mins = milliseconds/1000/60;
-			long hrs = mins/60;
-
-			System.out.println("Time taken to run DataSync() = " +milliseconds/1000 + " seconds => "+mins+" mins, => "+hrs+" hours");
+			long hrs = milliseconds/1000/60/60;
+			long  mins = (milliseconds/1000/60)%60;
+			long  secs = (milliseconds/1000);
+			if (secs > 60) {
+				secs = secs%60;
+				//mins = secs/60;
+			}
+			System.out.println("437 Time taken to run DataSync() time = "+milliseconds+" milliseconds, "+hrs+" hours: "+mins+" mins : "+secs +" secs" );
 			
 			if(br !=null){
 				br.close();
@@ -576,11 +582,10 @@ public class RunTaskService {
 			}
 		}
 		
-		System.out.println("Project creating... (save)");
 		projDAO.immediateSaveProject(myproj);
 		//projDAO.saveProject(myproj);
 
-		System.out.println("Project created");
+		//System.out.println("Project created");
 		
 		} catch(Exception e) {
 			logger.error(e.getMessage());
@@ -659,12 +664,13 @@ public class RunTaskService {
 		return true;
 	}
 	
-	public String getUsernamesAsString(Project proj, List<Object> userlist) {
+	public List getUsernamesAsString(Project proj, List<Object> userlist) {
 		
 		List <String> ulist = new ArrayList<String>();
 		List <String> rlist = new ArrayList<String>();
 		String usernames = "";
-		
+		List list = new ArrayList();
+
 		for(int i1 = 0; i1 < userlist.size(); i1++) {
 			String[]  arrOfStr = (String[]) userlist.get(i1); 	//USERNAME|CAMPUS|FULLNAME|EMAIL|USER_ROLE|COURSE_NAME|COURSE_CODE|ACAD_YR|SEM|COURSE_ID
 
@@ -673,9 +679,12 @@ public class RunTaskService {
 
 			if (!proj.hasMember(USERNAME)) {
 				// if user is not member to this project, add it here
-				ulist.add(USERNAME);
-				rlist.add(Role);
-
+				if (!ulist.contains(USERNAME)) {
+					ulist.add(USERNAME);
+					rlist.add(Role);
+				} else
+					continue;
+				
 				if (usernames.equals("") || usernames.isEmpty()) {
 					usernames = "'"+USERNAME+"'";
 				} else {
@@ -683,51 +692,50 @@ public class RunTaskService {
 				}	
 			}
 		}
-		return usernames;
+		list.add(ulist);
+		list.add(rlist);
+		return list;
 	}
 
 	@CommitAfter
-	public boolean addUserToProj(Project proj, List<Object> userlist,ProjRole studentRole,ProjRole leaderRole, ProjRole TutorRole) {
+	public int addUserToProj(Project proj, List<User> ulist_db,ProjRole studentRole,ProjRole leaderRole, ProjRole TutorRole, List<String> rlist) {
 		//System.out.println("inside 0 addUserToProj ");
 		
         int saveflag =0;
 		ProjRole role = null;
 		
 		List <String> ulist = new ArrayList<String>();
-		List <String> rlist = new ArrayList<String>();
-		String usernames = getUsernamesAsString(proj, userlist);
+		//List <String> rlist = new ArrayList<String>();
+		//String usernames = getUsernamesAsString(proj, userlist);
 		
 //		FilterType filterType = null;
 //		String searchText = null;
 //		UserSearchableField searchIn = UserSearchableField.username;
 //		Boolean enabled =true; School school= null;
 //		Integer firstResult=0; Integer maxResult=1;
-		List <User> ulist_db = new ArrayList<User>();
-		DateTime  t11 = DateTime.now();
+		//List <User> ulist_db = new ArrayList<User>();
 
-		if (!usernames.isEmpty()) {
-			ulist_db = userDAO.getUsersByUsernames(usernames);  // usernames = 'username1','username' by Kanesh
-			/*
-			for (int u=0; u < ulist.size(); u++) {
-				String uname= ulist.get(u);
-				List<User> ul = userDAO.searchUsers(FilterType.EXACT_WORD,uname,searchIn,enabled,school,firstResult,maxResult);
-				System.out.println("710 :  searchUsers  "+uname);
-				System.out.println("711 :  searchUsers ul.size() =  "+ul.size());
+		//System.out.println("710 ulist_db.size() = "+ulist_db.size()+", rlist.size() = "+rlist.size());
+		
+		if (ulist_db != null && ulist_db.size() > 0 && ulist_db.size()==rlist.size()) {
+			//ulist_db = userDAO.getUsersByUsernames(usernames);  // usernames = 'username1','username' by Kanesh
+			//System.out.println("713");
 
-		 		ulist_db.addAll(ul);
-			}
-			 */
-			// create a user
-			DateTime t21 = DateTime.now();
-			System.out.println("715 ulist_db.size() = "+ulist_db.size()+", userDAO.getUsersByUsernames, time = " +Math.abs(t21.getMillis()-t11.getMillis()));
+			for (int l =0; l < ulist_db.size(); l++) {
+				//System.out.println("716");
 
-			for (int l =0; l<ulist_db.size(); l++) {
 				User user = ulist_db.get(l);
+				//System.out.println("722");
+				if (user == null) {
+					//System.out.println("User is null "+user);
+					continue;
+				}
+					
 				String Role = rlist.get(l);
-				String USERNAME = user.getUsername();
-				System.out.println(l+": 721 Debug :  Adding mbr to proj "+USERNAME); //+" displayname = "+user.getDisplayName()+", "+proj.getCourseId()
-
+				//System.out.println("725");
 				try {
+					String USERNAME = user.getUsername();
+					//System.out.println(l+": 728 Debug :  Adding mbr to proj "+USERNAME); //+" displayname = "+user.getDisplayName()+", "+proj.getCourseId()
 					if (Role.equals("STUDENT")) {
 						role = studentRole;
 					} else if (Role.equals("Instructor")) {
@@ -744,24 +752,50 @@ public class RunTaskService {
 					saveflag += 1;
 
 					if (Role.equals("Instructor") || Role.equals("Teaching_Assistant") ) {
-						userDAO.save(user);
+						//userDAO.save(user);
 						saveflag = 0;
 					}
 				} catch (Exception e) {
-					System.out.println(USERNAME+" : addMember exception:"+e);
+					//System.out.println("758 Error catch : addMember exception:"+e+", user = ");
+					continue;
 				}
 			}
+			/*
 			if (saveflag > 0) {
 				DateTime t1 = DateTime.now();
-				projDAO.immediateSaveProject(proj);
+				//projDAO.immediateSaveProject(proj);
 				DateTime t2 = DateTime.now();
-				System.out.println("afetr  projDAO.immediateSaveProject(proj), time = " +Math.abs(t2.getMillis()-t1.getMillis()));
+				System.out.println("afetr  projDAO.immediateSaveProject(proj), time = " +Math.abs(t2.getMillis()-t1.getMillis())+" millisecond");
 				return false;
 			}
+			*/
+		} else {
+			//System.out.println("######## 769 list mismatched for "+proj.getCourseId()+", ulist_db.size = "+ulist_db.size()+", rlist.size= "+rlist.size());
 		}
-		return true;
+		return saveflag;
 	}
 	
+	// Function to remove duplicates from an ArrayList 
+    public static <T> ArrayList<T> removeDuplicates(ArrayList<T> list) 
+    { 
+  
+        // Create a new ArrayList 
+        ArrayList<T> newList = new ArrayList<T>(); 
+  
+        // Traverse through the first list 
+        for (T element : list) { 
+  
+            // If this element is not present in newList 
+            // then add it 
+            if (!newList.contains(element)) { 
+  
+                newList.add(element); 
+            } 
+        } 
+  
+        // return the new list 
+        return newList; 
+    } 
 	@CommitAfter
 	public Object DataSync() throws IOException {
 	//public Object onSuccessFromForm() throws IOException 
@@ -776,6 +810,7 @@ public class RunTaskService {
 		CharSequence term_past2 = null;
 		CharSequence term_past1 =  null;
 		CharSequence term_current = null;
+		
 		if (month >=1 && month <= 7) { //Jan -July
 			 term_past2 = y-1+"S1";
 			 term_past1 =  y-1+"S2";
@@ -801,8 +836,9 @@ public class RunTaskService {
 		
 		int count = 0;
 		//////////////////////////////////
-	    System.out.println("beginning of the matching term,enrolmatchedlines.size() =  "+enrolmatchedlines.size());
+	    System.out.println("beginning of the matching term, enrolmatchedlines.size() =  "+enrolmatchedlines.size()+" entries");
 		List<String> ArrCourseids = new ArrayList<String>();	
+		DateTime et1 = DateTime.now();
 
 		for (String line : enrolmatchedlines) {
 			String[]  arrOfStr = line.split("\\|",-2);
@@ -843,7 +879,9 @@ public class RunTaskService {
 					//System.out.println("completed project existence checking");
 			}
 		}
-		System.out.println("end of the matching term");
+		DateTime et2 = DateTime.now();
+		
+		System.out.println("end of the matching term, time taken = "+Math.abs(et2.getMillis()-et1.getMillis())/1000+" seconds");
 
 		System.out.println(count +" projects created");
 		//Create new projects based on if it not existing in eUreka 
@@ -893,93 +931,235 @@ public class RunTaskService {
 				logger.error(e.getMessage());
 			}
 		}
-		System.out.println("project full = "+projList.size());
+		System.out.println("924 project full = "+projList.size());
 		projList.clear(); // free up memory
-		System.out.println("project filtered = "+projList_filered.size());
+		System.out.println("926 project filtered = "+projList_filered.size());
 		
-		DateTime t11 = DateTime.now();
-		//List <User> ulist_db = userDAO.getUsersByUsernames("'tkanesh','gbgoh'");
-		//System.out.println("1033 ulist_db.size() = "+ulist_db.size());
+		String str_usernames = "";
+		List<Map> alluserlist = new ArrayList<Map>();
 
-		ProjRole studentRole = projRoleDAO.getRoleByName(PredefinedNames.PROJROLE_STUDENT);
-		ProjRole leaderRole = projRoleDAO.getRoleByName(PredefinedNames.PROJROLE_LEADER);
-		ProjRole TutorRole = projRoleDAO.getRoleByName(PredefinedNames.PROJROLE_SCHOOL_TUTOR);
 
-		DateTime t21 = DateTime.now();
-		
-		System.out.println("projRoleDAO.getRoleByName, time = " +Math.abs(t21.getMillis()-t11.getMillis()));
+		List<User> all_ulist_db = new ArrayList<User>();
+		ArrayList<String> all_ulist = new ArrayList<String>();
+		//########################
+		Map<String, List <String> > all_ulist_map = new HashMap<String, List<String> >();
+		Map<String, List <String> > all_rlist_map = new HashMap<String, List<String> >();
 
-		for (int i=0; i < projList_filered.size(); i++) {
+		DateTime st1 = DateTime.now();
+
+		for (int i=0; i < projList_filered.size(); i++) {  //projList_filered 1
 
 			Project proj = projList_filered.get(i);
-			String proj_id = proj.getId();
 			stringToSearch = proj.getCourseId()+"\\|";
 
 			List<Object> userlist = new ArrayList<Object>();
+
 			List<String>  matchedlines = findInFile(Paths.get(fileName),stringToSearch,"","", 1);
 			
 			for (String line : matchedlines) {
 				userlist.add(line.split("\\|",-2));
 			}
-			
-			System.out.println("userlist.size(): "+userlist.size() +", Calling addUserToProj() ....");
+			//System.out.println("userlist.size(): "+userlist.size() +", Calling addUserToProj() ....");
 			if (userlist.size() > 0) {
-				DateTime t1 = DateTime.now();
-				System.out.println("Before calling addUserToProj for "+proj.getCourseId());
+				List list = getUsernamesAsString(proj, userlist);
+				List<String> ulist = (List<String>) list.get(0);
+				List<String> rlist = (List<String>) list.get(1);
+								
+				//System.out.println("962 i = "+i+", ulist_db.size() = "+ulist.size()+", rlist.size() = "+rlist.size());
 
-				addUserToProj(proj,userlist,studentRole,leaderRole,TutorRole);
-				DateTime t2 = DateTime.now();
+				if (ulist.size() > 0 && rlist.size() > 0 && ulist.size() == rlist.size()) {
+					if (all_ulist.size() == 0)
+						all_ulist = (ArrayList<String>) ulist;
+					else
+						all_ulist.addAll(ulist);
+					all_ulist = removeDuplicates(all_ulist);
 
-				System.out.println("afetr  addUserToProj(proj,userlist) for "+proj.getCourseId() +", time = " +Math.abs(t2.getMillis()-t1.getMillis()));
-				
-				// Uncomment below removeUserFromProj() after performance improved 2019-12-06
-//				t1 = DateTime.now();
-//
-//				removeUserFromProj(proj,userlist);
-//				t2 = DateTime.now();
-//
-//				System.out.println("After removeUserFromProj(proj,userlist) for "+proj.getCourseId() +", time = " +Math.abs(t2.getMillis()-t1.getMillis())+", members after removal = "+proj.getMembers().size());
+					all_ulist_map.put(proj.getCourseId(),ulist);
+					all_rlist_map.put(proj.getCourseId(),rlist);
+					//ulist.clear();
+					//rlist.clear();
+				}
+				//alluserlist.add(map);
+				//if (!unamestr.isEmpty()) {
+				//	str_usernames += ","+unamestr;
+					/*
+					if (!unamestr.isEmpty()) {
+						System.out.println("921 getUsersByUsernames calling, unamestr = "+unamestr);
+						List<User> ul = userDAO.getUsersByUsernames(unamestr);
+						System.out.println("923 ");
+
+						System.out.println("924 ul.size() = "+ul.size());
+						if (ul.size() >0) 
+						if (all_ulist_db.size() == 0)
+							all_ulist_db = ul;
+						else
+							all_ulist_db.addAll(ul);
+						System.out.println("925 ");
+						System.out.println("932 all_ulist_db.size() = "+all_ulist_db.size());
+
+						//break;
+					}
+					*/
+				//}
 			}
 			userlist.clear();
-			//System.out.println("addUserToProj & removeUserFromProj completed for "+proj.getCourseId());
 		}
+		/*
+		for (Map.Entry<String, List< String>> entry : all_ulist_map.entrySet()) {
+			String k = entry.getKey();
+            List <String> v = entry.getValue();
+            
+            System.out.println("Key: " + k + ", Value: " + v);
+		}*/
 		
-		for (int i=0; i < projList_filered.size(); i++) {
-
-			Project proj = projList_filered.get(i);
-			String proj_id = proj.getId();
-			stringToSearch = proj.getCourseId()+"\\|";
-
-			List<Object> userlist = new ArrayList<Object>();
-			//List<String>  matchedlines = enrolmatchedlines; //findInFile(Paths.get(fileName),stringToSearch, 1);
-			List<String>  matchedlines = findInFile(Paths.get(fileName),stringToSearch,"","", 1);
+		DateTime st2 = DateTime.now();
+		System.out.println("1002 afetr  projList_filered 1, time = " +Math.abs(st2.getMillis()-st1.getMillis()) +" milliseconds");
+		//###########################
+		
+		//System.out.println("1005 all_ulist_map created all_ulist.size() = "+all_ulist.size()+", all_ulist_map.size = "+all_ulist_map.size()+", all_rlist_map.size = "+all_rlist_map.size());
+		for (int s=0; s < all_ulist.size(); s++) {
+			String USERNAME = all_ulist.get(s);
+			if ( USERNAME.equals(null)|| USERNAME.equals("") || USERNAME.isEmpty())
+				continue;
 			
-			for (String line : matchedlines) {
-				userlist.add(line.split("\\|",-2));
+			if (str_usernames.equals(null)|| str_usernames.equals("") || str_usernames.isEmpty()) {
+				str_usernames = "'"+USERNAME+"'";
+			} else {
+				str_usernames += ", '"+USERNAME+"'";
 			}
-			
-			System.out.println("userlist.size(): "+userlist.size() +", Calling addUserToProj() ....");
-			if (userlist.size() > 0) {
-				DateTime t1 = DateTime.now();
-				System.out.println("Before calling addUserToProj for "+proj.getCourseId());
-
-				addUserToProj(proj,userlist,studentRole,leaderRole,TutorRole);
-				DateTime t2 = DateTime.now();
-
-				System.out.println("afetr  addUserToProj(proj,userlist) for "+proj.getCourseId() +", time = " +Math.abs(t2.getMillis()-t1.getMillis()));
-				
-				// Uncomment below removeUserFromProj() after performance improved 2019-12-06
-//				t1 = DateTime.now();
-//
-//				removeUserFromProj(proj,userlist);
-//				t2 = DateTime.now();
-//
-//				System.out.println("After removeUserFromProj(proj,userlist) for "+proj.getCourseId() +", time = " +Math.abs(t2.getMillis()-t1.getMillis())+", members after removal = "+proj.getMembers().size());
-			}
-			userlist.clear();
-			//System.out.println("addUserToProj & removeUserFromProj completed for "+proj.getCourseId());
 		}
-		System.out.print("All filtered projects enrolment have been synced.");
+		//System.out.println("1017 str_usernames created str_usernames = "+str_usernames);
+
+		List<User> ulist_db = new ArrayList<User>();
+
+		DateTime t111 = DateTime.now();
+
+		if (!str_usernames.isEmpty()) {
+			//System.out.println("1023 getUsersByUsernames calling str_usernames= "+str_usernames);
+
+			all_ulist_db = userDAO.getUsersByUsernames(str_usernames);
+		}
+
+		DateTime t211 = DateTime.now();
+		System.out.println("1030 afetr  getUsersByUsernames(proj,userlist) all_ulist_db.size() = "+all_ulist_db.size()+", time = " +(Math.abs(t211.getMillis()-t111.getMillis()))/1000 +" seconds");
+
+		Map<String, User > all_username_user_map = new HashMap<String, User >();
+
+		for (int d=0; d < all_ulist_db.size(); d++) {
+			User user = all_ulist_db.get(d);
+			if (all_username_user_map.get(user.getUsername()) == null && user != null) 
+				all_username_user_map.put(user.getUsername(),user);
+		}
+		//System.out.println("1038 all_username_user_map created size = "+all_username_user_map.size());
+
+		all_ulist_db.clear();
+		////////////////////
+		if (all_username_user_map.size() > 0) {
+			System.out.println("1043 Going to add enrollment for filered projects");
+
+			DateTime t11 = DateTime.now();
+			//List <User> ulist_db = userDAO.getUsersByUsernames("'tkanesh','gbgoh'");
+			//System.out.println("1033 ulist_db.size() = "+ulist_db.size());
+
+			ProjRole studentRole = projRoleDAO.getRoleByName(PredefinedNames.PROJROLE_STUDENT);
+			ProjRole leaderRole = projRoleDAO.getRoleByName(PredefinedNames.PROJROLE_LEADER);
+			ProjRole TutorRole = projRoleDAO.getRoleByName(PredefinedNames.PROJROLE_SCHOOL_TUTOR);
+
+			DateTime t21 = DateTime.now();
+			System.out.println("1055 projRoleDAO.getRoleByName, time = " +Math.abs(t21.getMillis()-t11.getMillis())/1000 +" seconds");
+			Project proj = null; // used after end of the for loop to save project
+			//User user = null;// used after end of the for loop to save project user
+			count = 0;
+			for (int i=0; i < projList_filered.size(); i++) {  //projList_filered 2
+				//if (i > 10)
+				//	break;
+				try {
+					//System.out.println("1062  i= "+i+", projList_filered.get(i) = "+projList_filered.get(i).getCourseId());
+
+					proj = projList_filered.get(i);
+					//System.out.println("1065 i= "+i);
+					stringToSearch = proj.getCourseId()+"\\|";
+					//System.out.println("1067 i= "+i);
+
+					List<Object> userlist = new ArrayList<Object>();
+					/*
+					//List<String>  matchedlines = enrolmatchedlines; //findInFile(Paths.get(fileName),stringToSearch, 1);
+					List<String>  matchedlines = findInFile(Paths.get(fileName),stringToSearch,"","", 1);
+
+					for (String line : matchedlines) {
+						userlist.add(line.split("\\|",-2));
+					}
+					 */
+					//System.out.println("1080 , all_ulist_map.size = "+all_ulist_map.size()+", all_rlist_map.size = "+all_rlist_map.size());
+
+					List<String> ulist = all_ulist_map.get(proj.getCourseId());	//System.out.println("1077 i= "+i);
+					//System.out.println("1083 ulist = "+ulist);
+					//System.out.println("1084 ulist.listIterator() = "+ulist.listIterator());
+
+					List<String> rlist = all_rlist_map.get(proj.getCourseId());	//System.out.println("1079 i= "+i);
+
+					if (ulist == null || rlist == null) {
+						//System.out.println("ulist /rlist is null");
+						continue;
+					} else {
+						//System.out.println("1110 ulist.size() = "+ulist.size()+", rlist.size() = "+rlist.size());
+
+						//System.out.println("1109");
+					}
+					//for (Map.Entry<String> entry : ulist.entrySet()) {
+					ulist_db.clear();
+					
+					for (int ul = 0; ul< ulist.size(); ul++) {
+						//System.out.println("1117 ul ="+ul +"uname = "+ulist.get(ul));
+						User user = all_username_user_map.get(ulist.get(ul));
+						//for (int ud = 0; ud< ulist_db.size(); ud++) {
+
+						//	if (!ulist_db.get(ud).getUsername().equals(user.getUsername())) {
+								ulist_db.add(user);
+						//	}
+						//}
+					}
+					//System.out.println("1084 ulist_db is ready for = " +proj.getCourseId());
+
+					//System.out.println("1086 ulist_db.size(): "+ulist_db.size());
+
+					if (ulist_db.size() > 0 && ulist.size() == rlist.size()) {
+						DateTime t1 = DateTime.now();
+						//System.out.println("1090 Before calling addUserToProj for "+proj.getCourseId());
+
+						count += addUserToProj(proj,ulist_db,studentRole,leaderRole,TutorRole,rlist);
+						DateTime t2 = DateTime.now();
+
+						System.out.println("1095 afetr  addUserToProj(proj,userlist) for "+proj.getCourseId() +", time = " +Math.abs(t2.getMillis()-t1.getMillis())/1000  +" seconds");
+
+						// Uncomment below removeUserFromProj() after performance improved 2019-12-06
+						//				t1 = DateTime.now();
+						//
+						//				removeUserFromProj(proj,userlist);
+						//				t2 = DateTime.now();
+						//
+						//				System.out.println("After removeUserFromProj(proj,userlist) for "+proj.getCourseId() +", time = " +Math.abs(t2.getMillis()-t1.getMillis())+", members after removal = "+proj.getMembers().size());
+					}
+					userlist.clear();
+					
+					//System.out.println("addUserToProj & removeUserFromProj completed for "+proj.getCourseId());
+				} catch (Exception e) {
+					appState.recordErrorMsg(e.getMessage());
+					logger.error(e.getMessage());
+					System.out.println("1112: Error: "+e.getMessage());
+					continue;
+				}
+			}
+			if (proj != null && user != null) {
+				System.out.println("1150: Saving projects at last: ");
+
+				projDAO.immediateSaveProject(proj);
+				//userDAO.save(user);
+
+			}
+			all_username_user_map.clear();
+		}
+		System.out.println("1117 All filtered projects enrolment have been synced. Total of "+count+" project-user added.");
 
 	} catch (NumberFormatException ex) {
 		appState.recordErrorMsg("Invalid Data type, " + ex.getMessage());
@@ -1001,6 +1181,8 @@ public class RunTaskService {
 		//appState.recordErrorMsg(ex.getMessage());
 
 		logger.error(ex.getMessage());
+		System.out.println("1151: Error: "+ex.getMessage());
+
 		/*
 		in.close();
 		savedFile.delete();
@@ -1013,7 +1195,7 @@ public class RunTaskService {
 		}
 		return null;
 		*/
-	}catch(Exception e) {
+	} catch(Exception e) {
 		appState.recordErrorMsg(e.getMessage());
 		logger.error(e.getMessage());
 	} finally {
