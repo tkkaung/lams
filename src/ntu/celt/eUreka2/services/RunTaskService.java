@@ -611,20 +611,25 @@ public class RunTaskService {
 			for(int i1 = 0; i1 < userlist.size(); i1++) {
 				String[]  arrOfStr = (String[]) userlist.get(i1);	
 				snapshotlist.add(arrOfStr[0]);
+				System.out.println("arrOfStr[0] = "+arrOfStr[0]);
 			}
+			
 			for(ProjUser pu_db :members){
 				System.out.println("test 1");
 
 				String db_uname = pu_db.getUser().getUsername();
 				System.out.println("db_uname = "+	db_uname);
 
+					if (db_uname == null)
+						continue;
+					
 					if (!snapshotlist.contains(db_uname)) {
 						// if user is no longer  member to this project, remove it from project
 						
 						System.out.println(db_uname+"  is going to be removed");
-
-						//try {
-							User u = pu_db.getUser();
+						//User user = null;
+						try {
+							//user = pu_db.getUser();
 
 							proj.removeMember(pu_db); // FIXME: some errors with function
 							
@@ -632,7 +637,7 @@ public class RunTaskService {
 							//System.out.println("pu_db.getRole().getName() = "+ pu_db.getRole().getName());
 							System.out.println("test 2");
 
-							userDAO.save(u);
+							//userDAO.save(u);
 							
 							//saveflag += 1;
 							//projDAO.immediateSaveProject(proj);
@@ -640,11 +645,12 @@ public class RunTaskService {
 							System.out.println("test 3");
 
 
-//						} catch (Exception e) {
-//							System.out.println(db_uname+" : removeMember exception:"+e.getMessage());
-//						}
+						} catch (Exception e) {
+							System.out.println(db_uname+",  : removeMember exception:"+e.getMessage());
+							continue;
+						}
 						//break;
-					}					
+					}			
 				}
 			}
 		
@@ -964,7 +970,7 @@ public class RunTaskService {
 				List list = getUsernamesAsString(proj, userlist);
 				List<String> ulist = (List<String>) list.get(0);
 				List<String> rlist = (List<String>) list.get(1);
-								
+
 				//System.out.println("962 i = "+i+", ulist_db.size() = "+ulist.size()+", rlist.size() = "+rlist.size());
 
 				if (ulist.size() > 0 && rlist.size() > 0 && ulist.size() == rlist.size()) {
@@ -974,6 +980,9 @@ public class RunTaskService {
 						all_ulist.addAll(ulist);
 					all_ulist = removeDuplicates(all_ulist);
 
+					
+					
+					///////////////////
 					all_ulist_map.put(proj.getCourseId(),ulist);
 					all_rlist_map.put(proj.getCourseId(),rlist);
 					//ulist.clear();
@@ -1082,14 +1091,14 @@ public class RunTaskService {
 					//System.out.println("1067 i= "+i);
 
 					List<Object> userlist = new ArrayList<Object>();
-					/*
+
 					//List<String>  matchedlines = enrolmatchedlines; //findInFile(Paths.get(fileName),stringToSearch, 1);
 					List<String>  matchedlines = findInFile(Paths.get(fileName),stringToSearch,"","", 1);
 
 					for (String line : matchedlines) {
 						userlist.add(line.split("\\|",-2));
 					}
-					 */
+					 
 					//System.out.println("1080 , all_ulist_map.size = "+all_ulist_map.size()+", all_rlist_map.size = "+all_rlist_map.size());
 
 					List<String> ulist = all_ulist_map.get(proj.getCourseId());	//System.out.println("1077 i= "+i);
@@ -1110,7 +1119,7 @@ public class RunTaskService {
 					ulist_db.clear();
 					
 					for (int ul = 0; ul< ulist.size(); ul++) {
-						//System.out.println("1117 ul ="+ul +"uname = "+ulist.get(ul));
+						//System.out.println("1125 ulist.size()"+ulist.size()+", ul ="+ul +"uname = "+ulist.get(ul));
 						User user = all_username_user_map.get(ulist.get(ul));
 						//for (int ud = 0; ud< ulist_db.size(); ud++) {
 
@@ -1130,17 +1139,36 @@ public class RunTaskService {
 						count += addUserToProj(proj,ulist_db,studentRole,leaderRole,TutorRole,rlist);
 						DateTime t2 = DateTime.now();
 
-						System.out.println("1095 afetr  addUserToProj(proj,userlist) for "+proj.getCourseId() +", time = " +Math.abs(t2.getMillis()-t1.getMillis())/1000  +" seconds");
+						//System.out.println("1095 afetr  addUserToProj(proj,userlist) for "+proj.getCourseId() +", time = " +Math.abs(t2.getMillis()-t1.getMillis())/1000  +" seconds");
+						System.out.println("1139 before  removeUserFromProj(proj,ulist) for "+proj.getCourseId() +", ulist_db.size = " +ulist_db.size() +", ulist.size = " +ulist.size() +", rlist.size = " +rlist.size());
+						
+						///////// Debug 
+						if (proj.getCourseId().equals("19S1-BU8101-SEM-1"))
+							for(int i1 = 0; i1 < userlist.size(); i1++) {
+								String[] s = (String[])userlist.get(i1);
+								System.out.print("1147:19S1-BU8101-SEM-1 - "+s[0]+", ");	
+							}
+						System.out.println();
+						
+						if (proj.getCourseId().equals("119S1-OM9103"))
+							for(int i1 = 0; i1 < userlist.size(); i1++) {
+								String[] s = (String[])userlist.get(i1);
 
-						// Uncomment below removeUserFromProj() after performance improved 2019-12-06
-						//				t1 = DateTime.now();
+								System.out.print("1151: 19S1-OM9103 - "+s[0]+", ");	
+							}
+						System.out.println();
+
+						// Remove below after execution time reduced
+						//t1 = DateTime.now();
 						//
-						//				removeUserFromProj(proj,userlist);
-						//				t2 = DateTime.now();
+						//removeUserFromProj(proj,userlist);
+						//t2 = DateTime.now();
 						//
-						//				System.out.println("After removeUserFromProj(proj,userlist) for "+proj.getCourseId() +", time = " +Math.abs(t2.getMillis()-t1.getMillis())+", members after removal = "+proj.getMembers().size());
+						//System.out.println("After removeUserFromProj(proj,userlist) for "+proj.getCourseId() +", time = " +Math.abs(t2.getMillis()-t1.getMillis())+", members after removal = "+proj.getMembers().size());
 					}
 					userlist.clear();
+					ulist.clear();
+					rlist.clear();
 					
 					//System.out.println("addUserToProj & removeUserFromProj completed for "+proj.getCourseId());
 				} catch (Exception e) {
@@ -1150,7 +1178,7 @@ public class RunTaskService {
 					continue;
 				}
 			}
-			if (proj != null && user != null) {
+			if (proj != null) { // && user != null
 				System.out.println("1150: Saving projects at last: ");
 
 				projDAO.immediateSaveProject(proj);
