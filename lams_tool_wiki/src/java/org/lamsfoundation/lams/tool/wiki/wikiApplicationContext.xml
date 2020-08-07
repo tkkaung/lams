@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+	<!-- ========================= GENERAL DEFINITIONS ========================= -->
+
+	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
+
+	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
+	<bean id="wikiService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name="postInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+		<property name ="target">
+			<bean class="org.lamsfoundation.lams.tool.wiki.service.WikiService">
+				<property name="wikiSessionDAO"><ref bean="wikiSessionDAO"/></property>
+				<property name="wikiUserDAO"><ref bean="wikiUserDAO"/></property>
+				<property name="wikiDAO"><ref bean="wikiDAO"/></property>
+				<property name="wikiPageDAO"><ref bean="wikiPageDAO"/></property>
+				<property name="wikiPageContentDAO"><ref bean="wikiPageContentDAO"/></property>
+				<property name="toolService"><ref bean="lamsToolService"/></property>
+ 				<property name="wikiToolContentHandler"><ref bean="wikiToolContentHandler"/></property>
+		   		<property name="exportContentService"><ref bean="exportToolContentService"/></property> 				
+		   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
+		   		<property name="eventNotificationService"><ref bean="eventNotificationService"/></property> 
+		   		<property name="messageService"><ref bean="wikiMessageService"/></property>
+		   		<property name="lessonService"><ref bean="lessonService"/></property>
+		   		<property name="wikiOutputFactory"><ref bean="wikiOutputFactory"/></property>
+			</bean>
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="add*">PROPAGATION_REQUIRED</prop>
+            	<prop key="audit*">PROPAGATION_REQUIRED</prop>
+				<prop key="create*">PROPAGATION_REQUIRED</prop>
+				<prop key="compare*">PROPAGATION_REQUIRED</prop>
+				<prop key="copy*">PROPAGATION_REQUIRED</prop>
+				<prop key="delete*">PROPAGATION_REQUIRED</prop>
+                <prop key="export*">PROPAGATION_REQUIRED</prop>
+				<prop key="forceCompleteUser">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED</prop>
+				<prop key="import*">PROPAGATION_REQUIRED</prop>
+				<prop key="insert*">PROPAGATION_REQUIRED</prop>
+				<prop key="is*">PROPAGATION_REQUIRED</prop>
+				<prop key="leaveToolSession">PROPAGATION_REQUIRED</prop>
+				<prop key="mark*">PROPAGATION_REQUIRED</prop>
+				<prop key="restore*">PROPAGATION_REQUIRED</prop>
+				<prop key="retrieve*">PROPAGATION_REQUIRED</prop>
+				<prop key="remove*">PROPAGATION_REQUIRED</prop>
+                <prop key="resetDefineLater">PROPAGATION_REQUIRED</prop>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="setReflectiveData">PROPAGATION_REQUIRED</prop>		
+				<prop key="update*">PROPAGATION_REQUIRED</prop>		
+			</props>
+		</property>
+	</bean>
+	
+	<!-- OutputFactory -->
+	<bean id="wikiOutputFactory" class="org.lamsfoundation.lams.tool.wiki.service.WikiOutputFactory">  
+    	<property name="toolMessageService"><ref bean="wikiMessageService"/></property>  
+	</bean> 
+	
+	<!--  DAO classes -->
+	<bean id="wikiDAO" class="org.lamsfoundation.lams.tool.wiki.dao.hibernate.WikiDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>  
+	
+	<bean id="wikiPageDAO" class="org.lamsfoundation.lams.tool.wiki.dao.hibernate.WikiPageDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean> 
+	
+	<bean id="wikiPageContentDAO" class="org.lamsfoundation.lams.tool.wiki.dao.hibernate.WikiPageContentDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean> 
+
+	<bean id="wikiSessionDAO" class="org.lamsfoundation.lams.tool.wiki.dao.hibernate.WikiSessionDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	
+	<bean id="wikiUserDAO" class="org.lamsfoundation.lams.tool.wiki.dao.hibernate.WikiUserDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+
+	<bean id="wikiToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>wikiworkspace</value></property>
+		<property name="repositoryUser"><value>wiki</value></property>
+		<property name="repositoryId"><value>lams-ex</value></property>
+	</bean>
+	
+	<bean id="wikiMessageService" class="org.lamsfoundation.lams.util.MessageService" >
+		<property name="messageSource">
+			<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+				<property name="basename"><value>org.lamsfoundation.lams.tool.wiki.ApplicationResources</value></property>
+				<property name="defaultEncoding" value="UTF-8" />
+			</bean>
+		</property>										
+	</bean>
+
+</beans>

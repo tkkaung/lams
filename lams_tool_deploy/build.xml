@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="LAMS Tool Deploy Utility " basedir="." default="deploy">
+
+	<path id="libs.classpath">
+        <fileset dir="lib">
+            <include name="**/*.jar"/>
+        </fileset>
+		<fileset dir="../lams_build/deploy-tool/lib">
+			<include name="commons-*.jar" />
+			<include name="mysql-connector-java-*.jar" />
+			<include name="xstream-*.jar" />
+		</fileset>
+	</path>
+
+	<path id="product.classpath">
+		<pathelement location="${basedir}/build/classes/java" />
+		<path refid="libs.classpath" />
+	</path>
+
+	
+	<target name="_clean-dirs">
+		<!-- Internal target: Recreates dirs for compiled output files. -->
+		<echo>${ant.project.name}: Removing cache and build folders</echo>
+		<delete dir="build" quiet="true" />
+		
+		<echo>${ant.project.name}: Creating build dir structure</echo>
+		<mkdir dir="${basedir}/build/classes/java" />
+		<mkdir dir="${basedir}/build/lib" />
+	</target>
+
+	
+	<target name="_compile-java" depends="_clean-dirs">
+		<!-- Internal target: Compile Java sources. -->
+		<echo>${ant.project.name}: Compiling Java sources</echo>
+		<javac srcdir="src/java"
+			   compiler="modern"
+               source="11"
+			   target="11"
+               debug="on"
+			   includeantruntime="false"
+			   debuglevel="lines,vars,source"
+               classpathref="libs.classpath"
+               destdir="${basedir}/build/classes/java"
+		>
+        <compilerarg line="-encoding utf-8"/>
+        </javac>
+		
+		<echo>${ant.project.name}: Copying additional non-Java sources</echo>
+	 	<copy todir="${basedir}/build/classes/java" overwrite="true">
+			<fileset dir="src/java">
+				<include name="**/*.properties"/>
+			</fileset>
+		</copy>
+	</target>
+	
+	
+	<target name="_build-jar" depends="_compile-java">
+		<!-- Internal target: Creates JAR file. -->
+		<echo>${ant.project.name}: Building JAR</echo>
+		<jar jarfile="${basedir}/build/lib/lams-tool-deploy.jar">
+			<fileset dir="${basedir}/build/classes/java" />
+		</jar>
+	</target>
+
+
+	<target name="deploy" depends="_build-jar" description="Builds and copies JAR to lams_build/deploy-tool/lib">
+		<copy todir="../lams_build/deploy-tool/lib" file="${basedir}/build/lib/lams-tool-deploy.jar" />
+	</target>
+</project>

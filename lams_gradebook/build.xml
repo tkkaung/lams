@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="LAMS Gradebook" basedir="." default="print-usage">
+	
+	<import file="../lams_build/build_base.xml"/> 
+
+</project>

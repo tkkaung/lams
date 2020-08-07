@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+	<bean id="toolContentDAO" class="org.lamsfoundation.lams.tool.dao.hibernate.ToolContentDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	<bean id="toolDAO" class="org.lamsfoundation.lams.tool.dao.hibernate.ToolDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	<bean id="toolSessionDAO" class="org.lamsfoundation.lams.tool.dao.hibernate.ToolSessionDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	<bean id="systemToolDAO" class="org.lamsfoundation.lams.tool.dao.hibernate.SystemToolDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	
+	
+	<bean id="toolContentIDGeneratorTarget" class="org.lamsfoundation.lams.tool.ToolContentIDGenerator">
+		<property name="toolContentDao"><ref bean="toolContentDAO"/></property>
+	</bean>	
+	
+	<bean id="toolContentIDGenerator" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name="target"><ref bean="toolContentIDGeneratorTarget"/></property>
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="getNextToolContentIDFor">PROPAGATION_REQUIRES_NEW</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<bean id="lamsCoreToolServiceTarget" class="org.lamsfoundation.lams.tool.service.LamsCoreToolService" scope="prototype">
+		<property name="activityDAO"><ref bean="activityDAO"/></property>
+		<property name="toolContentDAO"><ref bean="toolContentDAO"/></property>
+		<property name="toolSessionDAO"><ref bean="toolSessionDAO"/></property>
+		<property name="systemToolDAO"><ref bean="systemToolDAO"/></property>
+		<property name="contentIDGenerator"><ref bean="toolContentIDGenerator"/></property>	
+		<property name="messageService"><ref bean="commonMessageService"/></property>
+	</bean>	
+	
+	<bean id="lamsCoreToolService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name="target"><ref bean="lamsCoreToolServiceTarget"/></property>
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="createToolSession">PROPAGATION_REQUIRED</prop>
+				<prop key="deleteToolSession">PROPAGATION_REQUIRED</prop>
+				<prop key="findToolService">PROPAGATION_REQUIRED</prop>
+				<prop key="forceCompleteActivity">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
+			    <prop key="is*">PROPAGATION_REQUIRED</prop>
+				<prop key="notifyTool*">PROPAGATION_REQUIRED</prop>
+				<prop key="notifyToolToDeleteContent">PROPAGATION_REQUIRES_NEW</prop>
+			    <prop key="remove*">PROPAGATION_REQUIRED</prop>
+			    <!-- It needs to be committed before the subsequent isReadOnly check -->
+				<prop key="removeLearnerContent">PROPAGATION_REQUIRES_NEW</prop>
+			    <prop key="setupToolURLWithTool*">PROPAGATION_REQUIRED</prop>
+			    <prop key="update*">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean>   	
+	
+	<bean id="lamsToolService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+		<property name="target">
+				<bean class="org.lamsfoundation.lams.tool.service.LamsToolService">
+					<property name="activityDAO"><ref bean="activityDAO"/></property>
+					<property name="logEventService"><ref bean="logEventService"/></property>
+					<property name="toolDAO"><ref bean="toolDAO"/></property>	
+					<property name="toolSessionDAO"><ref bean="toolSessionDAO"/></property>
+					<property name="toolContentDAO"><ref bean="toolContentDAO"/></property>	
+					<property name="gradebookService"><ref bean="gradebookService"/></property>				
+			   		<property name="lamsCoreToolService"><ref bean="lamsCoreToolService"/></property>
+			   		<property name="lessonService"><ref bean="lessonService"/></property>
+					<property name="learnerService"><ref bean="learnerService"/></property>
+					<property name="dataFlowDAO"><ref bean="dataFlowDAO"/></property>
+					<property name="userManagementService"><ref bean="userManagementService"/></property>
+				</bean>
+			</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="auditLogStartEditingActivityInMonitor">PROPAGATION_REQUIRED</prop>
+				<prop key="completeToolSession">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED</prop>
+				<prop key="is*">PROPAGATION_REQUIRED</prop>
+				<prop key="removeActivityMark">PROPAGATION_REQUIRED</prop>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="updateActivityMark">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean>  
+		
+</beans>

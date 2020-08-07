@@ -1,0 +1,920 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="LAMS Build" basedir="." default="print-usage">
+
+	<!-- Import properties from the shared and o/s specific files -->
+	<property file="build.properties"/>
+	<property file="common.properties" />
+	<property file="${osPropertiesName}.properties" />
+	
+	<!-- Check if WildFly was slimmed. It can be any file removed in slimming process -->
+	<available file="${server.home}/standalone/configuration/standalone-full.xml" property="non-slimmed"/>
+	
+	<target name="print-usage" description="Displays Ant targets descriptions">
+		<echo>
+		LAMS main build file
+		------------------------------------------------------
+		
+		Available targets are:
+		print-usage               --> Display this information
+		copy-tags                 --> Copies custom JSP tags from Central to all other projects
+		build-db                  --> Creates database tables and entries
+		deploy-ear-updater        --> Builds and deploys LAMS EAR for updater
+		deploy-lams	              --> Runs full LAMS redeployment
+		deploy-lams-min-tools     --> Runs full LAMS redeployment with minimal Tools set
+		deploy-lams-min-tools     --> Runs full LAMS redeployment with full Tools set. Mainly for development.
+		slim-wildfly              --> Removes unused WidlFly files
+			
+		If you want to run full deployment, execute lams-cruise.
+		</echo>
+	</target>
+
+	
+	<target name="_clean-dirs">
+		<!-- Internal target: Recreates dirs for compiled output files. -->
+		<echo>${ant.project.name}: Removing cache and build folders</echo>
+		<delete dir="${server.home}server/default/tmp" />
+		<!-- <delete dir="${server.home}server/default/work" /> -->
+		<delete dir="assembly" />
+		
+		<echo>${ant.project.name}: Creating build dir structure</echo>
+		<mkdir dir="assembly" />
+	</target>
+
+	
+	<target name="_clean-core" depends="_clean-dirs">
+		<!-- Internal target: Removes output dirs of Core projects -->
+		<ant antfile="../lams_common/build.xml"            target="_clean-dirs" inheritAll="false" />
+		<ant antfile="../lams_contentrepository/build.xml" target="_clean-dirs" inheritAll="false" />
+		<ant antfile="../lams_central/build.xml"           target="_clean-dirs" inheritAll="false" />
+		<ant antfile="../lams_learning/build.xml"          target="_clean-dirs" inheritAll="false" />
+		<ant antfile="../lams_monitoring/build.xml"        target="_clean-dirs" inheritAll="false" />
+		<ant antfile="../lams_admin/build.xml"             target="_clean-dirs" inheritAll="false" />
+		<ant antfile="../lams_www/build.xml"               target="_clean-dirs" inheritAll="false" />
+		<ant antfile="../lams_gradebook/build.xml"         target="_clean-dirs" inheritAll="false" />
+	</target>
+
+	
+	<target name="_clean-tools">
+		<!-- Internal target: Removes output dirs of Tools -->
+		<ant antfile="../lams_tool_assessment/build.xml"    target="_clean-dirs" inheritAll="false"/>
+		<ant antfile="../lams_tool_chat/build.xml"          target="_clean-dirs" inheritAll="false"/>
+		<ant antfile="../lams_tool_daco/build.xml"          target="_clean-dirs" inheritAll="false"/>
+		<ant antfile="../lams_tool_forum/build.xml"         target="_clean-dirs" inheritAll="false"/>
+		<ant antfile="../lams_tool_images/build.xml"        target="_clean-dirs" inheritAll="false"/>
+		<ant antfile="../lams_tool_imscc/build.xml"         target="_clean-dirs" inheritAll="false"/>
+		<ant antfile="../lams_tool_lamc/build.xml"          target="_clean-dirs" inheritAll="false"/>
+		<ant antfile="../lams_tool_laqa/build.xml"          target="_clean-dirs" inheritAll="false"/>
+		<ant antfile="../lams_tool_larsrc/build.xml"        target="_clean-dirs" inheritAll="false"/>
+		<ant antfile="../lams_tool_leader/build.xml"        target="_clean-dirs" inheritAll="false"/>
+		<ant antfile="../lams_tool_nb/build.xml"          	target="_clean-dirs" inheritAll="false"/>
+		<ant antfile="../lams_tool_notebook/build.xml"      target="_clean-dirs" inheritAll="false"/>
+		<ant antfile="../lams_tool_pixlr/build.xml"         target="_clean-dirs" inheritAll="false"/>
+		<ant antfile="../lams_tool_sbmt/build.xml"          target="_clean-dirs" inheritAll="false"/>
+		<ant antfile="../lams_tool_scratchie/build.xml"     target="_clean-dirs" inheritAll="false"/>
+		<ant antfile="../lams_tool_scribe/build.xml"        target="_clean-dirs" inheritAll="false"/>
+		<ant antfile="../lams_tool_spreadsheet/build.xml"   target="_clean-dirs" inheritAll="false"/>
+		<ant antfile="../lams_tool_survey/build.xml"        target="_clean-dirs" inheritAll="false"/>
+		<ant antfile="../lams_tool_task/build.xml"          target="_clean-dirs" inheritAll="false"/>
+		<ant antfile="../lams_tool_vote/build.xml"          target="_clean-dirs" inheritAll="false"/>
+		<ant antfile="../lams_tool_wiki/build.xml"          target="_clean-dirs" inheritAll="false"/>
+		
+		<!-- 
+			<ant antfile="../lams_tool_kaltura/build.xml"       target="_clean-dirs" inheritAll="false" />
+			<ant antfile="../lams_tool_eadventure/build.xml"    target="_clean-dirs" inheritAll="false"/>
+			<ant antfile="../lams_tool_videorecorder/build.xml" target="_clean-dirs" inheritAll="false"/>
+			<ant antfile="../lams_tool_wookie/build.xml"    	target="_clean-dirs" inheritAll="false"/>
+			<ant antfile="../lams_tool_bbb/build.xml"           target="_clean-dirs" inheritAll="false" />
+			<ant antfile="../lams_tool_dimdim/build.xml"        target="_clean-dirs" inheritAll="false" />
+			<ant antfile="../lams_tool_gmap/build.xml"          target="_clean-dirs" inheritAll="false" />
+			
+			<ant antfile="../lams_tool_doku/build.xml"          target="_clean-dirs" inheritAll="false" />
+			<ant antfile="../lams_tool_zoom/build.xml"          target="_clean-dirs" inheritAll="false" />
+			<ant antfile="../lams_tool_preview/build.xml"       target="_clean-dirs" inheritAll="false" />
+		-->
+	</target>
+	
+	<target name="copy-tags" description="Copies lams.tld and LAMS Tags from lams-central to other projects.">
+		<ant antfile="../lams_admin/build.xml"              target="copy-tags" inheritAll="false"/>
+		<ant antfile="../lams_learning/build.xml"           target="copy-tags" inheritAll="false"/>
+		<ant antfile="../lams_monitoring/build.xml"         target="copy-tags" inheritAll="false"/>
+		<ant antfile="../lams_gradebook/build.xml"          target="copy-tags" inheritAll="false"/>
+		<ant antfile="../lams_www/build.xml"                target="copy-tags" inheritAll="false"/>
+		<ant antfile="../lams_tool_assessment/build.xml"    target="copy-tags" inheritAll="false"/>
+		<ant antfile="../lams_tool_chat/build.xml"          target="copy-tags" inheritAll="false"/>
+		<ant antfile="../lams_tool_daco/build.xml"          target="copy-tags" inheritAll="false"/>
+		<ant antfile="../lams_tool_doku/build.xml"          target="copy-tags" inheritAll="false"/>
+		<ant antfile="../lams_tool_forum/build.xml"         target="copy-tags" inheritAll="false"/>
+		<ant antfile="../lams_tool_gmap/build.xml"          target="copy-tags" inheritAll="false"/>
+		<ant antfile="../lams_tool_images/build.xml"        target="copy-tags" inheritAll="false"/>
+		<ant antfile="../lams_tool_imscc/build.xml"         target="copy-tags" inheritAll="false"/>
+		<ant antfile="../lams_tool_lamc/build.xml"          target="copy-tags" inheritAll="false"/>
+		<ant antfile="../lams_tool_laqa/build.xml"          target="copy-tags" inheritAll="false"/>
+		<ant antfile="../lams_tool_larsrc/build.xml"        target="copy-tags" inheritAll="false"/>
+		<ant antfile="../lams_tool_leader/build.xml"        target="copy-tags" inheritAll="false"/>
+		<ant antfile="../lams_tool_nb/build.xml"          	target="copy-tags" inheritAll="false"/>
+		<ant antfile="../lams_tool_mindmap/build.xml"       target="copy-tags" inheritAll="false"/>
+		<ant antfile="../lams_tool_notebook/build.xml"      target="copy-tags" inheritAll="false"/>
+		<ant antfile="../lams_tool_pixlr/build.xml"         target="copy-tags" inheritAll="false"/>
+		<ant antfile="../lams_tool_preview/build.xml"       target="copy-tags" inheritAll="false"/>
+		<ant antfile="../lams_tool_sbmt/build.xml"          target="copy-tags" inheritAll="false"/>
+		<ant antfile="../lams_tool_scratchie/build.xml"     target="copy-tags" inheritAll="false"/>
+		<ant antfile="../lams_tool_scribe/build.xml"        target="copy-tags" inheritAll="false"/>
+		<ant antfile="../lams_tool_spreadsheet/build.xml"   target="copy-tags" inheritAll="false"/>
+		<ant antfile="../lams_tool_survey/build.xml"        target="copy-tags" inheritAll="false"/>
+		<ant antfile="../lams_tool_task/build.xml"          target="copy-tags" inheritAll="false"/>
+		<ant antfile="../lams_tool_vote/build.xml"          target="copy-tags" inheritAll="false"/>
+		<ant antfile="../lams_tool_wiki/build.xml"          target="copy-tags" inheritAll="false"/>
+		<ant antfile="../lams_tool_zoom/build.xml"          target="copy-tags" inheritAll="false"/>
+		
+		<!-- 
+			<ant antfile="../lams_tool_kaltura/build.xml"       target="copy-tags" inheritAll="false" />
+			<ant antfile="../lams_tool_eadventure/build.xml"    target="copy-tags" inheritAll="false"/>
+			<ant antfile="../lams_tool_videorecorder/build.xml" target="copy-tags" inheritAll="false"/>
+			<ant antfile="../lams_tool_wookie/build.xml"    	target="copy-tags" inheritAll="false"/>
+			<ant antfile="../lams_tool_bbb/build.xml"           target="copy-tags" inheritAll="false" />
+			<ant antfile="../lams_tool_dimdim/build.xml"        target="copy-tags" inheritAll="false" />
+			<ant antfile="../lams_tool_gmap/build.xml"          target="copy-tags" inheritAll="false" />
+		-->
+		<echo>MANUALLY COPY TAGS TO UNLISTED PROJECTS</echo>
+	</target>
+
+	
+	<target name="build-db" description="Rebuilds LAMS Database.">
+		<ant antfile="../lams_common/build.xml" target="build-db" inheritAll="false" />
+	</target>
+	
+			
+	<target name="_build-core">
+		<!-- Internal target: Builds LAMS core projects -->
+		<echo>Building LAMS core projects</echo>
+		<ant antfile="../lams_common/build.xml"            target="_build-jar"     inheritAll="false" />
+		<ant antfile="../lams_contentrepository/build.xml" target="_build-jar"     inheritAll="false" />
+		<ant antfile="../lams_central/build.xml"           target="_build-product" inheritAll="false" />
+		<ant antfile="../lams_learning/build.xml"          target="_build-product" inheritAll="false" />
+		<ant antfile="../lams_monitoring/build.xml"        target="_build-product" inheritAll="false" />
+		<ant antfile="../lams_admin/build.xml"             target="_build-product" inheritAll="false" />
+		<ant antfile="../lams_www/build.xml"               target="_clean-dirs"     inheritAll="false" />
+		<ant antfile="../lams_www/build.xml"               target="_build-war"     inheritAll="false" />
+		<ant antfile="../lams_gradebook/build.xml"         target="_build-product" inheritAll="false" />
+	</target>
+	
+	
+	<target name="_build-ear" depends="_clean-dirs, _build-core">
+		<!-- Internal target: Assembles LAMS EAR in exploded form -->
+		<echo>${ant.project.name}: Copying libraries</echo>
+		<copy todir="assembly/lams.ear" flatten="true">
+			<fileset dir="..">
+				<include name="lams_monitoring/build/lib/*.war"/>
+				<include name="lams_learning/build/lib/*.war"/>
+				<include name="lams_admin/build/lib/*.war"/>
+				<include name="lams_gradebook/build/lib/*.war"/>
+			</fileset>
+		</copy>
+		<copy todir="assembly/lams.ear/lib" flatten="true">
+			<fileset dir="..">
+				<include name="lams_common/build/lib/lams.jar" />
+				<include name="lams_contentrepository/build/lib/*.jar" />
+				<include name="lams_central/build/lib/*.jar" />
+				<include name="lams_monitoring/build/lib/*.jar"/>
+				<include name="lams_learning/build/lib/*.jar"/>
+				<include name="lams_admin/build/lib/*.jar"/>
+				<include name="lams_gradebook/build/lib/*.jar"/>
+			</fileset>
+		</copy>
+
+		<echo>Copying lams-central.war</echo>
+		<copy todir="assembly/lams.ear/lams-central.war">
+			<fileset dir="../lams_central/build/lib/lams-central.war" />
+		</copy>
+		
+		<echo>Expanding lams-www.war</echo>
+		<unjar src="../lams_www/build/lib/lams-www.war" 
+			   dest="assembly/lams.ear/lams-www.war"
+		/>
+		
+		<echo>Copying language files</echo>
+		<copy todir="assembly/lams.ear/lams-dictionary.jar">
+			<fileset dir="../lams_common/build/lib/language" />
+			<fileset dir="../lams_central/build/lib/language" />
+			<fileset dir="../lams_monitoring/build/lib/language" />
+			<fileset dir="../lams_learning/build/lib/language" />
+			<fileset dir="../lams_admin/build/lib/language" />
+			<fileset dir="../lams_gradebook/build/lib/language" />
+		</copy>
+
+		<echo>Copying EAR configuration files</echo>
+		<copy todir="assembly/lams.ear/META-INF" overwrite="true" verbose="true">
+			<fileset dir="${conf.dir}/j2ee">
+				<include name="*.xml" />
+				<exclude name="jboss-all.xml" />
+			</fileset>
+		</copy>
+		<copy tofile="assembly/lams.ear/META-INF/MANIFEST.MF" overwrite="true" verbose="true">
+			<fileset file="${conf.dir}/j2ee/MANIFEST-template.MF" />
+	        <filterset>
+	        	<filter token="version" value="${project.version}"/>
+	        </filterset>
+		</copy>
+		<copy todir="assembly/lams.ear/META-INF" overwrite="true" verbose="true">
+			<fileset file="${conf.dir}/j2ee/jboss-all.xml" />
+	        <filterset>
+	        	<filter token="secure.cookie" value="${secure.cookie}"/>
+	        </filterset>
+		</copy>
+		
+		<echo>Copying EAR static 3rd party dependencies (not included as modules)</echo>
+		<copy todir="assembly/lams.ear/lib" flatten="true">
+			<!-- copy autopatcher-->
+			<fileset dir="lib/autopatch">
+				<include name="*.jar" />
+			</fileset>
+		</copy>
+	</target>
+
+	
+	<target name="_deploy-ear" depends="_build-ear">
+		<echo>Deploying EAR</echo>
+		<delete dir="${server.home}/standalone/deployments/lams.ear"/>
+		<copy todir="${server.home}/standalone/deployments/lams.ear">
+			<fileset dir="assembly/lams.ear" />
+		</copy>
+	</target>
+	
+	
+	<target name="deploy-ear-updater" depends="_build-ear"
+		description="Deploys EAR file to the win_installer directory.">
+		<echo>Deploying EAR to Windows Installer dir</echo>
+		<delete dir="../win_installer/assembly"/>
+		<copy todir="../win_installer/assembly/lams.ear">
+			<fileset dir="assembly/lams.ear" />
+		</copy>
+	</target>
+
+	<target name="_deploy-tools">
+		<echo>Deploying Tools</echo>
+		<ant antfile="../lams_tool_assessment/build.xml"    target="deploy-tool" inheritAll="false" />
+		<ant antfile="../lams_tool_chat/build.xml"          target="deploy-tool" inheritAll="false" />
+		<ant antfile="../lams_tool_daco/build.xml"          target="deploy-tool" inheritAll="false" />
+		<ant antfile="../lams_tool_forum/build.xml"         target="deploy-tool" inheritAll="false" />
+		<ant antfile="../lams_tool_images/build.xml"        target="deploy-tool" inheritAll="false" />
+		<ant antfile="../lams_tool_imscc/build.xml"         target="deploy-tool" inheritAll="false" />
+		<ant antfile="../lams_tool_lamc/build.xml"          target="deploy-tool" inheritAll="false" />
+		<ant antfile="../lams_tool_laqa/build.xml"          target="deploy-tool" inheritAll="false" />
+		<ant antfile="../lams_tool_larsrc/build.xml"        target="deploy-tool" inheritAll="false" />
+		<ant antfile="../lams_tool_leader/build.xml"        target="deploy-tool" inheritAll="false" />
+		<ant antfile="../lams_tool_mindmap/build.xml"       target="deploy-tool" inheritAll="false" />
+		<ant antfile="../lams_tool_nb/build.xml"          	target="deploy-tool" inheritAll="false" />
+		<ant antfile="../lams_tool_notebook/build.xml"      target="deploy-tool" inheritAll="false" />
+		<ant antfile="../lams_tool_pixlr/build.xml"         target="deploy-tool" inheritAll="false" />
+		<ant antfile="../lams_tool_sbmt/build.xml"          target="deploy-tool" inheritAll="false" />
+		<ant antfile="../lams_tool_scratchie/build.xml"     target="deploy-tool" inheritAll="false" />
+		<ant antfile="../lams_tool_scribe/build.xml"        target="deploy-tool" inheritAll="false" />
+		<ant antfile="../lams_tool_spreadsheet/build.xml"   target="deploy-tool" inheritAll="false" />
+  		<ant antfile="../lams_tool_survey/build.xml"        target="deploy-tool" inheritAll="false" />
+  		<ant antfile="../lams_tool_task/build.xml"          target="deploy-tool" inheritAll="false" />
+		<ant antfile="../lams_tool_vote/build.xml"          target="deploy-tool" inheritAll="false" />
+		<ant antfile="../lams_tool_wiki/build.xml"          target="deploy-tool" inheritAll="false" />
+		
+		<!-- 
+			<ant antfile="../lams_tool_kaltura/build.xml"       target="deploy-tool" inheritAll="false" />
+			<ant antfile="../lams_tool_eadventure/build.xml"    target="deploy-tool" inheritAll="false"/>
+			<ant antfile="../lams_tool_videorecorder/build.xml" target="deploy-tool" inheritAll="false"/>
+			<ant antfile="../lams_tool_wookie/build.xml"    	target="deploy-tool" inheritAll="false"/>
+			<ant antfile="../lams_tool_bbb/build.xml"           target="deploy-tool" inheritAll="false" />
+			<ant antfile="../lams_tool_dimdim/build.xml"        target="deploy-tool" inheritAll="false" />
+			<ant antfile="../lams_tool_gmap/build.xml"          target="deploy-tool" inheritAll="false" />
+			
+			<ant antfile="../lams_tool_doku/build.xml"          target="deploy-tool" inheritAll="false" />
+			<ant antfile="../lams_tool_zoom/build.xml"          target="deploy-tool" inheritAll="false" />
+			<ant antfile="../lams_tool_preview/build.xml"       target="deploy-tool" inheritAll="false" />
+		-->
+	</target>
+	
+
+	<target name="_deploy-learning-library">
+		<!-- Internal target: Deploys a parallel activity. -->
+		
+		<path id="deploy.classpath">
+			<fileset dir="../lams_build/deploy-tool/lib">
+				<include name="*.jar" />
+			</fileset>
+			<fileset dir="../lams_build/lib">
+				<include name="**/*.jar" />
+			</fileset>
+		</path>
+		
+		<property name="dictionary.dir" value="" />
+
+		<property name="library.assembly"     value="assembly/${library.name}" />
+		<property name="library.basedir"      value="librarypackages/${library.name}" />
+		<property name="library.language.src" value="${library.basedir}/language/lams" />
+		<property name="library.language.dst" value="${server.home}/standalone/deployments/lams.ear/lams-dictionary.jar/org/lamsfoundation/lams/library/${library.name}" />
+
+		<copy todir="${library.assembly}/sql" overwrite="true" verbose="true">
+			<fileset dir="${library.basedir}">
+				<include name="*.sql"/>
+			</fileset>
+		</copy>
+
+		<copy todir="${library.assembly}/language" overwrite="true">
+			<fileset dir="${library.language.src}" />
+		</copy>
+
+		<echo>Parsing deploy library XML</echo>
+		<copy file="${library.basedir}/deployLibrary.xml" tofile="${library.assembly}/deploy.xml" overwrite="true">
+		  	<!-- replace @assemblydir@ in the xml template - this allows it to run under any directory structure -->
+	        <filterchain>
+	            <striplinecomments>
+	               <comment value="!"/>
+	            </striplinecomments>
+	           <replacetokens>
+	                <token key="assemblydir" value="${library.assembly}/sql"/>
+	            </replacetokens>
+	            <replacetokens>
+		            <token key="assemblylangdir" value="${library.assembly}/language"/>
+		        </replacetokens>
+	            <replacetokens>
+		             <token key="lamsear" value="${server.home}/standalone/deployments/lams.ear"/>
+		        </replacetokens>
+	        </filterchain>
+	    </copy>
+
+		<echo>Generating properties XML file</echo>
+		<taskdef name="generateDeployLibraryProperties" 
+			classname="org.lamsfoundation.lams.tool.deploy.libraryActivity.CreateLibraryPackageTask">
+		    <classpath refid="deploy.classpath"/>
+		</taskdef>
+		<generateDeployLibraryProperties depends="compile" 
+			mode="development" 
+			outputPath="${library.assembly}"
+			configFile="${library.assembly}/deploy.xml"
+			dbPassword="${db.password}"
+			dbUsername="${db.username}"
+			dbDriverUrl="${db.url.build}"
+			dbDriverClass="com.mysql.cj.jdbc.Driver"	
+		/>
+	
+		<echo>Deploying language files</echo>
+		<copy todir="${library.language.dst}" overwrite="true">
+			<fileset dir="${library.language.src}" />
+		</copy>
+
+		<java
+			classname="org.lamsfoundation.lams.tool.deploy.libraryActivity.DeployLibrary"
+			classpathref="deploy.classpath"
+			fork="true">
+				<arg file="${library.assembly}/deploy.xml"/>
+				<arg file="${library.assembly}/language"/>
+		</java>
+	</target>
+	
+	
+	<target name="_deploy-learning-libraries">
+		<echo>${ant.project.name}: Deploying Library Activities</echo>
+
+		<echo>Generating deployment package for share resources / forum parallel activity</echo>
+		<antcall target="_deploy-learning-library">
+			<param name="library.name" value="shareresourcesforum"/>
+		</antcall> 
+ 
+		<echo>Generating deployment package for chat / scribe parallel activity</echo>
+		<antcall target="_deploy-learning-library">
+			<param name="library.name" value="chatscribe"/>
+		</antcall> 
+
+		<echo>Generating deployment package for forum / scribe parallel activity</echo>
+		<antcall target="_deploy-learning-library">
+			<param name="library.name" value="forumscribe"/>
+		 </antcall> 
+	</target>
+
+
+	<target name="_deploy-resources">
+		<!-- Internal target: Deploys third party JARs and cofiguration files -->
+		<echo>${ant.project.name}: Deploying libraries as WildFly modules</echo>
+		
+		<copy todir="${server.home}/modules/system/layers/base/org/apache/poi/main" overwrite="true" verbose="true">
+			<fileset dir="lib/apache-poi">
+				<include name="poi-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/org/apache/poi/main/module.xml"
+			  file="lib/apache-poi/poi.module.xml" overwrite="true" verbose="true" />
+		
+		<copy todir="${server.home}/modules/system/layers/base/org/apache/xmlbeans/main" overwrite="true" verbose="true">
+			<fileset dir="lib/apache-poi">
+				<include name="xmlbeans-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/org/apache/xmlbeans/main/module.xml"
+			  file="lib/apache-poi/xmlbeans.module.xml" overwrite="true" verbose="true" />
+		
+		<copy todir="${server.home}/modules/system/layers/base/org/apache/batik/main" overwrite="true" verbose="true">
+			<fileset dir="lib/batik">
+				<include name="batik-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/org/apache/batik/main/module.xml"
+			file="lib/batik/batik.module.xml" overwrite="true" verbose="true" />
+		
+		<copy todir="${server.home}/modules/system/layers/base/org/owasp/csrfguard/main" overwrite="true" verbose="true">
+			<fileset dir="lib/csrfguard">
+				<include name="csrfguard-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/org/owasp/csrfguard/main/module.xml"
+			file="lib/csrfguard/csrf.module.xml" overwrite="true" verbose="true" />
+		
+		<copy todir="${server.home}/modules/system/layers/base/org/imsglobal/main" overwrite="true" verbose="true">
+			<fileset dir="lib/basiclti-util">
+				<include name="basiclti-util-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/org/imsglobal/main/module.xml"
+			  file="lib/basiclti-util/basiclti-util.module.xml" overwrite="true" verbose="true" />
+		
+		<copy todir="${server.home}/modules/system/layers/base/net/oauth/core/main" overwrite="true" verbose="true">
+			<fileset dir="lib/basiclti-util">
+				<include name="oauth-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/net/oauth/core/main/module.xml"
+			  file="lib/basiclti-util/oauth.module.xml" overwrite="true" verbose="true" />
+		
+		<copy todir="${server.home}/modules/system/layers/base/oauth/signpost/main" overwrite="true" verbose="true">
+			<fileset dir="lib/basiclti-util">
+				<include name="signpost-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/oauth/signpost/main/module.xml"
+			  file="lib/basiclti-util/signpost.module.xml" overwrite="true" verbose="true" />		
+
+
+		<copy todir="${server.home}/modules/system/layers/base/net/gjerull/etherpad/client/main" overwrite="true" verbose="true">
+			<fileset dir="lib/etherpad">
+				<include name="etherpad_lite_client-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/net/gjerull/etherpad/client/main/module.xml"
+			  file="lib/etherpad/etherpad.module.xml" overwrite="true" verbose="true" />
+		
+		
+		<copy todir="${server.home}/modules/system/layers/base/net/fckeditor/main" overwrite="true" verbose="true">
+			<fileset dir="lib/fckeditor">
+				<include name="fckeditor-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/net/fckeditor/main/module.xml"
+			  file="lib/fckeditor/fckeditor.module.xml" overwrite="true" verbose="true" />
+		
+		<copy todir="${server.home}/modules/system/layers/base/org/apache/commons/collections4/main" overwrite="true" verbose="true">
+			<fileset dir="lib/jakarta-commons">
+				<include name="commons-collections4-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/org/apache/commons/collections4/main/module.xml"
+			  file="lib/jakarta-commons/collections4.module.xml" overwrite="true" verbose="true" />
+		
+		<copy todir="${server.home}/modules/system/layers/base/org/apache/commons/digester/main" overwrite="true" verbose="true">
+			<fileset dir="lib/jakarta-commons">
+				<include name="commons-digester-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/org/apache/commons/digester/main/module.xml"
+			  file="lib/jakarta-commons/digester.module.xml" overwrite="true" verbose="true" />
+		
+		<copy todir="${server.home}/modules/system/layers/base/org/apache/commons/discovery/main" overwrite="true" verbose="true">
+			<fileset dir="lib/jakarta-commons">
+				<include name="commons-discovery-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/org/apache/commons/discovery/main/module.xml"
+			  file="lib/jakarta-commons/discovery.module.xml" overwrite="true" verbose="true" />
+			
+		<copy todir="${server.home}/modules/system/layers/base/org/apache/commons/fileupload/main" overwrite="true" verbose="true">
+			<fileset dir="lib/jakarta-commons">
+				<include name="commons-fileupload-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/org/apache/commons/fileupload/main/module.xml"
+			  file="lib/jakarta-commons/fileupload.module.xml" overwrite="true" verbose="true" />
+		
+		<copy todir="${server.home}/modules/system/layers/base/org/apache/commons/validator/main" overwrite="true" verbose="true">
+			<fileset dir="lib/jakarta-commons">
+				<include name="commons-validator-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/org/apache/commons/validator/main/module.xml"
+			  file="lib/jakarta-commons/validator.module.xml" overwrite="true" verbose="true" />
+		
+		
+		
+		<copy todir="${server.home}/modules/system/layers/base/org/scilab/forge/jlatexmath/main" overwrite="true" verbose="true">
+			<fileset dir="lib/jlatexmath">
+				<include name="jlatexmath-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/org/scilab/forge/jlatexmath/main/module.xml"
+			  file="lib/jlatexmath/jlatexmath.module.xml" overwrite="true" verbose="true" />
+
+		
+		
+		<copy todir="${server.home}/modules/system/layers/base/org/json/simple/main" overwrite="true" verbose="true">
+			<fileset dir="lib/json">
+				<include name="json-simple-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/org/json/simple/main/module.xml"
+			  file="lib/json/json-simple.module.xml" overwrite="true" verbose="true" />
+		
+		<copy todir="${server.home}/modules/system/layers/base/io/jsonwebtoken/main" overwrite="true" verbose="true">
+			<fileset dir="lib/json">
+				<include name="jjwt-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/io/jsonwebtoken/main/module.xml"
+			  file="lib/json/jjwt.module.xml" overwrite="true" verbose="true" />
+		
+		
+		<copy todir="${server.home}/modules/system/layers/base/com/mysql/main" overwrite="true" verbose="true">
+			<fileset dir="lib/mysql">
+				<include name="mysql-connector-java-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/com/mysql/main/module.xml"
+			  file="lib/mysql/mysql-connector-java.module.xml" overwrite="true" verbose="true" />
+		
+		
+		
+		<copy todir="${server.home}/modules/system/layers/base/org/quartz/main" overwrite="true" verbose="true">
+			<fileset dir="lib/quartz">
+				<include name="quartz-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/org/quartz/main/module.xml"
+			  file="lib/quartz/quartz.module.xml" overwrite="true" verbose="true" />
+
+		
+		
+		<copy todir="${server.home}/modules/system/layers/base/org/springframework/main" overwrite="true" verbose="true">
+			<fileset dir="lib/spring">
+				<include name="*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/org/springframework/main/module.xml"
+			  file="lib/spring/spring.module.xml" overwrite="true" verbose="true" />
+		
+		
+		
+		<copy todir="${server.home}/modules/system/layers/base/org/tuckey/urlrewritefilter/main" overwrite="true" verbose="true">
+			<fileset dir="lib/urlrewritefilter">
+				<include name="urlrewritefilter-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/org/tuckey/urlrewritefilter/main/module.xml"
+			  file="lib/urlrewritefilter/urlrewritefilter.module.xml" overwrite="true" verbose="true" />
+		
+		
+		
+		<copy todir="${server.home}/modules/system/layers/base/com/warrenstrange/googleauth/main" overwrite="true" verbose="true">
+			<fileset dir="lib/googleauth">
+				<include name="googleauth-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/com/warrenstrange/googleauth/main/module.xml"
+			  file="lib/googleauth/googleauth.module.xml" overwrite="true" verbose="true" />		
+		
+		
+		
+		<copy todir="${server.home}/modules/system/layers/base/org/apache/xmlcommons/main" overwrite="true" verbose="true">
+			<fileset dir="lib/xml-commons">
+				<include name="xml-apis*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/org/apache/xmlcommons/main/module.xml"
+			  file="lib/xml-commons/xmlcommons.module.xml" overwrite="true" verbose="true" />
+		
+		
+		
+		<copy todir="${server.home}/modules/system/layers/base/com/thoughtworks/xstream/main" overwrite="true" verbose="true">
+			<fileset dir="lib/xstream">
+				<include name="xstream-*.jar" />
+			</fileset>
+		</copy>
+		
+		<copy tofile="${server.home}/modules/system/layers/base/com/thoughtworks/xstream/main/module.xml"
+			  file="lib/xstream/xstream.module.xml" overwrite="true" verbose="true" />
+		
+
+		<echo>${ant.project.name}: Deploying configuration files</echo>
+		<antcall target="_deploy-standalone-config" />
+		<antcall target="_deploy-standalone-config-slimmed" />
+		
+		<!-- Mark EAR for WildFly deployment -->
+		<delete >
+			<fileset dir="${server.home}/standalone/deployments" includes="lams.ear.*"/>
+		</delete>
+		<touch file="${server.home}/standalone/deployments/lams.ear.dodeploy" />
+		
+		<echo>${ant.project.name}: Deploying root context content</echo>
+		<delete dir="${server.home}welcome-content" />
+		<mkdir dir="${server.home}/welcome-content" />
+		<copy todir="${server.home}/welcome-content" verbose="true">
+			<fileset dir="conf/welcome-content" />
+		</copy>
+	</target>
+	
+	
+	<target name="_deploy-standalone-config" if="non-slimmed">
+		<copy todir="${server.home}/standalone/configuration" overwrite="true" verbose="true">
+			<fileset file="${conf.dir}/standalone.xml" />
+	        <filterset>
+	        	<filter token="db.url.run" value="${db.url.run}"/>
+                <filter token="db.username" value="${db.username}"/>
+                <filter token="db.password" value="${db.password}"/>
+	        	<filter token="db.timezone" value="${db.timezone}"/>
+	        </filterset>
+		</copy>
+	</target>
+	
+	
+	<target name="_deploy-standalone-config-slimmed" unless="non-slimmed">
+		<copy todir="${server.home}/standalone/configuration" overwrite="true" verbose="true">
+			<fileset file="${conf.dir}/slim/standalone.xml" />
+	        <filterset>
+	        	<filter token="db.url.run" value="${db.url.run}"/>
+                <filter token="db.username" value="${db.username}"/>
+                <filter token="db.password" value="${db.password}"/>
+	        	<filter token="db.timezone" value="${db.timezone}"/>
+	        </filterset>
+		</copy>
+	</target>
+	
+	
+	<target name="explode-all" description="Explode WARs of all standard modules.">
+		<ant antfile="../lams_learning/build.xml"           target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_monitoring/build.xml"         target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_admin/build.xml"              target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_gradebook/build.xml"          target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_assessment/build.xml"    target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_chat/build.xml"          target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_daco/build.xml"          target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_forum/build.xml"         target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_images/build.xml"        target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_imscc/build.xml"         target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_lamc/build.xml"          target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_laqa/build.xml"          target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_larsrc/build.xml"        target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_leader/build.xml"        target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_mindmap/build.xml"       target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_nb/build.xml"          	target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_notebook/build.xml"      target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_pixlr/build.xml"         target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_sbmt/build.xml"          target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_scratchie/build.xml"     target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_scribe/build.xml"        target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_spreadsheet/build.xml"   target="explode-war" inheritAll="false" />
+  		<ant antfile="../lams_tool_survey/build.xml"        target="explode-war" inheritAll="false" />
+  		<ant antfile="../lams_tool_task/build.xml"          target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_vote/build.xml"          target="explode-war" inheritAll="false" />
+		<ant antfile="../lams_tool_wiki/build.xml"          target="explode-war" inheritAll="false" />
+		<!-- 
+			<ant antfile="../lams_tool_kaltura/build.xml"       target="explode-war" inheritAll="false" />
+			<ant antfile="../lams_tool_eadventure/build.xml"    target="explode-war" inheritAll="false"/>
+			<ant antfile="../lams_tool_videorecorder/build.xml" target="explode-war" inheritAll="false"/>
+			<ant antfile="../lams_tool_wookie/build.xml"    	target="explode-war" inheritAll="false"/>
+			<ant antfile="../lams_tool_bbb/build.xml"           target="explode-war" inheritAll="false" />
+			<ant antfile="../lams_tool_dimdim/build.xml"        target="explode-war" inheritAll="false" />
+			<ant antfile="../lams_tool_gmap/build.xml"          target="explode-war" inheritAll="false" />
+			
+			<ant antfile="../lams_tool_doku/build.xml"          target="explode-war" inheritAll="false" />
+			<ant antfile="../lams_tool_zoom/build.xml"          target="explode-war" inheritAll="false" />
+			<ant antfile="../lams_tool_preview/build.xml"       target="explode-war" inheritAll="false" />
+		-->
+	</target>
+	
+	
+	<!-- cruise control task : build lams -->
+	<target name="deploy-lams" depends="_build-ear, build-db, _deploy-ear, _deploy-resources, _deploy-tools, _deploy-learning-libraries"
+		    description="Builds entire LAMS" />
+	
+	
+	<!-- cruise control task : build lams without tools -->
+	<target name="deploy-lams-min-tools" depends="_build-ear, build-db, _deploy-ear, _deploy-resources"
+	        description="Builds entire LAMS without tools">
+		<echo>${ant.project.name}: Deploying minimal set of Tools</echo>
+  		<ant antfile="../lams_tool_notebook/build.xml" target="deploy-tool" inheritAll="false" />
+		<ant antfile="../lams_tool_wiki/build.xml" 	 target="deploy-tool" inheritAll="false" />
+	</target>
+	
+	<target name="deploy-lams-all-tools" depends="_build-ear, build-db, _deploy-ear, _deploy-resources, _deploy-tools, _deploy-learning-libraries"
+		    description="Builds entire LAMS with all tools including optional ones and stubs. Mainly for development.">
+		<echo>${ant.project.name}: Deploying optional set of Tools</echo>
+		<ant antfile="../lams_tool_kaltura/build.xml"       target="deploy-tool" inheritAll="false" />
+		<ant antfile="../lams_tool_eadventure/build.xml"    target="deploy-tool" inheritAll="false"/>
+		<ant antfile="../lams_tool_videorecorder/build.xml" target="deploy-tool" inheritAll="false"/>
+		<ant antfile="../lams_tool_wookie/build.xml"    	target="deploy-tool" inheritAll="false"/>
+		<ant antfile="../lams_tool_bbb/build.xml"           target="deploy-tool" inheritAll="false" />
+		<ant antfile="../lams_tool_dimdim/build.xml"        target="deploy-tool" inheritAll="false" />
+		<ant antfile="../lams_tool_gmap/build.xml"          target="deploy-tool" inheritAll="false" />
+		
+		<ant antfile="../lams_tool_doku/build.xml"          target="deploy-tool" inheritAll="false" />
+		<ant antfile="../lams_tool_zoom/build.xml"          target="deploy-tool" inheritAll="false" />
+		<ant antfile="../lams_tool_preview/build.xml"       target="deploy-tool" inheritAll="false" />
+	</target>
+	
+	
+	<!-- cruise control task : build lams -->
+	<target name="deploy-cluster" description="Prepare cluster environment">
+		
+		<echo>${ant.project.name}: Copying configuration files</echo>
+		<copy todir="${server.home}/domain/configuration" overwrite="true" verbose="true">
+			<fileset dir="${conf.dir}">
+				<include name="domain.xml" />
+				<include name="host.xml" />
+			</fileset>
+	        <filterset>
+	        	<filter token="db.url.run" value="${db.url.run}"/>
+                <filter token="db.username" value="${db.username}"/>
+                <filter token="db.password" value="${db.password}"/>
+	        	<filter token="db.timezone" value="${db.timezone}"/>
+	        </filterset>
+		</copy>
+		
+		<property name="webappTag" value="&lt;/web-app&gt;" />
+		<property name="distributableTag" value="&lt;distributable/&gt;" />
+		<echo>${ant.project.name}: Making Central sessions distributable</echo>
+		<!-- Remove existing entries first, so it is possible to run target multiple times -->
+		<replaceregexp file="${server.home}/standalone/deployments/lams.ear/lams-central.war/WEB-INF/web.xml"
+					   flags="gi"
+		               match="${distributableTag}" 
+			           replace=""
+		/>
+		<replaceregexp file="${server.home}/standalone/deployments/lams.ear/lams-central.war/WEB-INF/web.xml"
+			 		   flags="gi"
+			           match="(${webappTag})"
+			           replace="${line.separator}    ${distributableTag}${line.separator}${line.separator}\1"
+		/>
+		
+		<echo>${ant.project.name}: Zipping lams.ear into domain/tmp dir</echo>
+		<zip destfile="${server.home}/domain/tmp/lams.ear"
+			 basedir="${server.home}/standalone/deployments/lams.ear"
+			 encoding="UTF8"
+		 	 compress="false"
+			 update="true"
+		/>
+	</target>
+	
+	
+	<target name="slim-standalone"
+			description="Removes unnecessary files from Wildfly 14.0.1 STANDALONE mode; do not run for domain mode!">
+		<delete includeemptydirs="true" verbose="true" failonerror="false">
+			<!-- Domain version of server. Standalone is used. -->
+			<fileset dir="${server.home}/domain/" />
+			<!-- Client -->
+			<fileset dir="${server.home}/appclient/" />
+			<!-- Binaries -->
+			<fileset dir="${server.home}/bin/">
+				<include name="client/"/>
+				<include name=".jbossclirc"/>
+				<include name="add*"/>
+				<include name="appclient*"/>
+				<include name="jboss-cli*"/>
+				<include name="jconsole*"/>
+				<include name="jdr*"/>
+				<include name="domain*"/>
+				<include name="elytron*"/>
+				<include name="launcher.jar"/>
+				<include name="product.conf"/>
+				<include name="vault*"/>
+				<include name="wildfly-elytron-tool.jar"/>
+				<include name="ws*"/>
+				<include name="*.ps1"/>
+			</fileset>
+			<!-- Config files -->
+			<fileset dir="${server.home}/standalone/configuration/">
+				<include name="standalone-*"/>
+			</fileset>
+			<!-- Libraries -->
+			<fileset dir="${server.home}/modules/system/layers/base/">
+				<include name="ch/"/>
+				<include name="com/google/"/>
+				<include name="com/googlecode/"/>
+				<include name="com/h2database/"/>
+				<include name="com/jcraft/"/>
+				<include name="com/microsoft/"/>
+				<include name="com/squareup/"/>
+				<include name="com/sun/jsf-impl/"/>
+				<include name="gnu/"/>
+				<include name="io/agroal/"/>
+				<include name="io/jaegertr/"/>
+				<include name="io/opentracing/"/>
+				<include name="io/smallrye/"/>
+				<include name="javax/faces/"/>
+				<include name="nu/"/>
+				<include name="org/apache/avro/"/>
+				<include name="org/apache/commons/lang3/"/>
+				<include name="org/apache/james/"/>
+				<include name="org/apache/lucene/"/>
+				<include name="org/apache/neethi/"/>
+				<include name="org/apache/openjpa/"/>
+				<include name="org/apache/santuario/"/>
+				<include name="org/apache/qpid/"/>
+				<include name="org/apache/thrift/"/>
+				<include name="org/apache/velocity/"/>
+				<include name="org/apache/xml-resolver/"/>
+				<include name="org/codehaus/jettison/"/>
+				<include name="org/eclipse/microprofile/"/>
+				<include name="org/eclipse/persistence/"/>
+				<include name="org/eclipse/yasson/"/>
+				<include name="org/fusesource/"/>
+				<include name="org/glassfish/soteria/"/>
+				<include name="org/hibernate/4.1/"/>
+				<include name="org/hibernate/4.3/"/>
+				<include name="org/hibernate/5.0/"/>
+				<include name="org/hibernate/jipijapa-hibernate4-3/"/>
+				<include name="org/hibernate/jipijapa-hibernate5/"/>
+				<include name="org/hibernate/envers/"/>
+				<include name="org/hibernate/search/"/>
+				<include name="org/hornetq/"/>
+				<include name="org/infinispan/cachestore/"/>
+				<include name="org/jberet/"/>
+				<include name="org/jboss/as/appclient/"/>
+				<include name="org/jboss/as/clustering/ejb3/"/>
+				<include name="org/jboss/as/clustering/web/"/>
+				<include name="org/jboss/as/cmp/"/>
+				<include name="org/jboss/as/configadmin/"/>
+				<include name="org/jboss/as/domain-add-user/"/>
+				<include name="org/jboss/as/domain-http-error-context/"/>
+				<include name="org/jboss/as/jacorb/"/>
+				<include name="org/jboss/as/jaxr/"/>
+				<include name="org/jboss/as/jaxrs/"/>
+				<include name="org/jboss/as/jdr/"/>
+				<include name="org/jboss/as/jpa/hibernate/"/>
+				<include name="org/jboss/as/jsf/"/>
+				<include name="org/jboss/as/jsf-injection/"/>
+				<include name="org/jboss/as/jsr77/"/>
+				<include name="org/jboss/as/mail/"/>
+				<include name="org/jboss/as/management-client-content/"/>
+				<include name="org/jboss/as/modcluster/"/>
+				<include name="org/jboss/as/patching/"/>
+				<include name="org/jboss/as/pojo/"/>
+				<include name="org/jboss/as/sar/"/>
+				<include name="org/jboss/as/security-api/"/>
+				<include name="org/jboss/as/webservices/"/>
+				<include name="org/jboss/as/vault-tool/"/>
+				<include name="org/jboss/as/xts/"/>
+				<include name="org/jboss/genericjms/"/>
+				<include name="org/jboss/integration/"/>
+				<include name="org/jboss/mod_cluster/"/>
+				<include name="org/jboss/narayana/rts/"/>
+				<include name="org/jboss/remoting3/"/>
+				<include name="org/jboss/resteasy/jose-jwt/"/>
+				<include name="org/jboss/resteasy/resteasy-atom-provider/"/>
+				<include name="org/jboss/resteasy/resteasy-cdi/"/>
+				<include name="org/jboss/resteasy/resteasy-crypto/"/>
+				<include name="org/jboss/resteasy/resteasy-jackson2-provider/"/>
+				<include name="org/jboss/resteasy/resteasy-jackson-provider/"/>
+				<include name="org/jboss/resteasy/resteasy-jettison-provider/"/>
+				<include name="org/jboss/resteasy/resteasy-jaxb-provider/"/>
+				<include name="org/jboss/resteasy/resteasy-jsapi/"/>
+				<include name="org/jboss/resteasy/resteasy-json-binding-provider/"/>
+				<include name="org/jboss/resteasy/resteasy-json-p-provider/"/>
+				<include name="org/jboss/resteasy/resteasy-multipart-provider/"/>
+				<include name="org/jboss/resteasy/resteasy-rxjava2/"/>
+				<include name="org/jboss/resteasy/resteasy-spring/"/>
+				<include name="org/jboss/resteasy/resteasy-yaml-provider/"/>
+				<include name="org/jboss/resteasy/resteasy-validator-provider-11/"/>
+				<include name="org/jboss/security/xacml/"/>
+				<include name="org/jboss/ws/saaj-impl/"/>
+				<include name="org/jboss/ws/tools/"/>
+				<include name="org/jsoup/"/>
+				<include name="org/opensaml/"/>
+				<include name="org/picketlink/"/>
+				<include name="org/wildfly/extension/batch/"/>
+				<include name="org/wildfly/extension/datasources-agroal/"/>
+				<include name="org/wildfly/extension/discovery/"/>
+				<include name="org/wildfly/extension/ee-security/"/>
+				<include name="org/wildfly/extension/elytron/"/>
+				<include name="org/wildfly/extension/messaging-activemq/"/>
+				<include name="org/wildfly/extension/microprofile/"/>
+				<include name="org/wildfly/extension/mod_cluster/"/>
+				<include name="org/wildfly/extension/picketlink/"/>
+				<include name="org/wildfly/extension/rts/"/>
+				<include name="org/wildfly/microprofile/"/>
+				<include name="org/wildfly/mod_cluster/"/>
+				<include name="org/yaml/"/>
+			</fileset>
+			<!-- Default content -->
+			<fileset dir="${server.home}">
+				<include name="README.txt" />
+			</fileset>
+			<!-- Other -->
+			<fileset dir="${server.home}/standalone/deployments/">
+				<include name="README.txt"/>
+			</fileset>
+			<fileset dir="${server.home}/docs/" />
+		</delete>
+	</target>
+</project>

@@ -1,0 +1,46 @@
+@import "_lams_variables.scss";
+
+#select-lessons-area {
+	display: none;
+}
+
+.ui-jqgrid.ui-jqgrid-bootstrap .ui-th-column .cbox,
+.ui-jqgrid.ui-jqgrid-bootstrap .jqgrow>td>.cbox {
+    height: 14px !important;
+    width: 14px !important;
+}
+
+/* Formatting buttons on the Gradebook Lesson screen */
+.gbTopButtonsContainer {
+	height: 30px;
+	padding: 0px !important;
+}
+
+.gbTopButtonsContainer div {
+	display: inline;
+}
+
+.gbTopButtonsContainer a {
+	margin: 5px 5px 5px 0;
+}
+
+.gbTopButtonsContainer button {
+	margin: 5px 5px 5px 0;
+}
+
+.lockLabel {
+	margin: 10px 5px 5px 0;
+	display: block;
+}
+
+.markChartDiv {
+	margin-top: 10px;
+	margin-left: 10px;
+	margin-bottom: 10px;
+	width: 95%;
+	height: 500px;
+}
+
+.archive td[role="gridcell"] {
+	color: lighten($gray-base, 50%);
+}

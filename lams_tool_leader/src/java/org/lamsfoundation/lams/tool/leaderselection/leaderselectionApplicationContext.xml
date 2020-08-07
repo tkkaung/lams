@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+	<!-- ========================= GENERAL DEFINITIONS ========================= -->
+
+	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
+	<bean id="leaderselectionMessageService" class="org.lamsfoundation.lams.util.MessageService" >
+		<property name="messageSource">
+			<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+				<property name="basename"><value>org.lamsfoundation.lams.tool.leaderselection.ApplicationResources</value></property>
+				<property name="defaultEncoding" value="UTF-8" />
+			</bean>
+		</property>										
+	</bean>
+
+	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
+	<bean id="leaderselectionOutputFactory" class="org.lamsfoundation.lams.tool.leaderselection.service.LeaderselectionOutputFactory" >  
+    	<property name="toolMessageService"><ref bean="leaderselectionMessageService"/></property>  
+	</bean> 
+	<bean id="leaderselectionService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+		<property name ="target">
+			<bean class="org.lamsfoundation.lams.tool.leaderselection.service.LeaderselectionService">
+				<property name="leaderselectionSessionDAO"><ref bean="leaderselectionSessionDAO"/></property>
+				<property name="leaderselectionUserDAO"><ref bean="leaderselectionUserDAO"/></property>
+				<property name="leaderselectionDAO"><ref bean="leaderselectionDAO"/></property>
+				<property name="toolService"><ref bean="lamsToolService"/></property>
+ 				<property name="leaderselectionToolContentHandler"><ref bean="leaderselectionToolContentHandler"/></property>
+		   		<property name="exportContentService"><ref bean="exportToolContentService"/></property> 				
+		   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
+		   		<property name="leaderselectionOutputFactory"><ref bean="leaderselectionOutputFactory"/></property>
+			</bean>
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="add*">PROPAGATION_REQUIRED</prop>
+            	<prop key="audit*">PROPAGATION_REQUIRED</prop>
+				<prop key="copy*">PROPAGATION_REQUIRED</prop>
+				<prop key="create*">PROPAGATION_REQUIRED</prop>
+				<prop key="export*">PROPAGATION_REQUIRED</prop>
+				<prop key="finish*">PROPAGATION_REQUIRED</prop>
+				<prop key="forceCompleteUser">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED</prop>
+				<prop key="import*">PROPAGATION_REQUIRED</prop>
+				<prop key="is*">PROPAGATION_REQUIRED</prop>
+				<prop key="leaveToolSession">PROPAGATION_REQUIRED</prop>
+                <prop key="release*">PROPAGATION_REQUIRED</prop>
+				<prop key="remove*">PROPAGATION_REQUIRED</prop>
+				<prop key="retrieve*">PROPAGATION_REQUIRED</prop>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="set*">PROPAGATION_REQUIRED</prop>
+				<prop key="update*">PROPAGATION_REQUIRED</prop>				
+			</props>
+		</property>
+	</bean>
+	
+	<!--  DAO classes -->
+	<bean id="leaderselectionDAO" class="org.lamsfoundation.lams.tool.leaderselection.dao.hibernate.LeaderselectionDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>  
+
+	<bean id="leaderselectionSessionDAO" class="org.lamsfoundation.lams.tool.leaderselection.dao.hibernate.LeaderselectionSessionDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	
+	<bean id="leaderselectionUserDAO" class="org.lamsfoundation.lams.tool.leaderselection.dao.hibernate.LeaderselectionUserDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+
+	<bean id="leaderselectionToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>leaderselectionworkspace</value></property>
+		<property name="repositoryUser"><value>leaderselection</value></property>
+		<property name="repositoryId"><value>lams-ex</value></property>
+	</bean>
+
+</beans>

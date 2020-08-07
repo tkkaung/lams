@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+<!-- ========================= GENERAL DEFINITIONS ========================= -->
+
+	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
+	<bean id="lavoteMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basename"><value>org.lamsfoundation.lams.tool.vote.ApplicationResources</value></property>
+		<property name="defaultEncoding" value="UTF-8" />
+	</bean>
+	<bean id="lavoteMessageService" class="org.lamsfoundation.lams.util.MessageService" >
+		<property name="messageSource"><ref bean="lavoteMessageSource"/></property>										
+	</bean>
+	
+
+	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
+
+	<!-- tool beans -->
+
+
+	<bean id="voteContentDAO" class="org.lamsfoundation.lams.tool.vote.dao.hibernate.VoteContentDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>  
+
+	<bean id="voteSessionDAO" class="org.lamsfoundation.lams.tool.vote.dao.hibernate.VoteSessionDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+
+	<bean id="voteUserDAO" class="org.lamsfoundation.lams.tool.vote.dao.hibernate.VoteUserDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	
+	<bean id="voteQueContentDAO" class="org.lamsfoundation.lams.tool.vote.dao.hibernate.VoteQueContentDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	
+	<bean id="voteUsrAttemptDAO" class="org.lamsfoundation.lams.tool.vote.dao.hibernate.VoteUsrAttemptDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+
+	<bean id="voteToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>vote11</value></property>
+		<property name="repositoryUser"><value>vote11</value></property>
+		<property name="repositoryId"><value>vote_11</value></property>
+	</bean>
+	
+
+	<!-- end of tool beans -->
+	
+	<bean id="voteOutputFactory" class="org.lamsfoundation.lams.tool.vote.service.VoteOutputFactory">
+		<property name="toolMessageService"><ref bean="lavoteMessageService"/></property>
+	</bean>
+	
+	<bean id="voteService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+			<property name="target">
+				<bean class="org.lamsfoundation.lams.tool.vote.service.VoteService">
+					<property name="voteContentDAO"><ref bean="voteContentDAO"/></property>
+					<property name="voteSessionDAO"><ref bean="voteSessionDAO"/></property>
+					<property name="voteUserDAO"><ref bean="voteUserDAO"/></property>
+					<property name="voteQueContentDAO"><ref bean="voteQueContentDAO"/></property>
+					<property name="voteUsrAttemptDAO"><ref bean="voteUsrAttemptDAO"/></property>
+			 		<property name="dataFlowDAO"><ref bean="dataFlowDAO"/></property>
+					<property name="toolService"><ref bean="lamsToolService"/></property>	
+					<property name="logEventService"><ref bean="logEventService"/></property>
+					<property name="voteToolContentHandler"><ref bean="voteToolContentHandler"/></property>		
+			   		<property name="exportContentService"><ref bean="exportToolContentService"/></property>						
+			   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>								   		
+			   		<property name="voteOutputFactory"><ref bean="voteOutputFactory"/></property>
+			   		<property name="messageService"><ref bean="lavoteMessageService"/></property>
+			   		<property name="userManagementService"><ref bean="userManagementService"/></property>
+				</bean>
+			</property>
+			<property name="transactionAttributes">
+				<props>			
+            		<prop key="audit*">PROPAGATION_REQUIRED</prop>	    
+					<prop key="buildQuestionMap">PROPAGATION_REQUIRED</prop>
+				    <prop key="checkLeaderSelectToolForSessionLeader">PROPAGATION_REQUIRED</prop>
+					<prop key="copy*">PROPAGATION_REQUIRED</prop>
+					<prop key="count*">PROPAGATION_REQUIRED</prop>
+					<prop key="create*">PROPAGATION_REQUIRED</prop>
+				    <prop key="countSessionComplete">PROPAGATION_REQUIRED</prop>
+					<prop key="export*">PROPAGATION_REQUIRED</prop>
+					<prop key="get*">PROPAGATION_REQUIRED</prop>
+					<prop key="hideOpenVote">PROPAGATION_REQUIRED</prop>
+				    <prop key="forceCompleteUser">PROPAGATION_REQUIRED</prop>
+					<prop key="import*">PROPAGATION_REQUIRED</prop>
+				    <prop key="is*">PROPAGATION_REQUIRED</prop>
+				    <prop key="leaveToolSession">PROPAGATION_REQUIRED</prop>
+				    <prop key="recalculateUserAnswers">PROPAGATION_REQUIRED</prop>
+				    <prop key="prepareChartData">PROPAGATION_REQUIRED</prop>
+					<prop key="remove*">PROPAGATION_REQUIRED</prop>
+              	    <prop key="resetDefineLater">PROPAGATION_REQUIRED,-VoteApplicationException</prop>
+					<prop key="save*">PROPAGATION_REQUIRED</prop>
+					<prop key="showOpenVote">PROPAGATION_REQUIRED</prop>
+					<prop key="studentActivityOccurredGlobal">PROPAGATION_REQUIRED</prop>
+					<prop key="update*">PROPAGATION_REQUIRED</prop>
+				</props>
+			</property>
+	</bean>  
+</beans>
+

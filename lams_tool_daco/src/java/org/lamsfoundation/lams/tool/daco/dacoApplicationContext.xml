@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+	<bean id="dacoMessageService" class="org.lamsfoundation.lams.util.MessageService" >
+		<property name="messageSource">
+			<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+				<property name="basename"><value>org.lamsfoundation.lams.tool.daco.ApplicationResources</value></property>
+				<property name="defaultEncoding" value="UTF-8" />
+			</bean>
+		</property>										
+	</bean>
+
+    <!-- core beans -->
+    <bean id="dacoDao" class="org.lamsfoundation.lams.tool.daco.dao.hibernate.DacoDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+    <bean id="dacoQuestionDao" class="org.lamsfoundation.lams.tool.daco.dao.hibernate.DacoQuestionDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="dacoUserDao" class="org.lamsfoundation.lams.tool.daco.dao.hibernate.DacoUserDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="dacoSessionDao" class="org.lamsfoundation.lams.tool.daco.dao.hibernate.DacoSessionDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+   <bean id="dacoAnswerDao" class="org.lamsfoundation.lams.tool.daco.dao.hibernate.DacoAnswerDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+
+    <!-- Managers -->
+	<bean id="dacoToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>dacoworkspace</value></property>
+		<property name="repositoryUser"><value>daco</value></property>
+		<property name="repositoryId"><value>lams-daco</value></property>
+	</bean>
+	
+	<bean id="dacoOutputFactory" class="org.lamsfoundation.lams.tool.daco.service.DacoOutputFactory">
+ 		<property name="toolMessageService"><ref bean="dacoMessageService"/></property>
+ 	</bean>
+	
+    <bean id="dacoManagerTarget" class="org.lamsfoundation.lams.tool.daco.service.DacoServiceImpl">
+        <property name="dacoDao">
+            <ref bean="dacoDao"/>
+        </property>
+        <property name="dacoQuestionDao">
+            <ref bean="dacoQuestionDao"/>
+        </property>
+        <property name="dacoAnswerDao">
+            <ref bean="dacoAnswerDao"/>
+        </property>
+        <property name="dacoUserDao">
+            <ref bean="dacoUserDao"/>
+        </property>
+        <property name="dacoSessionDao">
+            <ref bean="dacoSessionDao"/>
+        </property>
+        <property name="dacoToolContentHandler">
+            <ref bean="dacoToolContentHandler"/>
+        </property>
+   		<property name="toolService">
+   			<ref bean="lamsToolService"/>
+   		</property>
+   		<property name="userManagementService">
+   			<ref bean="userManagementService"/>
+   		</property>
+   		<property name="exportContentService">
+   			<ref bean="exportToolContentService"/>
+   		</property>
+   		<property name="messageService">
+   			<ref bean="dacoMessageService"/>
+   		</property>
+		<property name="coreNotebookService">
+			<ref bean="coreNotebookService"/>
+		</property>
+		<property name="eventNotificationService">
+			<ref bean="eventNotificationService"/>
+		</property>
+		<property name="dacoOutputFactory"><ref bean="dacoOutputFactory"/></property>
+    </bean>
+
+    <bean id="dacoService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+        <property name="target">
+            <ref bean="dacoManagerTarget"/>
+        </property>
+        <property name="proxyTargetClass">
+            <value>false</value>
+        </property>
+        <property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+        <property name="transactionAttributes">
+            <props>
+            	<prop key="audit*">PROPAGATION_REQUIRED</prop>
+                <prop key="copyToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="create*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="delete*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>             
+                <prop key="export*">PROPAGATION_REQUIRED,+java.lang.Exception</prop> 
+                <prop key="finishToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>    
+                <prop key="forceCompleteUser">PROPAGATION_REQUIRED</prop>
+                <prop key="get*">PROPAGATION_REQUIRED</prop>                    
+				<prop key="import*">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+                <prop key="is*">PROPAGATION_REQUIRED</prop>
+                <prop key="leaveToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="notifyTeachers*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="release*">readOnly, PROPAGATION_REQUIRED</prop>
+                <prop key="remove*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="resetDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="save*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="set*">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+				<prop key="update*">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+				<prop key="upload*">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+            </props>
+        </property>
+    </bean>
+</beans>
+

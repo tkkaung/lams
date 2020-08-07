@@ -1,0 +1,17 @@
+@import "_lams_variables.scss";
+
+.tablediv {
+	margin: 10px 5px;
+}
+
+.ui-jqgrid a {
+    color: $a-link-default !important;
+}
+
+.ui-jqgrid a:hover {
+    color: $a-link-default-hover !important;
+}
+
+.ui-jqgrid a:focus {
+    color: $a-link-default-focus !important;
+}

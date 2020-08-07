@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+ 	<!-- Hibernate Properties. Should be used by all Hibernate session factories unless -->
+  	<!--  the tool has a specific need for a different setting. 						-->
+  	<bean id="hibernateProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+  	
+	  	<property name="properties">
+		<props>
+			<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+			<prop key="hibernate.show_sql">false</prop>
+			<prop key="hibernate.current_session_context_class">org.lamsfoundation.lams.util.hibernate.TransactionAwareSessionContext</prop>
+		    <prop key="hibernate.cache.use_second_level_cache">false</prop>
+		    <prop key="hibernate.cache.use_query_cache">false</prop>
+            <prop key="hibernate.cache.region.factory_class">org.hibernate.cache.infinispan.JndiInfinispanRegionFactory</prop>
+            <prop key="hibernate.cache.default_cache_concurrency_strategy">TRANSACTIONAL</prop>
+            <prop key="hibernate.transaction.jta.platform">org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform</prop>   
+            <prop key="hibernate.transaction.coordinator_class">jta</prop>   
+             
+            <!-- 
+            <prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.contentrepository.CrNode.cfg">contentrepository-entity</prop>
+            <prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.contentrepository.CrNode.crNodeVersions.cfg">contentrepository-entity</prop>
+            <prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.contentrepository.CrNodeVersion.cfg">contentrepository-entity</prop>
+            <prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.contentrepository.CrNodeVersion.crNodeVersionProperties.cfg">contentrepository-entity</prop>
+            <prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.contentrepository.CrNodeVersionProperty.cfg">contentrepository-entity</prop>
+            <prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.contentrepository.CrWorkspace.cfg">contentrepository-entity</prop>	
+            -->		
+		</props>
+		</property>
+  	</bean>
+  	
+	<import resource="commonContext.xml"/>
+
+	<!-- JNDI DataSource for all "core" components 		  -->
+	<!-- uses lams-ds datasource set up in the app-server -->
+	<bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiName"><value>java:jboss/datasources/lams-ds</value></property>
+	</bean>
+
+	<bean id="transactionManager" class="org.springframework.transaction.jta.JtaTransactionManager">
+		<property name="transactionManagerName" value="java:/TransactionManager"/>
+	</bean>
+	
+	
+	<!-- PostProcessor to convert Hibernate specific (checked) exceptions to Runtime DataAccessExceptions -->
+	<bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor"/>
+
+	<!-- Extra wrapper for all proxied methods.
+		In case of optimistic locking exceptions it retrires the transaction up to 5 times -->
+	<bean id="transactionRetryInterceptor" class="org.lamsfoundation.lams.web.filter.TransactionRetryInterceptor">
+		<property name="transactionRetryService"><ref bean="transactionRetryService"/></property>
+	</bean>
+</beans>

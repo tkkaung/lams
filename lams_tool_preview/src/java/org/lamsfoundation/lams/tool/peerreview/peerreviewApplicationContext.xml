@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+           				   
+    <bean id="peerreviewMessageService" class="org.lamsfoundation.lams.util.MessageService" >
+		<property name="messageSource">
+			<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+				<property name="basename"><value>org.lamsfoundation.lams.tool.peerreview.ApplicationResources</value></property>
+				<property name="defaultEncoding" value="UTF-8" />
+			</bean>
+		</property>										
+	</bean>
+	
+    <!-- core beans -->
+    <bean id="peerreviewDao" class="org.lamsfoundation.lams.tool.peerreview.dao.hibernate.PeerreviewDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="peerreviewUserDao" class="org.lamsfoundation.lams.tool.peerreview.dao.hibernate.PeerreviewUserDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="peerreviewSessionDao" class="org.lamsfoundation.lams.tool.peerreview.dao.hibernate.PeerreviewSessionDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+
+    <!-- Managers -->
+	<bean id="peerreviewToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>peerreviewworkspace</value></property>
+		<property name="repositoryUser"><value>peerreview</value></property>
+		<property name="repositoryId"><value>lams-peerreview</value></property>
+	</bean>
+	
+    <bean id="peerreviewManagerTarget" class="org.lamsfoundation.lams.tool.peerreview.service.PeerreviewServiceImpl">
+        <property name="peerreviewDao">
+            <ref bean="peerreviewDao"/>
+        </property>
+        <property name="peerreviewUserDao">
+            <ref bean="peerreviewUserDao"/>
+        </property>
+        <property name="peerreviewSessionDao">
+            <ref bean="peerreviewSessionDao"/>
+        </property>
+        <property name="peerreviewToolContentHandler">
+            <ref bean="peerreviewToolContentHandler"/>
+        </property>
+   		<property name="toolService">
+   			<ref bean="lamsToolService"/>
+   		</property>
+   		<property name="userManagementService">
+   			<ref bean="userManagementService"/>
+   		</property>
+   		<property name="exportContentService">
+   			<ref bean="exportToolContentService"/>
+   		</property>
+   		<property name="messageService"><ref bean="peerreviewMessageService"/></property>
+		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
+		<property name="ratingService"><ref bean="ratingService"/></property> 
+ 		<property name="eventNotificationService"><ref bean="eventNotificationService"/></property> 
+     </bean>
+
+    <bean id="peerreviewService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name="preInterceptors">
+			<list>		
+				<ref bean="transactionRetryInterceptor" /> 
+			</list>
+		</property>
+		<property name="target">
+            <ref bean="peerreviewManagerTarget"/>
+        </property>
+        <property name="proxyTargetClass">
+            <value>false</value>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+            	<prop key="audit*">PROPAGATION_REQUIRED</prop>
+            	<prop key="comment*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="copyToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>  
+                <prop key="create*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="delete*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="email*">PROPAGATION_REQUIRED,+java.lang.Exception</prop>             
+                <prop key="export*">PROPAGATION_REQUIRED,+java.lang.Exception</prop>  
+                <prop key="finishToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>   
+                <prop key="forceCompleteUser">PROPAGATION_REQUIRED</prop>
+                <prop key="generate*">PROPAGATION_REQUIRED,+java.lang.Exception</prop> 
+                <prop key="get*">PROPAGATION_REQUIRED</prop>
+			    <prop key="import*">PROPAGATION_REQUIRED,+java.lang.Exception</prop>    
+                <prop key="is*">PROPAGATION_REQUIRED</prop>
+                <prop key="leaveToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>  
+                <prop key="markUserFinished">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="rate*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="remove*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="resetDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="save*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="set*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="update*">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+            </props>
+        </property>
+    </bean>
+</beans>
+

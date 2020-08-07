@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+	<bean id="centralToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>centralworkspace</value></property>
+		<property name="repositoryUser"><value>central</value></property>
+		<property name="repositoryId"><value>lams-central</value></property>
+	</bean>
+	
+	<bean id="centralMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basename"><value>org.lamsfoundation.lams.central.ApplicationResources</value></property>
+		<property name="defaultEncoding" value="UTF-8" />
+	</bean>
+	<bean id="centralMessageService" class="org.lamsfoundation.lams.util.MessageService" >
+		<property name="messageSource"><ref bean="centralMessageSource"/></property>										
+	</bean>
+	
+</beans>

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+           				   
+	<bean id="laimagMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basename"><value>org.lamsfoundation.lams.tool.imageGallery.ApplicationResources</value></property>
+		<property name="defaultEncoding" value="UTF-8" />
+	</bean>
+	<bean id="laimagMessageService" class="org.lamsfoundation.lams.util.MessageService" >
+		<property name="messageSource"><ref bean="laimagMessageSource"/></property>										
+	</bean>
+    
+    <!-- OutputFactory -->
+	<bean id="imageGalleryOutputFactory" class="org.lamsfoundation.lams.tool.imageGallery.service.ImageGalleryOutputFactory">  
+    	<property name="toolMessageService"><ref bean="laimagMessageService"/></property>  
+	</bean> 
+
+    <!-- core beans -->
+    <bean id="laimagImageGalleryDao" class="org.lamsfoundation.lams.tool.imageGallery.dao.hibernate.ImageGalleryDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+    <bean id="laimagImageGalleryItemDao" class="org.lamsfoundation.lams.tool.imageGallery.dao.hibernate.ImageGalleryItemDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+    <bean id="laimagImageVoteDao" class="org.lamsfoundation.lams.tool.imageGallery.dao.hibernate.ImageVoteDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>      
+    <bean id="laimagImageGalleryItemVisitDao" class="org.lamsfoundation.lams.tool.imageGallery.dao.hibernate.ImageGalleryItemVisitDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="laimagImageGalleryUserDao" class="org.lamsfoundation.lams.tool.imageGallery.dao.hibernate.ImageGalleryUserDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="laimagImageGallerySessionDao" class="org.lamsfoundation.lams.tool.imageGallery.dao.hibernate.ImageGallerySessionDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+    
+   <bean id="laimagImageGalleryConfigItemDAO" class="org.lamsfoundation.lams.tool.imageGallery.dao.hibernate.ImageGalleryConfigItemDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+    
+    <!-- Managers -->
+	<bean id="laimagImageGalleryToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>sharedimageGalleryworkspace</value></property>
+		<property name="repositoryUser"><value>sharedimageGallery</value></property>
+		<property name="repositoryId"><value>lams-sharedresources</value></property>
+	</bean>
+	
+    <bean id="laimagImageGalleryManagerTarget" class="org.lamsfoundation.lams.tool.imageGallery.service.ImageGalleryServiceImpl">
+        <property name="imageGalleryDao">
+            <ref bean="laimagImageGalleryDao"/>
+        </property>
+        <property name="imageGalleryItemDao">
+            <ref bean="laimagImageGalleryItemDao"/>
+        </property>     
+        <property name="imageVoteDao">
+            <ref bean="laimagImageVoteDao"/>
+        </property>          
+        <property name="imageGalleryItemVisitDao">
+            <ref bean="laimagImageGalleryItemVisitDao"/>
+        </property>
+        <property name="imageGalleryUserDao">
+            <ref bean="laimagImageGalleryUserDao"/>
+        </property>
+        <property name="imageGallerySessionDao">
+            <ref bean="laimagImageGallerySessionDao"/>
+        </property>
+        <property name="imageGalleryConfigItemDAO">
+            <ref bean="laimagImageGalleryConfigItemDAO"/>
+        </property>
+        <property name="imageGalleryToolContentHandler">
+            <ref bean="laimagImageGalleryToolContentHandler"/>
+        </property>
+   		<property name="toolService">
+   			<ref bean="lamsToolService"/>
+   		</property>
+   		<property name="logEventService">
+   			<ref bean="logEventService"/>
+   		</property>
+   		<property name="userManagementService">
+   			<ref bean="userManagementService"/>
+   		</property>
+   		<property name="exportContentService">
+   			<ref bean="exportToolContentService"/>
+   		</property>
+   		<property name="eventNotificationService">
+			<ref bean="eventNotificationService"/>
+		</property>
+   		<property name="messageService"><ref bean="laimagMessageService"/></property>
+		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
+		<property name="ratingService"><ref bean="ratingService"/></property>
+		<property name="imageGalleryOutputFactory"><ref bean="imageGalleryOutputFactory"/></property> 
+    </bean>
+
+    <bean id="laimagImageGalleryService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+        <property name="target">
+            <ref bean="laimagImageGalleryManagerTarget"/>
+        </property>
+        <property name="proxyTargetClass">
+            <value>false</value>
+        </property>
+        <property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+        <property name="transactionAttributes">
+            <props>
+            	<prop key="audit*">PROPAGATION_REQUIRED</prop>
+                <prop key="copyToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="create*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="delete*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>               
+                <prop key="export*">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+                <prop key="finishToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="forceCompleteUser">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED, -java.lang.Exception</prop>
+			    <prop key="import*">PROPAGATION_REQUIRED,+java.lang.Exception</prop> 
+				<prop key="is*">PROPAGATION_REQUIRED</prop>
+                <prop key="leaveToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="notifyTeachersOnImageSumbit">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="remove*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="resetDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="save*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="set*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="toggleImageVisibility">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="updateEntry">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="upload*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+            </props>
+        </property>
+    </bean>
+</beans>
+

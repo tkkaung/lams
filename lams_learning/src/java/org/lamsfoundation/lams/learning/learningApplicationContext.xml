@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+	<!--
+  - Application context definition for lams survey business layer.
+	- Contains bean references to the transaction manager and to the DAOs in
+	- dataAccessContext.xml (see web.xml's "contextConfigLocation").
+	-->
+
+	<!-- ========================= GENERAL DEFINITIONS ========================= -->
+	<bean id="monitoringMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basename">
+			<value>org.lamsfoundation.lams.monitoring.ApplicationResources</value>
+		</property>
+		<property name="defaultEncoding" value="UTF-8" />
+	</bean>
+	
+	<bean id="monitoringMessageService" class="org.lamsfoundation.lams.util.MessageService" >
+		<property name="messageSource" ref="monitoringMessageSource" />								
+	</bean>
+
+	<bean id="learningMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basename">
+			<value>org.lamsfoundation.lams.learning.ApplicationResources</value>
+		</property>
+		<property name="defaultEncoding" value="UTF-8" />
+	</bean>
+	
+	<bean id="learningMessageService" class="org.lamsfoundation.lams.util.MessageService" >
+		<property name="messageSource" ref="learningMessageSource" />	
+	</bean>
+	
+	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
+	<bean id="learnerService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+		<property name="target">
+			<bean class="org.lamsfoundation.lams.learning.service.LearnerService">
+				<property name="progressEngine"><ref bean="progressEngine"/></property>
+				<property name="lessonDAO"><ref bean="lessonDAO"/></property>
+				<property name="learnerProgressDAO"><ref bean="learnerProgressDAO"/></property>
+				<property name="lamsCoreToolService"><ref bean="lamsCoreToolService"/></property>
+				<property name="activityDAO"><ref bean="activityDAO"/></property>
+				<property name="groupingDAO"><ref bean="groupingDAO"/></property>
+				<property name="groupUserDAO"><ref bean="groupUserDAO"/></property>
+				<property name="activityMapping"><ref bean="activityMapping"/></property>
+				<property name="userManagementService"><ref bean="userManagementService"/></property>
+				<property name="lessonService"><ref bean="lessonService"/></property>
+				<property name="gradebookService"><ref bean="gradebookService"/></property>
+				<property name="logEventService"><ref bean="logEventService"/></property>
+				<property name="commandDAO"><ref bean="commandDAO"/></property>
+				<property name="kumaliveService"><ref bean="kumaliveService"/></property>
+				<property name="messageService"><ref bean="learningMessageService"/></property>
+			</bean>
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="calculate*">PROPAGATION_REQUIRED</prop>
+				<prop key="chooseActivity">PROPAGATION_REQUIRED</prop>
+				<prop key="completeToolSession">PROPAGATION_REQUIRES_NEW</prop>
+				<prop key="completeActivity">PROPAGATION_REQUIRED</prop>
+				<prop key="create*">PROPAGATION_REQUIRED</prop>
+				<prop key="createCommand*">PROPAGATION_REQUIRES_NEW</prop>
+				<prop key="determineBranch">PROPAGATION_REQUIRED</prop>	
+				<prop key="exitLesson">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="is*">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="joinLesson">PROPAGATION_REQUIRED</prop>
+				<prop key="knockGate">PROPAGATION_REQUIRED</prop>
+				<prop key="learner*">PROPAGATION_REQUIRED</prop>
+				<prop key="moveToActivity">PROPAGATION_REQUIRED</prop>
+				<prop key="performGrouping">PROPAGATION_REQUIRED</prop>		
+				<prop key="recalcProgressForLearner">PROPAGATION_REQUIRES_NEW</prop>	
+				<prop key="selectBranch">PROPAGATION_REQUIRED</prop>
+   			</props>
+		</property>
+	</bean> 
+	
+	<bean id="kumaliveService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+		<property name="target">
+			<bean class="org.lamsfoundation.lams.learning.kumalive.service.KumaliveService">
+				<property name="securityService"><ref bean="securityService"/></property>
+				<property name="kumaliveDAO"><ref bean="kumaliveDAO"/></property>
+				<property name="messageService"><ref bean="learningMessageService"/></property>
+			</bean>
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="export*">PROPAGATION_REQUIRED</prop>
+				<prop key="finish*">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED</prop>
+				<prop key="log*">PROPAGATION_REQUIRED</prop>
+				<prop key="release*">PROPAGATION_REQUIRED</prop>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="score*">PROPAGATION_REQUIRED</prop>
+				<prop key="start*">PROPAGATION_REQUIRED</prop>
+   			</props>
+		</property>
+	</bean> 
+	
+	<bean id="presenceChatService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+		<property name ="target">
+			<bean class="org.lamsfoundation.lams.learning.presence.service.PresenceChatService">
+				<property name="presenceChatDAO"><ref bean="presenceChatDAO" /></property>
+			</bean>
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="create*">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED</prop>
+				<prop key="update*">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<bean id="presenceChatDAO" class="org.lamsfoundation.lams.learning.presence.dao.hibernate.PresenceChatDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>	
+	
+	<bean id="commandDAO" class="org.lamsfoundation.lams.learning.command.dao.hibernate.CommandDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>	
+	
+	<bean id="kumaliveDAO" class="org.lamsfoundation.lams.learning.kumalive.dao.hibernate.KumaliveDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>	
+	
+	<!-- bean id="toolService" class="org.lamsfoundation.lams.tool.service.DummyToolService" singleton="false">
+	</bean-->
+
+	<bean id="progressEngine" class="org.lamsfoundation.lams.learning.progress.ProgressEngine" >
+		<property name="activityDAO"><ref bean="activityDAO"/></property>
+		<property name="logEventService"><ref bean="logEventService"/></property>
+		<property name="messageService"><ref bean="learningMessageService"/></property>
+	</bean>
+	
+	<bean id="activityMapping" class="org.lamsfoundation.lams.learning.web.util.ActivityMapping" >
+		<property name="toolService"><ref bean="lamsCoreToolService"/></property>
+	</bean>
+	
+	<!-- bean id="dummyLearnerService" class="org.lamsfoundation.lams.learning.service.DummyLearnerService" singleton="false">
+		<constructor-arg>
+			<ref bean="progressEngine"/>
+		</constructor-arg>
+		<property name="lessonDAO"><ref bean="lessonDAO"/></property>
+	</bean-->	
+</beans>

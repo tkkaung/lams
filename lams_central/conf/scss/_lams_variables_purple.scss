@@ -1,0 +1,119 @@
+// Definitions for the Purple skin
+@import "_bootstrap-variables.scss";
+@import "_mixins.scss";
+
+$brand-primary:  #85237d;  // Overridden bootstrap setting
+
+// LAMS SASS Global Variables
+
+$gray-light-mid:  lighten($gray-base, 86.5%); // #dddddd
+$gray-lightest:  lighten($gray-base, 96%); // #f5f5f5 or whitesmoke
+
+// Primary colour shades
+$brand-primary-darkest: #33002e; // used for main page offcanvas course list
+$brand-primary-darker: #4d0046;  // used for main page offcanvas course list
+$brand-primary-mid: lighten($brand-primary, 12%); 
+$brand-primary-light: #edbae9; 
+$brand-primary-bright: #aa7fa6;   // used when we need a primary standout, such as the right hand bar indicating the current org in the offcanvas course list.
+
+// a links
+$a-link-default: $brand-primary-darkest;
+$a-link-default-hover: $brand-primary-bright;
+$a-link-default-focus: $brand-primary-bright;
+
+// Success Green shades
+$brand-success-light: lighten($brand-success, 25%); // #b5dfb5
+
+// Warning Yellow shades:
+$contrast-fade-start: #FCF0AD; // Used in Forum, Comment for highlighting replies
+$contrast-light: #F6EEBF; 
+
+// Borders in various colours
+// Grey or black
+$border-thin-black: thin solid black;
+$border-thin-dotted: thin dotted #AAAAAA; // admin, central, monitoring
+$border-thin-dashed: thin dashed #AAAAAA; // only used in admin
+$border-thin-solid: thin solid #AAAAAA; // admin and monitoring
+$border-thin-body-bg: thin solid $body-bg; // white line
+$border-thin-default: thin solid #AAAAAA;
+$border-thin-default-light: thin solid $legend-border-color;
+$medium-default: 3px solid $gray-light-mid;
+// Blue
+$border-thin-primary: thin solid $brand-primary;
+// Red
+$border-thin-danger: thin solid $brand-danger;
+$border-medium-danger: 3px solid $brand-danger;
+
+// learner page box shadow
+$panel-box-shadow: 0 1px 1px rgba(8, 8, 8, 0.88);
+
+// progress bar
+$optional-activity-background: lighten($brand-primary-mid, 50%); 
+$optional-activity-background-heading: lighten($brand-primary-mid, 35%); 
+$optional-activity-background-hover: $contrast-light;
+$completed-activity-fill: $brand-primary;
+$current-activity-fill: #BB0000;
+$gate-activity-fill: #FF0000;
+$complex-activity-fill: #999999;
+$not-started-activity-fill: #009900;
+
+// Used just for main.css - the main page
+$main_default_link: #560400; // #5A738E;
+$main_default_link_hover:  $brand-primary-darker;
+$main_blue_light_highlight: #b57bb1;
+$main_fav_org_link: #fefefe; // #A7B1C2;
+$main_offcanvas_link: #85237D;
+$main_offcanvas_link_color: $body-bg;
+$main_offcanvas_background: $brand-primary-darker;
+$main_offcanvas_color: $gray-lighter;
+$main_offcanvas_logo_background: $brand-primary-darkest;
+$main_offcanvas_search_background: $brand-primary-darkest;
+$main_dropdown_border: #D9DEE4;
+$main_navbar_link: #515356;
+$main_singlelesson_hover_border: #dabdd8;
+$main_singlelesson_hover_background: #e6d3e5;
+
+
+// navbar login bar
+$navbar-brand-login-color: #f6f6f6;
+$navbar-login-background: #56004e;
+
+// panel header color
+$panel-default-heading-background: lighten($brand-primary-bright, 20%);
+
+// Text & typography
+$headings-default-color: $brand-primary-darker;
+
+$stripes_background: url('/lams/images/css/light-fabric.jpg');
+$url_css_directory: "/lams/images/css/";
+$login_logo: "/lams/images/svg/lams_logo_white.svg";
+$login_logo_size: auto 20px;
+$login-logo_div_width: 100px;
+
+$offcanvas_logo: "/lams/images/svg/lams_logo_white.svg";
+$offcanvas_height: 31px;
+// Forms - Overridden bootstrap settings
+$input-border-focus: lighten($brand-primary-bright, 20%); 
+
+// Alerts - Overridden bootstrap settings
+$alert-info-bg:      lighten($brand-primary-bright, 30%);
+$alert-info-text:    $brand-primary;
+$alert-info-border:  darken(adjust-hue($alert-info-bg, -10), 7%);
+
+// generic portrait colors
+$portrait-color-0:#001f3f;
+$portrait-color-1:#FF851B;
+$portrait-color-2:#85144b;
+$portrait-color-3:#111111;
+$portrait-color-4:#3D9970;
+$portrait-color-5:#0074D9;
+$portrait-color-6:#FF4136;
+
+// Canvas background svg:
+// <svg xmlns='http://www.w3.org/2000/svg' width='20' height='20'>
+//  <rect width='20' height='20' fill='#fefefe'/>
+//  <rect x='10' y='10' width='1.5' height='1.5' fill='#b6b6b6'/>
+// </svg>
+// this has to be url encoded and added to the background below
+$canvas-dot-background: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2720%27%20height%3D%2720%27%3E%0D%0A%20%20%3Crect%20width%3D%2720%27%20height%3D%2720%27%20fill%3D%27%23fefefe%27%2F%3E%0D%0A%3Crect%20x%3D%2710%27%20y%3D%2710%27%20width%3D%271.5%27%20height%3D%271.5%27%20fill%3D%27%23b6b6b6%27%2F%3E%0D%0A%3C%2Fsvg%3E");
+

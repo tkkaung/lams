@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+	<!-- ========================= GENERAL DEFINITIONS ========================= -->
+	<bean id="workspaceMessageService" class="org.lamsfoundation.lams.util.MessageService" >
+		<property name="messageSource">
+			<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+				<property name="basename">
+					<value>org.lamsfoundation.lams.central.ApplicationResources</value>
+				</property>
+				<property name="defaultEncoding" value="UTF-8" />
+			</bean>
+		</property>
+    </bean>
+	
+	<!-- ========================= BUSINESS OBJECT DEFINITIONS ========================= -->	
+	<bean id="workspaceServiceTarget" class="org.lamsfoundation.lams.workspace.service.WorkspaceManagementService">
+		<property name="learningDesignDAO"><ref bean="learningDesignDAO"/></property>
+		<property name="baseDAO"><ref bean="baseDAO"/></property>
+		<property name="authoringService"><ref bean="authoringService"/></property>
+		<property name="userMgmtService"><ref bean="userManagementService"/></property>
+		<property name="messageService"><ref bean="workspaceMessageService"/></property>
+	</bean>
+	
+	<bean id="workspaceManagementService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
+		<property name ="target"><ref bean="workspaceServiceTarget"/></property>
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+		
+		<!-- TransactionProxyFactoryBean by default just proxies all interfaces implemented by the target object -->
+		<!-- AuthoringService is class so needs to be proxied via CGLIB -->
+		<!-- Specify "proxyTargetClass" = "true" to generate a CGLIB proxy-->
+		<property name="proxyTargetClass"><value>true</value></property>     
+		
+		<property name="transactionAttributes">
+			<props>
+				<prop key="copy*">PROPAGATION_REQUIRED</prop>
+				<prop key="create*">PROPAGATION_REQUIRED</prop>
+				<prop key="delete*">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="is*">PROPAGATION_REQUIRED</prop>	
+				<prop key="move*">PROPAGATION_REQUIRED</prop>					
+				<prop key="rename*">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean>
+</beans>

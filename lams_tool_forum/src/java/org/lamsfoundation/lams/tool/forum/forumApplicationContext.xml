@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+	<bean id="forumMessageService" class="org.lamsfoundation.lams.util.MessageService"
+		>
+		<property name="messageSource">
+			<bean id="messageSource"
+				class="org.springframework.context.support.ResourceBundleMessageSource">
+				<property name="basename">
+					<value>org.lamsfoundation.lams.tool.forum.ApplicationResources</value>
+				</property>
+				<property name="defaultEncoding" value="UTF-8" />
+			</bean>
+		</property>
+	</bean>
+
+	<!-- core beans -->
+	<bean id="forumDao" class="org.lamsfoundation.lams.tool.forum.dao.hibernate.ForumDao">
+		<property name="sessionFactory">
+			<ref bean="coreSessionFactory" />
+		</property>
+	</bean>
+	<bean id="forumUserDao"
+		class="org.lamsfoundation.lams.tool.forum.dao.hibernate.ForumUserDao">
+		<property name="sessionFactory">
+			<ref bean="coreSessionFactory" />
+		</property>
+	</bean>
+
+	<bean id="attachmentDao"
+		class="org.lamsfoundation.lams.tool.forum.dao.hibernate.AttachmentDao">
+		<property name="sessionFactory">
+			<ref bean="coreSessionFactory" />
+		</property>
+	</bean>
+
+	<bean id="messageDao"
+		class="org.lamsfoundation.lams.tool.forum.dao.hibernate.MessageDao">
+		<property name="sessionFactory">
+			<ref bean="coreSessionFactory" />
+		</property>
+	</bean>
+
+	<bean id="timestampDao"
+		class="org.lamsfoundation.lams.tool.forum.dao.hibernate.TimestampDao">
+		<property name="sessionFactory">
+			<ref bean="coreSessionFactory" />
+		</property>
+	</bean>
+
+	<bean id="messageSeqDao"
+		class="org.lamsfoundation.lams.tool.forum.dao.hibernate.MessageSeqDao">
+		<property name="sessionFactory">
+			<ref bean="coreSessionFactory" />
+		</property>
+	</bean>
+	<bean id="messageRatingDao"
+		class="org.lamsfoundation.lams.tool.forum.dao.hibernate.MessageRatingDAO">
+		<property name="sessionFactory">
+			<ref bean="coreSessionFactory" />
+		</property>
+	</bean>
+	<bean id="forumToolSessionDao"
+		class="org.lamsfoundation.lams.tool.forum.dao.hibernate.ForumToolSessionDao">
+		<property name="sessionFactory">
+			<ref bean="coreSessionFactory" />
+		</property>
+	</bean>
+
+	<!-- Managers -->
+	<bean id="forumToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>forumworkspace</value></property>
+		<property name="repositoryUser"><value>forum</value></property>
+		<property name="repositoryId"><value>lams-forum</value></property>
+	</bean>
+
+	<bean id="forumOutputFactory"
+		class="org.lamsfoundation.lams.tool.forum.service.ForumOutputFactory">
+		<property name="toolMessageService">
+			<ref bean="forumMessageService" />
+		</property>
+	</bean>
+
+	<bean id="forumManagerTarget" class="org.lamsfoundation.lams.tool.forum.service.ForumService">
+		<property name="forumDao">
+			<ref bean="forumDao" />
+		</property>
+		<property name="forumUserDao">
+			<ref bean="forumUserDao" />
+		</property>
+		<property name="attachmentDao">
+			<ref bean="attachmentDao" />
+		</property>
+		<property name="messageDao">
+			<ref bean="messageDao" />
+		</property>
+		<property name="messageSeqDao">
+			<ref bean="messageSeqDao" />
+		</property>
+		<property name="messageRatingDao">
+			<ref bean="messageRatingDao" />
+		</property>	
+		<property name="timestampDao">
+			<ref bean="timestampDao" />
+		</property>
+		<property name="forumToolSessionDao">
+			<ref bean="forumToolSessionDao" />
+		</property>
+		<property name="forumToolContentHandler">
+			<ref bean="forumToolContentHandler" />
+		</property>
+		<property name="toolService">
+			<ref bean="lamsToolService" />
+		</property>
+		<property name="userManagementService">
+			<ref bean="userManagementService" />
+		</property>
+		<property name="exportContentService">
+			<ref bean="exportToolContentService" />
+		</property>
+		<property name="logEventService">
+			<ref bean="logEventService" />
+		</property>
+		<property name="messageService">
+			<ref bean="forumMessageService" />
+		</property>
+		<property name="coreNotebookService">
+			<ref bean="coreNotebookService" />
+		</property>
+		<property name="forumOutputFactory">
+			<ref bean="forumOutputFactory" />
+		</property>
+		<property name="eventNotificationService">
+			<ref bean="eventNotificationService" />
+		</property>
+		<property name="lessonService">
+			<ref bean="lessonService"/>
+		</property>
+		<property name="activityDAO">
+			<ref bean="activityDAO"/>
+		</property>		
+	</bean>
+
+	<bean id="forumService"
+		class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager">
+			<ref bean="transactionManager" />
+		</property>
+		<property name="target">
+			<ref bean="forumManagerTarget" />
+		</property>
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+		<property name="transactionAttributes">
+			<props>		
+            	<prop key="audit*">PROPAGATION_REQUIRED</prop>
+				<prop key="cloneContentTopics">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="copyToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="create*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="delete*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="export*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="finishUserSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="forceCompleteUser">PROPAGATION_REQUIRED</prop>
+			    <prop key="get*">PROPAGATION_REQUIRED,readOnly,-java.lang.Exception</prop>
+			    <prop key="is*">PROPAGATION_REQUIRED,readOnly,-java.lang.Exception</prop>	
+				<prop key="import*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="leaveToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="rateMessage">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="releaseMarksForSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="replyTopic">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="resetDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="remove*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="save*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="sendNotificationsOnNewPosting">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="set*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="update*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="uploadAttachment">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+			</props>
+		</property>
+	</bean>
+
+</beans>

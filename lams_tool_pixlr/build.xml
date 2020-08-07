@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="LAMS Tool Pixlr" basedir="."> 
+	<import file="../lams_build/build_tools_base.xml"/>
+	
+	<!-- Below are Tool specifc targets and targets overriding ones from the imported base file. -->
+	<target name="deploy-tool" depends="tools_base.deploy-tool"
+		    description="Build Tool archives and run deployment. Do not run on a production environment.">
+		
+		<!-- Creating the image directory for pixlr in lams-www.war -->
+		<mkdir dir="${server.home}/standalone/deployments/lams.ear/lams-www.war/images/pixlr" />
+		<copy  todir="${server.home}/standalone/deployments/lams.ear/lams-www.war/images/pixlr">
+			<fileset dir="${conf.web.dir}/images/">
+				<include name="blank.jpg" />
+			</fileset>
+		</copy>
+	</target>
+</project>

@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+	<bean id="resourceMessageService" class="org.lamsfoundation.lams.util.MessageService" >
+		<property name="messageSource">
+			<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+				<property name="basename"><value>org.lamsfoundation.lams.tool.rsrc.ApplicationResources</value></property>
+				<property name="defaultEncoding" value="UTF-8" />
+			</bean>
+		</property>										
+	</bean>
+    <!-- core beans -->
+    <bean id="resourceDao" class="org.lamsfoundation.lams.tool.rsrc.dao.hibernate.ResourceDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+    <bean id="resourceItemDao" class="org.lamsfoundation.lams.tool.rsrc.dao.hibernate.ResourceItemDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+    <bean id="resourceItemVisitDao" class="org.lamsfoundation.lams.tool.rsrc.dao.hibernate.ResourceItemVisitDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="resourceUserDao" class="org.lamsfoundation.lams.tool.rsrc.dao.hibernate.ResourceUserDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="resourceSessionDao" class="org.lamsfoundation.lams.tool.rsrc.dao.hibernate.ResourceSessionDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+    
+    <bean id="resourceOutputFactory" class="org.lamsfoundation.lams.tool.rsrc.service.ResourceOutputFactory">  
+    	<property name="toolMessageService"><ref bean="resourceMessageService"/></property>  
+	</bean> 
+
+
+    <!-- Managers -->
+	<bean id="resourceToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>sharedresourcesworkspace</value></property>
+		<property name="repositoryUser"><value>sharedresources</value></property>
+		<property name="repositoryId"><value>lams-sharedresources</value></property>
+	</bean>
+	
+    <bean id="resourceManagerTarget" class="org.lamsfoundation.lams.tool.rsrc.service.ResourceServiceImpl">
+        <property name="resourceDao">
+            <ref bean="resourceDao"/>
+        </property>
+        <property name="resourceItemDao">
+            <ref bean="resourceItemDao"/>
+        </property>
+        <property name="resourceItemVisitDao">
+            <ref bean="resourceItemVisitDao"/>
+        </property>
+        <property name="resourceUserDao">
+            <ref bean="resourceUserDao"/>
+        </property>
+        <property name="resourceSessionDao">
+            <ref bean="resourceSessionDao"/>
+        </property>
+        <property name="resourceToolContentHandler">
+            <ref bean="resourceToolContentHandler"/>
+        </property>
+   		<property name="toolService">
+   			<ref bean="lamsToolService"/>
+   		</property>
+   		<property name="logEventService">
+   			<ref bean="logEventService"/>
+   		</property>
+   		<property name="userManagementService">
+   			<ref bean="userManagementService"/>
+   		</property>
+   		<property name="exportContentService">
+   			<ref bean="exportToolContentService"/>
+   		</property>
+   		<property name="messageService"><ref bean="resourceMessageService"/></property>
+		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>   
+		<property name="eventNotificationService">
+			<ref bean="eventNotificationService"/>
+		</property>
+		<property name="ratingService"><ref bean="ratingService"/></property>
+		<property name="resourceOutputFactory"><ref bean="resourceOutputFactory"/></property>
+    </bean>
+
+    <bean id="resourceService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+        <property name="target">
+            <ref bean="resourceManagerTarget"/>
+        </property>
+        <property name="proxyTargetClass">
+            <value>false</value>
+        </property>
+        <property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+        <property name="transactionAttributes">
+            <props>
+            	<prop key="audit*">PROPAGATION_REQUIRED</prop>
+            	<prop key="check*">PROPAGATION_REQUIRED</prop>
+                <prop key="copyToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="create*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="delete*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>               
+                <prop key="export*">PROPAGATION_REQUIRED,+java.lang.Exception</prop>  
+                <prop key="finishToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop> 
+                <prop key="forceCompleteUser">PROPAGATION_REQUIRED</prop>
+                <prop key="get*">PROPAGATION_REQUIRED</prop>
+                <prop key="is*">PROPAGATION_REQUIRED</prop>
+                <prop key="leaveToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="notifyTeachers*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="remove*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="resetDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="retrieveComplete">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="save*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>                    
+				<prop key="set*">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+				<prop key="upload*">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+            </props>
+        </property>
+    </bean>
+</beans>
+

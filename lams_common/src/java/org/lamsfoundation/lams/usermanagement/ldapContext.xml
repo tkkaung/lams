@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+           				   
+	<bean id="ldapServiceTarget" class="org.lamsfoundation.lams.usermanagement.service.LdapService">
+		<property name="service"><ref bean="userManagementService"/></property>
+		<property name="timezoneService"><ref bean="timezoneService"/></property>
+	</bean>
+	
+	<bean id="ldapService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
+		<property name ="target"><ref bean="ldapServiceTarget"/></property>
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+		
+		<!-- TransactionProxyFactoryBean by default just proxies all interfaces implemented by the target object -->
+		<!-- AuthoringService is class so needs to be proxied via CGLIB -->
+		<!-- Specify "proxyTargetClass" = "true" to generate a CGLIB proxy-->
+		<property name="proxyTargetClass"><value>true</value></property>     
+		<property name="transactionAttributes">
+			<props>
+				<prop key="addLDAPUser">PROPAGATION_REQUIRED</prop>
+				<prop key="bulkUpdate">PROPAGATION_REQUIRED</prop>
+				<prop key="createLDAPUser">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED</prop>
+				<prop key="updateLDAPUser">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean>
+</beans>

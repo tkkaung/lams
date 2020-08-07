@@ -1,0 +1,487 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="build_base" basedir="." default="print-usage">
+	<description>
+		This is a base for most LAMS build.xml files.
+		It contains several most common tasks.
+	</description>
+	
+	<!-- Directory of this parent file -->
+	<dirname property="base.dir" file="${ant.file.build_base}"/>
+	 
+	<!-- Import project specific property file; base dir for this is the importing build.xml file -->
+	<property file="build.properties" />
+	<!-- Import common property files; base dir for this is the current file -->
+	<property file="${base.dir}/build.properties"/>
+	<property file="${base.dir}/common.properties"/>
+	<property file="${base.dir}/${osPropertiesName}.properties"/>
+	
+	<!-- Set library paths -->
+	<path id="libs.classpath" >
+		<fileset dir="../../lams/lams_build/lib">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset file="../../lams/lams_common/build/lib/lams.jar" />
+		<!-- Same list as in projects' .classpath file references to WildFly modules.
+			 They need to be exactly listed as **/*.jar would load other versions of JARs
+			 that are also present in lams_build/lib.
+		-->
+		<fileset dir="${server.home}/modules/system/layers/base">
+			<include name="io/undertow/core/main/undertow-core-*.jar" />
+			<include name="io/undertow/servlet/main/undertow-servlet-*.jar" />
+			<include name="javax/servlet/api/main/jboss-servlet-api*.jar" />
+			<include name="javax/servlet/jsp/api/main/jboss-jsp-api*.jar" />
+			<include name="javax/servlet/jstl/api/main/*.jar" />
+			<include name="javax/transaction/api/main/jboss-transaction-*.jar" />
+			<include name="org/javassist/main/javassist-*.jar" />
+			<include name="org/picketbox/main/picketbox-*.jar" />
+			<include name="org/jboss/logging/main/jboss-logging-*.jar" />
+			<include name="org/jboss/log4j/logmanager/main/log4j-jboss-logmanager-*.jar" />
+			<include name="org/jboss/logmanager/main/jboss-logmanager-*.jar" />
+			<include name="org/slf4j/main/slf4j-api-*.jar" />
+			<include name="org/slf4j/impl/main/slf4j-jboss-logmanager-*.jar" />
+			<include name="org/jboss/logging/commons/logging/main/commons-logging-jboss-logging-*.jar" /> <!-- Alias for Commons Logging -->
+			<include name="javax/xml/rpc/api/main/jboss-jaxrpc-api*.jar" />
+			<include name="javax/mail/api/main/javax.mail-*.jar" />
+			<include name="org/jboss/remoting-jmx/main/remoting-jmx-*.jar" />
+			<include name="org/apache/commons/beanutils/main/commons-beanutils-*.jar" />
+			<include name="org/apache/commons/collections/main/commons-collections-*.jar" />
+			<include name="org/apache/httpcomponents/core/main/httpclient-*.jar" />
+			<include name="org/apache/httpcomponents/core/main/httpcore-*.jar" />
+			<include name="org/apache/commons/io/main/commons-io-*.jar" />
+			<include name="org/apache/commons/lang/main/commons-lang-*.jar" />
+			<include name="org/apache/commons/codec/main/commons-codec-*.jar" />
+			<include name="javax/websocket/api/main/jboss-websocket-api*.jar" />
+			<include name="org/jboss/as/controller-client/main/wildfly-controller-client-*.jar" />
+			<include name="org/jboss/dmr/main/jboss-dmr-*.jar" />
+			<include name="com/fasterxml/jackson/core/jackson-core/main/jackson-core-*.jar" />
+			<include name="com/fasterxml/jackson/core/jackson-databind/main/jackson-databind-*.jar" />
+			<include name="javax/activation/api/main/activation-*.jar" />
+			<include name="javax/persistence/api/main/javax.persistence-api-*.jar" />
+			<include name="org/hibernate/main/hibernate-core-*.Final.jar" />
+		</fileset>
+		<!-- Optional project own libraries -->
+		<fileset dir="lib" erroronmissingdir="false">
+			<include name="**/*.jar"/>
+		</fileset>
+	</path>
+	
+	<path id="product.classpath">
+		<path refid="libs.classpath"/>
+		<pathelement location="${basedir}/build/classes/java"/>
+	</path>
+
+	
+	<!-- ================================================================ -->
+	<!-- Print information								                  -->
+	<!-- ================================================================ -->
+	
+	<target name="print-usage" description="Displays Ant targets descriptions">
+		<echo>
+		${ant.project.name} build file
+		------------------------------------------------------
+		
+		Available targets are:
+			
+		print-usage				--> Display this information
+		copy-tags               --> Copies custom JSP tags from Central
+		deploy-jar         		--> Deploys JAR to EAR
+		deploy-war         		--> Deploys WAR to EAR
+		copy-to-lams-lib      --> Copies JAR to lams-build for other projects to use
+		explode-war             --> Unpacks WAR in EAR
+		explode-war-synchronize --> Updates web content in exploded WAR
+		explode-war-delete      --> Removes exploded WAR
+		</echo>	
+	</target>
+	
+	<target name="_print-classpath">
+		<!-- Internal target: Prints out paths to library and project classes. -->
+		<echo message="java.class.path = ${java.class.path}" />
+		<property name="libs.classpath.string" refid="libs.classpath" />
+		<echo message="libs.classpath = ${libs.classpath.string}" />
+	</target>
+	
+	
+	<target name="_target-not-available">
+		<echo>This target is not implemented or applicable for ${ant.project.name}</echo>
+	</target>
+	
+	<!-- ================================================================ -->
+	<!-- Preparations									                  -->
+	<!-- ================================================================ -->
+
+	<target name="_clean-dirs">
+		<!-- Internal target: Recreates dirs for compiled output files. -->
+		<echo>${ant.project.name}: Removing cache and build folders</echo>
+		<delete dir="${server.home}server/default/tmp" quiet="true" />
+		<delete dir="${server.home}server/default/work" quiet="true" />
+		<delete dir="${basedir}/build" quiet="true" />
+				
+		<echo>${ant.project.name}: Creating build dir structure</echo>
+		<mkdir dir="${basedir}/build/classes/java" />
+		<mkdir dir="${basedir}/build/lib" />
+		<mkdir dir="${basedir}/build/deploy" />
+		<mkdir dir="${basedir}/build/deploy/sql" />
+		<mkdir dir="${basedir}/build/deploy/language" />
+		<mkdir dir="${basedir}/build/war" />
+		<mkdir dir="${basedir}/build/css" />
+	</target>
+	
+	
+	<target name="copy-tags" description="Copies LAMS TLD and TAGs.">
+		<echo>${ant.project.name}: Copying tags from Central</echo>
+   		<copy todir="${conf.web.dir}/WEB-INF/tlds/lams" 
+   			  file="../../lams/lams_central/web/WEB-INF/tlds/lams/lams.tld" overwrite="true" verbose="true" />	
+		<copy todir="${conf.web.dir}/WEB-INF/tags" overwrite="true" verbose="true">
+			<fileset dir="../../lams/lams_central/web/WEB-INF/tags" />
+		</copy>
+	</target>
+	
+	<!-- =================================================================== -->
+	<!-- Database Tasks                                             		 -->
+	<!-- =================================================================== -->
+	
+	<target name="_db-script">
+		<!-- Internal target: Runs SQL script given by call parameter. -->
+		<sql driver="com.mysql.cj.jdbc.Driver"
+		     url="${db.url.build}"
+			 userid="${db.username}"
+			 password="${db.password}"
+			 encoding="utf8">
+			<classpath>
+				<fileset dir="../../lams/lams_build/lib/mysql" includes="*.jar"/> 
+			</classpath>
+			<transaction src="${sql.script}" />
+		</sql>
+	</target>
+	
+	<!-- ================================================================ -->
+	<!-- Compilations								                      -->
+	<!-- ================================================================ -->
+
+	<available property="common.jar.exists" file="../../lams/lams_common/build/lib/lams.jar" type="file" />
+	
+	<target name="_build-common" unless="common.jar.exists">
+		<ant antfile="../lams_common/build.xml" target="_build-jar" inheritAll="false"/>
+	</target>
+	
+	<target name="_compile-java-nocommon" depends="_clean-dirs">
+		<!-- Internal target: Compile Java sources. -->
+		<echo>${ant.project.name}: Compiling Java sources</echo>
+		<javac srcdir="${src.java.dir}"
+			   compiler="modern"
+	           source="11"
+			   target="11"
+               debug="on"
+               includeantruntime="false"
+			   debuglevel="lines,vars,source"
+               classpathref="libs.classpath"
+               destdir="${basedir}/build/classes/java">
+               <compilerarg line="-encoding utf-8"/>
+			   <compilerarg line="--add-exports java.base/sun.net.www.protocol.https=ALL-UNNAMED"/>
+        </javac>
+        
+		<echo>${ant.project.name}: Copying additional non-Java resources</echo>
+	 	<copy todir="${basedir}/build/classes/java" overwrite="true">
+			<fileset dir="${src.java.dir}">
+				<include name="**/*.xml"/>
+				<include name="**/*.properties"/>
+				<!-- Autopatch -->
+				<include name="**/*.sql"/>
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="_compile-java" depends="_build-common, _compile-java-nocommon" />
+
+	<!-- ================================================================ -->
+	<!-- Build archives        		    	          					  -->
+	<!-- ================================================================ -->
+
+	<target name="_copy-hbm">
+		<echo>${ant.project.name}: Copying Hibernate mapping files</echo>
+		<copy todir="${basedir}/build/classes/java" overwrite="true">
+			<fileset dir="${conf.dir}/hibernate/mappings" erroronmissingdir="false">
+				<include name="**/*.hbm.xml"/>
+			</fileset>
+		</copy>
+	</target>
+					
+	
+	<target name="_copy-language" if="product.core">
+		<!-- Internal target: Copies language tags to build dir for easier EAR assembly.
+		     Required only for base products, not Tools -->
+		<echo>${ant.project.name}: Copying language files to build dir</echo>
+		<copy todir="${basedir}/build/lib/language/${product.path.filesystem}">
+			<fileset dir="${conf.dir}/language/lams">
+				<include name="**/*.properties"/>
+				<include name="**/*.txt"/>
+			</fileset>
+		</copy>
+	</target>
+	
+	
+	<target name="_build-manifest">
+		<!-- Internal target: Creates a JAR/WAR manifest out of a template. -->
+		<echo>${ant.project.name}: Preparing manifest</echo>
+		<copy tofile="${basedir}/build/MANIFEST.MF" verbose="true">
+			<fileset dir="${base.dir}/conf/j2ee">
+				<include name="MANIFEST-template.MF" />
+			</fileset>
+	        <filterset>
+	        	<filter token="product" value="${ant.project.name}"/>
+	        	<filter token="version" value="${project.version}"/>
+	        </filterset>
+		</copy>
+	</target>
+	
+	
+	<target name="_build-jar" depends="_compile-java, _copy-hbm, _build-manifest, _copy-language">
+		<!-- Internal target: Creates JAR file. -->
+		<echo>${ant.project.name}: Building JAR</echo>
+		<jar jarfile="${basedir}/build/lib/${product}.jar"
+			 manifest="${basedir}/build/MANIFEST.MF">
+			<fileset dir="${basedir}/build/classes/java" />
+		</jar>
+	</target>
+
+	
+	<target name="_build-war" depends="_build-manifest, _copy-language, _copy-jsp, _copy-libs, _copy-deployment-handler">
+		<!-- Internal target: Creates WAR file. -->
+		<echo>${ant.project.name}: Building WAR</echo>
+		
+		<!-- Add extra dir for CKEditor connector -->
+		<mkdir dir="${basedir}/build/war/userfiles"/>
+		
+		<war warfile="${basedir}/build/lib/${product}.war" 
+  		     webxml="${basedir}/build/war/WEB-INF/web.xml"
+			 manifest="${basedir}/build/MANIFEST.MF">
+			<fileset dir="${basedir}/build/war" />
+		</war>
+	</target>
+	
+	
+	<!-- This is needed for lams_build, otherwise building WAR deletes JAR and other way around -->
+	<target name="_build-product" depends="_build-jar, _build-war" />
+
+	<!-- =================================================================== -->
+	<!-- Product deployment			                                         -->
+	<!-- =================================================================== -->
+	
+	<target name="deploy-jar" depends="_build-jar" description="Deploys JAR.">	
+		<echo>${ant.project.name}: Deploying JAR</echo>
+		<copy file="${basedir}/build/lib/${product}.jar" todir="${server.home}/standalone/deployments/lams.ear/lib" overwrite="true" verbose="true" />
+	</target>
+	
+	
+	<target name="deploy-war" depends="_build-war, explode-war-delete" description="Deploys WAR.">
+		<echo>${ant.project.name}: Deploying WAR</echo>
+		<copy file="${basedir}/build/lib/${product}.war" todir="${server.home}/standalone/deployments/lams.ear" overwrite="true" verbose="true" />
+		
+		<echo>Copying language files for ${ant.project.name}, if exist</echo>
+		<copy todir="${server.home}/standalone/deployments/lams.ear/lams-dictionary.jar/${product.path.filesystem}" overwrite="true">
+		   <fileset dir="${conf.dir}/language/lams" erroronmissingdir="false">
+		    <include name="**/*.properties"/>
+		    <include name="**/*.txt"/>
+		   </fileset>
+		</copy>
+	</target>
+	
+	
+	<target name="_add-conf-module">
+		<!-- Internal target: Adds subprojects' JAR/WAR to LAMS EAR application.xml -->
+		<property name="moduleActivationPlaceholder" value="&lt;!-- Optional Module Placeholder - do not remove --&gt;" />
+		<loadfile srcFile="conf/moduleActivation.xml" property="moduleActivationEntry" quiet="true" />
+		<echo>${ant.project.name}: Enable module in EAR config files</echo>
+		<!-- Remove existing entries first, so it is possible to run target multiple times -->
+		<replaceregexp file="${server.home}/standalone/deployments/lams.ear/META-INF/application.xml"
+					   flags="gi"
+		               match="${moduleActivationEntry}" 
+			           replace=""
+		/>
+		<replaceregexp file="${server.home}/standalone/deployments/lams.ear/META-INF/application.xml"
+			 		   flags="i"
+			           match="(${moduleActivationPlaceholder})"
+			           replace="${moduleActivationEntry}    \1"
+		/>
+	</target>
+
+	<!-- =================================================================== -->
+	<!-- Explode WAR                                        				 -->
+	<!-- =================================================================== -->
+	
+	<available property="product.war.exists" file="${server.home}/standalone/deployments/lams.ear/${product}.war" type="file" />
+	
+	<target name="explode-war" if="product.war.exists" description="Explodes deployed WAR to folder.">
+		<echo>${ant.project.name}: Renaming existing WAR</echo>
+		<move tofile="${server.home}/standalone/deployments/lams.ear/temp-${product}.war" file="${server.home}/standalone/deployments/lams.ear/${product}.war" />
+		<echo>${ant.project.name}: Exploding WAR to folder</echo>
+		<unjar src="${server.home}/standalone/deployments/lams.ear/temp-${product}.war" dest="${server.home}/standalone/deployments/lams.ear/${product}.war" />
+		<echo>${ant.project.name}: Removing temporary WAR</echo>
+		<delete>
+			<fileset dir="${server.home}/standalone/deployments/lams.ear">
+				<include name="temp-${product}.war" />
+			</fileset>
+		</delete>
+	</target>
+	
+	
+	<target name="explode-war-synchronize" description="Copies web files into exploded WAR folder.">
+		<echo>Overwriting deployed ${ant.project.name} web files with source files</echo>
+		<copy todir="${server.home}/standalone/deployments/lams.ear/${product}.war" verbose="yes">
+			<fileset dir="${conf.web.dir}">
+				<include name="**/*.*" />
+				<exclude name="**/*.scss"/>
+			</fileset>
+		</copy>
+	</target>
+	
+	
+	<target name="explode-war-delete" description="Deletes exploded WAR folder.">
+		<echo>${ant.project.name}: Removing WAR folder</echo>
+		<delete dir="${server.home}/standalone/deployments/lams.ear/${product}.war" quiet="true" />
+
+		<echo>Removing temporary WAR for ${ant.project.name}, if exists</echo>
+		<delete file="${server.home}/standalone/deployments/lams.ear/temp-${product}.war" quiet="true" />
+	</target>
+	
+	
+	<target name="_copy-jsp" depends="sass.compile, _js-minify">
+		<!-- Internal target: Copies JSP files. -->
+		<echo>${ant.project.name}: Copying JSP files</echo>
+
+		<!-- No processing is needed so copy files straight to assembly dir to create WAR -->
+		<echo>Copying web resources</echo>
+	 	<copy todir="${basedir}/build/war">
+			<fileset dir="${conf.web.dir}">
+				<exclude name="**/*.scss"/>
+			</fileset>
+	 	</copy>
+	</target>
+	
+	<target name="_copy-libs">
+		<echo>${ant.project.name}: Copying additional libraries</echo>
+	 	<copy todir="${basedir}/build/war/WEB-INF/lib" flatten="true" verbose="true">
+			<fileset dir="${basedir}/lib" erroronmissingdir="false">
+				<include name="**/*"/>
+			</fileset>
+	 	</copy>
+	</target>
+	
+	<target name="_copy-deployment-handler">
+		<!-- Internal target: Copies WildFly deployment handler -->
+		<echo>${ant.project.name}: Copying deployment handler</echo>
+
+	 	<copy todir="${basedir}/build/war/META-INF/services"
+	 		  file="../../lams/lams_build/conf/deployment-handler/io.undertow.servlet.ServletExtension" />
+	</target>
+
+	<!-- ====================================================================== -->
+	<!--  Compile scss files to css files. Assumes SASS is installed. See       -->
+	<!--  sass_exec_file in unix/windows.properties.						    -->
+	<!--  sass.compile compiles all .sccs files.    						    -->
+	<!--  sass.compile.auto compiles modified .sccs files. Use for auto builds. -->
+	<!-- ====================================================================== -->
+	<target name="_sass.do.compile">
+        <apply dest="${basedir}/build/css" executable="${sass_exec_file}" failonerror="true" verbose="true">
+        	<arg value="--sourcemap=none"/>
+        	<arg value="--load-path=${scss.common.variables}"/>
+            <srcfile/>
+            <targetfile/>
+	        <fileset dir="${scss.css.dir}" erroronmissingdir="false">
+		        <include name="*.scss"/>
+	            <exclude name="_*.scss" />
+ 	        </fileset>
+            <mapper from="*.scss" to="*.css" type="glob"/>
+        </apply>
+	    <ant target="_css.minify.copy"/>
+	    	<ant target="_css.nominify.copy"/>
+	</target>
+	
+	<target name="_css.minify.copy"  if="${css.minify}">
+		<echo> Minifying Files </echo>
+	    <apply executable="java" parallel="false">
+	        <fileset dir="${basedir}/build/css">
+		        	<include name="*.css"/>
+		        	<exclude name="*-min.css"/>
+		    </fileset>
+	        <arg line="-jar"/>
+	        <arg path="${yuicompressor}"/>
+	         <srcfile/>
+	        <arg line="-o"/>
+	        <mapper type="glob" from="*.css" to="${basedir}/build/css/*-min.css"/>
+	        <targetfile/>
+	    </apply>
+    		<echo>Copying css files from build area to web/css directory. The .map files are not copied. </echo>
+	 	<copy todir="${scss.css.dir}">
+			<fileset dir="${basedir}/build/css" erroronmissingdir="false">
+				<include name="*.css"/>
+			</fileset>
+		    <mapper type="glob" from="*-min.css" to="*.css"/>
+	 	</copy>
+	</target>
+
+	<target name="_css.nominify.copy" unless="${css.minify}">
+    		<echo>Copying css files from build area to web/css directory. The .map files are not copied. </echo>
+	 	<copy todir="${scss.css.dir}" verbose="true">
+			<fileset dir="${basedir}/build/css" erroronmissingdir="false">
+				<include name="*.css"/>
+		        	<exclude name="*-min.css"/>
+			</fileset>
+		    <mapper type="glob" from="*.css" to="*.css"/>
+	 	</copy>
+	</target>
+
+	<target name="_sass.build.clean">
+		<delete quiet="true">
+    			<fileset dir="${basedir}/build/css" includes="*.css"/>
+		</delete>
+	</target>
+	
+    <target name="sass.compile" description="Creates css files from scss (sass) files"  depends="_sass.build.clean">
+		<echo>Compiling ALL .sccs files from ${scss.css.dir} using ${sass_exec_file}</echo>
+		<mkdir dir="${basedir}/build/css" />
+		<touch verbose="true">
+	        <fileset dir="${scss.css.dir}" erroronmissingdir="false">
+		        <include name="**/*.scss"/>
+ 	        </fileset>
+   	 	</touch>
+  	  	<ant target="_sass.do.compile"/>
+    </target>
+
+    <target name="sass.compile.auto" description="Creates css files from *modified* scss (sass) files">
+		<echo>Compiling modified .sccs files from ${scss.css.dir} using ${sass_exec_file}</echo>
+		<mkdir dir="${basedir}/build/css" />
+		<ant target="_sass.do.compile"/>
+    </target>
+
+	<!-- Minify specific javascript files -->
+	<fileset id="js.to.minify" dir="${basedir}/web/includes/javascript">
+        	<include name="*.js"/>
+    </fileset>
+
+	<target name="_set-do.js.minify">
+		<condition property="do.js.minify">
+	    		<and>
+		      <istrue value="${js.minify}"/>
+		      <available file="${basedir}/web/includes/javascript" type="dir"/>
+		    </and>
+		</condition>
+	</target>
+	
+  	<!-- Must run before the general web copy or the minified files will not be included as the files are up to date. -->
+	<target name="_js-minify" depends="_set-do.js.minify" if="do.js.minify">
+		<echo>Minifying Javascript Files</echo>
+		<mkdir dir="${basedir}/build/war/includes/javascript" />
+	    <apply executable="java" parallel="false">
+	        <fileset refid="js.to.minify"/>
+	        <arg line="-jar"/>
+	        <arg path="${yuicompressor}"/>
+	        <srcfile/>
+	        <arg line="-o"/>
+	        <mapper type="glob" from="*.js" to="${basedir}/build/war/includes/javascript/*.js"/>
+	        <targetfile/>
+	    </apply>
+	</target>
+
+</project>

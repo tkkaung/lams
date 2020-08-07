@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+	<bean id="lasurvMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basename"><value>org.lamsfoundation.lams.tool.survey.ApplicationResources</value></property>
+		<property name="defaultEncoding" value="UTF-8" />
+	</bean>
+	<bean id="lasurvMessageService" class="org.lamsfoundation.lams.util.MessageService" >
+		<property name="messageSource"><ref bean="lasurvMessageSource"/></property>										
+	</bean>
+
+    <!-- OutputFactory -->
+	<bean id="surveyOutputFactory" class="org.lamsfoundation.lams.tool.survey.service.SurveyOutputFactory" >  
+    	<property name="toolMessageService"><ref bean="lasurvMessageService"/></property>  
+	</bean> 
+    <!-- core beans -->
+    <bean id="lasurvSurveyDao" class="org.lamsfoundation.lams.tool.survey.dao.hibernate.SurveyDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+    <bean id="lasurvSurveyQuestionDao" class="org.lamsfoundation.lams.tool.survey.dao.hibernate.SurveyQuestionDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+    <bean id="lasurvSurveyAnswerDao" class="org.lamsfoundation.lams.tool.survey.dao.hibernate.SurveyAnswerDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="lasurvSurveyUserDao" class="org.lamsfoundation.lams.tool.survey.dao.hibernate.SurveyUserDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="lasurvSurveySessionDao" class="org.lamsfoundation.lams.tool.survey.dao.hibernate.SurveySessionDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+
+
+    <!-- Managers -->
+	<bean id="lasurvSurveyToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>lasruvSurveyWorkspace</value></property>
+		<property name="repositoryUser"><value>lasruvSurveys</value></property>
+		<property name="repositoryId"><value>lams-survey</value></property>
+	</bean>
+	
+    <bean id="lasurvSurveyManagerTarget" class="org.lamsfoundation.lams.tool.survey.service.SurveyServiceImpl">
+        <property name="surveyDao">
+            <ref bean="lasurvSurveyDao"/>
+        </property>
+        <property name="surveyQuestionDao">
+            <ref bean="lasurvSurveyQuestionDao"/>
+        </property>
+        <property name="surveyAnswerDao">
+            <ref bean="lasurvSurveyAnswerDao"/>
+        </property>
+        <property name="surveyUserDao">
+            <ref bean="lasurvSurveyUserDao"/>
+        </property>
+        <property name="surveySessionDao">
+            <ref bean="lasurvSurveySessionDao"/>
+        </property>
+        <property name="surveyToolContentHandler">
+            <ref bean="lasurvSurveyToolContentHandler"/>
+        </property>
+   		<property name="toolService">
+   			<ref bean="lamsToolService"/>
+   		</property>
+   		<property name="userManagementService">
+   			<ref bean="userManagementService"/>
+   		</property>
+   		<property name="exportContentService">
+   			<ref bean="exportToolContentService"/>
+   		</property>
+   		<property name="messageService"><ref bean="lasurvMessageService"/></property>
+		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>   	
+		<property name="eventNotificationService">
+			<ref bean="eventNotificationService"/>
+		</property>
+		<property name="surveyOutputFactory"><ref bean="surveyOutputFactory"/></property>
+    </bean>
+
+    <bean id="lasurvSurveyService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+        <property name="target">
+            <ref bean="lasurvSurveyManagerTarget"/>
+        </property>
+        <property name="proxyTargetClass">
+            <value>false</value>
+        </property>
+        <property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+        <property name="transactionAttributes">
+            <props>
+            	<prop key="audit*">PROPAGATION_REQUIRED</prop>
+                <prop key="copyToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="create*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="delete*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>               
+                <prop key="export*">PROPAGATION_REQUIRED,+java.lang.Exception</prop> 
+                <prop key="finishToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="forceCompleteUser">PROPAGATION_REQUIRED</prop>
+                <prop key="get*">PROPAGATION_REQUIRED</prop>
+			    <prop key="import*">PROPAGATION_REQUIRED,+java.lang.Exception</prop>   
+                <prop key="is*">PROPAGATION_REQUIRED</prop>
+                <prop key="leaveToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="notifyTeachersOnAnswerSumbit">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="remove*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="resetDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="save*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>                   
+				<prop key="set*">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+                <prop key="update*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+            </props>
+        </property>
+    </bean>
+</beans>
+

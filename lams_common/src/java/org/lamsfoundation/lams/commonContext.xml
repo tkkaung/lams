@@ -1,0 +1,736 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+	<!-- ========================= GENERAL DEFINITIONS ========================= -->
+
+	<import resource="messageContext.xml"/>
+
+	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
+
+ 	<!-- Hibernate SessionFactory. Since LAMS 2.3 it is used in all tools and other parts of LAMS,
+ 		 rather than several local Session Factories.
+ 	-->
+	<bean id="coreSessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+		<property name="dataSource"><ref bean="dataSource"/></property>
+		<property name="packagesToScan">
+			<list>
+				<value>org.lamsfoundation.lams.comments</value>
+				<value>org.lamsfoundation.lams.config</value>
+				<value>org.lamsfoundation.lams.contentrepository</value>
+				<value>org.lamsfoundation.lams.events</value>
+				<value>org.lamsfoundation.lams.gradebook</value>
+				<value>org.lamsfoundation.lams.integration</value>
+				<value>org.lamsfoundation.lams.learningdesign</value>
+				<value>org.lamsfoundation.lams.lesson</value>
+				<value>org.lamsfoundation.lams.logevent</value>
+				<value>org.lamsfoundation.lams.outcome</value>
+				<value>org.lamsfoundation.lams.planner</value>
+				<value>org.lamsfoundation.lams.policies</value>
+				<value>org.lamsfoundation.lams.themes</value>
+				<value>org.lamsfoundation.lams.timezone</value>
+				<value>org.lamsfoundation.lams.tool</value>
+				<value>org.lamsfoundation.lams.usermanagement</value>
+				<value>org.lamsfoundation.lams.workspace</value>
+				<value>org.lamsfoundation.lams.**.model</value>
+			</list>
+		</property>
+		<property name="hibernateProperties"><ref bean="hibernateProperties"/></property>
+	</bean>
+	
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver" />
+	
+	<bean id="transactionRetryService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean ="transactionManager"/></property>
+		<property name ="target">
+			<bean class="org.lamsfoundation.lams.util.TransactionRetryService" />
+		</property>
+		<property name="proxyTargetClass"><value>true</value></property> 
+		<property name="transactionAttributes">
+			<props>
+				<prop key="*">PROPAGATION_REQUIRES_NEW</prop>
+			</props>
+		</property>
+	</bean>	
+	
+	<!-- ========================= BUSINESS OBJECT DEFINITIONS ========================= -->
+
+	<!-- LAMS primary business object: Hibernate implementation -->
+	<bean id="userManagementServiceTarget" class="org.lamsfoundation.lams.usermanagement.service.UserManagementService"
+		  scope="prototype"
+	>
+		<property name="baseDAO"><ref bean="baseDAO"/></property>
+		<property name="groupDAO"><ref bean="groupDAO"/></property>
+		<property name="roleDAO"><ref bean="roleDAO"/></property>
+		<property name="organisationDAO"><ref bean="organisationDAO"/></property>
+		<property name="favoriteOrganisationDAO"><ref bean="favoriteOrganisationDAO"/></property>
+		<property name="userDAO"><ref bean="userDAO"/></property>
+		<property name="userOrganisationDAO"><ref bean="userOrganisationDAO"/></property>
+		<property name="messageService"><ref bean="commonMessageService"/></property>
+		<property name="centralToolContentHandler"><ref bean="centralToolContentHandler"/></property>
+	</bean>	
+	
+	<!-- Transactional proxy for the user management primary business object -->
+	<bean id="userManagementService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name="target"><ref bean="userManagementServiceTarget"/></property>
+		<property name="proxyTargetClass"><value>true</value></property> 
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property> 
+		<property name="transactionAttributes">
+			<props>
+				<prop key="canEditGroup">PROPAGATION_REQUIRED</prop>
+				<prop key="create*">PROPAGATION_REQUIRED</prop>
+				<prop key="delete*">PROPAGATION_REQUIRED</prop>
+				<prop key="disable*">PROPAGATION_REQUIRED</prop>
+				<prop key="find*">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED</prop>
+				<prop key="hasRoleInOrganisation">PROPAGATION_REQUIRED</prop>
+				<prop key="is*">PROPAGATION_REQUIRED</prop>
+				<prop key="log*">PROPAGATION_REQUIRED</prop>
+				<prop key="remove*">PROPAGATION_REQUIRED</prop>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="set*">PROPAGATION_REQUIRED</prop>
+				<prop key="toggleOrganisationFavorite">PROPAGATION_REQUIRED</prop>
+				<prop key="update*">PROPAGATION_REQUIRED</prop>
+				<prop key="upload*">PROPAGATION_REQUIRED</prop>
+				<prop key="userHasData">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<bean id="learningDesignServiceTarget" class="org.lamsfoundation.lams.learningdesign.service.LearningDesignService">
+		<property name="messageService"><ref bean="commonMessageService"/></property>
+		<property name="learningDesignDAO"><ref bean="learningDesignDAO"/></property>
+		<property name="activityDAO"><ref bean="activityDAO"/></property>
+		<property name="groupingDAO"><ref bean="groupingDAO"/></property>
+		<property name="toolDAO"><ref bean="toolDAO"/></property>
+		<property name="learningLibraryDAO"><ref bean="learningLibraryDAO"/></property>
+		<property name="toolActMessageService"><ref bean="loadedMessageSourceService"/></property>
+	</bean>
+	
+	<bean id="learningDesignService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name="target"><ref bean="learningDesignServiceTarget"/></property>
+		<property name="proxyTargetClass"><value>true</value></property> 
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="fillLearningLibraryID">PROPAGATION_REQUIRED</prop>
+				<prop key="internationaliseActivityTitle">PROPAGATION_REQUIRED</prop>
+				<prop key="getAllLearningLibraryDetails">PROPAGATION_REQUIRED</prop>
+				<prop key="getLearning*">PROPAGATION_REQUIRED</prop>
+				<prop key="getToolDTOs">PROPAGATION_REQUIRED</prop>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="setValid">PROPAGATION_REQUIRED</prop>
+				<prop key="validateLearningDesign">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<bean id="lessonServiceTarget" class="org.lamsfoundation.lams.lesson.service.LessonService">
+		<property name="lessonDAO"><ref bean="lessonDAO"/></property>
+		<property name="lessonClassDAO"><ref bean="lessonClassDAO"/></property>
+		<property name="groupingDAO"><ref bean="groupingDAO"/></property>
+		<property name="baseDAO"><ref bean="baseDAO"/></property>
+		<property name="learnerProgressDAO"><ref bean="learnerProgressDAO"/></property>
+		<property name="messageService"><ref bean="commonMessageService"/></property>
+	</bean>
+	
+	<bean id="lessonService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name="target"><ref bean="lessonServiceTarget"/></property>
+		<property name="proxyTargetClass"><value>true</value></property> 
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="add*">PROPAGATION_REQUIRED</prop>
+				<prop key="checkLessonReleaseConditions">PROPAGATION_REQUIRED</prop>
+				<prop key="create*">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED</prop>
+				<prop key="perform*">PROPAGATION_REQUIRED</prop>
+				<prop key="remove*">PROPAGATION_REQUIRED</prop>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="update*">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<bean id="themeServiceTarget" class="org.lamsfoundation.lams.themes.service.ThemeService">
+		<property name="themeDAO"><ref bean="themeDAO"/></property>
+		<property name="userManagementService"><ref bean="userManagementService"/></property>
+	</bean>
+	
+	<bean id="themeService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
+		<property name ="target"><ref bean="themeServiceTarget"/></property>
+		<property name="proxyTargetClass"><value>true</value></property> 
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="get*">PROPAGATION_REQUIRED</prop>
+				<prop key="removeTheme">PROPAGATION_REQUIRED</prop>
+				<prop key="store*">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<bean id="timezoneServiceTarget" class="org.lamsfoundation.lams.timezone.service.TimezoneService">
+		<property name="timezoneDAO"><ref bean="timezoneDAO"/></property>
+	</bean>
+	
+	<bean id="timezoneService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
+		<property name ="target"><ref bean="timezoneServiceTarget"/></property>
+		<property name="proxyTargetClass"><value>true</value></property> 
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="get*">PROPAGATION_REQUIRED</prop>
+				<prop key="set*">PROPAGATION_REQUIRED</prop>
+				<prop key="update*">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="signupServiceTarget" class="org.lamsfoundation.lams.signup.service.SignupService">
+		<property name="signupDAO"><ref bean="signupDAO" /></property>
+		<property name="userManagementService"><ref bean="userManagementService" /></property>
+		<property name="lessonService"><ref bean="lessonService" /></property>
+	</bean>
+
+	<bean id="signupService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager" /></property>
+		<property name="target"><ref bean="signupServiceTarget" /></property>
+		<property name="proxyTargetClass"><value>true</value></property>
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="contextExists">PROPAGATION_REQUIRED</prop>
+				<prop key="courseKeyIsValid">PROPAGATION_REQUIRED</prop>
+				<prop key="emailVerify">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED</prop>
+				<prop key="sign*">PROPAGATION_REQUIRED</prop>
+				<prop key="usernameExists">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<bean id="policyServiceTarget" class="org.lamsfoundation.lams.policies.service.PolicyService">
+		<property name="policyDAO"><ref bean="policyDAO" /></property>
+		<property name="userManagementService"><ref bean="userManagementService" /></property>
+		<property name="lessonService"><ref bean="lessonService" /></property>
+	</bean>
+
+	<bean id="policyService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager" /></property>
+		<property name="target"><ref bean="policyServiceTarget" /></property>
+		<property name="proxyTargetClass"><value>true</value></property>
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="get*">PROPAGATION_REQUIRED</prop>
+				<prop key="is*">PROPAGATION_REQUIRED</prop>
+				<prop key="store*">PROPAGATION_REQUIRED</prop>
+				<prop key="toggle*">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<bean id="exportToolContentServiceTarget" class="org.lamsfoundation.lams.learningdesign.service.ExportToolContentService">
+		<property name="learningDesignService"><ref bean="learningDesignService"/></property>
+		<property name="messageService"><ref bean="commonMessageService"/></property>
+		<property name="activityDAO"><ref bean="activityDAO"/></property>
+		<property name="toolDAO"><ref bean="toolDAO"/></property>
+		<property name="toolContentDAO"><ref bean="toolContentDAO"/></property>
+		<property name="systemToolDAO"><ref bean="systemToolDAO"/></property>
+		<property name="baseDAO"><ref bean="baseDAO"/></property>
+		<property name="licenseDAO"><ref bean="licenseDAO"/></property>
+		<property name="groupingDAO"><ref bean="groupingDAO"/></property>
+		<property name="transitionDAO"><ref bean="transitionDAO"/></property>
+		<property name="learningDesignDAO"><ref bean="learningDesignDAO"/></property>
+		<property name="learningLibraryDAO"><ref bean="learningLibraryDAO"/></property>
+	</bean>
+	
+	<bean id="exportToolContentService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
+		<property name ="target"><ref bean="exportToolContentServiceTarget"/></property>
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+		<!-- TransactionProxyFactoryBean by default just proxies all interfaces implemented by the target object -->
+		<!-- AuthoringService is class so needs to be proxied via CGLIB -->
+		<!-- Specify "proxyTargetClass" = "true" to generate a CGLIB proxy-->
+		<property name="proxyTargetClass"><value>true</value></property>     
+		
+		<property name="transactionAttributes">
+			<props>
+				<prop key="export*">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+				<prop key="import*">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+				<prop key="register*">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<!--  Access a message service related to a programatically loaded message file. -->
+	<!--  Can be used to arbitrarily access any message file that is on the classpath -->
+	<!--  as long as you know the file's name and full path.                          -->
+	<bean id="loadedMessageSourceService" class="org.lamsfoundation.lams.util.LoadedMessageSourceService">
+    </bean>
+    	
+    <!--  Each message service created by loadedMessageService is a ResourceBundleMessageSource -->
+	<bean id="loadedMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource" scope="prototype">
+		<property name="defaultEncoding" value="UTF-8" />
+	</bean>
+			
+	<!--  Core Notebook Service -->
+	<bean id="coreNotebookServiceTarget" class="org.lamsfoundation.lams.notebook.service.CoreNotebookService">
+		<property name="messageService"><ref bean="commonMessageService"/></property>
+		<property name="userManagementService"><ref bean="userManagementService"/></property>
+		<property name="notebookEntryDAO"><ref bean="notebookEntryDAO" /></property>
+		<property name="baseDAO"><ref bean="baseDAO" /></property>
+	</bean>
+	
+	<bean id="coreNotebookService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
+		<property name ="target"><ref bean="coreNotebookServiceTarget"/></property>
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+		<!-- TransactionProxyFactoryBean by default just proxies all interfaces implemented by the target object -->
+		<!-- AuthoringService is class so needs to be proxied via CGLIB -->
+		<!-- Specify "proxyTargetClass" = "true" to generate a CGLIB proxy-->
+		<property name="proxyTargetClass"><value>true</value></property>     
+		
+		<property name="transactionAttributes">
+			<props>
+				<prop key="create*">PROPAGATION_REQUIRED</prop>
+				<prop key="delete*">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED</prop>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="update*">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!--  Rating Service -->
+
+	<bean id="ratingService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+
+		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
+		<property name ="target">
+			<bean class="org.lamsfoundation.lams.rating.service.RatingService">
+				<property name="messageService"><ref bean="commonMessageService"/></property>
+				<property name="ratingDAO"><ref bean="ratingDAO" /></property>
+				<property name="ratingCommentDAO"><ref bean="ratingCommentDAO" /></property>
+				<property name="ratingCriteriaDAO"><ref bean="ratingCriteriaDAO" /></property>
+				<property name="userManagementService"><ref bean="userManagementService"/></property>
+			</bean>
+		</property>
+		<property name="proxyTargetClass"><value>true</value></property> 
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="create*">PROPAGATION_REQUIRED</prop>
+				<prop key="commentItem">PROPAGATION_REQUIRED</prop>
+				<prop key="convertToStyled">PROPAGATION_REQUIRED</prop>
+				<prop key="countUsersRatedEachItem*">PROPAGATION_REQUIRED</prop>
+				<prop key="delete*">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED</prop>
+				<prop key="is*">PROPAGATION_REQUIRED</prop>
+				<prop key="rate*">PROPAGATION_REQUIRED</prop>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="update*">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+
+	</bean>
+	
+	<!-- Event notification Service -->
+
+	 <bean id="scheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="applicationContextSchedulerContextKey" value="context.central"/>
+        <property name="schedulerName" value="LAMS"/>
+    	<property name="quartzProperties">
+			<props>
+				<prop key="org.quartz.jobStore.class">org.springframework.scheduling.quartz.LocalDataSourceJobStore</prop>
+				<prop key="org.quartz.jobStore.driverDelegateClass">org.quartz.impl.jdbcjobstore.StdJDBCDelegate</prop>
+				<prop key="org.quartz.jobStore.tablePrefix">lams_qtz_</prop>
+			</props>
+		</property> 
+		<property name="dataSource"><ref bean="dataSource"/></property>
+	
+		<property name="jobDetails">
+			<list>
+				<ref bean="resendMessagesJob" />
+			</list>
+		</property>
+		<property name="triggers">
+			<list>
+				<ref bean="resendMessagesJobTrigger" />
+			</list>
+		</property>    
+    </bean>
+
+
+    <bean id="eventNotificationService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name ="transactionManager"><ref bean="transactionManager"/></property>
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+		<property name ="target">
+			<bean class="org.lamsfoundation.lams.events.EventNotificationService">
+				<property name="eventDAO"><ref bean="eventDAO" /></property>
+				<property name="userManagementService"><ref bean="userManagementService"/></property>
+        		<property name="messageService"><ref bean="commonMessageService"/></property>
+        		<property name="lessonService"><ref bean="lessonService"/></property>
+        		<property name="toolService"><ref bean="lamsToolService"/></property>
+			</bean>	
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="create*">PROPAGATION_REQUIRED</prop>
+				<prop key="eventExists">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED</prop>
+				<prop key="isSubscribed">PROPAGATION_REQUIRED</prop>
+				<prop key="notify*">PROPAGATION_REQUIRED</prop>
+				<prop key="resendMessages">PROPAGATION_REQUIRED</prop>
+				<prop key="sendMessage">PROPAGATION_REQUIRED</prop>
+				<prop key="subscribe">PROPAGATION_REQUIRED</prop>
+				<prop key="trigger*">PROPAGATION_REQUIRED</prop>
+				<prop key="unsubscribe">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<bean name="resendMessagesJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass" value="org.lamsfoundation.lams.events.ResendMessagesJob" />
+		<property name="name" value="Resend Messages Job"/>
+		<property name="durability" value="true" />
+	</bean>
+	
+	<bean id="resendMessagesJobTrigger" 
+                class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="resendMessagesJob" />
+		<property name="name" value="Resend Messages Job Trigger"/>
+		<property name="repeatInterval" value="3600000" />
+		<property name="startDelay" value="120000" />
+	</bean>
+	
+	
+	<!-- Log Event notification Service -->
+	
+	<bean id="logEventService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+		<property name ="target">
+			<bean class="org.lamsfoundation.lams.logevent.service.LogEventService">
+				<property name="lessonDAO"><ref bean="lessonDAO"/></property>
+				<property name="logEventDAO"><ref bean="logEventDAO"/></property>
+				<property name="messageService"><ref bean="commonMessageService"/></property>
+				<property name="userManagementService"><ref bean="userManagementService"/></property>
+			</bean>	
+		</property>
+		<property name="proxyTargetClass"><value>true</value></property> 
+		<property name="transactionAttributes">
+			<props>
+				<prop key="get*">PROPAGATION_REQUIRED</prop>
+				<prop key="log*">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean>	
+	
+	<!--  Configuration service -->
+	<bean id="configurationService"  class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+		<property name ="target">
+			<bean class="org.lamsfoundation.lams.util.Configuration">
+				<property name="configurationDAO"><ref bean="configurationDAO" /></property>
+				<property name="messageService"><ref bean="commonMessageService" /></property>
+				<property name="scheduler"><ref bean="scheduler" /></property>
+			</bean>
+		</property>
+		<property name="proxyTargetClass"><value>true</value></property> 
+		<property name="transactionAttributes">
+			<props>
+				<prop key="get*">PROPAGATION_REQUIRED</prop>
+				<prop key="persist*">PROPAGATION_REQUIRED</prop>
+				<prop key="refreshCache">PROPAGATION_REQUIRED</prop>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="update*">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- Security service -->
+	<bean id="securityServiceTarget" class="org.lamsfoundation.lams.security.SecurityService">
+		<property name="securityDAO"><ref bean="securityDAO"/></property>
+		<property name="logEventService"><ref bean="logEventService"/></property>
+	</bean>	
+	
+	<bean id="securityService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name="target"><ref bean="securityServiceTarget"/></property>
+		<property name="proxyTargetClass"><value>true</value></property> 
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="is*">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="has*">PROPAGATION_REQUIRED,readOnly</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- Outcome service -->
+	<bean id="outcomeServiceTarget" class="org.lamsfoundation.lams.outcome.service.OutcomeService">
+		<property name="outcomeDAO"><ref bean="outcomeDAO"/></property>
+		<property name="messageService"><ref bean="authoringMessageService"/></property>
+	</bean>	
+	
+	<bean id="outcomeService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name="target"><ref bean="outcomeServiceTarget"/></property>
+		<property name="proxyTargetClass"><value>true</value></property> 
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="*">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<bean id="etherpadServiceTarget" class="org.lamsfoundation.lams.etherpad.service.EtherpadService">
+
+	</bean>
+	
+	<bean id="etherpadService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name="target"><ref bean="etherpadServiceTarget"/></property>
+		<property name="proxyTargetClass"><value>true</value></property> 
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="*">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<!-- Learning Design related beans-->
+	
+	<bean id="activityDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	<bean id="branchActivityEntryDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.BranchActivityEntryDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	<bean id="learningLibraryDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningLibraryDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	<bean id="learningDesignDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>	
+	<bean id="transitionDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.TransitionDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>	
+	<bean id="groupingDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupingDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>	
+	<bean id="groupDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	<bean id="groupUserDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupUserDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	<bean id="licenseDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.LicenseDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	
+	<!-- Lesson related beans -->
+	
+	<bean id="lessonDAO" class="org.lamsfoundation.lams.lesson.dao.hibernate.LessonDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+
+	<bean id="lessonClassDAO" class="org.lamsfoundation.lams.lesson.dao.hibernate.LessonClassDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+
+	<bean id="learnerProgressDAO" class="org.lamsfoundation.lams.lesson.dao.hibernate.LearnerProgressDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	
+	<!--User management related beans -->
+	
+	<bean id="baseDAO" class="org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	<!--  Theme beans -->
+	<bean id="themeDAO" class="org.lamsfoundation.lams.themes.dao.hibernate.ThemeDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	
+	<bean id="roleDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.RoleDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	
+	<bean id="organisationDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.OrganisationDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	
+	<bean id="favoriteOrganisationDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.FavoriteOrganisationDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	
+	<bean id="userDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.UserDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	
+	<bean id="userOrganisationDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.UserOrganisationDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	
+	<!--  Timezone service related beans -->
+	<bean id="timezoneDAO" class="org.lamsfoundation.lams.timezone.dao.hibernate.TimezoneDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>	
+	
+	<!--  Signup service related beans -->
+	<bean id="signupDAO" class="org.lamsfoundation.lams.signup.dao.hibernate.SignupDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory" /></property>
+	</bean>
+	
+	<!--  Policy service related beans -->
+	<bean id="policyDAO" class="org.lamsfoundation.lams.policies.dao.hibernate.PolicyDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory" /></property>
+	</bean>
+	
+	<!--Event service related beans -->
+	<bean id="eventDAO" class="org.lamsfoundation.lams.events.dao.hibernate.EventDAOHibernate">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	
+	<!--  LogEvent service related beans -->
+	<bean id="logEventDAO" class="org.lamsfoundation.lams.logevent.dao.hibernate.LogEventDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>		
+	
+	<!-- Core Notebook related beans -->
+	<bean id="notebookEntryDAO" class="org.lamsfoundation.lams.notebook.dao.hibernate.NotebookEntryDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>	
+
+	<!-- Rating related beans -->
+	<bean id="ratingDAO" class="org.lamsfoundation.lams.rating.dao.hibernate.RatingDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>	
+	<bean id="ratingCommentDAO" class="org.lamsfoundation.lams.rating.dao.hibernate.RatingCommentDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>	
+	<bean id="ratingCriteriaDAO" class="org.lamsfoundation.lams.rating.dao.hibernate.RatingCriteriaDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	
+	<!--  Configuration related beans -->
+	<bean id="configurationDAO" class="org.lamsfoundation.lams.config.dao.hibernate.ConfigurationDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	
+	<!--  Competence related beans -->
+	<bean id="competenceDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.CompetenceDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	<bean id="competenceMappingDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.CompetenceMappingDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	
+	<!--  Data flow related beans -->
+	<bean id="dataFlowDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.DataFlowDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	
+	<!--  Data flow related beans -->
+	<bean id="securityDAO" class="org.lamsfoundation.lams.security.SecurityDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+		
+	<!-- Outcome related beans -->
+	<bean id="outcomeDAO" class="org.lamsfoundation.lams.outcome.dao.hibernate.OutcomeDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	
+	<!--  System Session bean -->
+	<bean id="SystemSession"
+	    class="org.lamsfoundation.lams.web.session.SessionManager"
+	    init-method="init"
+	    destroy-method="destroy" />
+	
+	<bean id="statisticsService" class="org.lamsfoundation.lams.statistics.service.StatisticsService">
+   		<property name="baseDAO">
+   			<ref bean="baseDAO"/>
+   		</property>	
+   		<property name="userService">
+   			<ref bean="userManagementService"/>
+   		</property>
+    </bean>
+</beans>

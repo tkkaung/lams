@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_3_1.xsd"
+	version="3.1">
+	<context-param>
+		<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
+		<param-value>org.lamsfoundation.lams.learning.ApplicationResources</param-value>
+	</context-param>
+
+	<context-param>
+		<param-name>messageSource</param-name>
+		<param-value>monitoringMessageSource</param-value>
+	</context-param>
+
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value></param-value>
+	</context-param>
+	<context-param>
+		<param-name>locatorFactorySelector</param-name>
+		<param-value>classpath:/org/lamsfoundation/lams/beanRefContext.xml</param-value>
+	</context-param>
+	<context-param>
+		<param-name>parentContextKey</param-name>
+		<param-value>context.central</param-value>
+	</context-param>
+
+	<listener>
+		<listener-class>
+			org.springframework.web.context.ContextLoaderListener
+		</listener-class>
+	</listener>
+
+	<filter>
+		<filter-name>HibernateFilter</filter-name>
+		<filter-class>org.springframework.orm.hibernate5.support.OpenSessionInViewFilter</filter-class>
+		<init-param>
+			<param-name>sessionFactoryBeanName</param-name>
+			<param-value>coreSessionFactory</param-value>
+		</init-param>
+		<init-param>
+			<param-name>singleSession</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+
+	<filter>
+		<filter-name>SystemSessionFilter</filter-name>
+		<filter-class>
+			org.lamsfoundation.lams.web.session.SystemSessionFilter
+		</filter-class>
+	</filter>
+
+	<filter>
+		<filter-name>LocaleFilter</filter-name>
+		<filter-class>
+			org.lamsfoundation.lams.web.filter.LocaleFilter
+		</filter-class>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>HibernateFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>SystemSessionFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>LocaleFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<servlet>
+		<servlet-name>spring</servlet-name>
+		<servlet-class>
+			org.springframework.web.servlet.DispatcherServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<!--  Temporary servlet for fixing progress bar and gradebook -->
+	<servlet>
+		<servlet-name>RepopulateProgressMarksServlet</servlet-name>
+		<servlet-class>
+			org.lamsfoundation.lams.learning.web.servlet.RepopulateProgressMarksServlet
+		</servlet-class>
+	</servlet>
+	
+	<servlet>
+		<servlet-name>LogLessonMarkPushedToIntegrationsServlet</servlet-name>
+		<servlet-class>
+			org.lamsfoundation.lams.learning.web.servlet.LogLessonMarkPushedToIntegrationsServlet
+		</servlet-class>
+	</servlet>	
+	
+	<servlet-mapping>
+		<servlet-name>RepopulateProgressMarksServlet</servlet-name>
+		<url-pattern>/repopulateProgress</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+		<servlet-name>LogLessonMarkPushedToIntegrationsServlet</servlet-name>
+		<url-pattern>/logLessonMarkPushedToIntegrations</url-pattern>
+	</servlet-mapping>
+
+	<!-- Optional Module Placeholder - do not remove -->
+
+	<servlet-mapping>
+		<servlet-name>spring</servlet-name>
+		<url-pattern>*.do</url-pattern>
+	</servlet-mapping>
+	
+	<session-config>
+		<cookie-config>
+			<path>/lams</path>
+		</cookie-config>
+	</session-config>
+
+	<error-page>
+		<error-code>500</error-code>
+		<location>/error.jsp</location>
+	</error-page>
+	<error-page>
+		<error-code>403</error-code>
+		<location>/403.jsp</location>
+	</error-page>
+	<error-page>
+		<error-code>404</error-code>
+		<location>/404.jsp</location>
+	</error-page>
+
+	<jsp-config>
+		<jsp-property-group>
+			<url-pattern>*.jsp</url-pattern>
+			<page-encoding>UTF-8</page-encoding>
+			<default-content-type>text/html; charset=UTF-8</default-content-type>
+  		</jsp-property-group>
+  		
+		<!-- ======================================================== -->
+		<!-- JSTL 1.2 Tag Library -->
+		<!-- ======================================================== -->
+		<taglib>
+			<taglib-uri>tags-fmt</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/jstl/fmt.tld</taglib-location>
+		</taglib>
+		<taglib>
+			<taglib-uri>tags-core</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/jstl/c.tld</taglib-location>
+		</taglib>
+		<taglib>
+			<taglib-uri>tags-function</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/jstl/fn.tld</taglib-location>
+		</taglib>
+		<taglib>
+			<taglib-uri>tags-xml</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/jstl/x.tld</taglib-location>
+		</taglib>
+		<!-- ======================================================== -->
+		<!-- JSTL 1.2 Tag Library: Apache implementation of TLV -->
+		<!-- ======================================================== -->
+		<taglib>
+			<taglib-uri>tags-permittedTaglibs</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/jstl/permittedTaglibs.tld</taglib-location>
+		</taglib>
+		<taglib>
+			<taglib-uri>tags-scriptfree</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/jstl/scriptfree.tld</taglib-location>
+		</taglib>
+		<!-- ======================================================== -->
+		<!-- Customized Tag Library -->
+		<!-- ======================================================== -->
+		<taglib>
+			<taglib-uri>tags-lams</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/lams/lams.tld</taglib-location>
+		</taglib>
+
+	</jsp-config>
+
+	<!-- Security Constraint -->
+	<deny-uncovered-http-methods />
+	
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Secure Content</web-resource-name>
+			<url-pattern>/*</url-pattern>
+			<http-method>GET</http-method>
+ 			<http-method>POST</http-method>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>LEARNER</role-name>
+			<role-name>AUTHOR</role-name>
+			<role-name>MONITOR</role-name>
+			<role-name>SYSADMIN</role-name>
+		</auth-constraint>
+	</security-constraint>
+
+	<!-- Login Configuration -->
+	<login-config>
+		<auth-method>FORM</auth-method>
+		<realm-name>LAMS</realm-name>
+		<form-login-config>
+			<form-login-page>/login.jsp</form-login-page>
+			<form-error-page>/login.jsp</form-error-page>
+		</form-login-config>
+	</login-config>
+	
+	<!-- Security Roles -->
+	<security-role>
+		<description>Student</description>
+		<role-name>LEARNER</role-name>
+	</security-role>
+
+	<security-role>
+		<description>Authors Learning Designs</description>
+		<role-name>AUTHOR</role-name>
+	</security-role>
+
+	<security-role>
+		<description>Member of Staff</description>
+		<role-name>MONITOR</role-name>
+	</security-role>
+
+	<security-role>
+		<description>Group Manager</description>
+		<role-name>GROUP MANAGER</role-name>
+	</security-role>
+	<security-role>
+		<description>LAMS System Adminstrator</description>
+		<role-name>SYSADMIN</role-name>
+	</security-role>
+</web-app>

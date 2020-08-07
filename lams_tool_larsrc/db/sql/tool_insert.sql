@@ -1,0 +1,42 @@
+INSERT INTO lams_tool
+(
+tool_signature,
+service_name,
+tool_display_name,
+description,
+tool_identifier,
+tool_version,
+valid_flag,
+grouping_support_type_id,
+learner_url,
+learner_preview_url,
+learner_progress_url,
+author_url,
+monitor_url,
+pedagogical_planner_url,
+help_url,
+language_file,
+create_date_time,
+modified_date_time
+)
+VALUES
+(
+'larsrc11',
+'resourceService',
+'Shared Resources',
+'Shared Resources',
+'sharedresources',
+'@tool_version@',
+0,
+2,
+'tool/larsrc11/learning/start.do?mode=learner',
+'tool/larsrc11/learning/start.do?mode=author',
+'tool/larsrc11/learning/start.do?mode=teacher',
+'tool/larsrc11/authoring/start.do',
+'tool/larsrc11/monitoring/summary.do',
+'tool/larsrc11/authoring/initPedagogicalPlannerForm.do',
+'http://wiki.lamsfoundation.org/display/lamsdocs/larsrc11',
+'org.lamsfoundation.lams.tool.rsrc.ApplicationResources',
+NOW(),
+NOW()
+)

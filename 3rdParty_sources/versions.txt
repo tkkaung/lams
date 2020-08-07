@@ -1,0 +1,72 @@
+In this project are located source files for 3rd party libraries used in LAMS.
+This project helps in development and is optional to download. LAMS will build without it.
+If you update a library version in lams_build/lib or anywhere else in LAMS,
+check if you should also update source code here.
+
+This project contains following versions:
+
+basiclti-util 1.2
+
+CKEditor Java 2.6
+
+Apache HttpClient 4.5.2
+
+Apache HttpCore 4.4.4
+
+Apache POI 3.17
+
+Commons Digester 2.1
+
+Commons Fileupload 1.3.3
+
+Commons Lang 2.6
+
+Commons IO 2.5
+
+Commons Validator 1.6
+
+CSRF Guard master from 2020.01.07 with a custom modification in CsrfGuard.java
+
+Etherpad Client 1.2.13
+
+Hibernate Core 5.3.6
+
+httpunit 1.7
+
+Jackson 2.9.5
+
+javax.persistence API 2.2
+
+jLaTexMath 1.0.6
+
+jsonwebtoken 0.9.0
+
+JSP API 2.3 1.0.3
+
+MySQL Connector/J 8.0.11
+
+oauth 20100527
+
+oauth-provider 20100527
+
+opensaml 2.6.0
+
+openws 1.5.0
+
+Quartz 2.2.3
+
+picketbox 5.0.3
+
+Servlet API 4.0.0
+
+Spring 4.3.12
+
+Undertow core 2.0.13
+
+Undertow servlet 2.0.13
+
+xmltooling 1.4.0
+
+XStream 1.4.11
+
+websocket api_1.1_spec-1.1.3.Final

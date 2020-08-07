@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+	
+	<bean id="gradebookMessageService" class="org.lamsfoundation.lams.util.MessageService" >
+		<property name="messageSource">
+			<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+				<property name="basename"><value>org.lamsfoundation.lams.gradebook.ApplicationResources</value></property>
+				<property name="defaultEncoding" value="UTF-8" />
+			</bean>
+		</property>										
+	</bean>
+
+	<bean id="gradebookServiceTarget" class="org.lamsfoundation.lams.gradebook.service.GradebookService" >
+		<property name="toolService"><ref bean="lamsCoreToolService"/></property> 	
+		<property name="lessonService"><ref bean="lessonService"/></property> 
+		<property name="userService"><ref bean="userManagementService"/></property>	
+		<property name="gradebookDAO"><ref bean="gradebookDAO"/></property> 
+		<property name="learnerProgressDAO"><ref bean="learnerProgressDAO"/></property>
+		<property name="lessonDAO"><ref bean="lessonDAO"/></property>
+		<property name="activityDAO"><ref bean="activityDAO"/></property>
+		<property name="messageService"><ref bean="gradebookMessageService"/></property>
+		<property name="logEventService"><ref bean="logEventService"/></property>
+		<property name="outcomeService"><ref bean="outcomeService"/></property> 
+		<property name="integrationService"><ref bean="integrationService"/></property>
+	</bean>
+	
+	<bean id="gradebookService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean" >
+		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
+		<property name ="target"><ref bean="gradebookServiceTarget"/></property>
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="archive*">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="export*">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="recalculate*">PROPAGATION_REQUIRED</prop>
+				<prop key="remove*">PROPAGATION_REQUIRED</prop>
+				<prop key="toggleMarksReleased">PROPAGATION_REQUIRED</prop>
+				<prop key="update*">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<!--  Gradebook related beans -->
+	<bean id="gradebookDAO" class="org.lamsfoundation.lams.gradebook.dao.hibernate.GradebookDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+</beans>

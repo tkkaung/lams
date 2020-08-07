@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+<!--
+  - Application context definition for lams survey business layer.
+	- Contains bean references to the transaction manager and to the DAOs in
+	- dataAccessContext.xml (see web.xml's "contextConfigLocation").
+	-->
+		<bean id="monitoringMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+			<property name="basename">
+				<value>org.lamsfoundation.lams.monitoring.ApplicationResources</value>
+			</property>
+			<property name="defaultEncoding" value="UTF-8" />
+		</bean>
+
+	<!-- ========================= GENERAL DEFINITIONS ========================= -->
+		<bean id="monitoringMessageService" class="org.lamsfoundation.lams.util.MessageService" >
+			<property name="messageSource">
+				<ref bean="monitoringMessageSource"/>
+			</property>
+		</bean>
+	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
+
+
+	<!--
+	  - Lams monitoring primary business object (default implementation), as an inner bean wrapped
+		- by an outer transactional proxy. The two bean definitions could have been separate,
+		- but this is cleaner as there is no need to ever access the unwrapped object.
+	-->
+	<bean id="monitoringServiceTarget" class="org.lamsfoundation.lams.monitoring.service.MonitoringService" scope="prototype">
+		<property name="baseDAO"><ref bean="baseDAO"/></property>
+		<property name="groupingDAO"><ref bean="groupingDAO"/></property>
+		<property name="groupDAO"><ref bean="groupDAO"/></property>
+		<property name="groupUserDAO"><ref bean="groupUserDAO"/></property>
+		<property name="lessonDAO"><ref bean="lessonDAO"/></property>
+		<property name="lessonClassDAO"><ref bean="lessonClassDAO"/></property>	
+		<property name="authoringService"><ref bean="authoringService"/></property>
+		<property name="activityDAO"><ref bean="activityDAO"/></property>	
+		<property name="learningDesignDAO"><ref bean="learningDesignDAO"/></property>
+		<property name="learnerProgressDAO"><ref bean="learnerProgressDAO"/></property>
+		<property name="eventDAO"><ref bean="eventDAO"/></property>
+		<property name="lamsCoreToolService"><ref bean="lamsCoreToolService"/></property>			
+		<property name="learnerService"><ref bean="learnerService"/></property>			
+		<property name="logEventService"><ref bean="logEventService"/></property>				
+		<property name="lessonService"><ref bean="lessonService"/></property>			
+		<property name="userManagementService"><ref bean="userManagementService"/></property>			
+		<property name="securityService"><ref bean="securityService"/></property>
+		<property name="scheduler"><ref bean="scheduler"/></property>
+		<property name="messageService"><ref bean="monitoringMessageService"/></property>
+	</bean>	
+	
+	<bean id="monitoringService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+		<property name="target"><ref bean="monitoringServiceTarget"/></property>
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="add*">PROPAGATION_REQUIRED</prop>
+				<prop key="*archive*">PROPAGATION_REQUIRED</prop>
+				<prop key="check*">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="cloneLesson*">PROPAGATION_REQUIRED</prop>
+				<prop key="closeGate">PROPAGATION_REQUIRED</prop>
+				<prop key="create*">PROPAGATION_REQUIRED</prop>
+				<prop key="delete*">PROPAGATION_REQUIRED</prop>
+				<prop key="export*">PROPAGATION_REQUIRED</prop>
+				<prop key="finishLesson*">PROPAGATION_REQUIRED</prop>
+				<prop key="force*">PROPAGATION_REQUIRED</prop>
+				<prop key="generateLessonProgressEmail">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED</prop>
+				<prop key="initializeLesson*">PROPAGATION_REQUIRED</prop>
+				<prop key="is*">PROPAGATION_REQUIRED</prop>
+				<prop key="open*">PROPAGATION_REQUIRED</prop>
+				<prop key="remove*">PROPAGATION_REQUIRED</prop>
+				<prop key="scheduleGate">PROPAGATION_REQUIRED</prop>
+				<prop key="*suspendLesson">PROPAGATION_REQUIRED</prop>
+				<prop key="start*">PROPAGATION_REQUIRED</prop>
+				<prop key="setGroupName">PROPAGATION_REQUIRED</prop>
+				<prop key="toggle*">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean>    
+</beans>

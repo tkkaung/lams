@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="LAMS TestHarness" basedir="." default="run">
+
+	<property name="build" value="./build"/>
+	<property name="src" value="./src"/>
+	<property name="lib" value="./lib"/>
+
+	<path id="project.classpath">
+		<pathelement location="${basedir}/build" />
+		<fileset dir="lib">
+			<include name="*.jar" />
+		</fileset>
+		<pathelement location="${java.class.path}" />
+	</path>
+
+	<target name="compile" depends="clean">
+		<javac destdir="${basedir}/build" srcdir="${src}"
+        	debug="on" source="11" target="11" includeantruntime="false" >
+			<classpath>
+				<path refid="project.classpath"/>
+			</classpath>
+			<compilerarg line="-encoding utf-8"/>
+			<include name="**/*.java"/>
+		</javac>
+	</target>
+
+	<target name="clean">
+		<mkdir dir="${basedir}/build"/>
+		<delete includeemptydirs="true">
+			<fileset dir="${basedir}/build" includes="**/*"/>
+		</delete>
+	</target>
+
+	
+	
+	<target name="run" depends="compile" description="Run testharness">
+		<java classname="org.lamsfoundation.testharness.Main" fork="true">
+			<classpath>
+				<path refid="project.classpath"/>
+			</classpath>
+			<arg value="test.properties"/>
+			<jvmarg value="-Xmx1024m"/>
+		</java>
+	</target>
+
+</project>

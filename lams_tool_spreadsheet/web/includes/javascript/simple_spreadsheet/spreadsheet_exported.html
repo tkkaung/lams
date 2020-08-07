@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+		
+
+<html lang="en-AU" dir="LTR">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<meta http-equiv="pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache, no-store">
+		<meta http-equiv="Expires" content="0">
+		<title>  </title>
+		<link href="../../css/defaultHTML_learner.css" rel="stylesheet" type="text/css">
+		<!--[if IE]>
+			<style type="text/css">
+			@import url ("../../css/ie-styles.css");
+			</style>
+		<![endif]-->
+		<!--[if IE 7]>');
+			<style type="text/css">
+			@import url ("../../css/ie7-styles.css");
+			</style>
+		<![endif]-->
+		
+		<script type="text/javascript">
+			function changeLabel(id, text) {
+				var element = document.getElementById(id);
+	
+				if (element) {
+			      	if (element.childNodes[0]) {
+				    	element.childNodes[0].nodeValue=text;
+				    } else if (element.value) {
+				        element.value=text;
+				    } else { //if (element.innerHTML)
+				        element.innerHTML=text;
+				    }			
+				}				
+			}
+			
+			function getURLParameter(name) {
+			    return decodeURIComponent( (RegExp(name + '=' + '(.*?)(&|$)').exec(location.search)||[,""])[1] ) 
+			}
+		</script>
+	</head>
+			
+	<body class="stripes">
+		<div id="content">
+		
+			<h1 id="sentBy"></h1><br>
+				
+			<div id="noSpreadsheet"> <br>
+				 <b id="userHasntSent"> </b>	
+			</div>
+
+			<div id="spreadsheet">
+				<iframe id="externalSpreadsheet" name="externalSpreadsheet" src=""
+					style="width:635px;" frameborder="no" height="385px" scrolling="no">
+				</iframe>		
+			</div>							
+				
+			<br><br><br>
+			<table cellpadding="0" style="width:635px;">
+				<tr>
+					<td align="right" >
+						<a href="javascript:window.close();" class="button" id="closeButton">Close</a>
+					</td>
+				</tr>
+			</table>				
+				
+		</div>
+		<div id="footer"></div>
+		
+		<script type="text/javascript">
+		
+			var userName = getURLParameter("userName");
+			changeLabel("sentBy", getURLParameter("labelSentBy") + " " + userName);
+			document.title = getURLParameter("labelTitle");
+			changeLabel("closeButton", getURLParameter("labelCloseButton"));
+
+			var code = getURLParameter("code");
+			//if there is no code - show userHasntSent warning
+			if (code == "") {
+				document.getElementById("externalSpreadsheet").style.height = "0px";
+				changeLabel("userHasntSent", getURLParameter("labelUserHasntSent"));
+				
+			//and Spreadsheet otherwise
+			} else {
+				document.getElementById("noSpreadsheet").style.visibility = "hidden";
+				document.getElementById("externalSpreadsheet").src = "spreadsheet_offline.html"
+						+ "?lang=" + getURLParameter("lang")
+						+ "&code=" + encodeURIComponent(code);
+			}
+
+		</script>
+		
+	</body>
+</html>
+

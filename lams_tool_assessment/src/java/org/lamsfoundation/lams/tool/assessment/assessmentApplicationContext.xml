@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+	<bean id="laasseMessageService" class="org.lamsfoundation.lams.util.MessageService">
+		<property name="messageSource">
+			<bean id="laasseMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+				<property name="basename"><value>org.lamsfoundation.lams.tool.assessment.ApplicationResources</value></property>
+				<property name="defaultEncoding" value="UTF-8" />
+			</bean>
+		</property>										
+	</bean>
+
+    <!-- OutputFactory -->
+	<bean id="assessmentOutputFactory" class="org.lamsfoundation.lams.tool.assessment.service.AssessmentOutputFactory">  
+    	<property name="toolMessageService"><ref bean="laasseMessageService"/></property>  
+	</bean> 
+	
+    <!-- core beans -->
+    <bean id="laasseAssessmentDao" class="org.lamsfoundation.lams.tool.assessment.dao.hibernate.AssessmentDAOHibernate">
+        <property name="sessionFactory">
+             <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+    <bean id="laasseAssessmentQuestionDao" class="org.lamsfoundation.lams.tool.assessment.dao.hibernate.AssessmentQuestionDAOHibernate">
+        <property name="sessionFactory">
+             <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+    <bean id="laasseAssessmentQuestionResultDao" class="org.lamsfoundation.lams.tool.assessment.dao.hibernate.AssessmentQuestionResultDAOHibernate">
+        <property name="sessionFactory">
+             <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+    <bean id="laasseAssessmentResultDao" class="org.lamsfoundation.lams.tool.assessment.dao.hibernate.AssessmentResultDAOHibernate">
+        <property name="sessionFactory">
+             <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="laasseAssessmentUserDao" class="org.lamsfoundation.lams.tool.assessment.dao.hibernate.AssessmentUserDAOHibernate">
+        <property name="sessionFactory">
+             <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="laasseAssessmentSessionDao" class="org.lamsfoundation.lams.tool.assessment.dao.hibernate.AssessmentSessionDAOHibernate">
+        <property name="sessionFactory">
+             <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+
+
+    <!-- Managers -->
+	<bean id="laasseAssessmentToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+	 	<property name="repositoryService"><ref bean="repositoryService"/></property>
+	 	<property name="repositoryWorkspaceName" ><value>sharedassessmentworkspace</value></property>
+	 	<property name="repositoryUser"><value>sharedassessment</value></property>
+	 	<property name="repositoryId"><value>lams-sharedresources</value></property>
+	</bean> 
+	
+    <bean id="laasseAssessmentManagerTarget" class="org.lamsfoundation.lams.tool.assessment.service.AssessmentServiceImpl">
+        <property name="assessmentDao">
+            <ref bean="laasseAssessmentDao"/>
+        </property>
+        <property name="assessmentQuestionDao">
+            <ref bean="laasseAssessmentQuestionDao"/>
+        </property>
+        <property name="assessmentQuestionResultDao">
+            <ref bean="laasseAssessmentQuestionResultDao"/>
+        </property>
+        <property name="assessmentResultDao">
+            <ref bean="laasseAssessmentResultDao"/>
+        </property>
+        <property name="assessmentUserDao">
+            <ref bean="laasseAssessmentUserDao"/>
+        </property>
+        <property name="assessmentSessionDao">
+            <ref bean="laasseAssessmentSessionDao"/>
+        </property>
+        <property name="assessmentToolContentHandler">
+            <ref bean="laasseAssessmentToolContentHandler"/>
+        </property>
+   		<property name="toolService">
+   			<ref bean="lamsToolService"/>
+   		</property>
+   		<property name="learnerService">
+   			<ref bean="learnerService"/>
+   		</property>
+   		<property name="logEventService">
+   			<ref bean="logEventService"/>
+   		</property>
+   		<property name="userManagementService">
+   			<ref bean="userManagementService"/>
+   		</property>
+   		<property name="exportContentService">
+   			<ref bean="exportToolContentService"/>
+   		</property>
+   		<property name="messageService">
+   			<ref bean="laasseMessageService"/>
+   		</property>
+		<property name="coreNotebookService">
+			<ref bean="coreNotebookService"/>
+		</property>   
+		<property name="eventNotificationService">
+			<ref bean="eventNotificationService"/>
+		</property>
+   		<property name="assessmentOutputFactory">
+   			<ref bean="assessmentOutputFactory"/>
+   		</property>
+    </bean>
+
+    <bean id="laasseAssessmentService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+        <property name="target">
+            <ref bean="laasseAssessmentManagerTarget"/>
+        </property>
+        <property name="proxyTargetClass">
+            <value>false</value>
+        </property>
+        <property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+        <property name="transactionAttributes">
+            <props>
+            	<prop key="audit*">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+                <prop key="changeQuestionResultMark">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="checkLeaderSelectToolForSessionLeader">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+				<prop key="copyAnswersFromLeader">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+                <prop key="copyToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="count*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="create*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="delete*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>               
+                <prop key="export*">PROPAGATION_REQUIRED,+java.lang.Exception</prop>  
+                <prop key="finishToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="forceCompleteUser">PROPAGATION_REQUIRED</prop>   
+			    <prop key="import*">PROPAGATION_REQUIRED,+java.lang.Exception</prop>                 
+				<prop key="get*">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+				<prop key="is*">PROPAGATION_REQUIRED,+java.lang.Exception</prop> 
+                <prop key="launchTimeLimit">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="leaveToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="loadupLastAttempt">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="notify*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="processUserAnswers">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="recalculate*">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+				<prop key="releaseFromCache">readOnly, PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+                <prop key="remove*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="resetDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="save*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="set*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="store*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="unset*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="update*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+            </props>
+        </property>
+    </bean>
+</beans>

@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+	<bean id="scratchieMessageService" class="org.lamsfoundation.lams.util.MessageService" >
+		<property name="messageSource">
+			<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+				<property name="basename"><value>org.lamsfoundation.lams.tool.scratchie.ApplicationResources</value></property>
+				<property name="defaultEncoding" value="UTF-8" />
+			</bean>
+		</property>										
+	</bean>
+    <!-- core beans -->
+    <bean id="scratchieDao" class="org.lamsfoundation.lams.tool.scratchie.dao.hibernate.ScratchieDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+    <bean id="scratchieItemDao" class="org.lamsfoundation.lams.tool.scratchie.dao.hibernate.ScratchieItemDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+    <bean id="scratchieAnswerVisitDao" class="org.lamsfoundation.lams.tool.scratchie.dao.hibernate.ScratchieAnswerVisitDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+    
+    <bean id="scratchieBurningQuestionDao" class="org.lamsfoundation.lams.tool.scratchie.dao.hibernate.ScratchieBurningQuestionDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+    <bean id="burningQuestionLikeDao" class="org.lamsfoundation.lams.tool.scratchie.dao.hibernate.BurningQuestionLikeDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="scratchieUserDao" class="org.lamsfoundation.lams.tool.scratchie.dao.hibernate.ScratchieUserDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="scratchieSessionDao" class="org.lamsfoundation.lams.tool.scratchie.dao.hibernate.ScratchieSessionDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+    
+   <bean id="scratchieConfigItemDao" class="org.lamsfoundation.lams.tool.scratchie.dao.hibernate.ScratchieConfigItemDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+    
+    <bean id="scratchieOutputFactory" class="org.lamsfoundation.lams.tool.scratchie.service.ScratchieOutputFactory">  
+    	<property name="toolMessageService"><ref bean="scratchieMessageService"/></property>  
+	</bean>
+
+    <!-- Managers -->
+	<bean id="scratchieToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
+		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		<property name="repositoryWorkspaceName" ><value>sharedscratchieworkspace</value></property>
+		<property name="repositoryUser"><value>sharedscratchie</value></property>
+		<property name="repositoryId"><value>lams-sharedresources</value></property>
+	</bean>
+	
+    <bean id="scratchieManagerTarget" class="org.lamsfoundation.lams.tool.scratchie.service.ScratchieServiceImpl">
+        <property name="scratchieDao">
+            <ref bean="scratchieDao"/>
+        </property>
+        <property name="scratchieItemDao">
+            <ref bean="scratchieItemDao"/>
+        </property>
+        <property name="scratchieAnswerVisitDao">
+            <ref bean="scratchieAnswerVisitDao"/>
+        </property>
+        <property name="scratchieBurningQuestionDao">
+            <ref bean="scratchieBurningQuestionDao"/>
+        </property>
+        <property name="burningQuestionLikeDao">
+            <ref bean="burningQuestionLikeDao"/>
+        </property>
+        <property name="scratchieUserDao">
+            <ref bean="scratchieUserDao"/>
+        </property>
+        <property name="scratchieSessionDao">
+            <ref bean="scratchieSessionDao"/>
+        </property>
+        <property name="scratchieConfigItemDao">
+            <ref bean="scratchieConfigItemDao"/>
+        </property>
+        <property name="scratchieToolContentHandler">
+            <ref bean="scratchieToolContentHandler"/>
+        </property>
+   		<property name="toolService">
+   			<ref bean="lamsToolService"/>
+   		</property>
+   		<property name="userManagementService">
+   			<ref bean="userManagementService"/>
+   		</property>
+   		<property name="exportContentService">
+   			<ref bean="exportToolContentService"/>
+   		</property>
+   		<property name="logEventService"><ref bean="logEventService"/></property>
+   		<property name="messageService"><ref bean="scratchieMessageService"/></property>
+		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>   
+		<property name="eventNotificationService">
+			<ref bean="eventNotificationService"/>
+		</property>
+		<property name="scratchieOutputFactory"><ref bean="scratchieOutputFactory"/></property>
+    </bean>
+
+    <bean id="scratchieService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+        <property name="target">
+            <ref bean="scratchieManagerTarget"/>
+        </property>
+        <property name="proxyTargetClass">
+            <value>false</value>
+        </property>
+        <property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+        <property name="transactionAttributes">
+            <props>
+            	<prop key="addLike">PROPAGATION_REQUIRED,-java.lang.Exception</prop> 
+            	<prop key="audit*">PROPAGATION_REQUIRED</prop>  
+                <prop key="changeUserMark">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="checkLeaderSelectToolForSessionLeader">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="copy*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="count*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="create*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="delete*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>            
+                <prop key="export*">PROPAGATION_REQUIRED,+java.lang.Exception</prop> 
+                <prop key="finishToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="forceCompleteUser">PROPAGATION_REQUIRED</prop>
+                <prop key="get*">PROPAGATION_REQUIRED</prop>
+			    <prop key="import*">PROPAGATION_REQUIRED,+java.lang.Exception</prop>  
+                <prop key="is*">PROPAGATION_REQUIRED</prop>
+                <prop key="launchTimeLimit">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="leaveToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="logAnswerAccess">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="populateItemsWithConfidenceLevels">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+            	<prop key="recalculate*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="recordItemScratched">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="release*">PROPAGATION_REQUIRED</prop>
+                <prop key="remove*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="resetDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="save*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="set*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>                    
+            </props>
+        </property>
+    </bean>
+</beans>
+
